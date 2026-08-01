@@ -126,5 +126,7 @@ export async function generateWalletPass(user: WalletPassUser): Promise<Buffer> 
 
   // ── Sign & pack ────────────────────────────────────────────────────
   const pass = new PKPass(buffers, { wwdr, signerCert, signerKey });
-  return pass.getAsBuffer();
+  // getAsBuffer() may be sync or async depending on passkit-generator version
+  const buf = pass.getAsBuffer();
+  return buf instanceof Promise ? await buf : buf;
 }

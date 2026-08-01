@@ -52,6 +52,7 @@ employeeRouter.post("/me/regenerate-code", requireAuth, async (req, res) => {
       width: 320,
       margin: 2,
       color: { dark: "#2B273F", light: "#FFFFFF" },
+      errorCorrectionLevel: "H",
     });
     res.json({ employeeCode: code, qrCode });
   } catch {
