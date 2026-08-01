@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, UserCheck, FolderKanban,
   FileText, Settings, Menu, X, Bell, LogOut,
   ChevronDown, TrendingUp, FileEdit, User,
-  Building2, Target, ChevronRight, FileSignature, CreditCard,
+  Building2, Target, ChevronRight, FileSignature, CreditCard, MessageSquare,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
@@ -12,6 +12,7 @@ import { authApi, usersApi } from "../api/client";
 import type { Notification } from "../types";
 import OfoqLogo from "../components/OfoqLogo";
 import { useLang } from "../i18n/LangContext";
+import NotificationPermissionModal from "../components/NotificationPermissionModal";
 
 interface NavItem {
   href?: string;
@@ -118,6 +119,7 @@ export default function AdminLayout() {
     { href: "/admin/users",         label: t.admin.users,      icon: Users },
     { href: "/admin/cms",           label: t.admin.cms,        icon: FileEdit },
     { href: "/admin/settings",      label: t.admin.settings,   icon: Settings },
+    { href: "/admin/contact",       label: "الاستشارات",        icon: MessageSquare },
     { href: "/admin/employee/card", label: t.admin.myCard,     icon: CreditCard },
   ];
 
@@ -149,6 +151,7 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen flex bg-gray-50" dir="rtl">
+      <NotificationPermissionModal />
       {/* ── Sidebar ─────────────────────── */}
       {/* Mobile overlay */}
       <AnimatePresence>

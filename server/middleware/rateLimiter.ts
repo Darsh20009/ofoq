@@ -1,10 +1,10 @@
 import rateLimit from "express-rate-limit";
 
 // Global limiter — applies to /api/* only
-// 1000 req per 15 min per IP — كافٍ لآلاف الاستخدامات اليومية
+// 3000 req per 15 min per IP — covers heavy admin dashboard polling
 export const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 1000,
+  max: 3000,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "طلبات كثيرة جداً، يُرجى الانتظار قليلاً" },

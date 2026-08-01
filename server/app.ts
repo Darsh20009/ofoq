@@ -111,12 +111,16 @@ app.use(passport.initialize() as any);
 app.use(globalLimiter as any);
 
 // ── Static Files ─────────────────────────────────────────────────
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
-// Serve public/ at both /public/ prefix AND root so robots.txt, sitemap.xml,
-// manifest.json, icons etc. are accessible at their canonical paths.
+// uploads: no-cache (user content changes)
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads"), {
+  maxAge: 0,
+  setHeaders: (res) => res.setHeader("Cache-Control", "no-cache"),
+}));
+// public (icons, images, manifest): long-lived cache — 30 days
 const publicDir = path.join(process.cwd(), "public");
-app.use(express.static(publicDir));
-app.use("/public", express.static(publicDir));
+const PUBLIC_CACHE = { maxAge: "30d", immutable: false } as const;
+app.use(express.static(publicDir, PUBLIC_CACHE));
+app.use("/public", express.static(publicDir, PUBLIC_CACHE));
 
 // ── Routes ───────────────────────────────────────────────────────
 registerRoutes(app);

@@ -188,6 +188,7 @@ export default function App() {
           <Route path="contracts" element={<ContractsPage />} />
           <Route path="employee/card" element={<EmployeeCardPage />} />
           <Route path="employee/dashboard" element={<EmployeeDashboardPage />} />
+          <Route path="contact" element={<div className="card p-8 text-center text-gray-400">صفحة الاستشارات قيد الإنشاء — Task #9</div>} />
         </Route>
 
         {/* ── Fallback ─────────────────────────────── */}

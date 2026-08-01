@@ -1,15 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- خلفية كحلية بزوايا دائرية -->
-  <rect width="64" height="64" rx="12" fill="#1B3A5C"/>
-
-  <!-- حرف O — مستطيل أبيض مجوف (الإطار) -->
-  <rect x="8" y="8" width="22" height="34" rx="5" fill="none" stroke="#FFFFFF" stroke-width="4"/>
-
-  <!-- حرف F — أحمر، يبدأ من منتصف اليمين -->
-  <text x="36" y="32" font-family="Arial Black, Arial, sans-serif"
-        font-size="26" font-weight="900" fill="#E63329">F</text>
-
-  <!-- حرفا Q — مربعان صغيران بيضاء في الأسفل -->
-  <rect x="8"  y="48" width="10" height="10" rx="3" fill="none" stroke="#FFFFFF" stroke-width="3"/>
-  <rect x="22" y="48" width="10" height="10" rx="3" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none'>
+  <rect x='3' y='3' width='22' height='34' rx='5' stroke='white' stroke-width='4.5' fill='none'/>
+  <line x1='30' y1='4'  x2='30' y2='36' stroke='#C13229' stroke-width='5' stroke-linecap='square'/>
+  <line x1='30' y1='4'  x2='55' y2='4'  stroke='#C13229' stroke-width='5' stroke-linecap='square'/>
+  <line x1='30' y1='19' x2='50' y2='19' stroke='#C13229' stroke-width='5' stroke-linecap='square'/>
+  <rect x='3'  y='44' width='13' height='17' rx='3' stroke='white' stroke-width='3.5' fill='none'/>
+  <rect x='19' y='44' width='13' height='17' rx='3' stroke='white' stroke-width='3.5' fill='none'/>
+  <rect x='25.5' y='56' width='3' height='9' rx='1.5' fill='#C13229' transform='rotate(-45 27 60.5)'/>
 </svg>

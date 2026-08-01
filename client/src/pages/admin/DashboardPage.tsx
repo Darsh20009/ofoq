@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   TrendingUp, Users, FolderKanban, FileText,
   DollarSign, AlertTriangle, ArrowUpRight, ArrowDownRight,
-  Target, CheckCircle2, Clock, Zap,
+  Target, CheckCircle2, Clock, Zap, MessageSquare,
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -10,24 +10,26 @@ import {
 } from "recharts";
 import { motion } from "framer-motion";
 import { analyticsApi } from "../../api/client";
-import type { DashboardStats } from "../../types";
 import { useAuthStore } from "../../store/authStore";
+import { Link } from "react-router-dom";
 
-const COLORS = ["#C13229", "#1C2B6E", "#E5FE04", "#5774C8", "#F97316"];
+const COLORS = ["#C13229", "#1C2B6E", "#E5FE04", "#33B27C", "#F97316", "#8B5CF6"];
+
+const ARABIC_MONTHS = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
 
 function StatCard({
-  title, value, sub, icon: Icon, color, trend, delay = 0,
+  title, value, sub, icon: Icon, color, trend, delay = 0, href,
 }: {
   title: string; value: string | number; sub?: string;
   icon: React.ComponentType<{ size?: number; className?: string }>;
-  color: string; trend?: { value: number; up: boolean }; delay?: number;
+  color: string; trend?: { value: number; up: boolean }; delay?: number; href?: string;
 }) {
-  return (
+  const inner = (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.4 }}
-      className="card flex items-center gap-4"
+      className="card flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow"
     >
       <div className={`stat-icon ${color}`}>
         <Icon size={22} className="text-white" />
@@ -45,45 +47,82 @@ function StatCard({
       )}
     </motion.div>
   );
+  return href ? <Link to={href}>{inner}</Link> : inner;
 }
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
+
   const { data: overview, isLoading } = useQuery({
     queryKey: ["dashboard-overview"],
-    queryFn: () => analyticsApi.overview().then((r) => r.data.data),
-  });
-  const { data: revenue } = useQuery({
-    queryKey: ["dashboard-revenue"],
-    queryFn: () => analyticsApi.revenue({ months: 6 }).then((r) => r.data.data),
-  });
-  const { data: funnel } = useQuery({
-    queryKey: ["dashboard-funnel"],
-    queryFn: () => analyticsApi.leadsFunnel().then((r) => r.data.data),
-  });
-  const { data: byStage } = useQuery({
-    queryKey: ["dashboard-stages"],
-    queryFn: () => analyticsApi.projectsByStage().then((r) => r.data.data),
+    queryFn: () => analyticsApi.overview().then((r) => r.data),
+    staleTime: 2 * 60 * 1000,   // 2 min cache
+    refetchInterval: 5 * 60 * 1000, // refresh every 5 min
   });
 
-  const stats: DashboardStats | null = overview?.stats || null;
+  const { data: revenueRaw } = useQuery({
+    queryKey: ["dashboard-revenue"],
+    queryFn: () => analyticsApi.revenue({ period: 6 }).then((r) => r.data.revenue || []),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: funnelRaw } = useQuery({
+    queryKey: ["dashboard-funnel"],
+    queryFn: () => analyticsApi.leadsFunnel().then((r) => r.data.funnel || []),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: stagesRaw } = useQuery({
+    queryKey: ["dashboard-stages"],
+    queryFn: () => analyticsApi.projectsByStage().then((r) => r.data.stages || []),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // ── Transform server responses to chart-friendly shapes ───────────
+  const revenueChartData = (revenueRaw || []).map((r: { _id: { year: number; month: number }; total: number }) => ({
+    month: ARABIC_MONTHS[(r._id?.month ?? 1) - 1],
+    revenue: r.total || 0,
+  }));
+
+  const funnelChartData = (funnelRaw || []).map((f: { _id: string; count: number }) => ({
+    stage: f._id || "—",
+    count: f.count || 0,
+  }));
+
+  const stagesData = (stagesRaw || []).map((s: { _id: string; count: number }) => ({
+    stage: s._id || "—",
+    count: s.count || 0,
+  }));
+
+  // ── Data from overview ─────────────────────────────────────────────
+  const leads     = overview?.leads     || {};
+  const customers = overview?.customers || {};
+  const projects  = overview?.projects  || {};
+  const revenue   = overview?.revenue   || {};
+  const tasks     = overview?.tasks     || {};
+  const team      = overview?.team      || {};
+  const recentLeads    = overview?.recentLeads    || [];
+  const recentProjects = overview?.recentProjects || [];
+  const insights       = overview?.insights       || [];
+
+  const wonRate = leads.total ? Math.round((leads.won / leads.total) * 100) : 0;
 
   const greetingHour = new Date().getHours();
   const greeting =
     greetingHour < 12 ? "صباح الخير" : greetingHour < 17 ? "مساء الخير" : "مساء النور";
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div>
         <h1 className="page-title">
-          {greeting}، {user?.name?.split(" ")[0]}
+          {greeting}، {user?.name?.split(" ")[0]} 👋
         </h1>
         <p className="page-subtitle">إليك ملخص أداء منظومة أفق اليوم</p>
       </div>
 
       {/* AI Insight Banner */}
-      {overview?.insights && (
+      {insights?.summary && (
         <motion.div
           initial={{ opacity: 0, x: -16 }}
           animate={{ opacity: 1, x: 0 }}
@@ -94,8 +133,8 @@ export default function DashboardPage() {
           </div>
           <div>
             <p className="text-ofoq-yellow text-xs font-semibold mb-1">رؤية ذكية</p>
-            <p className="text-white text-sm leading-relaxed">{overview.insights.summary}</p>
-            {overview.insights.actions?.slice(0, 2).map((a: string, i: number) => (
+            <p className="text-white text-sm leading-relaxed">{insights.summary}</p>
+            {insights.actions?.slice(0, 2).map((a: string, i: number) => (
               <p key={i} className="text-white/60 text-xs mt-1">• {a}</p>
             ))}
           </div>
@@ -115,30 +154,40 @@ export default function DashboardPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard title="إجمالي المستخدمين" value={stats?.users.total || 0}
-            sub={`${stats?.users.new || 0} جديد هذا الشهر`}
-            icon={Users} color="bg-ofoq-navy" trend={{ value: 12, up: true }} delay={0} />
-          <StatCard title="الفرص التجارية" value={stats?.leads.total || 0}
-            sub={`معدل الإغلاق ${stats?.leads.wonRate || 0}%`}
-             icon={Target} color="bg-ofoq-red" trend={{ value: 8, up: true }} delay={0.05} />
-          <StatCard title="العملاء النشطون" value={stats?.customers.active || 0}
-            sub={`من أصل ${stats?.customers.total || 0} عميل`}
+          <StatCard href="/admin/users"
+            title="فريق العمل" value={team.total || 0}
+            sub="المستخدمون النشطون"
+            icon={Users} color="bg-ofoq-navy" delay={0} />
+          <StatCard href="/admin/crm/leads"
+            title="الفرص التجارية" value={leads.total || 0}
+            sub={`${leads.thisMonth || 0} جديدة هذا الشهر — معدل الإغلاق ${wonRate}%`}
+            icon={Target} color="bg-ofoq-red"
+            trend={wonRate ? { value: wonRate, up: wonRate > 20 } : undefined} delay={0.05} />
+          <StatCard href="/admin/crm/customers"
+            title="العملاء النشطون" value={customers.active || 0}
+            sub={`من أصل ${customers.total || 0} عميل — ${customers.newThisMonth || 0} جديد`}
             icon={CheckCircle2} color="bg-indigo-500" delay={0.1} />
-          <StatCard title="المشاريع الجارية" value={stats?.projects.active || 0}
-            sub={stats?.projects.overdue ? `${stats.projects.overdue} متأخرة` : "لا يوجد تأخير"}
+          <StatCard href="/admin/projects"
+            title="المشاريع الجارية" value={projects.active || 0}
+            sub={tasks.overdue ? `⚠️ ${tasks.overdue} مهمة متأخرة` : `${projects.completed || 0} مكتمل`}
             icon={FolderKanban} color="bg-orange-500"
-            trend={stats?.projects.overdue ? { value: stats.projects.overdue, up: false } : undefined}
-            delay={0.15} />
-          <StatCard title="إيرادات الشهر" value={`${(stats?.revenue.month || 0).toLocaleString("ar")} ر.س`}
-             icon={DollarSign} color="bg-ofoq-red" trend={{ value: 15, up: true }} delay={0.2} />
-          <StatCard title="الفواتير المعلقة" value={stats?.invoices.pending || 0}
-            sub={`${(stats?.invoices.overdue || 0)} متأخرة`}
-            icon={Clock} color="bg-yellow-500" delay={0.25} />
-          <StatCard title="إجمالي الإيرادات" value={`${(stats?.invoices.revenue || 0).toLocaleString("ar")} ر.س`}
-            icon={TrendingUp} color="bg-purple-500" trend={{ value: 22, up: true }} delay={0.3} />
-          <StatCard title="الفواتير المتأخرة" value={stats?.invoices.overdue || 0}
-            icon={AlertTriangle} color="bg-red-500"
-            trend={stats?.invoices.overdue ? { value: 3, up: false } : undefined} delay={0.35} />
+            trend={tasks.overdue ? { value: tasks.overdue, up: false } : undefined} delay={0.15} />
+          <StatCard href="/admin/invoices"
+            title="إيرادات هذا الشهر" value={`${(revenue.thisMonth || 0).toLocaleString("ar")} ر.س`}
+            sub="الفواتير المدفوعة"
+            icon={DollarSign} color="bg-ofoq-red" delay={0.2} />
+          <StatCard href="/admin/invoices"
+            title="إجمالي الإيرادات" value={`${(revenue.total || 0).toLocaleString("ar")} ر.س`}
+            sub="جميع الفواتير المدفوعة"
+            icon={TrendingUp} color="bg-purple-500" delay={0.25} />
+          <StatCard href="/admin/projects"
+            title="إجمالي المشاريع" value={projects.total || 0}
+            sub={`${projects.completed || 0} مكتمل`}
+            icon={FileText} color="bg-teal-500" delay={0.3} />
+          <StatCard href="/admin/contact"
+            title="طلبات التواصل" value="—"
+            sub="اضغط لعرض الاستشارات"
+            icon={MessageSquare} color="bg-yellow-500" delay={0.35} />
         </div>
       )}
 
@@ -155,25 +204,34 @@ export default function DashboardPage() {
               <p className="text-xs text-gray-400 mt-0.5">آخر 6 أشهر</p>
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={revenue?.monthly || []}>
-              <defs>
-                <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
-                   <stop offset="5%" stopColor="#E5322A" stopOpacity={0.2} />
-                   <stop offset="95%" stopColor="#E5322A" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fontFamily: "Cairo" }} />
-              <YAxis tick={{ fontSize: 11 }} />
-              <Tooltip
-                contentStyle={{ fontFamily: "Cairo", fontSize: 12, borderRadius: 12, border: "none", boxShadow: "0 4px 24px rgba(0,0,0,0.1)" }}
-                formatter={(v: number) => [`${v.toLocaleString("ar")} ر.س`, "الإيرادات"]}
-              />
-               <Area type="monotone" dataKey="revenue" stroke="#E5322A" strokeWidth={2.5}
-                 fill="url(#rev)" dot={{ fill: "#E5322A", r: 4 }} activeDot={{ r: 6 }} />
-            </AreaChart>
-          </ResponsiveContainer>
+          {revenueChartData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={220}>
+              <AreaChart data={revenueChartData}>
+                <defs>
+                  <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%"  stopColor="#C13229" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#C13229" stopOpacity={0}   />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
+                <Tooltip
+                  contentStyle={{ fontFamily: "Cairo", fontSize: 12, borderRadius: 12, border: "none", boxShadow: "0 4px 24px rgba(0,0,0,0.1)" }}
+                  formatter={(v: number) => [`${v.toLocaleString("ar")} ر.س`, "الإيرادات"]}
+                />
+                <Area type="monotone" dataKey="revenue" stroke="#C13229" strokeWidth={2.5}
+                  fill="url(#rev)" dot={{ fill: "#C13229", r: 4 }} activeDot={{ r: 6 }} />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-[220px] flex items-center justify-center text-gray-400 text-sm">
+              <div className="text-center">
+                <TrendingUp size={32} className="mx-auto mb-2 text-gray-300" />
+                <p>لا توجد إيرادات مسجّلة بعد</p>
+              </div>
+            </div>
+          )}
         </motion.div>
 
         {/* Pipeline funnel */}
@@ -181,62 +239,136 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45 }} className="card"
         >
-          <h3 className="font-bold text-navy-700 mb-6">توزيع الفرص</h3>
-          <ResponsiveContainer width="100%" height={180}>
-            <PieChart>
-              <Pie data={funnel?.stages || [{ name: "جاري التحميل", value: 1 }]}
-                cx="50%" cy="50%" innerRadius={50} outerRadius={80}
-                dataKey="count" nameKey="stage" paddingAngle={3}
-              >
-                {(funnel?.stages || []).map((_: unknown, i: number) => (
-                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+          <h3 className="font-bold text-navy-700 mb-4">توزيع الفرص</h3>
+          {funnelChartData.length > 0 ? (
+            <>
+              <ResponsiveContainer width="100%" height={160}>
+                <PieChart>
+                  <Pie data={funnelChartData}
+                    cx="50%" cy="50%" innerRadius={45} outerRadius={72}
+                    dataKey="count" nameKey="stage" paddingAngle={3}
+                  >
+                    {funnelChartData.map((_: unknown, i: number) => (
+                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{ fontFamily: "Cairo", fontSize: 12, borderRadius: 12 }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="space-y-1.5 mt-2">
+                {funnelChartData.slice(0, 5).map((s: { stage: string; count: number }, i: number) => (
+                  <div key={i} className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
+                      <span className="text-gray-600 truncate">{s.stage}</span>
+                    </div>
+                    <span className="font-semibold text-navy-700">{s.count}</span>
+                  </div>
                 ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{ fontFamily: "Cairo", fontSize: 12, borderRadius: 12 }}
-                formatter={(v: number, n: string) => [v, n]}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="space-y-2 mt-2">
-            {(funnel?.stages || []).slice(0, 4).map((s: { stage: string; count: number }, i: number) => (
-              <div key={i} className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
-                  <span className="text-gray-600">{s.stage}</span>
-                </div>
-                <span className="font-semibold text-navy-700">{s.count}</span>
               </div>
-            ))}
-          </div>
+            </>
+          ) : (
+            <div className="h-[220px] flex items-center justify-center text-gray-400 text-sm text-center">
+              <div>
+                <Target size={32} className="mx-auto mb-2 text-gray-300" />
+                <p>لا توجد فرص بعد</p>
+              </div>
+            </div>
+          )}
         </motion.div>
       </div>
 
       {/* Projects by stage */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }} className="card"
-      >
-        <h3 className="font-bold text-navy-700 mb-6">مراحل المشاريع</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
-          {(byStage?.stages || [
-            { stage: "طلب", count: 0 }, { stage: "مراجعة", count: 0 },
-            { stage: "عرض سعر", count: 0 }, { stage: "عقد", count: 0 },
-            { stage: "دفع", count: 0 }, { stage: "تنفيذ", count: 0 },
-            { stage: "إغلاق", count: 0 },
-          ]).map((s: { stage: string; count: number }, i: number) => (
-            <div key={i} className="text-center p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
-              <div
-                className="w-10 h-10 rounded-full mx-auto flex items-center justify-center mb-2 font-bold text-white text-sm"
-                style={{ background: COLORS[i % COLORS.length] }}
-              >
-                {s.count}
+      {stagesData.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="card">
+          <h3 className="font-bold text-navy-700 mb-4">مراحل المشاريع</h3>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-3">
+            {stagesData.map((s: { stage: string; count: number }, i: number) => (
+              <div key={i} className="text-center p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                <div className="w-10 h-10 rounded-full mx-auto flex items-center justify-center mb-2 font-bold text-white text-sm"
+                  style={{ background: COLORS[i % COLORS.length] }}>
+                  {s.count}
+                </div>
+                <p className="text-xs text-gray-600 font-medium">{s.stage}</p>
               </div>
-              <p className="text-xs text-gray-600 font-medium">{s.stage}</p>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Recent activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent leads */}
+        {recentLeads.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }} className="card">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-navy-700">آخر الفرص التجارية</h3>
+              <Link to="/admin/crm/leads" className="text-xs text-ofoq-green hover:underline">عرض الكل</Link>
             </div>
-          ))}
-        </div>
-      </motion.div>
+            <div className="space-y-3">
+              {recentLeads.slice(0, 4).map((lead: any, i: number) => (
+                <div key={i} className="flex items-center gap-3 text-sm">
+                  <div className="w-8 h-8 rounded-full bg-ofoq-red/10 flex items-center justify-center flex-shrink-0">
+                    <Target size={14} className="text-ofoq-red" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-navy-700 truncate">{lead.name || lead.companyName || "—"}</p>
+                    <p className="text-xs text-gray-400">{lead.status}</p>
+                  </div>
+                  <span className="text-xs text-gray-400">
+                    {new Date(lead.createdAt).toLocaleDateString("ar-SA")}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Recent projects */}
+        {recentProjects.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="card">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-navy-700">المشاريع الجارية</h3>
+              <Link to="/admin/projects" className="text-xs text-ofoq-green hover:underline">عرض الكل</Link>
+            </div>
+            <div className="space-y-3">
+              {recentProjects.slice(0, 4).map((proj: any, i: number) => (
+                <div key={i} className="flex items-center gap-3 text-sm">
+                  <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                    <FolderKanban size={14} className="text-indigo-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-navy-700 truncate">{proj.name || "—"}</p>
+                    <p className="text-xs text-gray-400">{proj.stage || proj.status}</p>
+                  </div>
+                  <div className="w-16">
+                    <div className="h-1.5 bg-gray-100 rounded-full">
+                      <div className="h-full bg-ofoq-green rounded-full" style={{ width: `${proj.progress || 0}%` }} />
+                    </div>
+                    <p className="text-[10px] text-gray-400 text-center mt-0.5">{proj.progress || 0}%</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Tasks overdue alert */}
+      {tasks.overdue > 0 && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}
+          className="card border border-red-100 bg-red-50 flex items-center gap-4">
+          <AlertTriangle size={20} className="text-red-500 flex-shrink-0" />
+          <p className="text-sm text-red-700 flex-1">
+            <strong>{tasks.overdue}</strong> مهمة متأخرة تحتاج إلى متابعة فورية
+          </p>
+          <Link to="/admin/projects" className="text-xs font-semibold text-red-600 hover:underline flex-shrink-0">
+            عرض المهام
+          </Link>
+        </motion.div>
+      )}
     </div>
   );
 }

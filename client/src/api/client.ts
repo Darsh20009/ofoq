@@ -123,10 +123,10 @@ export const invoicesApi = {
 
 /* ── Analytics ─────────────────────────────── */
 export const analyticsApi = {
-  overview: () => api.get("/analytics/overview"),
+  overview: () => api.get("/analytics/dashboard"),          // fixed: was /overview
   revenue: (params?: object) => api.get("/analytics/revenue", { params }),
   leadsFunnel: () => api.get("/analytics/leads-funnel"),
-  projectsByStage: () => api.get("/analytics/projects-by-stage"),
+  projectsByStage: () => api.get("/analytics/projects-stages"), // fixed: was projects-by-stage
 };
 
 /* ── CMS ───────────────────────────────────── */
