@@ -294,7 +294,20 @@ authRouter.post("/reset-password", async (req, res) => {
 
 // ── Get Current User ─────────────────────────────────────────────
 authRouter.get("/me", requireAuth, async (req, res) => {
-  res.json({ user: (req as any).user });
+  const u = (req as any).user;
+  // Normalize fullName → name for consistent client-side User type
+  res.json({
+    user: {
+      id: u._id,
+      name: u.fullName || u.name,
+      email: u.email,
+      role: u.role,
+      avatar: u.avatar,
+      department: u.department,
+      position: u.position,
+      employeeId: u.employeeId,
+    },
+  });
 });
 
 // ── Logout ────────────────────────────────────────────────────────
