@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import {
@@ -6,6 +7,26 @@ import {
   TrendingUp, BarChart3, CheckCircle, ChevronLeft, Star,
   FileCheck, MessageSquare, Handshake, Sparkles,
 } from "lucide-react";
+import { useAuthStore } from "../../store/authStore";
+import { authApi } from "../../api/client";
+
+function GoogleIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 48 48" style={{ display: "inline-block", verticalAlign: "middle" }}>
+      <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/>
+      <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4c-7.4 0-13.8 4.1-17.1 10.1z"/>
+      <path fill="#4CAF50" d="M24 44c5.5 0 10.4-2.1 14.1-5.5l-6.5-5.5C29.5 34.7 26.9 36 24 36c-5.2 0-9.6-3.3-11.2-8l-6.6 5.1C9.9 39.6 16.4 44 24 44z"/>
+      <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.6l6.5 5.5c-.5.4 7.4-5.4 7.4-16.6 0-1.3-.1-2.7-.4-3.5z"/>
+    </svg>
+  );
+}
+function AppleIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style={{ display: "inline-block", verticalAlign: "middle" }}>
+      <path d="M16.365 1.43c0 1.14-.415 2.19-1.24 3.14-.995 1.14-2.196 1.8-3.5 1.7-.04-1.1.44-2.24 1.24-3.15.99-1.15 2.28-1.83 3.5-1.69zM20.6 17.3c-.55 1.27-.82 1.84-1.53 2.96-.99 1.56-2.39 3.5-4.12 3.51-1.54.02-1.93-1-4.02-.99-2.08.01-2.52 1.01-4.06.99-1.73-.02-3.06-1.77-4.05-3.33C.5 17.32-.35 13 1.09 9.99c.79-1.68 2.2-2.75 3.73-2.77 1.5-.02 2.92 1 3.83 1s2.62-1.23 4.42-1.05c.75.03 2.87.3 4.23 2.28-.11.07-2.53 1.48-2.5 4.4.03 3.5 3.07 4.66 3.1 4.68 0 0-.24 0 0 0"/>
+    </svg>
+  );
+}
 
 const fadeUp = {
   hidden:  { opacity: 0, y: 28 },
@@ -177,6 +198,13 @@ const STEPS = [
 const PARTNERS = ["Saudi Aramco", "STC", "SABIC", "Riyad Bank", "Vision 2030", "NEOM"];
 
 export default function HomePage() {
+  const { isAuthenticated } = useAuthStore();
+  const [oauth, setOauth] = useState<{ google: boolean; apple: boolean }>({ google: false, apple: false });
+
+  useEffect(() => {
+    authApi.oauthStatus().then((r) => setOauth(r.data)).catch(() => {});
+  }, []);
+
   return (
     <div className="overflow-hidden">
       <Helmet>
@@ -227,6 +255,28 @@ export default function HomePage() {
                 استكشف خدماتنا
               </Link>
             </motion.div>
+
+            {/* OAuth quick sign-in — only when not logged in */}
+            {!isAuthenticated && (oauth.google || oauth.apple) && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
+                className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mt-5">
+                <span className="text-white/35 text-xs whitespace-nowrap">أو سجّل بـ</span>
+                <div className="flex items-center gap-2.5">
+                  {oauth.google && (
+                    <a href="/api/auth/google"
+                      className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm text-white text-sm font-medium px-4 py-2 rounded-xl transition-all">
+                      <GoogleIcon /> Google
+                    </a>
+                  )}
+                  {oauth.apple && (
+                    <a href="/api/auth/apple"
+                      className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm text-white text-sm font-medium px-4 py-2 rounded-xl transition-all">
+                      <AppleIcon /> Apple
+                    </a>
+                  )}
+                </div>
+              </motion.div>
+            )}
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
               className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-8">
@@ -547,6 +597,25 @@ export default function HomePage() {
                 تواصل معنا
               </Link>
             </div>
+
+            {/* OAuth quick sign-in — bottom CTA */}
+            {!isAuthenticated && (oauth.google || oauth.apple) && (
+              <div className="flex items-center justify-center gap-3 mt-6">
+                <span className="text-white/35 text-xs">أو سجّل دخولك مباشرة بـ</span>
+                {oauth.google && (
+                  <a href="/api/auth/google"
+                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm text-white text-sm font-medium px-4 py-2 rounded-xl transition-all">
+                    <GoogleIcon /> Google
+                  </a>
+                )}
+                {oauth.apple && (
+                  <a href="/api/auth/apple"
+                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm text-white text-sm font-medium px-4 py-2 rounded-xl transition-all">
+                    <AppleIcon /> Apple
+                  </a>
+                )}
+              </div>
+            )}
           </motion.div>
         </div>
       </section>
