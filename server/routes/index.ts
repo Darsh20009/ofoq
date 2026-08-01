@@ -13,6 +13,7 @@ import { contractsRouter } from "./contracts.routes.js";
 import { oauthRouter } from "./oauth.routes.js";
 import { webauthnRouter } from "./webauthn.routes.js";
 import { employeeRouter } from "./employee.routes.js";
+import { clientRouter } from "./client.routes.js";
 
 export function registerRoutes(app: Express): void {
   const API = "/api";
@@ -54,6 +55,9 @@ export function registerRoutes(app: Express): void {
 
   // ── Employee Card & Barcode ────────────────────────────────────
   app.use(`${API}/employee`, employeeRouter);
+
+  // ── Client Portal & Service Requests ─────────────────────────
+  app.use(`${API}/client`, clientRouter);
 
   // ── Health Check ─────────────────────────────────────────────
   app.get(`${API}/health`, (_req, res) => {

@@ -8,9 +8,19 @@ import { useSubdomain } from "./hooks/useSubdomain";
 import PublicLayout from "./layouts/PublicLayout";
 import AdminLayout from "./layouts/AdminLayout";
 import EmployeeLayout from "./layouts/EmployeeLayout";
+import ClientLayout from "./layouts/ClientLayout";
 
 // Employee Portal
 import EmployeePortalLoginPage from "./pages/employee/EmployeePortalLoginPage";
+
+// Client Portal
+import ClientLoginPage from "./pages/client/ClientLoginPage";
+import ClientRegisterPage from "./pages/client/ClientRegisterPage";
+import ClientDashboardPage from "./pages/client/ClientDashboardPage";
+import RequestsListPage from "./pages/client/RequestsListPage";
+import RequestDetailsPage from "./pages/client/RequestDetailsPage";
+import ServiceRequestPage from "./pages/client/ServiceRequestPage";
+import SupportPage from "./pages/client/SupportPage";
 
 // Public Pages
 import HomePage from "./pages/public/HomePage";
@@ -61,6 +71,20 @@ function RequireEmployeeAuth({ children }: { children: JSX.Element }) {
 function RequireEmployeeGuest({ children }: { children: JSX.Element }) {
   const { isAuthenticated } = useAuthStore();
   return isAuthenticated ? <Navigate to="/" replace /> : children;
+}
+
+/* ── Client Portal Guards ─────────────────────────────────────────── */
+function RequireClientAuth({ children }: { children: JSX.Element }) {
+  const { isAuthenticated, user } = useAuthStore();
+  if (!isAuthenticated) return <Navigate to="/client/login" replace />;
+  // Allow clients and admins (admins can preview the portal)
+  return children;
+}
+
+function RequireClientGuest({ children }: { children: JSX.Element }) {
+  const { isAuthenticated, user } = useAuthStore();
+  if (isAuthenticated && user?.role === "client") return <Navigate to="/client/dashboard" replace />;
+  return children;
 }
 
 export default function App() {
@@ -193,6 +217,41 @@ export default function App() {
           <Route path="employee/card" element={<EmployeeCardPage />} />
           <Route path="employee/dashboard" element={<EmployeeDashboardPage />} />
           <Route path="contact" element={<div className="card p-8 text-center text-gray-400">صفحة الاستشارات قيد الإنشاء — Task #9</div>} />
+        </Route>
+
+        {/* ── بوابة العملاء — تسجيل دخول/إنشاء حساب ──── */}
+        <Route
+          path="/client/login"
+          element={
+            <RequireClientGuest>
+              <ClientLoginPage />
+            </RequireClientGuest>
+          }
+        />
+        <Route
+          path="/client/register"
+          element={
+            <RequireClientGuest>
+              <ClientRegisterPage />
+            </RequireClientGuest>
+          }
+        />
+
+        {/* ── بوابة العملاء — صفحات محمية ────────────── */}
+        <Route
+          path="/client"
+          element={
+            <RequireClientAuth>
+              <ClientLayout />
+            </RequireClientAuth>
+          }
+        >
+          <Route index element={<Navigate to="/client/dashboard" replace />} />
+          <Route path="dashboard" element={<ClientDashboardPage />} />
+          <Route path="requests" element={<RequestsListPage />} />
+          <Route path="requests/new" element={<ServiceRequestPage />} />
+          <Route path="requests/:id" element={<RequestDetailsPage />} />
+          <Route path="support" element={<SupportPage />} />
         </Route>
 
         {/* ── Fallback ─────────────────────────────── */}

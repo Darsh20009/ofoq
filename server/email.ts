@@ -449,3 +449,117 @@ export async function sendDirectEmail(
   });
   return sendMail(to, name, subject, html);
 }
+
+// ── Service Request Emails ───────────────────────────────────────
+
+/** Notify admin at Info@ofooq.com about a new service request */
+export async function sendServiceRequestAdminNotify(opts: {
+  requestId: string;
+  companyName: string;
+  serviceLabel: string;
+  contactEmail: string;
+  contactPhone: string;
+  additionalNotes?: string;
+}): Promise<boolean> {
+  const cfg = getConfig();
+  const html = baseTemplate({
+    title: "طلب خدمة جديد",
+    preheader: `طلب خدمة جديد من ${opts.companyName}`,
+    heading: "📋 طلب خدمة جديد",
+    bodyHtml: `
+      ${p(`وردنا طلب خدمة جديد من منصة العملاء. يُرجى المراجعة والتواصل مع العميل في أقرب وقت.`)}
+      ${infoBox([
+        { label: "اسم الشركة",     value: opts.companyName },
+        { label: "نوع الخدمة",      value: opts.serviceLabel },
+        { label: "بريد التواصل",    value: opts.contactEmail },
+        { label: "هاتف التواصل",    value: opts.contactPhone },
+        ...(opts.additionalNotes ? [{ label: "ملاحظات", value: opts.additionalNotes }] : []),
+        { label: "رقم الطلب",       value: opts.requestId },
+      ])}
+      ${button("عرض الطلب في لوحة الإدارة", `${cfg.siteUrl}/admin/service-requests/${opts.requestId}`)}
+    `,
+  });
+  return sendMail("Info@ofooq.com", "فريق أفق", "طلب خدمة جديد - أفق لحلول الأعمال", html);
+}
+
+/** Confirm to client that their request was received */
+export async function sendServiceRequestClientConfirm(opts: {
+  toEmail: string;
+  clientName: string;
+  requestId: string;
+  companyName: string;
+  serviceLabel: string;
+}): Promise<boolean> {
+  const cfg = getConfig();
+  const html = baseTemplate({
+    title: "تأكيد استلام طلبك",
+    preheader: `تم استلام طلبك بنجاح — ${opts.serviceLabel}`,
+    heading: "✅ تم استلام طلبك بنجاح",
+    bodyHtml: `
+      ${p(`مرحباً ${accent(opts.clientName)}،`)}
+      ${p(`شكراً لثقتك بـ<strong>أفق لحلول الأعمال</strong>. تلقّينا طلبك وسيتواصل معك فريقنا خلال 24–48 ساعة عمل.`)}
+      ${infoBox([
+        { label: "اسم الشركة",  value: opts.companyName },
+        { label: "الخدمة المطلوبة", value: opts.serviceLabel },
+        { label: "رقم الطلب",  value: opts.requestId },
+      ])}
+      ${p(`يمكنك متابعة حالة طلبك في أي وقت من خلال بوابة العملاء.`)}
+      ${button("متابعة طلبي", `${cfg.siteUrl}/client/requests/${opts.requestId}`)}
+      ${p(`للاستفسار يمكنك التواصل معنا عبر: <a href="mailto:Info@ofooq.com" style="color:${COLORS.green}">Info@ofooq.com</a>`)}
+    `,
+  });
+  return sendMail(opts.toEmail, opts.clientName, "تأكيد استلام طلبك - أفق لحلول الأعمال", html);
+}
+
+/** Notify client when their request status changes */
+export async function sendServiceRequestStageUpdate(opts: {
+  toEmail: string;
+  requestId: string;
+  companyName: string;
+  prevStatusAr: string;
+  newStatusAr: string;
+  adminNote?: string;
+}): Promise<boolean> {
+  const cfg = getConfig();
+  const html = baseTemplate({
+    title: "تحديث حالة طلبك",
+    preheader: `حالة طلبك تغيّرت إلى: ${opts.newStatusAr}`,
+    heading: "🔄 تحديث على حالة طلبك",
+    bodyHtml: `
+      ${p(`مرحباً،`)}
+      ${p(`تم تحديث حالة طلبك المقدّم من شركة <strong>${opts.companyName}</strong>.`)}
+      ${infoBox([
+        { label: "الحالة السابقة", value: opts.prevStatusAr },
+        { label: "الحالة الجديدة", value: `<strong style="color:${COLORS.green}">${opts.newStatusAr}</strong>` },
+        { label: "رقم الطلب",      value: opts.requestId },
+        ...(opts.adminNote ? [{ label: "ملاحظة من الفريق", value: opts.adminNote }] : []),
+      ])}
+      ${button("عرض تفاصيل طلبي", `${cfg.siteUrl}/client/requests/${opts.requestId}`)}
+    `,
+  });
+  return sendMail(opts.toEmail, "العميل", `تحديث طلبك — ${opts.newStatusAr} | أفق`, html);
+}
+
+/** Notify client when admin replies on support */
+export async function sendSupportReplyNotify(opts: {
+  toEmail: string;
+  clientName: string;
+  adminName: string;
+  replyText: string;
+}): Promise<boolean> {
+  const cfg = getConfig();
+  const html = baseTemplate({
+    title: "رد جديد من فريق الدعم",
+    preheader: `${opts.adminName} ردّ على رسالتك`,
+    heading: "💬 رد جديد من فريق الدعم",
+    bodyHtml: `
+      ${p(`مرحباً ${accent(opts.clientName)}،`)}
+      ${p(`أرسل ${accent(opts.adminName)} ردّاً على رسالتك في منصة الدعم:`)}
+      <blockquote style="background:${COLORS.bgSoft};border-right:4px solid ${COLORS.green};margin:18px 0;padding:14px 18px;border-radius:0 10px 10px 0;font-style:italic;color:${COLORS.text};">
+        ${opts.replyText}
+      </blockquote>
+      ${button("عرض المحادثة", `${cfg.siteUrl}/client/support`)}
+    `,
+  });
+  return sendMail(opts.toEmail, opts.clientName, "رد من فريق أفق — الدعم", html);
+}

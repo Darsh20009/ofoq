@@ -17,3 +17,5 @@ export { SystemSettingsModel } from "./SystemSettings.js";
 export { AuditLogModel } from "./AuditLog.js";
 export { Pending2FAModel } from "./Pending2FA.js";
 export { ContactRequestModel } from "./ContactRequest.js";
+export { ServiceRequestModel } from "./ServiceRequest.js";
+export { SupportMessageModel } from "./SupportMessage.js";
