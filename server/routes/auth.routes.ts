@@ -62,7 +62,7 @@ authRouter.post("/register", registerLimiter, validate(registerSchema), async (r
       token,
       user: {
         id: user._id,
-        fullName: user.fullName,
+        name: user.fullName,
         email: user.email,
         role: user.role,
         lang: user.lang,
@@ -125,7 +125,7 @@ authRouter.post("/login", loginLimiter, validate(loginSchema), async (req, res) 
       token,
       user: {
         id: user._id,
-        fullName: user.fullName,
+        name: user.fullName,
         email: user.email,
         role: user.role,
         lang: user.lang,
@@ -133,6 +133,8 @@ authRouter.post("/login", loginLimiter, validate(loginSchema), async (req, res) 
         emailVerified: user.emailVerified,
         twoFactorEnabled: user.twoFactorEnabled,
         permissions: user.permissions,
+        position: (user as any).position,
+        department: (user as any).department,
       },
     });
   } catch (err: any) {
@@ -185,7 +187,7 @@ authRouter.post("/verify-2fa", async (req, res) => {
 
     res.json({
       token,
-      user: { id: user._id, fullName: user.fullName, email: user.email, role: user.role },
+      user: { id: user._id, name: user.fullName, email: user.email, role: user.role },
     });
   } catch (err: any) {
     res.status(500).json({ error: "خطأ في التحقق الثنائي" });

@@ -87,7 +87,7 @@ export default function LoginPage() {
         toast("أدخل رمز التحقق الثنائي", { icon: "🔐" });
       } else {
         setAuth(user, token);
-        toast.success(`مرحباً، ${user.fullName || user.name}!`);
+        toast.success(`مرحباً، ${user.name}!`);
         navigate(user.role === "employee" ? "/admin/employee/dashboard" : "/admin");
       }
     } catch (err: any) {
@@ -103,7 +103,7 @@ export default function LoginPage() {
       const res = await authApi.verify2FA({ tempToken: twoFAStep.tempToken, code: otpCode });
       const { user, token } = res.data;
       setAuth(user, token);
-      toast.success(`مرحباً، ${user.fullName || user.name}!`);
+      toast.success(`مرحباً، ${user.name}!`);
       navigate(user.role === "employee" ? "/admin/employee/dashboard" : "/admin");
     } catch (err: any) {
       toast.error(err?.response?.data?.error || "رمز التحقق غير صحيح");
