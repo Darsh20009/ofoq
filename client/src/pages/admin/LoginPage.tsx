@@ -28,8 +28,6 @@ function AppleIcon() {
   );
 }
 
-const RP_STORAGE_KEY = "ofoq_oauth_status_cache";
-
 interface LoginForm {
   email: string;
   password: string;
@@ -92,7 +90,9 @@ export default function LoginPage() {
         toast.success(`مرحباً، ${user.name}!`);
         navigate(user.role === "employee" ? "/admin/employee/dashboard" : "/admin");
       }
-    } catch {}
+    } catch (err: any) {
+      toast.error(err?.response?.data?.error || "بيانات الدخول غير صحيحة");
+    }
     setLoading(false);
   };
 
@@ -105,7 +105,9 @@ export default function LoginPage() {
       setAuth(user, token);
       toast.success(`مرحباً، ${user.name}!`);
       navigate(user.role === "employee" ? "/admin/employee/dashboard" : "/admin");
-    } catch {}
+    } catch (err: any) {
+      toast.error(err?.response?.data?.error || "رمز التحقق غير صحيح");
+    }
     setLoading(false);
   };
 
@@ -133,7 +135,6 @@ export default function LoginPage() {
       streamRef.current = stream;
       if (videoRef.current) videoRef.current.srcObject = stream;
       setCameraActive(true);
-      // Use BarcodeDetector if available
       if ("BarcodeDetector" in window) {
         const detector = new (window as any).BarcodeDetector({ formats: ["qr_code"] });
         detectorRef.current = detector;
@@ -166,205 +167,222 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-white flex items-stretch" dir="rtl">
-      <div className="hidden lg:flex lg:w-[58%] relative bg-cover bg-center items-center justify-center p-16" style={{ backgroundImage: "linear-gradient(rgba(12,19,56,.45),rgba(28,43,110,.70)), url('/images/aramco-tower-sunset.jpg')" }}>
+
+      {/* ── الجانب الأيسر — صورة خلفية + بطاقات ── */}
+      <div
+        className="hidden lg:flex lg:w-[58%] relative bg-cover bg-center items-center justify-center p-16"
+        style={{ backgroundImage: "linear-gradient(rgba(12,19,56,.45),rgba(28,43,110,.70)), url('/images/hero-aramco-hq.jpg')" }}
+      >
         <div className="text-center text-white">
           <OfoqLogo className="w-40 h-28 mx-auto mb-8 text-white" />
           <h2 className="text-5xl font-black">أفق لحلول الأعمال</h2>
           <p className="text-white/65 text-lg mt-4">نحوّل الطموح إلى أثر ملموس</p>
           <div className="mt-14 flex gap-4 justify-center">
-            <div className="glass rounded-2xl px-6 py-4"><b className="text-2xl block text-ofoq-yellow">٢٠٠+</b><span className="text-xs text-white/60">مشروع ناجح</span></div>
-            <div className="glass rounded-2xl px-6 py-4"><b className="text-2xl block text-ofoq-red">٩٨٪</b><span className="text-xs text-white/60">رضا العملاء</span></div>
-          </div>
-        </div>
-      </div>
-      <div className="w-full lg:w-[42%] flex items-center justify-center p-5 sm:p-10">
-      {/* Background dots */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-ofoq-green/20 rounded-full"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              width: `${Math.random() * 4 + 2}px`,
-              height: `${Math.random() * 4 + 2}px`,
-            }}
-          />
-        ))}
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
-      >
-        {/* Card */}
-        <div className="w-full max-w-md rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-xl bg-white">
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <OfoqLogo className="w-24 h-16 mx-auto text-ofoq-navy mb-4" dark />
-            <h1 className="text-ofoq-navy text-2xl font-bold">مرحباً بعودتك</h1>
-            <p className="text-gray-500 text-sm mt-1">سجّل دخولك إلى لوحة تحكم أفق</p>
-          </div>
-
-          {!twoFAStep ? (
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {/* Email */}
-              <div>
-                 <label className="label">البريد الإلكتروني</label>
-                <div className="relative">
-                  <Mail size={16} className="absolute top-1/2 -translate-y-1/2 right-3.5 text-white/30" />
-                  <input
-                    {...register("email", { required: "البريد مطلوب" })}
-                    type="email"
-                    placeholder="admin@ofoq.sa"
-                     className="input-field pr-10"
-                    dir="ltr"
-                  />
-                </div>
-                {errors.email && (
-                  <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>
-                )}
-              </div>
-
-              {/* Password */}
-              <div>
-                 <label className="label">كلمة المرور</label>
-                <div className="relative">
-                  <Lock size={16} className="absolute top-1/2 -translate-y-1/2 right-3.5 text-white/30" />
-                  <input
-                    {...register("password", { required: "كلمة المرور مطلوبة" })}
-                    type={showPass ? "text" : "password"}
-                    placeholder="••••••••"
-                     className="input-field pr-10 pl-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPass(!showPass)}
-                     className="absolute top-1/2 -translate-y-1/2 left-3.5 text-gray-400 hover:text-ofoq-red"
-                  >
-                    {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>
-                )}
-              </div>
-
-              <div className="flex justify-end">
-                 <a href="#" className="text-ofoq-red text-xs hover:underline">
-                  نسيت كلمة المرور؟
-                </a>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full btn-primary justify-center py-3.5 text-base"
-              >
-                {loading ? (
-                  <span className="flex items-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    جاري التحقق...
-                  </span>
-                ) : (
-                  "تسجيل الدخول"
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={handlePasskeyLogin}
-                disabled={passkeyLoading}
-                 className="w-full flex items-center justify-center gap-2 bg-ofoq-navy/5 border border-gray-200 text-ofoq-navy rounded-xl py-3 text-sm hover:bg-ofoq-navy/10 transition-all"
-              >
-                <Fingerprint size={17} className="text-ofoq-green" />
-                {passkeyLoading ? "جاري التحقق..." : "الدخول بمفتاح المرور (Passkey)"}
-              </button>
-
-              {(oauthStatus.google || oauthStatus.apple) && (
-                <>
-                  <div className="flex items-center gap-3 py-1">
-                    <div className="flex-1 h-px bg-white/10" />
-                    <span className="text-white/30 text-xs">أو</span>
-                    <div className="flex-1 h-px bg-white/10" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    {oauthStatus.google && (
-                      <a
-                        href="/api/auth/google"
-                        className="flex items-center justify-center gap-2 bg-white text-navy-800 rounded-xl py-3 text-sm font-medium hover:opacity-90 transition-opacity"
-                      >
-                        <GoogleIcon /> Google
-                      </a>
-                    )}
-                    {oauthStatus.apple && (
-                      <a
-                        href="/api/auth/apple"
-                        className="flex items-center justify-center gap-2 bg-black text-white rounded-xl py-3 text-sm font-medium hover:opacity-90 transition-opacity"
-                      >
-                        <AppleIcon /> Apple
-                      </a>
-                    )}
-                  </div>
-                </>
-              )}
-            </form>
-          ) : (
-            /* 2FA Step */
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 bg-ofoq-green/10 border border-ofoq-green/30 rounded-xl p-4">
-                <ShieldCheck size={20} className="text-ofoq-green flex-shrink-0" />
-                <p className="text-white/80 text-sm">
-                  {twoFAStep.method === "totp"
-                    ? "أدخل الرمز من تطبيق المصادقة"
-                    : "تم إرسال رمز التحقق إلى بريدك الإلكتروني"}
-                </p>
-              </div>
-              <input
-                value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value)}
-                maxLength={6}
-                placeholder="000000"
-                className="w-full bg-white/10 border border-white/20 text-white text-center text-2xl tracking-[0.5em] placeholder-white/20 rounded-xl px-4 py-3 focus:outline-none focus:border-ofoq-green"
-                dir="ltr"
-              />
-              <button
-                onClick={handle2FA}
-                disabled={loading || otpCode.length < 6}
-                className="w-full btn-primary justify-center py-3.5"
-              >
-                {loading ? "جاري التحقق..." : "تأكيد"}
-              </button>
-              <button
-                onClick={() => setTwoFAStep(null)}
-                className="w-full text-white/50 text-sm hover:text-white transition-colors"
-              >
-                العودة لتسجيل الدخول
-              </button>
+            <div className="glass rounded-2xl px-6 py-4">
+              <b className="text-2xl block text-ofoq-yellow">٢٠٠+</b>
+              <span className="text-xs text-white/60">مشروع ناجح</span>
             </div>
-          )}
+            <div className="glass rounded-2xl px-6 py-4">
+              <b className="text-2xl block text-ofoq-red">٩٨٪</b>
+              <span className="text-xs text-white/60">رضا العملاء</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── الجانب الأيمن — نموذج الدخول ── */}
+      <div className="w-full lg:w-[42%] flex items-center justify-center p-5 sm:p-10 bg-gray-50 relative">
+        {/* خلفية نقاط ديكورية */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
+          {[...Array(16)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full bg-ofoq-navy/10"
+              style={{
+                top: `${(i * 13 + 7) % 100}%`,
+                left: `${(i * 17 + 11) % 100}%`,
+                width: `${(i % 3) * 3 + 4}px`,
+                height: `${(i % 3) * 3 + 4}px`,
+              }}
+            />
+          ))}
         </div>
 
-        {/* Barcode login button */}
-        {!twoFAStep && (
-          <button
-            onClick={() => { setBarcodeOpen(true); setBarcodeCode(""); }}
-            className="w-full flex items-center justify-center gap-2 text-white/40 hover:text-white/70 text-xs mt-3 py-2 transition-colors"
-          >
-            <QrCode size={14} />
-            تسجيل الدخول بباركود الموظف
-          </button>
-        )}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-md relative z-10"
+        >
+          {/* البطاقة الرئيسية */}
+          <div className="w-full max-w-md rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-xl bg-white">
+            {/* اللوجو والعنوان */}
+            <div className="text-center mb-8">
+              <OfoqLogo className="w-24 h-16 mx-auto mb-4" dark />
+              <h1 className="text-ofoq-navy text-2xl font-bold">مرحباً بعودتك</h1>
+              <p className="text-gray-500 text-sm mt-1">سجّل دخولك إلى لوحة تحكم أفق</p>
+            </div>
 
-         <p className="text-center text-gray-400 text-xs mt-4">
-          © {new Date().getFullYear()} أفق لحلول الأعمال
-        </p>
-      </motion.div></div>
+            {!twoFAStep ? (
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                {/* البريد الإلكتروني */}
+                <div>
+                  <label className="label">البريد الإلكتروني</label>
+                  <div className="relative">
+                    <Mail size={16} className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-400" />
+                    <input
+                      {...register("email", { required: "البريد مطلوب" })}
+                      type="email"
+                      placeholder="admin@ofoq.sa"
+                      className="input-field pr-10"
+                      dir="ltr"
+                    />
+                  </div>
+                  {errors.email && (
+                    <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+                  )}
+                </div>
 
-      {/* ── Barcode / QR Login Modal ─────────────────────────── */}
+                {/* كلمة المرور */}
+                <div>
+                  <label className="label">كلمة المرور</label>
+                  <div className="relative">
+                    <Lock size={16} className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-400" />
+                    <input
+                      {...register("password", { required: "كلمة المرور مطلوبة" })}
+                      type={showPass ? "text" : "password"}
+                      placeholder="••••••••"
+                      className="input-field pr-10 pl-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPass(!showPass)}
+                      className="absolute top-1/2 -translate-y-1/2 left-3.5 text-gray-400 hover:text-ofoq-red transition-colors"
+                    >
+                      {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+                  )}
+                </div>
+
+                <div className="flex justify-end">
+                  <a href="#" className="text-ofoq-red text-xs hover:underline">
+                    نسيت كلمة المرور؟
+                  </a>
+                </div>
+
+                {/* زر الدخول */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full btn-primary justify-center py-3.5 text-base"
+                >
+                  {loading ? (
+                    <span className="flex items-center gap-2">
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      جاري التحقق...
+                    </span>
+                  ) : (
+                    "تسجيل الدخول"
+                  )}
+                </button>
+
+                {/* Passkey */}
+                <button
+                  type="button"
+                  onClick={handlePasskeyLogin}
+                  disabled={passkeyLoading}
+                  className="w-full flex items-center justify-center gap-2 bg-ofoq-navy/5 border border-gray-200 text-ofoq-navy rounded-xl py-3 text-sm hover:bg-ofoq-navy/10 transition-all"
+                >
+                  <Fingerprint size={17} className="text-ofoq-green" />
+                  {passkeyLoading ? "جاري التحقق..." : "الدخول بمفتاح المرور (Passkey)"}
+                </button>
+
+                {/* OAuth */}
+                {(oauthStatus.google || oauthStatus.apple) && (
+                  <>
+                    <div className="flex items-center gap-3 py-1">
+                      <div className="flex-1 h-px bg-gray-200" />
+                      <span className="text-gray-400 text-xs">أو</span>
+                      <div className="flex-1 h-px bg-gray-200" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      {oauthStatus.google && (
+                        <a
+                          href="/api/auth/google"
+                          className="flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 rounded-xl py-3 text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm"
+                        >
+                          <GoogleIcon /> Google
+                        </a>
+                      )}
+                      {oauthStatus.apple && (
+                        <a
+                          href="/api/auth/apple"
+                          className="flex items-center justify-center gap-2 bg-black text-white rounded-xl py-3 text-sm font-medium hover:opacity-90 transition-opacity"
+                        >
+                          <AppleIcon /> Apple
+                        </a>
+                      )}
+                    </div>
+                  </>
+                )}
+              </form>
+            ) : (
+              /* مرحلة التحقق الثنائي */
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                  <ShieldCheck size={20} className="text-emerald-600 flex-shrink-0" />
+                  <p className="text-gray-700 text-sm">
+                    {twoFAStep.method === "totp"
+                      ? "أدخل الرمز من تطبيق المصادقة"
+                      : "تم إرسال رمز التحقق إلى بريدك الإلكتروني"}
+                  </p>
+                </div>
+                <input
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value)}
+                  maxLength={6}
+                  placeholder="000000"
+                  className="w-full border border-gray-200 bg-gray-50 text-ofoq-navy text-center text-2xl tracking-[0.5em] placeholder-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-ofoq-red focus:ring-2 focus:ring-ofoq-red/20"
+                  dir="ltr"
+                />
+                <button
+                  onClick={handle2FA}
+                  disabled={loading || otpCode.length < 6}
+                  className="w-full btn-primary justify-center py-3.5"
+                >
+                  {loading ? "جاري التحقق..." : "تأكيد"}
+                </button>
+                <button
+                  onClick={() => setTwoFAStep(null)}
+                  className="w-full text-gray-400 text-sm hover:text-ofoq-navy transition-colors"
+                >
+                  العودة لتسجيل الدخول
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* زر باركود الموظف */}
+          {!twoFAStep && (
+            <button
+              onClick={() => { setBarcodeOpen(true); setBarcodeCode(""); }}
+              className="w-full flex items-center justify-center gap-2 text-gray-400 hover:text-ofoq-navy text-xs mt-4 py-2 transition-colors border border-transparent hover:border-gray-200 rounded-xl"
+            >
+              <QrCode size={14} />
+              تسجيل الدخول بباركود الموظف
+            </button>
+          )}
+
+          <p className="text-center text-gray-400 text-xs mt-4">
+            © {new Date().getFullYear()} أفق لحلول الأعمال
+          </p>
+        </motion.div>
+      </div>
+
+      {/* ── مودال الباركود / QR ── */}
       {barcodeOpen && (
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -380,17 +398,18 @@ export default function LoginPage() {
                 <QrCode size={20} className="text-ofoq-green" />
                 <h3 className="text-white font-bold">تسجيل دخول الموظف</h3>
               </div>
-              <button onClick={() => { stopCamera(); setBarcodeOpen(false); }}
-                className="text-white/40 hover:text-white/70 transition-colors">
+              <button
+                onClick={() => { stopCamera(); setBarcodeOpen(false); }}
+                className="text-white/40 hover:text-white/70 transition-colors"
+              >
                 <X size={18} />
               </button>
             </div>
 
-            {/* Camera viewfinder */}
+            {/* كاميرا المسح */}
             {cameraActive ? (
               <div className="relative mb-4 rounded-2xl overflow-hidden bg-black aspect-square">
                 <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
-                {/* Scanner frame overlay */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-48 h-48 relative">
                     <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-ofoq-green rounded-tl-lg" />
@@ -405,17 +424,19 @@ export default function LoginPage() {
                 </p>
               </div>
             ) : (
-              <button onClick={startCamera}
-                className="w-full flex items-center justify-center gap-2 bg-white/5 border border-white/15 text-white/70 hover:bg-white/10 hover:text-white rounded-2xl py-4 mb-4 transition-all text-sm">
+              <button
+                onClick={startCamera}
+                className="w-full flex items-center justify-center gap-2 bg-white/5 border border-white/15 text-white/70 hover:bg-white/10 hover:text-white rounded-2xl py-4 mb-4 transition-all text-sm"
+              >
                 <QrCode size={18} className="text-ofoq-green" />
                 مسح الباركود بالكاميرا
               </button>
             )}
 
             <div className="flex items-center gap-2 mb-3">
-              <div className="flex-1 h-px bg-white/10" />
-              <span className="text-white/30 text-xs">أو أدخل الكود يدوياً</span>
-              <div className="flex-1 h-px bg-white/10" />
+              <div className="flex-1 h-px bg-white/15" />
+              <span className="text-white/40 text-xs">أو أدخل الكود يدوياً</span>
+              <div className="flex-1 h-px bg-white/15" />
             </div>
 
             <input

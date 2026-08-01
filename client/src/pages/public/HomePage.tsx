@@ -54,7 +54,7 @@ export default function HomePage() {
       {/* ── Hero — Aramco HQ Sunset ──────────────────────────── */}
       <section
         className="min-h-screen flex items-center relative pt-20 bg-cover bg-center"
-        style={{ backgroundImage: "linear-gradient(rgba(8,13,42,.42),rgba(20,35,90,.62)), url('/images/aramco-hq-sunset.png')" }}
+        style={{ backgroundImage: "linear-gradient(rgba(8,13,42,.45),rgba(20,35,90,.65)), url('/images/hero-aramco-hq.jpg')" }}
       >
         <div className="absolute top-32 left-16 w-72 h-72 rounded-full bg-ofoq-red/10 blur-3xl pointer-events-none" />
         <div className="absolute bottom-20 right-10 w-56 h-56 rounded-full bg-ofoq-yellow/8 blur-3xl pointer-events-none" />
@@ -208,9 +208,8 @@ export default function HomePage() {
       {/* ── OFOQ Brand Photo Section ─────────────────────────── */}
       <section
         className="relative py-28 bg-cover bg-center overflow-hidden"
-        style={{ backgroundImage: "url('/images/ofoq-brand-banner.png')" }}
+        style={{ backgroundImage: "url('/images/ofoq-brand-photo2.jpg')" }}
       >
-        {/* Strong overlay so text is readable */}
         <div className="absolute inset-0 bg-gradient-to-l from-ofoq-navy/95 via-ofoq-navy/80 to-ofoq-navy/40" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-xl mr-auto">
@@ -236,7 +235,7 @@ export default function HomePage() {
       {/* ── Why Us — Riyadh skyline background ───────────────── */}
       <section
         className="py-24 relative overflow-hidden bg-cover bg-center"
-        style={{ backgroundImage: "linear-gradient(rgba(10,16,50,.68),rgba(28,43,110,.78)), url('/images/riyadh-faisaliah-palms.png')" }}
+        style={{ backgroundImage: "linear-gradient(rgba(10,16,50,.68),rgba(28,43,110,.78)), url('/images/hero-riyadh-towers.jpg')" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -270,10 +269,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Riyadh Kingdom Tower strip ───────────────────────── */}
+      {/* ── ITCC Tower strip ─────────────────────────────────── */}
       <section
         className="relative h-64 bg-cover bg-center"
-        style={{ backgroundImage: "linear-gradient(rgba(10,16,50,.30),rgba(28,43,110,.50)), url('/images/riyadh-kingdom-vertical.png')" }}
+        style={{ backgroundImage: "linear-gradient(rgba(10,16,50,.30),rgba(28,43,110,.55)), url('/images/riyadh-itcc-tower.jpg')" }}
       >
         <div className="absolute inset-0 flex items-center justify-center">
           <motion.div
@@ -326,7 +325,7 @@ export default function HomePage() {
       {/* ── CTA ──────────────────────────────────────────────── */}
       <section
         className="py-24 relative bg-cover bg-center"
-        style={{ backgroundImage: "linear-gradient(rgba(10,16,50,.78),rgba(28,43,110,.88)), url('/images/riyadh-district-dark.png')" }}
+        style={{ backgroundImage: "linear-gradient(rgba(10,16,50,.78),rgba(28,43,110,.88)), url('/images/riyadh-evening.jpg')" }}
       >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>

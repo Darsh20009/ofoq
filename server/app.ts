@@ -49,8 +49,9 @@ app.use(cors({
     if (!origin) return cb(null, true);
     // Explicit allowlist
     if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-    // Allow all *.replit.dev origins in development
-    if (process.env.NODE_ENV !== "production" && origin.endsWith(".replit.dev")) return cb(null, true);
+    // Allow all *.replit.dev origins in development (strip port before check)
+    const originHost = origin.replace(/:\d+$/, "");
+    if (process.env.NODE_ENV !== "production" && originHost.endsWith(".replit.dev")) return cb(null, true);
     return cb(new Error(`CORS: origin ${origin} not allowed`));
   },
   credentials: true,

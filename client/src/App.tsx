@@ -1,5 +1,7 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "./store/authStore";
+import { useState, useCallback, useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
 
 // Layouts
 import PublicLayout from "./layouts/PublicLayout";
@@ -28,6 +30,9 @@ import ContractsPage from "./pages/admin/contracts/ContractsPage";
 import EmployeeCardPage from "./pages/admin/employee/EmployeeCardPage";
 import EmployeeDashboardPage from "./pages/admin/employee/EmployeeDashboardPage";
 
+// Page Transition Loader
+import PageLoader from "./components/PageLoader";
+
 function RequireAuth({ children }: { children: JSX.Element }) {
   const { isAuthenticated } = useAuthStore();
   return isAuthenticated ? children : <Navigate to="/admin/login" replace />;
@@ -39,53 +44,78 @@ function RequireGuest({ children }: { children: JSX.Element }) {
 }
 
 export default function App() {
+  const location = useLocation();
+  const [showLoader, setShowLoader] = useState(false);
+  const [prevPath, setPrevPath] = useState(location.pathname);
+
+  // أظهر اللودر عند تغيّر المسار — ما عدا أول تحميل
+  useEffect(() => {
+    if (location.pathname !== prevPath) {
+      setShowLoader(true);
+      setPrevPath(location.pathname);
+    }
+  }, [location.pathname]); // eslint-disable-line
+
+  const handleLoaderDone = useCallback(() => {
+    setShowLoader(false);
+  }, []);
+
   return (
-    <Routes>
-      {/* ── Public Website ───────────────── */}
-      <Route element={<PublicLayout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/services" element={<ServicesPage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/blog" element={<BlogPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-      </Route>
+    <>
+      {/* ── Page Transition Loader ────────── */}
+      <AnimatePresence>
+        {showLoader && (
+          <PageLoader key={location.pathname} onDone={handleLoaderDone} />
+        )}
+      </AnimatePresence>
 
-      {/* ── Admin Auth ───────────────────── */}
-      <Route
-        path="/admin/login"
-        element={
-          <RequireGuest>
-            <LoginPage />
-          </RequireGuest>
-        }
-      />
-      <Route path="/admin/oauth/callback" element={<OAuthCallbackPage />} />
+      <Routes>
+        {/* ── Public Website ───────────────────────────── */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+        </Route>
 
-      {/* ── Admin Dashboard ──────────────── */}
-      <Route
-        path="/admin"
-        element={
-          <RequireAuth>
-            <AdminLayout />
-          </RequireAuth>
-        }
-      >
-        <Route index element={<DashboardPage />} />
-        <Route path="crm/leads" element={<LeadsPage />} />
-        <Route path="crm/customers" element={<CustomersPage />} />
-        <Route path="projects" element={<ProjectsPage />} />
-        <Route path="invoices" element={<InvoicesPage />} />
-        <Route path="users" element={<UsersPage />} />
-        <Route path="cms" element={<CmsPage />} />
-        <Route path="settings" element={<SettingsPage />} />
-        <Route path="profile" element={<ProfilePage />} />
-        <Route path="contracts" element={<ContractsPage />} />
-        <Route path="employee/card" element={<EmployeeCardPage />} />
-        <Route path="employee/dashboard" element={<EmployeeDashboardPage />} />
-      </Route>
+        {/* ── Admin Auth ───────────────────────────────── */}
+        <Route
+          path="/admin/login"
+          element={
+            <RequireGuest>
+              <LoginPage />
+            </RequireGuest>
+          }
+        />
+        <Route path="/admin/oauth/callback" element={<OAuthCallbackPage />} />
 
-      {/* ── Fallback ─────────────────────── */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* ── Admin Dashboard ──────────────────────────── */}
+        <Route
+          path="/admin"
+          element={
+            <RequireAuth>
+              <AdminLayout />
+            </RequireAuth>
+          }
+        >
+          <Route index element={<DashboardPage />} />
+          <Route path="crm/leads" element={<LeadsPage />} />
+          <Route path="crm/customers" element={<CustomersPage />} />
+          <Route path="projects" element={<ProjectsPage />} />
+          <Route path="invoices" element={<InvoicesPage />} />
+          <Route path="users" element={<UsersPage />} />
+          <Route path="cms" element={<CmsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="contracts" element={<ContractsPage />} />
+          <Route path="employee/card" element={<EmployeeCardPage />} />
+          <Route path="employee/dashboard" element={<EmployeeDashboardPage />} />
+        </Route>
+
+        {/* ── Fallback ─────────────────────────────────── */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }
