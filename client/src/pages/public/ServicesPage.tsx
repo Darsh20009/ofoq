@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
-  Building2, Scale, Trademark, Landmark, Users, MonitorSmartphone,
+  Building2, Scale, BadgeCheck, Landmark, Users, MonitorSmartphone,
   TrendingUp, BarChart3, ArrowLeft, CheckCircle,
 } from "lucide-react";
 
@@ -37,7 +37,7 @@ const SERVICES = [
     accent: "#8B5CF6",
   },
   {
-    icon: Trademark,
+    icon: BadgeCheck,
     num: "ثالثاً",
     title: "تسجيل العلامات التجارية",
     desc: "نحمي هويتك التجارية ونضمن حقوق ملكيتك الفكرية لدى الجهات الرسمية.",
