@@ -19,7 +19,7 @@ export default function ForgotPasswordPage() {
       await authApi.forgotPassword(email.trim());
       setSent(true);
     } catch {
-      toast.error("حدث خطأ، حاول مرة أخرى");
+      // silent
     } finally {
       setLoading(false);
     }

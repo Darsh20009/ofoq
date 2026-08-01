@@ -47,8 +47,8 @@ export default function EmployeePortalLoginPage() {
         toast.success(`مرحباً، ${user.name}!`);
         goHome();
       }
-    } catch (err: any) {
-      toast.error(err?.response?.data?.error || "بيانات الدخول غير صحيحة");
+    } catch {
+      // silent
     }
     setLoading(false);
   };
@@ -63,8 +63,8 @@ export default function EmployeePortalLoginPage() {
       setAuth(user, token);
       toast.success(`مرحباً، ${user.name}!`);
       goHome();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.error || "رمز التحقق غير صحيح");
+    } catch {
+      // silent
     }
     setLoading(false);
   };
@@ -89,7 +89,7 @@ export default function EmployeePortalLoginPage() {
         };
         scan();
       }
-    } catch { toast.error("تعذّر الوصول إلى الكاميرا"); }
+    } catch { /* silent */ }
   };
 
   const stopCamera = () => {
@@ -111,8 +111,8 @@ export default function EmployeePortalLoginPage() {
       setBarcodeOpen(false);
       toast.success(`مرحباً، ${user.name}!`);
       goHome();
-    } catch (e: any) {
-      toast.error(e?.response?.data?.error || "كود الموظف غير صحيح");
+    } catch {
+      // silent
     }
     setBarcodeLoading(false);
   };

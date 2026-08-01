@@ -18,7 +18,6 @@ export default function OAuthCallbackPage() {
     const error = params.get("error");
 
     if (error) {
-      toast.error("تعذّر تسجيل الدخول عبر هذه الطريقة");
       navigate("/admin/login", { replace: true });
       return;
     }
@@ -35,7 +34,6 @@ export default function OAuthCallbackPage() {
         navigate("/admin", { replace: true });
       })
       .catch(() => {
-        toast.error("تعذّر إكمال تسجيل الدخول");
         navigate("/admin/login", { replace: true });
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps

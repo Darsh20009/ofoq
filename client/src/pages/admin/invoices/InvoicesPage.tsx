@@ -49,14 +49,14 @@ export default function InvoicesPage() {
       const res = await fetch(`/api/invoices/${id}/pdf`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) { toast.error("تعذّر تحميل ملف PDF"); return; }
+      if (!res.ok) { return; }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url; a.download = `${number}.pdf`; a.click();
       URL.revokeObjectURL(url);
     } catch {
-      toast.error("خطأ في تحميل PDF");
+      // silent
     }
   };
 

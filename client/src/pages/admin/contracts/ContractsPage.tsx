@@ -21,7 +21,7 @@ async function downloadContractPdf(id: string, number: string) {
   const res = await fetch(`/api/contracts/${id}/pdf`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) { toast.error("تعذّر تحميل ملف PDF"); return; }
+  if (!res.ok) { return; }
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -63,31 +63,31 @@ export default function ContractsPage() {
   const createMut = useMutation({
     mutationFn: (data: object) => contractsApi.create(data),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success("تم إنشاء العقد"); closeModal(); },
-    onError: (e: any) => toast.error(e?.response?.data?.error || "خطأ في الإنشاء"),
+    onError: () => {},
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, data }: { id: string; data: object }) => contractsApi.update(id, data),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success("تم التحديث"); closeModal(); },
-    onError: (e: any) => toast.error(e?.response?.data?.error || "خطأ في التحديث"),
+    onError: () => {},
   });
 
   const sendMut = useMutation({
     mutationFn: (id: string) => contractsApi.send(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success("تم إرسال العقد للعميل"); },
-    onError: (e: any) => toast.error(e?.response?.data?.error || "خطأ في الإرسال"),
+    onError: () => {},
   });
 
   const signMut = useMutation({
     mutationFn: (id: string) => contractsApi.sign(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success("تم توثيق التوقيع"); },
-    onError: (e: any) => toast.error(e?.response?.data?.error || "خطأ في التوثيق"),
+    onError: () => {},
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => contractsApi.delete(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success("تم الحذف"); },
-    onError: (e: any) => toast.error(e?.response?.data?.error || "خطأ في الحذف"),
+    onError: () => {},
   });
 
   const contracts: any[] = data?.data?.contracts || data?.contracts || [];

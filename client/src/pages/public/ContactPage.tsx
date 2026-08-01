@@ -16,7 +16,7 @@ export default function ContactPage() {
   const mut = useMutation({
     mutationFn: (data: object) => contactApi.submit(data),
     onSuccess: () => setSubmitted(true),
-    onError: () => toast.error(t.contact.submitError),
+    onError: () => {},
   });
 
   return (

@@ -19,7 +19,6 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     if (!token) {
-      toast.error("رابط إعادة التعيين غير صالح");
       navigate("/admin/login", { replace: true });
     }
   }, [token, navigate]);
@@ -35,8 +34,8 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirm) { toast.error("كلمتا المرور غير متطابقتين"); return; }
-    if (password.length < 8)  { toast.error("كلمة المرور يجب أن تكون 8 أحرف على الأقل"); return; }
+    if (password !== confirm) { return; }
+    if (password.length < 8)  { return; }
 
     setLoading(true);
     try {
@@ -45,7 +44,7 @@ export default function ResetPasswordPage() {
       setTimeout(() => navigate("/admin/login", { replace: true }), 3000);
     } catch (err: any) {
       const msg = err?.response?.data?.error || "الرابط غير صالح أو منتهي الصلاحية";
-      toast.error(msg);
+      // silent
     } finally {
       setLoading(false);
     }

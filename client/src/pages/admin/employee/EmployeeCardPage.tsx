@@ -22,7 +22,7 @@ function downloadCardAsImage(cardRef: HTMLDivElement | null, filename: string) {
         a.href = canvas.toDataURL("image/png");
         a.click();
       });
-  }).catch(() => toast.error("تعذّر تحميل البطاقة"));
+  }).catch(() => {});
 }
 
 // ── Apple Wallet Pass download ──────────────────────────────────────
@@ -42,7 +42,7 @@ async function downloadWalletPass(setLoading: (v: boolean) => void) {
     toast.success("تم تحميل بطاقة Apple Wallet ✓");
   } catch (err: any) {
     const detail = err?.response?.data?.detail || err?.response?.data?.error;
-    toast.error(detail || "تعذّر توليد البطاقة، حاول مرة أخرى", { duration: 5000 });
+    // silent — button returns to idle state; user can retry
   } finally {
     setLoading(false);
   }
@@ -73,7 +73,7 @@ export default function EmployeeCardPage() {
   const regenMut = useMutation({
     mutationFn: () => employeeApi.regenerateCode(),
     onSuccess: () => { toast.success("تم تجديد الباركود — القديم لم يعد صالحاً"); refetch(); },
-    onError: () => toast.error("خطأ في تجديد الباركود"),
+    onError: () => {},
   });
 
   const card = data;

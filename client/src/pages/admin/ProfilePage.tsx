@@ -59,20 +59,20 @@ export default function ProfilePage() {
       return usersApi.update(user!._id, fd as any);
     },
     onSuccess: (res) => { updateUser(res.data.data?.user || res.data.user || res.data); toast.success("تم تحديث الصورة"); },
-    onError: () => toast.error("تعذّر رفع الصورة"),
+    onError: () => {},
   });
 
   const updateMut = useMutation({
     mutationFn: (data: object) => usersApi.update(user!._id, data),
     onSuccess: (res) => { updateUser(res.data.data?.user || res.data.user || res.data); toast.success("تم تحديث الملف الشخصي"); },
-    onError: (e: any) => toast.error(e?.response?.data?.error || "خطأ في التحديث"),
+    onError: () => {},
   });
 
   const pwdMut = useMutation({
     mutationFn: (data: { currentPassword: string; newPassword: string }) =>
       usersApi.changePassword(data),
     onSuccess: () => { resetPwd(); toast.success("تم تغيير كلمة المرور بنجاح"); },
-    onError: (e: any) => toast.error(e?.response?.data?.error || "تعذّر تغيير كلمة المرور"),
+    onError: () => {},
   });
 
   const totpSetupMut = useMutation({
@@ -82,7 +82,7 @@ export default function ProfilePage() {
       setTotpSecret(res.data.secret);
       setTotpState("verifying");
     },
-    onError: (e: any) => toast.error(e?.response?.data?.error || "خطأ في إعداد المصادقة"),
+    onError: () => {},
   });
 
   const totpVerifyMut = useMutation({
@@ -93,7 +93,7 @@ export default function ProfilePage() {
       updateUser({ ...user!, twoFactorEnabled: true } as any);
       toast.success("تم تفعيل المصادقة الثنائية 🎉");
     },
-    onError: (e: any) => toast.error(e?.response?.data?.error || "الرمز غير صحيح"),
+    onError: () => {},
   });
 
   const totpDisableMut = useMutation({
@@ -104,7 +104,7 @@ export default function ProfilePage() {
       updateUser({ ...user!, twoFactorEnabled: false } as any);
       toast.success("تم تعطيل المصادقة الثنائية");
     },
-    onError: (e: any) => toast.error(e?.response?.data?.error || "الرمز غير صحيح"),
+    onError: () => {},
   });
 
   const addPasskeyMut = useMutation({
@@ -115,7 +115,7 @@ export default function ProfilePage() {
       return webauthnApi.registerVerify(attResp, deviceName);
     },
     onSuccess: () => { toast.success("تم إضافة مفتاح المرور"); queryClient.invalidateQueries({ queryKey: ["webauthn-credentials"] }); },
-    onError: (e: any) => { if (e?.name !== "NotAllowedError") toast.error(e?.response?.data?.error || "تعذّرت الإضافة"); },
+    onError: () => {},
   });
 
   const deletePasskeyMut = useMutation({
@@ -202,7 +202,7 @@ export default function ProfilePage() {
           <h3 className="font-bold text-navy-700">تغيير كلمة المرور</h3>
         </div>
         <form onSubmit={handlePwd((d) => {
-          if (d.newPassword !== d.confirmPassword) { toast.error("كلمتا المرور غير متطابقتين"); return; }
+          if (d.newPassword !== d.confirmPassword) { return; }
           pwdMut.mutate({ currentPassword: d.currentPassword, newPassword: d.newPassword });
         })} className="space-y-4">
           <div className="relative">

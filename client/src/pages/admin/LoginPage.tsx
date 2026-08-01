@@ -71,10 +71,8 @@ export default function LoginPage() {
       setAuth(user, token);
       toast.success(`مرحباً، ${user.name || user.fullName}!`);
       navigate("/admin");
-    } catch (err: any) {
-      if (err?.name !== "NotAllowedError") {
-        toast.error(err?.response?.data?.error || "تعذّر الدخول بمفتاح المرور");
-      }
+    } catch {
+      // silent
     }
     setPasskeyLoading(false);
   };
@@ -92,8 +90,8 @@ export default function LoginPage() {
         toast.success(`مرحباً، ${user.name}!`);
         navigate(user.role === "employee" ? "/admin/employee/dashboard" : "/admin");
       }
-    } catch (err: any) {
-      toast.error(err?.response?.data?.error || "بيانات الدخول غير صحيحة");
+    } catch {
+      // silent
     }
     setLoading(false);
   };
@@ -107,8 +105,8 @@ export default function LoginPage() {
       setAuth(user, token);
       toast.success(`مرحباً، ${user.name}!`);
       navigate(user.role === "employee" ? "/admin/employee/dashboard" : "/admin");
-    } catch (err: any) {
-      toast.error(err?.response?.data?.error || "رمز التحقق غير صحيح");
+    } catch {
+      // silent
     }
     setLoading(false);
   };
@@ -125,8 +123,8 @@ export default function LoginPage() {
       setBarcodeOpen(false);
       toast.success(`مرحباً، ${user.name}!`);
       navigate("/admin/employee/dashboard");
-    } catch (e: any) {
-      toast.error(e?.response?.data?.error || "كود الموظف غير صحيح");
+    } catch {
+      // silent
     }
     setBarcodeLoading(false);
   };
@@ -196,7 +194,7 @@ export default function LoginPage() {
 
       requestAnimationFrame(tick);
     } catch {
-      toast.error("تعذّر الوصول إلى الكاميرا — تأكد من منح الإذن");
+      // silent
     }
   };
 
