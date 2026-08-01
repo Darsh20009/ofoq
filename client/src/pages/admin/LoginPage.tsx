@@ -8,6 +8,7 @@ import { startAuthentication } from "@simplewebauthn/browser";
 import { authApi, webauthnApi } from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
 import OfoqLogo from "../../components/OfoqLogo";
+import jsQR from "jsqr";
 
 function GoogleIcon() {
   return (
@@ -44,9 +45,10 @@ export default function LoginPage() {
   const [barcodeCode, setBarcodeCode] = useState("");
   const [barcodeLoading, setBarcodeLoading] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef  = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(document.createElement("canvas"));
   const streamRef = useRef<MediaStream | null>(null);
-  const detectorRef = useRef<any>(null);
+  const scanningRef = useRef(false);
   const { setAuth } = useAuthStore();
   const navigate = useNavigate();
 
@@ -131,37 +133,77 @@ export default function LoginPage() {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 640 } },
+      });
       streamRef.current = stream;
       if (videoRef.current) videoRef.current.srcObject = stream;
       setCameraActive(true);
-      if ("BarcodeDetector" in window) {
-        const detector = new (window as any).BarcodeDetector({ formats: ["qr_code"] });
-        detectorRef.current = detector;
-        const scan = async () => {
-          if (!videoRef.current || !detectorRef.current) return;
-          try {
-            const codes = await detectorRef.current.detect(videoRef.current);
-            if (codes.length > 0) {
-              const raw = codes[0].rawValue as string;
-              stopCamera();
-              await handleBarcodeLogin(raw);
-              return;
-            }
-          } catch {}
-          if (streamRef.current) requestAnimationFrame(scan);
-        };
-        requestAnimationFrame(scan);
-      }
+      scanningRef.current = true;
+
+      // انتظر حتى يبدأ الفيديو بالفعل
+      await new Promise<void>((resolve) => {
+        const v = videoRef.current!;
+        if (v.readyState >= 2) return resolve();
+        v.onloadeddata = () => resolve();
+      });
+
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
+
+      // محاولة BarcodeDetector أولاً (Chrome) ثم jsQR كـ fallback
+      const nativeDetector =
+        "BarcodeDetector" in window
+          ? new (window as any).BarcodeDetector({ formats: ["qr_code"] })
+          : null;
+
+      const tick = async () => {
+        if (!scanningRef.current || !streamRef.current) return;
+        const v = videoRef.current;
+        if (!v || v.readyState < 2 || v.videoWidth === 0) {
+          requestAnimationFrame(tick);
+          return;
+        }
+
+        canvas.width  = v.videoWidth;
+        canvas.height = v.videoHeight;
+        ctx.drawImage(v, 0, 0);
+
+        let result: string | null = null;
+
+        try {
+          if (nativeDetector) {
+            const codes = await nativeDetector.detect(v);
+            if (codes.length) result = codes[0].rawValue;
+          } else {
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const qr = jsQR(imgData.data, imgData.width, imgData.height, {
+              inversionAttempts: "dontInvert",
+            });
+            if (qr) result = qr.data;
+          }
+        } catch {}
+
+        if (result) {
+          stopCamera();
+          await handleBarcodeLogin(result);
+          return;
+        }
+
+        // مسح دائم كل 150 مللي ثانية
+        setTimeout(() => requestAnimationFrame(tick), 150);
+      };
+
+      requestAnimationFrame(tick);
     } catch {
-      toast.error("تعذّر الوصول إلى الكاميرا");
+      toast.error("تعذّر الوصول إلى الكاميرا — تأكد من منح الإذن");
     }
   };
 
   const stopCamera = () => {
+    scanningRef.current = false;
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
-    detectorRef.current = null;
     setCameraActive(false);
   };
 

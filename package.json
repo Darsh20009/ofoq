@@ -39,6 +39,7 @@
     "html2canvas": "^1.4.1",
     "http-proxy-middleware": "^3.0.7",
     "jsonwebtoken": "^9.0.2",
+    "jsqr": "^1.4.0",
     "lucide-react": "^0.462.0",
     "mongoose": "^8.9.0",
     "morgan": "^1.10.0",
