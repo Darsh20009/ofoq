@@ -26,20 +26,25 @@ function downloadCardAsImage(cardRef: HTMLDivElement | null, filename: string) {
 }
 
 // ── Apple Wallet Pass download ──────────────────────────────────────
-async function downloadWalletPass() {
+async function downloadWalletPass(setLoading: (v: boolean) => void) {
+  setLoading(true);
   try {
-    const res = await employeeApi.walletPass() as any;
-    if (res.data instanceof Blob) {
-      const url = URL.createObjectURL(res.data);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "ofoq-employee.pkpass";
-      a.click();
-      URL.revokeObjectURL(url);
-    }
+    const res = await (employeeApi.walletPass() as any);
+    const blob: Blob = res.data instanceof Blob ? res.data : new Blob([res.data]);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ofoq-employee.pkpass";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("تم تحميل بطاقة Apple Wallet ✓");
   } catch (err: any) {
-    const msg = err?.response?.data?.setup || "Apple Wallet سيكون متاحاً عند تفعيل شهادة المطوّر";
-    toast.error(msg, { duration: 4000 });
+    const detail = err?.response?.data?.detail || err?.response?.data?.error;
+    toast.error(detail || "تعذّر توليد البطاقة، حاول مرة أخرى", { duration: 5000 });
+  } finally {
+    setLoading(false);
   }
 }
 
@@ -58,6 +63,7 @@ export default function EmployeeCardPage() {
   const { user } = useAuthStore();
   const [flipped, setFlipped] = useState(false);
   const [cardRef, setCardRef] = useState<HTMLDivElement | null>(null);
+  const [walletLoading, setWalletLoading] = useState(false);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["employee-card"],
@@ -245,72 +251,61 @@ export default function EmployeeCardPage() {
             </button>
           </div>
 
-          {/* ── Apple Wallet (iOS only) ───────────────── */}
-          <AnimatePresence>
-            {isIOS && (
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-3"
-              >
-                {/* Wallet Preview Card */}
-                <div className="rounded-2xl overflow-hidden shadow-xl border border-white/10"
-                  style={{ background: "linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%)" }}>
-                  {/* Pass header */}
-                  <div className="flex items-center justify-between px-4 pt-4 pb-2">
-                    <div>
-                      <p className="text-white/50 text-[9px] uppercase tracking-widest">Employee Card</p>
-                      <p className="text-white font-bold text-sm">أفق لحلول الأعمال</p>
-                    </div>
-                    <OfoqLogo size={36} />
-                  </div>
-                  <div className="px-4 pb-3 flex items-end gap-3">
-                    {avatarUrl ? (
-                      <img src={avatarUrl} alt="" className="w-14 h-14 rounded-xl object-cover border border-[#33B27C]/40" />
-                    ) : (
-                      <div className="w-14 h-14 rounded-xl bg-[#33B27C]/20 flex items-center justify-center text-2xl text-[#33B27C] font-bold">
-                        {displayName.charAt(0)}
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-white font-bold">{displayName}</p>
-                      <p className="text-[#33B27C] text-xs">{position}</p>
-                    </div>
-                  </div>
-                  <div className="bg-black/30 mx-3 mb-3 rounded-xl p-2 flex items-center justify-center gap-2">
-                    {qrCode && <img src={qrCode} alt="QR" className="w-10 h-10 rounded" />}
-                    <p className="text-white/60 text-[10px] font-mono">{code}</p>
-                  </div>
+          {/* ── Apple Wallet ─────────────────────────── */}
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+
+            {/* Pass preview card */}
+            <div className="rounded-2xl overflow-hidden shadow-xl border border-white/10"
+              style={{ background: "linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%)" }}>
+              <div className="flex items-center justify-between px-4 pt-4 pb-2">
+                <div>
+                  <p className="text-white/50 text-[9px] uppercase tracking-widest">Employee Card</p>
+                  <p className="text-white font-bold text-sm">أفق لحلول الأعمال</p>
                 </div>
-
-                {/* Official "Add to Apple Wallet" button */}
-                <button
-                  onClick={downloadWalletPass}
-                  className="w-full flex items-center justify-center gap-2 bg-black text-white rounded-2xl py-3.5 px-6 font-semibold text-sm hover:bg-gray-900 active:scale-95 transition-transform shadow-xl"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                    <path d="M16.365 1.43c0 1.14-.415 2.19-1.24 3.14-.995 1.14-2.196 1.8-3.5 1.7-.04-1.1.44-2.24 1.24-3.15.99-1.15 2.28-1.83 3.5-1.69zm4.235 15.87c-.55 1.27-.82 1.84-1.53 2.96-.99 1.56-2.39 3.5-4.12 3.51-1.54.02-1.93-1-4.02-.99-2.08.01-2.52 1.01-4.06.99-1.73-.02-3.06-1.77-4.05-3.33C.5 17.32-.35 13 1.09 9.99c.79-1.68 2.2-2.75 3.73-2.77 1.5-.02 2.92 1 3.83 1s2.62-1.23 4.42-1.05c.75.03 2.87.3 4.23 2.28-.11.07-2.53 1.48-2.5 4.4.03 3.5 3.07 4.66 3.1 4.68" />
-                  </svg>
-                  <span>إضافة إلى Apple Wallet</span>
-                </button>
-
-                <p className="text-center text-xs text-gray-400 flex items-center justify-center gap-1">
-                  <AlertCircle size={12} />
-                  يتطلب تفعيل شهادة Apple Wallet من لوحة الإعدادات
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Show Wallet card preview on non-iOS too, but without the download button */}
-          {!isIOS && (
-            <div className="card bg-gray-50 text-center py-4">
-              <CreditCard size={24} className="text-gray-300 mx-auto mb-2" />
-              <p className="text-xs text-gray-400">
-                زر <strong>إضافة إلى Apple Wallet</strong> يظهر على أجهزة iPhone فقط
-              </p>
+                <OfoqLogo size={36} />
+              </div>
+              <div className="px-4 pb-3 flex items-end gap-3">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="" className="w-14 h-14 rounded-xl object-cover border border-[#33B27C]/40" />
+                ) : (
+                  <div className="w-14 h-14 rounded-xl bg-[#33B27C]/20 flex items-center justify-center text-2xl text-[#33B27C] font-bold">
+                    {displayName.charAt(0)}
+                  </div>
+                )}
+                <div>
+                  <p className="text-white font-bold">{displayName}</p>
+                  <p className="text-[#33B27C] text-xs">{position}</p>
+                </div>
+              </div>
+              <div className="bg-black/30 mx-3 mb-3 rounded-xl p-2 flex items-center justify-center gap-2">
+                {qrCode && <img src={qrCode} alt="QR" className="w-10 h-10 rounded" />}
+                <p className="text-white/60 text-[10px] font-mono">{code}</p>
+              </div>
             </div>
-          )}
+
+            {/* Download button — iOS opens pass directly, others save file */}
+            <button
+              onClick={() => downloadWalletPass(setWalletLoading)}
+              disabled={walletLoading}
+              className="w-full flex items-center justify-center gap-2 bg-black text-white rounded-2xl py-3.5 px-6 font-semibold text-sm hover:bg-gray-900 active:scale-95 transition-all shadow-xl disabled:opacity-60"
+            >
+              {walletLoading ? (
+                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                  <path d="M16.365 1.43c0 1.14-.415 2.19-1.24 3.14-.995 1.14-2.196 1.8-3.5 1.7-.04-1.1.44-2.24 1.24-3.15.99-1.15 2.28-1.83 3.5-1.69zm4.235 15.87c-.55 1.27-.82 1.84-1.53 2.96-.99 1.56-2.39 3.5-4.12 3.51-1.54.02-1.93-1-4.02-.99-2.08.01-2.52 1.01-4.06.99-1.73-.02-3.06-1.77-4.05-3.33C.5 17.32-.35 13 1.09 9.99c.79-1.68 2.2-2.75 3.73-2.77 1.5-.02 2.92 1 3.83 1s2.62-1.23 4.42-1.05c.75.03 2.87.3 4.23 2.28-.11.07-2.53 1.48-2.5 4.4.03 3.5 3.07 4.66 3.1 4.68" />
+                </svg>
+              )}
+              <span>{walletLoading ? "جاري التوليد..." : isIOS ? "إضافة إلى Apple Wallet" : "تحميل بطاقة Apple Wallet (.pkpass)"}</span>
+            </button>
+
+            {!isIOS && (
+              <p className="text-center text-xs text-gray-400 flex items-center justify-center gap-1">
+                <AlertCircle size={12} />
+                على iPhone: افتح الملف مباشرةً لإضافته إلى Wallet
+              </p>
+            )}
+          </motion.div>
         </>
       )}
     </div>

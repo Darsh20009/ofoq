@@ -3,6 +3,7 @@ import crypto from "crypto";
 import QRCode from "qrcode";
 import { requireAuth } from "../auth.js";
 import { UserModel } from "../models/index.js";
+import { generateWalletPass } from "../services/walletpass.service.js";
 
 export const employeeRouter = Router();
 
@@ -59,15 +60,37 @@ employeeRouter.post("/me/regenerate-code", requireAuth, async (req, res) => {
 });
 
 // ── GET /api/employee/me/wallet-pass ─────────────────────────────
-// Download Apple Wallet .pkpass (requires APPLE_WALLET_CERT secret)
+// Generates and streams a signed Apple Wallet .pkpass file
 employeeRouter.get("/me/wallet-pass", requireAuth, async (req, res) => {
-  if (!process.env.APPLE_WALLET_CERT) {
-    res.status(503).json({
-      error: "Apple Wallet غير مفعّل",
-      setup: "يتطلب شهادة APPLE_WALLET_CERT في إعدادات البيئة",
+  try {
+    const userId = (req as any).user._id;
+    let user = await UserModel.findById(userId).lean() as any;
+    if (!user) { res.status(404).json({ error: "المستخدم غير موجود" }); return; }
+
+    // Auto-generate employee code if missing
+    if (!user.employeeCode) {
+      const code = generateEmployeeCode();
+      await UserModel.findByIdAndUpdate(userId, { employeeCode: code });
+      user.employeeCode = code;
+    }
+
+    const passBuffer = await generateWalletPass({
+      fullName:     user.fullName,
+      fullNameAr:   user.fullNameAr,
+      position:     user.position,
+      department:   user.department,
+      employeeCode: user.employeeCode,
+      email:        user.email,
     });
-    return;
+
+    res.set({
+      "Content-Type":        "application/vnd.apple.pkpass",
+      "Content-Disposition": `attachment; filename="ofoq-${user.employeeCode}.pkpass"`,
+      "Content-Length":      String(passBuffer.length),
+    });
+    res.send(passBuffer);
+  } catch (err: any) {
+    console.error("[Employee] wallet-pass error:", err.message);
+    res.status(500).json({ error: "خطأ في توليد البطاقة", detail: err.message });
   }
-  // Full passkit generation wired in when certificate is configured
-  res.status(503).json({ error: "قريباً بعد رفع الشهادة" });
 });
