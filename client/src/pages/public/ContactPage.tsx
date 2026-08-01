@@ -53,7 +53,7 @@ export default function ContactPage() {
               <div className="card">
                 <h3 className="font-bold text-navy-700 text-lg mb-5">{t.contact.infoTitle}</h3>
                 <div className="space-y-4">
-                  <a href="tel:+966XXXXXXXXX" className="flex items-center gap-3 group">
+                  <a href="tel:+966500851177" className="flex items-center gap-3 group">
                     <div className="w-10 h-10 rounded-xl bg-ofoq-green/10 flex items-center justify-center group-hover:bg-ofoq-green transition-colors">
                       <Phone size={18} className="text-ofoq-green group-hover:text-white transition-colors" />
                     </div>
@@ -62,7 +62,7 @@ export default function ContactPage() {
                       <p className="font-semibold text-navy-700 text-sm">{t.contact.phoneVal}</p>
                     </div>
                   </a>
-                  <a href="mailto:info@ofoq.sa" className="flex items-center gap-3 group">
+                  <a href="mailto:info@ofoqhc.com" className="flex items-center gap-3 group">
                     <div className="w-10 h-10 rounded-xl bg-ofoq-green/10 flex items-center justify-center group-hover:bg-ofoq-green transition-colors">
                       <Mail size={18} className="text-ofoq-green group-hover:text-white transition-colors" />
                     </div>
