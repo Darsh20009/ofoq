@@ -24,12 +24,14 @@ export const appleEnabled = Boolean(
 passport.serializeUser((user: any, done) => done(null, user));
 passport.deserializeUser((user: any, done) => done(null, user));
 
+const BASE_URL = (process.env.APP_URL || "https://ofoqhc.com").replace(/\/$/, "");
+
 if (googleEnabled) {
   passport.use(new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      callbackURL: "/api/auth/google/callback",
+      callbackURL: `${BASE_URL}/api/auth/google/callback`,
       proxy: true,
     },
     async (_accessToken: string, _refreshToken: string, profile: any, done: any) => {
@@ -71,7 +73,7 @@ if (appleEnabled) {
       teamID: process.env.APPLE_TEAM_ID!,
       keyID: process.env.APPLE_KEY_ID!,
       privateKeyString: process.env.APPLE_PRIVATE_KEY!,
-      callbackURL: "/api/auth/apple/callback",
+      callbackURL: `${BASE_URL}/api/auth/apple/callback`,
       proxy: true,
       passReqToCallback: false,
       scope: ["name", "email"],
