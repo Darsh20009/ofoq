@@ -1,74 +1,59 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Menu, X, Phone, Mail, MapPin, ChevronUp, Globe } from "lucide-react";
+import { Menu, X, Phone, Mail, MapPin, ChevronUp, FileText, LogIn } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import OfoqLogo from "../components/OfoqLogo";
-import { useLang } from "../i18n/LangContext";
 
-/**
- * Qirox Studio Group logo — metallic Q with diagonal geometric cut.
- * Matches the official app icon: thick Q ring, dark-top-left → silver-bottom
- * gradient, and a straight diagonal slash tail at bottom-right.
- * No background (transparent).
- */
 function QiroxIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="20" height="20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        {/* Main metallic gradient — dark charcoal top-left → bright silver mid → softer bottom-right */}
-        <linearGradient id="qx-metal" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
-          <stop offset="0%"   stopColor="#555555"/>
+        <linearGradient id="qx-metal2" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
+          <stop offset="0%"   stopColor="#555"/>
           <stop offset="35%"  stopColor="#d0d0d0"/>
           <stop offset="65%"  stopColor="#e8e8e8"/>
           <stop offset="100%" stopColor="#9a9a9a"/>
         </linearGradient>
-        {/* Clip: mask out the bottom-right wedge to create the open gap in the Q */}
-        <clipPath id="qx-clip">
-          {/* Full square minus bottom-right triangle wedge */}
+        <clipPath id="qx-clip2">
           <polygon points="0,0 100,0 100,52 68,100 0,100"/>
         </clipPath>
       </defs>
-
-      {/* ── Q ring ── thick circle, clipped to create the open gap at bottom-right */}
-      <circle
-        cx="46" cy="46" r="30"
-        stroke="url(#qx-metal)" strokeWidth="14"
-        fill="none"
-        clipPath="url(#qx-clip)"
-      />
-
-      {/* ── Diagonal tail — straight bar from gap to bottom-right corner ── */}
-      <line
-        x1="63" y1="63"
-        x2="87" y2="91"
-        stroke="url(#qx-metal)" strokeWidth="13"
-        strokeLinecap="square"
-      />
+      <circle cx="46" cy="46" r="30" stroke="url(#qx-metal2)" strokeWidth="14" fill="none" clipPath="url(#qx-clip2)"/>
+      <line x1="63" y1="63" x2="87" y2="91" stroke="url(#qx-metal2)" strokeWidth="13" strokeLinecap="square"/>
     </svg>
   );
 }
 
+const NAV_LINKS = [
+  { href: "/",          label: "الرئيسية" },
+  { href: "/services",  label: "خدماتنا" },
+  { href: "/packages",  label: "الباقات" },
+  { href: "/countries", label: "دول الاستقطاب" },
+  { href: "/about",     label: "من نحن" },
+  { href: "/contact",   label: "تواصل معنا" },
+];
+
+const FOOTER_LINKS = NAV_LINKS;
+
+const SOCIAL = [
+  { label: "X",  href: "#", char: "𝕏" },
+  { label: "LI", href: "#", char: "in" },
+  { label: "IG", href: "#", char: "◉" },
+  { label: "WA", href: "#", char: "W" },
+];
+
 export default function PublicLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [showTop, setShowTop] = useState(false);
+  const [scrolled,   setScrolled]   = useState(false);
+  const [showTop,    setShowTop]     = useState(false);
   const { pathname } = useLocation();
-  const { lang, toggleLang, t } = useLang();
-
-  const navLinks = [
-    { href: "/",         label: t.nav.home },
-    { href: "/services", label: t.nav.services },
-    { href: "/about",    label: t.nav.about },
-    { href: "/blog",     label: t.nav.blog },
-    { href: "/contact",  label: t.nav.contact },
-  ];
 
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 20);
-      setShowTop(window.scrollY > 400);
+      setShowTop(window.scrollY > 500);
     };
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -79,34 +64,28 @@ export default function PublicLayout() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* ── Navbar ──────────────────────── */}
-      <header
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-          scrolled ? "glass-dark shadow-xl" : "bg-transparent"
-        }`}
-      >
+
+      {/* ── Navbar ─────────────────────────────────────────────── */}
+      <header className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
+        scrolled ? "glass-dark shadow-xl" : "bg-transparent"
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-18 py-3">
+
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-3 group">
-              <OfoqLogo className="w-16 h-12 text-white" />
-              <div>
-                <p className="text-white font-bold text-lg leading-none">
-                  {lang === "ar" ? "أفق" : "OFOQ"}
-                </p>
-                <p className="text-white/60 text-xs">
-                  {lang === "ar" ? "لحلول الأعمال" : "Business Solutions"}
-                </p>
+            <Link to="/" className="flex items-center gap-3 group flex-shrink-0">
+              <OfoqLogo className="w-16 h-12" />
+              <div className="hidden sm:block">
+                <p className="text-white font-bold text-base leading-none">أفق</p>
+                <p className="text-white/55 text-[10px]">لحلول الأعمال</p>
               </div>
             </Link>
 
             {/* Desktop nav */}
-            <nav className="hidden md:flex items-center gap-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            <nav className="hidden lg:flex items-center gap-0.5">
+              {NAV_LINKS.map((link) => (
+                <Link key={link.href} to={link.href}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                     pathname === link.href
                       ? "bg-ofoq-red text-white"
                       : "text-white/80 hover:text-white hover:bg-white/10"
@@ -118,26 +97,30 @@ export default function PublicLayout() {
             </nav>
 
             <div className="flex items-center gap-2">
-              {/* زر تغيير اللغة */}
-              <button
-                onClick={toggleLang}
-                title={t.nav.switchLang}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/25 text-white/80 hover:text-white hover:bg-white/10 hover:border-white/50 transition-all text-xs font-semibold"
+              {/* البروفايل — opens PDF */}
+              <a
+                href="/profile.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/25 text-white/80 hover:text-white hover:bg-white/10 hover:border-white/50 transition-all text-xs font-semibold"
+                title="البروفايل"
               >
-                <Globe size={13} />
-                <span>{lang === "ar" ? "EN" : "ع"}</span>
-              </button>
+                <FileText size={13} />
+                <span>البروفايل</span>
+              </a>
 
+              {/* دخول العميل */}
               <Link
-                to="/contact"
-                className="hidden md:flex btn-red text-xs px-4 py-2"
+                to="/client/login"
+                className="hidden md:flex items-center gap-1.5 btn-red text-xs px-4 py-2"
               >
-                {t.nav.getQuote}
+                <LogIn size={13} />
+                دخول العميل
               </Link>
 
               {/* Mobile toggle */}
               <button
-                className="md:hidden text-white p-2 rounded-lg hover:bg-white/10"
+                className="lg:hidden text-white p-2 rounded-lg hover:bg-white/10"
                 onClick={() => setMobileOpen(!mobileOpen)}
               >
                 {mobileOpen ? <X size={22} /> : <Menu size={22} />}
@@ -154,13 +137,11 @@ export default function PublicLayout() {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="md:hidden overflow-hidden glass-dark border-t border-white/10"
+              className="lg:hidden overflow-hidden glass-dark border-t border-white/10"
             >
               <nav className="flex flex-col p-4 gap-1">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    to={link.href}
+                {NAV_LINKS.map((link) => (
+                  <Link key={link.href} to={link.href}
                     className={`px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                       pathname === link.href
                         ? "bg-ofoq-red text-white"
@@ -170,126 +151,152 @@ export default function PublicLayout() {
                     {link.label}
                   </Link>
                 ))}
-                <Link to="/contact" className="btn-red mt-2 justify-center">
-                  {t.nav.getQuote}
-                </Link>
+                <div className="flex gap-2 mt-2">
+                  <a href="/profile.pdf" target="_blank" rel="noopener noreferrer"
+                    className="flex-1 flex items-center justify-center gap-1.5 btn-outline border-white/30 text-white text-sm py-2.5">
+                    <FileText size={14} /> البروفايل
+                  </a>
+                  <Link to="/client/login"
+                    className="flex-1 flex items-center justify-center gap-1.5 btn-red text-sm py-2.5">
+                    <LogIn size={14} /> دخول العميل
+                  </Link>
+                </div>
               </nav>
             </motion.div>
           )}
         </AnimatePresence>
       </header>
 
-      {/* ── Content ──────────────────────── */}
+      {/* ── Page content ───────────────────────────────────────── */}
       <main className="flex-1">
         <Outlet />
       </main>
 
-      {/* ── Footer ──────────────────────── */}
-      <footer className="bg-ofoq-navy text-white mt-0">
+      {/* ── Footer ─────────────────────────────────────────────── */}
+      <footer className="bg-ofoq-navy text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-            {/* Brand */}
-            <div className="md:col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
+
+            {/* Brand col */}
+            <div className="md:col-span-5">
               <div className="flex items-center gap-3 mb-4">
-                <OfoqLogo className="w-20 h-14 text-white" />
+                <OfoqLogo className="w-20 h-14" />
                 <div>
-                  <p className="font-bold text-xl">{t.footer.company}</p>
-                  <p className="text-white/50 text-sm">OFOQ Business Solutions</p>
+                  <p className="font-bold text-xl">أفق لحلول الأعمال</p>
+                  <p className="text-white/45 text-xs">OFOQ Business Solutions</p>
                 </div>
               </div>
-              <p className="text-white/60 text-sm leading-relaxed max-w-sm">
-                {t.footer.tagline}
+              <p className="text-white/55 text-sm leading-relaxed max-w-sm mb-6">
+                شريكك الموثوق لأعمالك في السعودية — نقدم حلولاً شاملة لتسهيل أعمالك ونكون شريكًا استراتيجيًا في بناء مستقبل شركتك واستدامتها.
               </p>
-              <div className="flex items-center gap-3 mt-6">
-                {["twitter", "linkedin", "instagram"].map((s) => (
-                  <a
-                    key={s}
-                    href="#"
-                    className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center hover:bg-ofoq-red transition-colors text-xs font-bold"
+              <div className="flex items-center gap-2">
+                {SOCIAL.map((s) => (
+                  <a key={s.label} href={s.href}
+                    className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center hover:bg-ofoq-red transition-colors text-xs font-bold text-white/70 hover:text-white"
                   >
-                    {s[0].toUpperCase()}
+                    {s.char}
                   </a>
                 ))}
               </div>
             </div>
 
-            {/* Links */}
-            <div>
-              <h4 className="font-bold mb-4 text-white">{t.footer.quickLinks}</h4>
-              <ul className="space-y-2">
-                {navLinks.map((l) => (
+            {/* Quick links */}
+            <div className="md:col-span-3">
+              <h4 className="font-bold mb-5 text-white text-sm uppercase tracking-wider">روابط هامة</h4>
+              <ul className="space-y-2.5">
+                {FOOTER_LINKS.map((l) => (
                   <li key={l.href}>
-                    <Link
-                      to={l.href}
-                      className="text-white/60 hover:text-ofoq-yellow text-sm transition-colors"
-                    >
+                    <Link to={l.href}
+                      className="text-white/55 hover:text-ofoq-yellow text-sm transition-colors flex items-center gap-1.5">
+                      <span className="w-1 h-1 rounded-full bg-ofoq-red flex-shrink-0" />
                       {l.label}
                     </Link>
                   </li>
                 ))}
+                <li>
+                  <a href="/profile.pdf" target="_blank" rel="noopener noreferrer"
+                    className="text-white/55 hover:text-ofoq-yellow text-sm transition-colors flex items-center gap-1.5">
+                    <span className="w-1 h-1 rounded-full bg-ofoq-red flex-shrink-0" />
+                    البروفايل
+                  </a>
+                </li>
               </ul>
             </div>
 
             {/* Contact */}
-            <div>
-              <h4 className="font-bold mb-4 text-white">{t.footer.contactUs}</h4>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-2 text-white/60 text-sm">
-                  <Phone size={14} className="text-ofoq-red flex-shrink-0" />
-                  <span>{t.footer.phone}</span>
+            <div className="md:col-span-4">
+              <h4 className="font-bold mb-5 text-white text-sm uppercase tracking-wider">اتصل بنا</h4>
+              <ul className="space-y-4">
+                <li>
+                  <a href="mailto:info@ofoqhc.com"
+                    className="flex items-start gap-3 text-white/55 hover:text-white text-sm transition-colors group">
+                    <div className="w-8 h-8 rounded-lg bg-ofoq-red/20 flex items-center justify-center flex-shrink-0 group-hover:bg-ofoq-red transition-colors">
+                      <Mail size={14} className="text-ofoq-red group-hover:text-white" />
+                    </div>
+                    <div>
+                      <p className="text-white/30 text-xs mb-0.5">البريد الإلكتروني</p>
+                      <span>info@ofoqhc.com</span>
+                    </div>
+                  </a>
                 </li>
-                <li className="flex items-center gap-2 text-white/60 text-sm">
-                  <Mail size={14} className="text-ofoq-red flex-shrink-0" />
-                  <span>{t.footer.email}</span>
+                <li>
+                  <a href="tel:+966500851177"
+                    className="flex items-start gap-3 text-white/55 hover:text-white text-sm transition-colors group">
+                    <div className="w-8 h-8 rounded-lg bg-ofoq-red/20 flex items-center justify-center flex-shrink-0 group-hover:bg-ofoq-red transition-colors">
+                      <Phone size={14} className="text-ofoq-red group-hover:text-white" />
+                    </div>
+                    <div>
+                      <p className="text-white/30 text-xs mb-0.5">رقم الجوال</p>
+                      <span dir="ltr">+966 500 851 177</span>
+                    </div>
+                  </a>
                 </li>
-                <li className="flex items-start gap-2 text-white/60 text-sm">
-                  <MapPin size={14} className="text-ofoq-red flex-shrink-0 mt-0.5" />
-                  <span>{t.footer.location}</span>
+                <li className="flex items-start gap-3 text-white/55 text-sm">
+                  <div className="w-8 h-8 rounded-lg bg-ofoq-red/20 flex items-center justify-center flex-shrink-0">
+                    <MapPin size={14} className="text-ofoq-red" />
+                  </div>
+                  <div>
+                    <p className="text-white/30 text-xs mb-0.5">الموقع</p>
+                    <span>السعودية — جدة — طريق الملك عبدالله</span>
+                  </div>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-white/40 text-xs">
-            <p>© {new Date().getFullYear()} {t.footer.company}. {t.footer.rights}</p>
+          <div className="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-white/35 text-xs">
+            <p>© {new Date().getFullYear()} أفق لحلول الأعمال. جميع الحقوق محفوظة.</p>
             <div className="flex gap-4">
-              <a href="#" className="hover:text-white transition-colors">{t.footer.privacy}</a>
-              <a href="#" className="hover:text-white transition-colors">{t.footer.terms}</a>
+              <a href="#" className="hover:text-white transition-colors">سياسة الخصوصية</a>
+              <a href="#" className="hover:text-white transition-colors">الشروط والأحكام</a>
             </div>
           </div>
         </div>
       </footer>
 
-      {/* ── Qirox Studio Attribution ──────────── */}
+      {/* Qirox attribution */}
       <div className="bg-[#070710] border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-center gap-2.5">
-          <span className="text-white/25 text-xs">{t.footer.madeBy}</span>
-          <a
-            href="https://qiroxstudio.online"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 group"
-            aria-label="Qirox Studio Group"
-          >
+          <span className="text-white/25 text-xs">صُنع بواسطة</span>
+          <a href="https://qiroxstudio.online" target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-2 group">
             <QiroxIcon />
-            <span className="text-white/40 text-xs font-medium group-hover:text-white/70 transition-colors tracking-wide">
+            <span className="text-white/35 text-xs font-medium group-hover:text-white/65 transition-colors tracking-wide">
               Qirox Studio Group
             </span>
           </a>
         </div>
       </div>
 
-      {/* ── Back to Top ───────────────── */}
+      {/* Back to top */}
       <AnimatePresence>
         {showTop && (
           <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="fixed bottom-8 left-6 w-11 h-11 bg-ofoq-red text-white rounded-full flex items-center justify-center shadow-ofoq-red hover:scale-110 transition-transform z-40"
           >
-            <ChevronUp size={20} />
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m18 15-6-6-6 6"/></svg>
           </motion.button>
         )}
       </AnimatePresence>

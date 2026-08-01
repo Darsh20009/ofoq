@@ -1,51 +1,55 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Award, Target, Heart, Users, Globe, TrendingUp, ArrowLeft } from "lucide-react";
 import { Helmet } from "react-helmet-async";
-import { useLang } from "../../i18n/LangContext";
+import { Target, Repeat2, LayoutGrid, Heart, ArrowLeft } from "lucide-react";
+import OfoqLogo from "../../components/OfoqLogo";
 
-const VAL_ICONS = [Heart, TrendingUp, Award, Target];
-const STAT_ICONS = [Award, Users, Globe, TrendingUp];
+const fadeUp = {
+  hidden:  { opacity: 0, y: 24 },
+  visible: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.5 } }),
+};
+
+const WHY = [
+  {
+    icon: Repeat2,
+    title: "ندرك التغيرات المستمرة",
+    desc: "ندرك التغيرات المستمرة في سوق العمل ونعتمد الديناميكية أساساً للعمل لنسخّر الأدوات المختلفة لتحقيق أهدافنا مع العميل كشركاء نجاح.",
+  },
+  {
+    icon: LayoutGrid,
+    title: "نفهم احتياجات القطاعات",
+    desc: "نفخر بتوفير مستشارين ومتخصصين في مجالات متعددة، حيث نولي اهتماماً كبيراً لتلبية احتياجات عملائنا في كل قطاع ونسعى لضمان توفير الكوادر المطلوبة بدقة وفاعلية.",
+  },
+  {
+    icon: Heart,
+    title: "نعتني بقيمكم وأهدافكم",
+    desc: "لدينا القدرة على تحقيق أعلى مستويات الإنتاجية بالإضافة لفهم دقيق لأهداف العميل وطبيعة عمل عملائنا وخططهم الحالية والمستقبلية.",
+  },
+];
 
 export default function AboutPage() {
-  const { t } = useLang();
-
-  const VALUES = [
-    { title: t.about.val0t, desc: t.about.val0d, icon: Heart },
-    { title: t.about.val1t, desc: t.about.val1d, icon: TrendingUp },
-    { title: t.about.val2t, desc: t.about.val2d, icon: Award },
-    { title: t.about.val3t, desc: t.about.val3d, icon: Target },
-  ];
-
-  const STATS = [
-    { icon: Award,      val: t.about.stat0v, label: t.about.stat0l },
-    { icon: Users,      val: t.about.stat1v, label: t.about.stat1l },
-    { icon: Globe,      val: t.about.stat2v, label: t.about.stat2l },
-    { icon: TrendingUp, val: t.about.stat3v, label: t.about.stat3l },
-  ];
-
   return (
     <>
       <Helmet>
-        <title>{t.about.metaTitle}</title>
-        <meta name="description" content="تعرّف على قصة أفق لحلول الأعمال (OFOQ) — رؤيتنا ومهمتنا وفريقنا المتميز في تقديم حلول رقمية متكاملة للشركات السعودية والخليجية." />
+        <title>من نحن — أفق لحلول الأعمال</title>
+        <meta name="description" content="تعرّف على شركة أفق لحلول الأعمال — شريكك الموثوق في تقديم الحلول المتكاملة لقطاع الأعمال في المملكة العربية السعودية." />
         <link rel="canonical" href="https://ofoqhc.com/about" />
-        <meta property="og:title" content={t.about.metaTitle} />
-        <meta property="og:url" content="https://ofoqhc.com/about" />
       </Helmet>
 
       {/* Hero */}
-      <section className="pt-32 pb-20 bg-cover bg-center" style={{ backgroundImage: "linear-gradient(rgba(10,16,50,.45),rgba(28,43,110,.62)), url('/images/riyadh-towers-palms.jpg')" }}>
+      <section className="pt-32 pb-20 bg-cover bg-center"
+        style={{ backgroundImage: "linear-gradient(rgba(10,16,50,.50),rgba(28,43,110,.68)), url('/images/riyadh-towers-palms.jpg')" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <span className="badge bg-ofoq-red/20 text-red-200 mb-4">{t.about.badge}</span>
+              <span className="badge bg-ofoq-red/20 text-red-200 mb-4">من نحن</span>
               <h1 className="text-5xl font-black text-white mt-3 mb-5">
-                {t.about.heroTitle1}<br />
-                <span className="text-ofoq-yellow">{t.about.heroTitle2}</span>
+                أفق لحلول الأعمال
+                <br />
+                <span className="text-ofoq-yellow">شريكك الموثوق</span>
               </h1>
               <p className="text-white/60 text-xl leading-relaxed max-w-2xl">
-                {t.about.heroSub}
+                تأسست أفق لحلول الأعمال لتكون شريكًا موثوقًا في تقديم الحلول المتكاملة التي تواكب تطلعات قطاع الأعمال في المملكة العربية السعودية
               </p>
             </motion.div>
           </div>
@@ -57,90 +61,114 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-              <h2 className="section-title mb-6">{t.about.storyTitle}</h2>
-              <div className="space-y-4 text-gray-600 leading-relaxed">
+              <h2 className="section-title mb-6">قصتنا</h2>
+              <div className="space-y-5 text-gray-600 leading-relaxed text-base">
                 <p>
-                  {t.about.storyP1}{" "}
-                  <strong className="text-navy-700">{t.about.storyVision}</strong>{" "}
-                  {t.about.storyP2}
+                  تأسست شركة أفق لحلول الأعمال لتكون شريكًا موثوقًا في تقديم الحلول المتكاملة التي تواكب تطلعات قطاع الأعمال في المملكة العربية السعودية. ومنذ انطلاقتنا، عملنا على تمكين الشركات من تحقيق أهدافها من خلال تقديم خدمات احترافية تدعم استقرار الأعمال ونموها المستدام.
                 </p>
-                <p>{t.about.storyP3}</p>
-                <p>{t.about.storyP4}</p>
+                <p>
+                  نؤمن في أفق أن رأس المال البشري هو المحرك الأساسي للتميّز، لذا نعتز بفريقنا الذي يجمع بين الخبرة والكفاءة، ويعمل بتناغم تام ينعكس على جودة الخدمات، وعلى رضا عملائنا، وعلى ثقة الشركاء بنا.
+                </p>
+                <p>
+                  في أفق، نواصل التقدّم برؤية طموحة وخطط مدروسة، لنكون الخيار الأول لحلول الأعمال في المملكة، وشريكًا استراتيجيًا في بناء مستقبل اقتصادي أكثر كفاءة واستدامة.
+                </p>
               </div>
             </motion.div>
-            <div className="grid grid-cols-2 gap-5">
-              {STATS.map((s, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }} viewport={{ once: true }}
-                  className="card text-center group hover:shadow-ofoq-red transition-shadow">
-                  <div className="w-12 h-12 rounded-xl bg-ofoq-red/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-ofoq-red transition-colors">
-                    <s.icon size={22} className="text-ofoq-red group-hover:text-white transition-colors" />
+
+            {/* Vision card */}
+            <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+              <div className="bg-ofoq-navy rounded-3xl p-10 text-white relative overflow-hidden">
+                {/* BG circles */}
+                <div className="absolute top-0 left-0 w-40 h-40 rounded-full bg-ofoq-red/10 -translate-x-1/2 -translate-y-1/2" />
+                <div className="absolute bottom-0 right-0 w-32 h-32 rounded-full bg-ofoq-yellow/8 translate-x-1/2 translate-y-1/2" />
+
+                <div className="relative z-10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-xl bg-ofoq-yellow/20 flex items-center justify-center">
+                      <Target size={20} className="text-ofoq-yellow" />
+                    </div>
+                    <h3 className="text-lg font-black text-ofoq-yellow">رؤيتنا</h3>
                   </div>
-                  <p className="text-3xl font-black text-navy-700 mb-1">{s.val}</p>
-                  <p className="text-gray-500 text-sm">{s.label}</p>
-                </motion.div>
-              ))}
-            </div>
+                  <p className="text-white/80 text-lg leading-relaxed mb-8">
+                    نتطلع لأن نكون الشركة الرائدة محلياً في تقديم حلول الأعمال في المملكة، وشريكًا استراتيجيًا في بناء مستقبل اقتصادي أكثر كفاءة واستدامة.
+                  </p>
+                  <div className="border-t border-white/10 pt-6 flex items-center gap-3">
+                    <OfoqLogo className="w-16 h-12" />
+                    <div>
+                      <p className="font-bold text-white">أفق لحلول الأعمال</p>
+                      <p className="text-white/40 text-xs">OFOQ Business Solutions</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Values */}
+      {/* Why choose OFOQ */}
       <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }} className="text-center mb-16">
-            <h2 className="section-title">{t.about.valuesTitle}</h2>
-            <p className="section-subtitle">{t.about.valuesSub}</p>
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
+            className="text-center mb-16">
+            <h2 className="section-title">لماذا تختار أفق؟</h2>
+            <p className="section-subtitle max-w-2xl mx-auto">
+              عندما تختار أفق فأنت تختار شريكاً استراتيجياً يقدّر وقتك، يدعم طموحاتك، ويضعك على الطريق الصحيح لتحقيق أهدافك
+            </p>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {VALUES.map((v, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }} viewport={{ once: true }}
-                className="card text-center group hover:shadow-ofoq transition-all hover:-translate-y-1">
-                <div className="w-14 h-14 rounded-2xl bg-ofoq-navy flex items-center justify-center mx-auto mb-4 group-hover:bg-ofoq-green transition-colors">
-                  <v.icon size={24} className="text-ofoq-yellow group-hover:text-white transition-colors" />
-                </div>
-                <h3 className="font-bold text-lg text-navy-700 mb-2">{v.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{v.desc}</p>
-              </motion.div>
-            ))}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
+            {WHY.map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="visible"
+                  viewport={{ once: true }}
+                  className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all group">
+                  <div className="w-14 h-14 rounded-2xl bg-ofoq-navy flex items-center justify-center mb-5 group-hover:bg-ofoq-red transition-colors">
+                    <Icon size={24} className="text-ofoq-yellow group-hover:text-white transition-colors" />
+                  </div>
+                  <h3 className="font-bold text-xl text-navy-700 mb-3">{item.title}</h3>
+                  <p className="text-gray-500 leading-relaxed text-sm">{item.desc}</p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Team */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }} className="text-center mb-16">
-            <h2 className="section-title">{t.about.teamTitle}</h2>
-            <p className="section-subtitle">{t.about.teamSub}</p>
+      {/* Mission Statement */}
+      <section
+        className="py-24 relative bg-cover bg-center"
+        style={{ backgroundImage: "linear-gradient(rgba(10,16,50,.80),rgba(28,43,110,.90)), url('/images/hero-riyadh-towers.jpg')" }}
+      >
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+            <div className="w-16 h-16 rounded-2xl bg-ofoq-yellow/15 flex items-center justify-center mx-auto mb-6">
+              <Target size={30} className="text-ofoq-yellow" />
+            </div>
+            <blockquote className="text-3xl sm:text-4xl font-black text-white leading-tight mb-6">
+              "نواصل التقدّم برؤية طموحة وخطط مدروسة،
+              <br />
+              <span className="text-ofoq-yellow">لنكون الخيار الأول لحلول الأعمال"</span>
+            </blockquote>
+            <p className="text-white/50 text-lg">— فريق أفق لحلول الأعمال</p>
           </motion.div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {t.about.team.map((member, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }} viewport={{ once: true }}
-                className="card text-center group hover:shadow-ofoq transition-all hover:-translate-y-1">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-ofoq-navy to-navy-600 flex items-center justify-center mx-auto mb-4 shadow-ofoq group-hover:scale-105 transition-transform">
-                  <span className="text-white font-bold text-xl">{member.initials}</span>
-                </div>
-                <h3 className="font-bold text-navy-700">{member.name}</h3>
-                <p className="text-gray-500 text-sm mt-1">{member.role}</p>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
 
       {/* CTA */}
       <section className="py-20 bg-ofoq-navy">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-black text-white mb-4">{t.about.ctaTitle}</h2>
-          <p className="text-white/60 mb-8">{t.about.ctaSub}</p>
-          <Link to="/contact" className="btn-yellow text-base px-8 py-4">
-            {t.common.contactToday} <ArrowLeft size={18} />
-          </Link>
+          <h2 className="text-3xl font-black text-white mb-4">هل أنت مستعد للبدء معنا؟</h2>
+          <p className="text-white/55 mb-8 text-lg">تواصل مع فريقنا اليوم ودعنا نساعدك في بناء مستقبل شركتك</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/client/register" className="btn-yellow text-base px-8 py-4">
+              ابدأ طلبك الآن <ArrowLeft size={18} />
+            </Link>
+            <Link to="/contact" className="btn-outline border-white/30 text-white hover:bg-white/10 text-base px-8 py-4">
+              تواصل معنا
+            </Link>
+          </div>
         </div>
       </section>
     </>

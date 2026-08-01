@@ -1,271 +1,517 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, CheckCircle, Star, TrendingUp, Users, Award, Globe, Zap, Shield, BarChart3, ChevronLeft } from "lucide-react";
 import { Helmet } from "react-helmet-async";
-import { useQuery } from "@tanstack/react-query";
-import { cmsApi, servicesApi } from "../../api/client";
-import { useLang } from "../../i18n/LangContext";
-
-const SERVICES_ICONS = [TrendingUp, Globe, BarChart3, Shield, Zap, Users];
-const WHY_ICONS = [Award, Zap, Users, CheckCircle];
+import {
+  ArrowLeft, Building2, Scale, Trademark, Landmark, Users, MonitorSmartphone,
+  TrendingUp, BarChart3, CheckCircle, ChevronLeft, Star,
+  FileCheck, MessageSquare, Handshake, Sparkles,
+} from "lucide-react";
 
 const fadeUp = {
-  hidden:  { opacity: 0, y: 30 },
-  visible: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.5 } }),
+  hidden:  { opacity: 0, y: 28 },
+  visible: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5 } }),
 };
 
+// ── 8 خدمات أفق ──────────────────────────────────────────────────────
+const SERVICES = [
+  {
+    icon: Building2,
+    title: "تأسيس الشركات",
+    desc: "إعداد عقود التأسيس وصياغتها بما يتوافق مع القوانين المحلية، واستخراج السجل التجاري والتراخيص اللازمة.",
+    color: "from-blue-500/20 to-blue-600/10",
+    accent: "text-blue-400",
+  },
+  {
+    icon: Scale,
+    title: "الخدمات القانونية",
+    desc: "صياغة ومراجعة العقود، الاستشارات القانونية في القضايا التجارية والعمالية، والتمثيل أمام الجهات القضائية.",
+    color: "from-purple-500/20 to-purple-600/10",
+    accent: "text-purple-400",
+  },
+  {
+    icon: Trademark,
+    title: "تسجيل العلامات التجارية",
+    desc: "تسجيل وحماية علامتك التجارية، ومتابعة الإجراءات مع الجهات المختصة لضمان حقوقك الكاملة.",
+    color: "from-amber-500/20 to-amber-600/10",
+    accent: "text-amber-400",
+  },
+  {
+    icon: Landmark,
+    title: "الخدمات الحكومية",
+    desc: "إنهاء الإجراءات الحكومية، استقطاب العمالة من سفارات المملكة، التراخيص التجارية والصناعية، الإقامات والتأشيرات.",
+    color: "from-emerald-500/20 to-emerald-600/10",
+    accent: "text-emerald-400",
+  },
+  {
+    icon: Users,
+    title: "إدارة الموارد البشرية",
+    desc: "التوظيف واستقطاب الكفاءات، إدارة الرواتب والأجور، برامج التدريب وتطوير الأداء.",
+    color: "from-ofoq-red/20 to-red-600/10",
+    accent: "text-red-400",
+  },
+  {
+    icon: MonitorSmartphone,
+    title: "إدارة المنصات الحكومية",
+    desc: "إدارة منصة قوى ومقيم والتأمينات الاجتماعية — تسجيل وتحديث بيانات الموظفين وتسهيل كل الإجراءات.",
+    color: "from-cyan-500/20 to-cyan-600/10",
+    accent: "text-cyan-400",
+  },
+  {
+    icon: TrendingUp,
+    title: "خدمات المستثمرين",
+    desc: "استشارات قانونية ومالية لدعم قرارات الاستثمار، والمساعدة في فتح الحسابات البنكية وإتمام المعاملات.",
+    color: "from-indigo-500/20 to-indigo-600/10",
+    accent: "text-indigo-400",
+  },
+  {
+    icon: BarChart3,
+    title: "تأهيل الشركات للإدراج",
+    desc: "التحضير للطرح العام (IPO)، تجهيز البيانات المالية والوثائق القانونية، والامتثال لمعايير سوق الأسهم.",
+    color: "from-rose-500/20 to-rose-600/10",
+    accent: "text-rose-400",
+  },
+];
+
+// ── الباقات ──────────────────────────────────────────────────────────
+const PACKAGES = [
+  {
+    name: "الباقة الفضية",
+    nameEn: "Silver",
+    color: "from-slate-400 to-slate-500",
+    border: "border-slate-400/40",
+    features: [
+      "وزارة التجارة",
+      "منصة سلامة",
+      "التأمينات الاجتماعية",
+      "خدمات التأمين الطبي",
+      "خدمات الزكاة والضريبة",
+    ],
+    recommended: false,
+  },
+  {
+    name: "الباقة الذهبية",
+    nameEn: "Gold",
+    color: "from-yellow-400 to-amber-500",
+    border: "border-yellow-400/50",
+    features: [
+      "وزارة التجارة",
+      "منصة أبشر ومقيم",
+      "منصة سلامة",
+      "التأمينات الاجتماعية",
+      "خدمات التأمين الطبي",
+      "خدمات الزكاة والضريبة",
+      "خدمات الاستشارات",
+    ],
+    recommended: true,
+  },
+  {
+    name: "الباقة البلاتينية",
+    nameEn: "Platinum",
+    color: "from-slate-200 to-slate-400",
+    border: "border-slate-200/50",
+    features: [
+      "وزارة التجارة",
+      "وزارة الإعلام",
+      "منصة أبشر ومقيم",
+      "منصة بلدي",
+      "منصة سلامة",
+      "التأمينات الاجتماعية",
+      "خدمات التأمين الطبي",
+      "خدمة تخفيف الأعباء",
+      "التدريب والتطوير",
+      "خدمات الاستشارات",
+    ],
+    recommended: false,
+  },
+];
+
+// ── دول الاستقطاب ────────────────────────────────────────────────────
+const COUNTRIES = [
+  { name: "باكستان",   flag: "🇵🇰" },
+  { name: "الهند",     flag: "🇮🇳" },
+  { name: "الأردن",    flag: "🇯🇴" },
+  { name: "سريلانكا", flag: "🇱🇰" },
+  { name: "مصر",       flag: "🇪🇬" },
+  { name: "الفلبين",  flag: "🇵🇭" },
+  { name: "بنجلاديش", flag: "🇧🇩" },
+  { name: "أوغندا",   flag: "🇺🇬" },
+  { name: "نيبال",    flag: "🇳🇵" },
+  { name: "السودان",  flag: "🇸🇩" },
+];
+
+// ── خطوات الطلب ──────────────────────────────────────────────────────
+const STEPS = [
+  {
+    n: "١",
+    icon: FileCheck,
+    title: "اختيار الخدمة وتقديم الطلب",
+    desc: "اختر الخدمة واملأ البيانات المطلوبة ثم أرسل الطلب",
+  },
+  {
+    n: "٢",
+    icon: MessageSquare,
+    title: "مراجعة وتدقيق الطلب",
+    desc: "يقوم الفريق بمراجعة التفاصيل والتواصل معك عند الحاجة",
+  },
+  {
+    n: "٣",
+    icon: CheckCircle,
+    title: "اتخاذ القرار",
+    desc: "يتم إبلاغك بالموافقة أو الرفض مع توضيح الأسباب",
+  },
+  {
+    n: "٤",
+    icon: Handshake,
+    title: "العرض المالي والموافقة",
+    desc: "يُرسَل لك عرض السعر وبمجرد موافقتك يبدأ التنفيذ",
+  },
+  {
+    n: "٥",
+    icon: Sparkles,
+    title: "تنفيذ الخدمة والإغلاق",
+    desc: "تنفيذ الخدمة ثم إغلاق الطلب بعد التأكد من رضاك التام",
+  },
+];
+
+// ── Partners logos (placeholder brand names) ──────────────────────────
+const PARTNERS = ["Saudi Aramco", "STC", "SABIC", "Riyad Bank", "Vision 2030", "NEOM"];
+
 export default function HomePage() {
-  const { t, lang } = useLang();
-  const { data: servicesData } = useQuery({
-    queryKey: ["public-services"],
-    queryFn: () => servicesApi.list({ isActive: true, limit: 6 }).then((r) => r.data),
-  });
-  const { data: testimonialsData } = useQuery({
-    queryKey: ["public-testimonials"],
-    queryFn: () => cmsApi.testimonials.list().then((r) => r.data),
-  });
-
-  const services     = servicesData?.data?.services || [];
-  const testimonials = testimonialsData?.data?.testimonials || [];
-
-  const STATS = [
-    { value: t.home.stat0v, label: t.home.stat0, icon: Award },
-    { value: t.home.stat1v, label: t.home.stat1, icon: Star },
-    { value: t.home.stat2v, label: t.home.stat2, icon: Users },
-    { value: t.home.stat3v, label: t.home.stat3, icon: Globe },
-  ];
-
-  const WHY_US = [
-    { title: t.home.whyReason0t, desc: t.home.whyReason0d, icon: Award },
-    { title: t.home.whyReason1t, desc: t.home.whyReason1d, icon: Zap },
-    { title: t.home.whyReason2t, desc: t.home.whyReason2d, icon: Users },
-    { title: t.home.whyReason3t, desc: t.home.whyReason3d, icon: CheckCircle },
-  ];
-
-  const DEFAULT_SERVICES = [
-    { title: t.home.svc0t, desc: t.home.svc0d },
-    { title: t.home.svc1t, desc: t.home.svc1d },
-    { title: t.home.svc2t, desc: t.home.svc2d },
-    { title: t.home.svc3t, desc: t.home.svc3d },
-    { title: t.home.svc4t, desc: t.home.svc4d },
-    { title: t.home.svc5t, desc: t.home.svc5d },
-  ];
-
   return (
     <div className="overflow-hidden">
       <Helmet>
-        <title>{t.home.metaTitle}</title>
-        <meta name="description" content="أفق (OFOQ) — منصة إدارة أعمال متكاملة للشركات السعودية والخليجية: CRM، مشاريع، فواتير إلكترونية، عقود، ذكاء اصطناعي. شريكك في التحول الرقمي." />
+        <title>أفق لحلول الأعمال — شريكك الموثوق في السعودية</title>
+        <meta name="description" content="أفق لحلول الأعمال — نقدم حلولاً شاملة لتأسيس الشركات، الخدمات القانونية، استقطاب العمالة، إدارة المنصات الحكومية وتأهيل الشركات للإدراج في سوق الأسهم." />
         <link rel="canonical" href="https://ofoqhc.com/" />
-        <meta property="og:title" content="أفق لحلول الأعمال | OFOQ — نظام إداري متكامل" />
+        <meta property="og:title" content="أفق لحلول الأعمال | شريكك الموثوق في السعودية" />
         <meta property="og:url" content="https://ofoqhc.com/" />
       </Helmet>
 
-      {/* ── Hero ─────────────────────────────────────────────── */}
+      {/* ══════════════════════════════════════════════════════════
+          Hero
+      ══════════════════════════════════════════════════════════ */}
       <section
         className="min-h-screen flex items-center relative pt-20 bg-cover bg-center"
-        style={{ backgroundImage: "linear-gradient(rgba(8,13,42,.45),rgba(20,35,90,.65)), url('/images/hero-aramco-hq.jpg')" }}
+        style={{ backgroundImage: "linear-gradient(rgba(8,13,42,.50),rgba(20,35,90,.70)), url('/images/hero-aramco-hq.jpg')" }}
       >
-        <div className="absolute top-32 left-16 w-72 h-72 rounded-full bg-ofoq-red/10 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-20 right-10 w-56 h-56 rounded-full bg-ofoq-yellow/8 blur-3xl pointer-events-none" />
+        {/* Glow orbs */}
+        <div className="absolute top-32 left-16 w-80 h-80 rounded-full bg-ofoq-red/10 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-20 right-10 w-60 h-60 rounded-full bg-amber-400/8 blur-3xl pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10 w-full">
           <div className="max-w-3xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 bg-ofoq-red/15 border border-ofoq-red/30 rounded-full px-4 py-2 mb-8"
-            >
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-2 bg-ofoq-red/15 border border-ofoq-red/30 rounded-full px-4 py-2 mb-8">
               <span className="w-2 h-2 bg-ofoq-red rounded-full animate-pulse" />
-              <span className="text-red-200 text-sm font-medium">{t.home.heroBadge}</span>
+              <span className="text-red-200 text-sm font-medium">شريكك الاستراتيجي في المملكة العربية السعودية</span>
             </motion.div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.1] mb-6"
-            >
-              {t.home.heroTitle1}
+            <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+              className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.1] mb-6">
+              شريكك الموثوق
               <br />
-              <span className="text-ofoq-red">{t.home.heroTitle2}</span>{" "}
-              {t.home.heroTitle3}
+              <span className="text-ofoq-red">لأعمالك</span> في السعودية
             </motion.h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-              className="text-white/65 text-xl leading-relaxed mb-10 max-w-2xl"
-            >
-              {t.home.heroSub}
+            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+              className="text-white/65 text-xl leading-relaxed mb-10 max-w-2xl">
+              نقدم حلولاً شاملة لتسهيل أعمالك ونكون شريكًا استراتيجيًا في بناء مستقبل شركتك واستدامتها
             </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-4"
-            >
-              <Link to="/contact" className="btn-yellow text-base px-8 py-4 shadow-ofoq-yellow">
-                {t.home.heroCta1}
-                <ArrowLeft size={18} />
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+              className="flex flex-col sm:flex-row gap-4">
+              <Link to="/client/register" className="btn-yellow text-base px-8 py-4 shadow-ofoq-yellow">
+                ابدأ طلبك الآن <ArrowLeft size={18} />
               </Link>
               <Link to="/services" className="btn-outline border-white/30 text-white hover:bg-white/10 hover:border-white text-base px-8 py-4">
-                {t.home.heroCta2}
+                استكشف خدماتنا
               </Link>
             </motion.div>
 
-            <motion.p
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-              className="text-white/55 text-sm mt-8"
-            >
-              {t.home.heroTrust}
-            </motion.p>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+              className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-8">
+              {["تأسيس الشركات", "خدمات قانونية", "موارد بشرية", "منصات حكومية"].map((s) => (
+                <span key={s} className="flex items-center gap-1.5 text-white/50 text-sm">
+                  <CheckCircle size={13} className="text-ofoq-red" /> {s}
+                </span>
+              ))}
+            </motion.div>
           </div>
         </div>
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/30">
-          <span className="text-xs">{t.home.scrollDown}</span>
+          <span className="text-xs">مرّر للأسفل</span>
           <div className="w-6 h-10 border border-white/20 rounded-full flex items-start justify-center pt-2">
             <div className="w-1 h-2 bg-white/40 rounded-full animate-bounce" />
           </div>
         </div>
       </section>
 
-      {/* ── Stats ────────────────────────────────────────────── */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {STATS.map((stat, i) => (
-              <motion.div
-                key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
-                className="text-center group"
-              >
-                <div className="w-14 h-14 rounded-2xl bg-ofoq-navy/5 flex items-center justify-center mx-auto mb-3 group-hover:bg-ofoq-red/10 transition-colors">
-                  <stat.icon size={24} className="text-ofoq-red" />
-                </div>
-                <p className="text-4xl font-black text-ofoq-navy mb-1">{stat.value}</p>
-                <p className="text-gray-500 text-sm font-medium">{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Services ─────────────────────────────────────────── */}
-      <section className="py-24 bg-gray-50">
+      {/* ══════════════════════════════════════════════════════════
+          خدماتنا
+      ══════════════════════════════════════════════════════════ */}
+      <section className="py-24 bg-gray-50" id="services">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
             className="text-center mb-16">
-            <span className="badge-red mb-4">{t.home.servicesBadge}</span>
-            <h2 className="section-title mt-2">{t.home.servicesTitle}</h2>
-            <p className="section-subtitle max-w-2xl mx-auto">{t.home.servicesSub}</p>
+            <span className="badge-red mb-4">خدماتنا</span>
+            <h2 className="section-title mt-2">حلول متكاملة لكل احتياجاتك</h2>
+            <p className="section-subtitle max-w-2xl mx-auto">
+              نقدم ٨ محاور رئيسية من الخدمات المتخصصة لدعم نمو عملك وتعزيز قدرتك التنافسية في السوق السعودي
+            </p>
           </motion.div>
 
-          {services.length === 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {DEFAULT_SERVICES.map((s, i) => {
-                const Icon = SERVICES_ICONS[i % SERVICES_ICONS.length];
-                return (
-                  <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="visible"
-                    viewport={{ once: true }} className="card-hover group">
-                    <div className="w-12 h-12 rounded-xl bg-ofoq-red/10 flex items-center justify-center mb-4 group-hover:bg-ofoq-red transition-colors">
-                      <Icon size={22} className="text-ofoq-red group-hover:text-white transition-colors" />
-                    </div>
-                    <h3 className="font-bold text-navy-700 text-lg mb-2">{s.title}</h3>
-                    <p className="text-gray-500 text-sm leading-relaxed mb-4">{s.desc}</p>
-                    <Link to="/services" className="text-ofoq-red text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all">
-                      {t.common.learnMore} <ChevronLeft size={14} />
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {services.map((s: { _id: string; title: { ar: string; en?: string }; description?: { ar?: string; en?: string }; icon?: string }, i: number) => {
-                const Icon = SERVICES_ICONS[i % SERVICES_ICONS.length];
-                return (
-                  <motion.div key={s._id} custom={i} variants={fadeUp} initial="hidden" whileInView="visible"
-                    viewport={{ once: true }} className="card-hover group">
-                    <div className="w-12 h-12 rounded-xl bg-ofoq-red/10 flex items-center justify-center mb-4 group-hover:bg-ofoq-red transition-colors">
-                      <Icon size={22} className="text-ofoq-red group-hover:text-white transition-colors" />
-                    </div>
-                    <h3 className="font-bold text-navy-700 text-lg mb-2">
-                      {lang === "en" && s.title.en ? s.title.en : s.title.ar}
-                    </h3>
-                    {s.description?.ar && (
-                      <p className="text-gray-500 text-sm leading-relaxed mb-4">
-                        {lang === "en" && s.description.en ? s.description.en : s.description.ar}
-                      </p>
-                    )}
-                    <Link to="/services" className="text-ofoq-red text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all">
-                      {t.common.learnMore} <ChevronLeft size={14} />
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
-          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {SERVICES.map((s, i) => {
+              const Icon = s.icon;
+              return (
+                <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="visible"
+                  viewport={{ once: true }}
+                  className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all group cursor-default">
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${s.color} flex items-center justify-center mb-4`}>
+                    <Icon size={22} className={s.accent} />
+                  </div>
+                  <h3 className="font-bold text-navy-700 text-base mb-2 leading-tight">{s.title}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed mb-4">{s.desc}</p>
+                  <Link to="/services" className={`${s.accent} text-xs font-semibold flex items-center gap-1 hover:gap-2 transition-all`}>
+                    اعرف المزيد <ChevronLeft size={12} />
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
 
           <div className="text-center mt-12">
             <Link to="/services" className="btn-outline">
-              {t.common.viewAll} <ArrowLeft size={16} />
+              استعرض جميع الخدمات <ArrowLeft size={16} />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── Brand Photo Section ───────────────────────────────── */}
+      {/* ══════════════════════════════════════════════════════════
+          خطوات الطلب
+      ══════════════════════════════════════════════════════════ */}
       <section
-        className="relative py-28 bg-cover bg-center overflow-hidden"
-        style={{ backgroundImage: "url('/images/ofoq-brand-photo2.jpg')" }}
+        className="py-24 relative bg-cover bg-center"
+        style={{ backgroundImage: "linear-gradient(rgba(10,16,50,.80),rgba(28,43,110,.90)), url('/images/riyadh-itcc-tower.jpg')" }}
       >
-        <div className="absolute inset-0 bg-gradient-to-l from-ofoq-navy/95 via-ofoq-navy/80 to-ofoq-navy/40" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="max-w-xl mr-auto">
-            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-              <span className="inline-block bg-ofoq-red/20 border border-ofoq-red/30 rounded-full px-4 py-1.5 text-red-300 text-sm font-medium mb-6">
-                {t.home.brandBadge}
-              </span>
-              <h2 className="text-4xl sm:text-5xl font-black text-white leading-tight mb-6">
-                {t.home.brandTitle1}<br />
-                <span className="text-ofoq-yellow">{t.home.brandTitle2}</span>
-              </h2>
-              <p className="text-white/65 text-lg leading-relaxed mb-8">{t.home.brandDesc}</p>
-              <Link to="/about" className="btn-yellow inline-flex">
-                {t.home.brandCta} <ArrowLeft size={16} />
-              </Link>
-            </motion.div>
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
+            className="text-center mb-16">
+            <span className="inline-block bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-white/80 text-sm font-medium mb-4">
+              كيف تبدأ معنا؟
+            </span>
+            <h2 className="text-4xl font-black text-white mt-2">
+              خطوات طلب الخدمة
+            </h2>
+            <p className="text-white/55 mt-3 text-lg">قدّم طلبك في دقائق محدودة من خلال اتباع الخطوات التالية</p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            {STEPS.map((step, i) => {
+              const Icon = step.icon;
+              return (
+                <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="visible"
+                  viewport={{ once: true }}
+                  className="relative">
+                  {/* Connector line */}
+                  {i < STEPS.length - 1 && (
+                    <div className="hidden lg:block absolute top-8 left-[-50%] w-full h-[1px] bg-white/15 z-0" />
+                  )}
+                  <div className="glass rounded-2xl p-5 text-center relative z-10 hover:bg-white/10 transition-colors">
+                    <div className="w-14 h-14 rounded-full bg-ofoq-red/20 border-2 border-ofoq-red/40 flex items-center justify-center mx-auto mb-3">
+                      <span className="text-ofoq-yellow font-black text-lg">{step.n}</span>
+                    </div>
+                    <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center mx-auto mb-3">
+                      <Icon size={16} className="text-white/70" />
+                    </div>
+                    <h4 className="font-bold text-white text-sm mb-2 leading-tight">{step.title}</h4>
+                    <p className="text-white/45 text-xs leading-relaxed">{step.desc}</p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link to="/client/register" className="btn-yellow text-base px-10 py-4">
+              ابدأ طلبك الآن <ArrowLeft size={18} />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ── Why Us ────────────────────────────────────────────── */}
+      {/* ══════════════════════════════════════════════════════════
+          الباقات
+      ══════════════════════════════════════════════════════════ */}
+      <section className="py-24 bg-white" id="packages">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
+            className="text-center mb-16">
+            <span className="badge-red mb-4">الباقات</span>
+            <h2 className="section-title mt-2">
+              اصنع مسار نجاحك
+              <span className="block text-ofoq-red">اختر باقتك بما يناسب احتياجك</span>
+            </h2>
+            <p className="section-subtitle max-w-2xl mx-auto">
+              اكتشف باقات أفق المصممة خصيصاً لدعم نمو أعمالك وإدارتها بثقة
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-7 items-start">
+            {PACKAGES.map((pkg, i) => (
+              <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="visible"
+                viewport={{ once: true }}
+                className={`relative rounded-3xl overflow-hidden border-2 ${pkg.border} ${
+                  pkg.recommended ? "shadow-2xl scale-[1.03]" : "shadow-lg"
+                } bg-white`}>
+
+                {pkg.recommended && (
+                  <div className="absolute top-0 inset-x-0 flex justify-center">
+                    <div className="bg-gradient-to-r from-amber-400 to-yellow-500 text-ofoq-navy text-xs font-black px-6 py-1.5 rounded-b-xl">
+                      ⭐ موصى بها
+                    </div>
+                  </div>
+                )}
+
+                {/* Header */}
+                <div className={`bg-gradient-to-br ${pkg.color} p-6 ${pkg.recommended ? "pt-10" : "pt-6"}`}>
+                  <p className="text-white/60 text-xs font-semibold tracking-widest uppercase mb-1">{pkg.nameEn}</p>
+                  <h3 className="text-white text-2xl font-black">{pkg.name}</h3>
+                </div>
+
+                {/* Features */}
+                <div className="p-6 space-y-3">
+                  {pkg.features.map((f, j) => (
+                    <div key={j} className="flex items-center gap-2.5">
+                      <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                        <CheckCircle size={12} className="text-emerald-600" />
+                      </div>
+                      <span className="text-gray-700 text-sm">{f}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="px-6 pb-6">
+                  <Link to="/client/register"
+                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all ${
+                      pkg.recommended
+                        ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-ofoq-navy hover:opacity-90"
+                        : "bg-ofoq-navy text-white hover:bg-navy-700"
+                    }`}>
+                    اشترك الآن <ArrowLeft size={15} />
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-10">
+            <Link to="/packages" className="btn-outline">
+              تفاصيل الباقات <ArrowLeft size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════
+          دول الاستقطاب
+      ══════════════════════════════════════════════════════════ */}
+      <section className="py-24 bg-gray-50" id="countries">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
+            className="text-center mb-14">
+            <span className="badge-red mb-4">دول الاستقطاب</span>
+            <h2 className="section-title mt-2">نستقطب الكفاءات من حول العالم</h2>
+            <p className="section-subtitle max-w-xl mx-auto">
+              نمتلك شبكة واسعة من الشراكات مع وكالات التوظيف في أبرز دول الاستقطاب
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            {COUNTRIES.map((c, i) => (
+              <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="visible"
+                viewport={{ once: true }}
+                className="bg-white rounded-2xl p-5 text-center shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all group">
+                <div className="text-5xl mb-3 group-hover:scale-110 transition-transform">{c.flag}</div>
+                <p className="font-bold text-navy-700 text-sm mb-3">{c.name}</p>
+                <Link to="/client/register"
+                  className="text-xs text-ofoq-red font-semibold hover:underline">
+                  اطلب الآن
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-10">
+            <Link to="/countries" className="btn-outline">
+              عرض جميع الدول <ArrowLeft size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════
+          شركاء النجاح
+      ══════════════════════════════════════════════════════════ */}
       <section
-        className="py-24 relative overflow-hidden bg-cover bg-center"
-        style={{ backgroundImage: "linear-gradient(rgba(10,16,50,.68),rgba(28,43,110,.78)), url('/images/hero-riyadh-towers.jpg')" }}
+        className="py-16 relative bg-cover bg-center"
+        style={{ backgroundImage: "linear-gradient(rgba(8,13,42,.55),rgba(28,43,110,.65)), url('/images/ofoq-brand-photo2.jpg')" }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <p className="text-center text-white/40 text-sm mb-8 uppercase tracking-widest">شركاء النجاح</p>
+          <div className="flex flex-wrap items-center justify-center gap-8">
+            {PARTNERS.map((p) => (
+              <div key={p} className="px-6 py-3 rounded-xl bg-white/8 border border-white/15 text-white/50 text-sm font-semibold hover:bg-white/15 hover:text-white/80 transition-all">
+                {p}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════
+          لماذا أفق؟
+      ══════════════════════════════════════════════════════════ */}
+      <section
+        className="py-24 relative bg-cover bg-center"
+        style={{ backgroundImage: "linear-gradient(rgba(10,16,50,.72),rgba(28,43,110,.82)), url('/images/hero-riyadh-towers.jpg')" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
               <span className="inline-block bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-white/80 text-sm font-medium mb-6">
-                {t.home.whyBadge}
+                لماذا تختار أفق؟
               </span>
               <h2 className="text-4xl font-black text-white mt-2 mb-6 leading-tight">
-                {t.home.whyTitle.split(" ").slice(0, -2).join(" ")}<br />
-                <span className="text-ofoq-yellow">{t.home.whyTitle.split(" ").slice(-2).join(" ")}</span>
+                عندما تختار أفق فأنت تختار
+                <br />
+                <span className="text-ofoq-yellow">شريكاً استراتيجياً</span>
               </h2>
-              <p className="text-white/60 text-lg leading-relaxed">{t.home.whySub}</p>
-              <Link to="/contact" className="btn-yellow mt-8 inline-flex">
-                {t.home.whyCta} <ArrowLeft size={16} />
+              <p className="text-white/55 text-lg leading-relaxed">
+                نقدّر وقتك، ندعم طموحاتك، ونضعك على الطريق الصحيح لتحقيق أهدافك
+              </p>
+              <Link to="/client/register" className="btn-yellow mt-8 inline-flex">
+                ابدأ رحلتك معنا <ArrowLeft size={16} />
               </Link>
             </motion.div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {WHY_US.map((item, i) => (
+              {[
+                { title: "ندرك التغيرات المستمرة", desc: "نعتمد الديناميكية أساساً للعمل ونسخّر الأدوات المختلفة لتحقيق أهدافنا مع العميل كشركاء نجاح" },
+                { title: "نفهم احتياجات القطاعات", desc: "نوفر مستشارين ومتخصصين في مجالات متعددة ونسعى لضمان توفير الكوادر المطلوبة بدقة وفاعلية" },
+                { title: "نعتني بقيمكم وأهدافكم", desc: "لدينا القدرة على تحقيق أعلى مستويات الإنتاجية مع فهم دقيق لأهداف العميل وخططه المستقبلية" },
+                { title: "خبرة واسعة في السوق", desc: "فريق متخصص يجمع بين الخبرة والكفاءة ويعمل بتناغم تام ينعكس على جودة الخدمات ورضا العملاء" },
+              ].map((item, i) => (
                 <motion.div key={i} custom={i} variants={fadeUp} initial="hidden" whileInView="visible"
                   viewport={{ once: true }}
                   className="glass rounded-2xl p-5 hover:bg-white/10 transition-colors">
-                  <div className="w-10 h-10 rounded-xl bg-ofoq-red/20 flex items-center justify-center mb-3">
-                    <item.icon size={20} className="text-red-300" />
+                  <div className="w-8 h-8 rounded-lg bg-ofoq-red/30 flex items-center justify-center mb-3">
+                    <Star size={14} className="text-red-300" />
                   </div>
-                  <h4 className="font-bold text-white mb-1.5">{item.title}</h4>
-                  <p className="text-white/50 text-sm leading-relaxed">{item.desc}</p>
+                  <h4 className="font-bold text-white mb-1.5 text-sm">{item.title}</h4>
+                  <p className="text-white/45 text-xs leading-relaxed">{item.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -273,76 +519,32 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Strip ─────────────────────────────────────────────── */}
-      <section
-        className="relative h-64 bg-cover bg-center"
-        style={{ backgroundImage: "linear-gradient(rgba(10,16,50,.30),rgba(28,43,110,.55)), url('/images/riyadh-itcc-tower.jpg')" }}
-      >
-        <div className="absolute inset-0 flex items-center justify-center">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center">
-            <p className="text-white/90 text-2xl sm:text-3xl font-black">
-              {t.home.strip1} <span className="text-ofoq-yellow">{t.home.strip2}</span> {t.home.strip3}
-            </p>
-            <p className="text-white/55 text-sm mt-2">{t.home.stripSub}</p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── Testimonials ─────────────────────────────────────── */}
-      {testimonials.length > 0 && (
-        <section className="py-24 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
-              className="text-center mb-16">
-              <span className="badge-red mb-4">{t.home.testimBadge}</span>
-              <h2 className="section-title mt-2">{t.home.testimTitle}</h2>
-            </motion.div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {testimonials.slice(0, 3).map((tm: { _id: string; author: { name: string; company: string; position?: string }; content: { ar: string; en?: string }; rating: number }, i: number) => (
-                <motion.div key={tm._id} custom={i} variants={fadeUp} initial="hidden" whileInView="visible"
-                  viewport={{ once: true }} className="card-hover">
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(tm.rating || 5)].map((_, j) => (
-                      <Star key={j} size={16} className="text-amber-400 fill-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-gray-600 leading-relaxed mb-6 text-sm">
-                    "{lang === "en" && tm.content?.en ? tm.content.en : tm.content?.ar}"
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-ofoq-navy flex items-center justify-center text-white font-bold">
-                      {tm.author?.name?.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-navy-700 text-sm">{tm.author?.name}</p>
-                      <p className="text-gray-400 text-xs">{tm.author?.position ? `${tm.author.position}، ` : ""}{tm.author?.company}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ── CTA ──────────────────────────────────────────────── */}
+      {/* ══════════════════════════════════════════════════════════
+          CTA
+      ══════════════════════════════════════════════════════════ */}
       <section
         className="py-24 relative bg-cover bg-center"
-        style={{ backgroundImage: "linear-gradient(rgba(10,16,50,.78),rgba(28,43,110,.88)), url('/images/riyadh-evening.jpg')" }}
+        style={{ backgroundImage: "linear-gradient(rgba(10,16,50,.82),rgba(28,43,110,.92)), url('/images/riyadh-evening.jpg')" }}
       >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <div className="inline-block px-5 py-2 rounded-full bg-ofoq-yellow/15 border border-ofoq-yellow/30 text-ofoq-yellow text-sm font-medium mb-6">
-              {t.home.ctaBadge}
+              لنبدأ معاً قصة نجاحك
             </div>
-            <h2 className="text-4xl sm:text-5xl font-black text-white mb-4 leading-tight">{t.home.ctaTitle}</h2>
-            <p className="text-white/60 text-lg mb-10 max-w-2xl mx-auto leading-relaxed">{t.home.ctaSub}</p>
+            <h2 className="text-4xl sm:text-5xl font-black text-white mb-4 leading-tight">
+              نساعدك على تحقيق أهدافك
+              <br />
+              <span className="text-ofoq-yellow">بخطى واثقة</span>
+            </h2>
+            <p className="text-white/55 text-lg mb-10 max-w-2xl mx-auto leading-relaxed">
+              تواصل معنا الآن وسيقوم فريقنا المتخصص بمساعدتك في اختيار أفضل الحلول المناسبة لعملك
+            </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/contact" className="btn-yellow text-base px-8 py-4">
-                {t.common.freeConsult} <ArrowLeft size={18} />
+              <Link to="/client/register" className="btn-yellow text-base px-10 py-4">
+                ابدأ طلبك الآن <ArrowLeft size={18} />
               </Link>
-              <Link to="/about" className="btn-outline border-white/30 text-white hover:bg-white/10 text-base px-8 py-4">
-                {t.home.ctaBtn2}
+              <Link to="/contact" className="btn-outline border-white/30 text-white hover:bg-white/10 text-base px-8 py-4">
+                تواصل معنا
               </Link>
             </div>
           </motion.div>

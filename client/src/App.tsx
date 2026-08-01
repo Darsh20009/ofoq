@@ -18,6 +18,8 @@ import ServicesPage from "./pages/public/ServicesPage";
 import AboutPage from "./pages/public/AboutPage";
 import BlogPage from "./pages/public/BlogPage";
 import ContactPage from "./pages/public/ContactPage";
+import PackagesPage from "./pages/public/PackagesPage";
+import CountriesPage from "./pages/public/CountriesPage";
 
 // Admin Pages
 import LoginPage from "./pages/admin/LoginPage";
@@ -149,6 +151,8 @@ export default function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/services" element={<ServicesPage />} />
+          <Route path="/packages" element={<PackagesPage />} />
+          <Route path="/countries" element={<CountriesPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/contact" element={<ContactPage />} />
