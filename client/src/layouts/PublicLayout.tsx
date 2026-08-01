@@ -12,18 +12,21 @@ const navLinks = [
   { href: "/contact", label: "تواصل معنا" },
 ];
 
-/** أيقونة Qirox الصحيحة — حرف Q بتصميم تقني مميز */
+/** أيقونة Qirox — حرف Q دائري بتدرج فضي مع ذيل قطري، بدون خلفية */
 function QiroxIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* جسم الـ Q: مستطيل ذو زوايا دائرية */}
-      <rect x="2" y="2" width="22" height="22" rx="5" stroke="white" strokeOpacity="0.42" strokeWidth="2.2" fill="none"/>
-      {/* شريط أفقي علوي */}
-      <line x1="8" y1="10" x2="18" y2="10" stroke="white" strokeOpacity="0.42" strokeWidth="2" strokeLinecap="round"/>
-      {/* شريط أفقي أوسط */}
-      <line x1="8" y1="16" x2="15" y2="16" stroke="white" strokeOpacity="0.42" strokeWidth="2" strokeLinecap="round"/>
-      {/* ذيل قطري — يخرج من الزاوية السفلية اليمنى للخارج */}
-      <line x1="21" y1="21" x2="30" y2="30" stroke="white" strokeOpacity="0.50" strokeWidth="2.6" strokeLinecap="round"/>
+    <svg width="20" height="20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="qirox-grad" x1="15" y1="15" x2="85" y2="85" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95"/>
+          <stop offset="55%" stopColor="#cccccc" stopOpacity="0.80"/>
+          <stop offset="100%" stopColor="#888888" stopOpacity="0.60"/>
+        </linearGradient>
+      </defs>
+      {/* حلقة الـ Q */}
+      <circle cx="46" cy="46" r="30" stroke="url(#qirox-grad)" strokeWidth="11" fill="none"/>
+      {/* الذيل القطري */}
+      <line x1="68" y1="68" x2="88" y2="90" stroke="url(#qirox-grad)" strokeWidth="10" strokeLinecap="round"/>
     </svg>
   );
 }
