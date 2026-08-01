@@ -26,10 +26,10 @@ async function seed() {
   if (existingAdmin) {
     console.log(`⏭️  المدير الرئيسي موجود مسبقاً: ${existingAdmin.email}`);
   } else {
-    const password = await hashPassword("Ofoq@2025!");
+    const password = await hashPassword("OFOQ@2026#");
     const admin = await UserModel.create({
       fullName: "مدير النظام",
-      email: "admin@ofoq.sa",
+      email: "admin@ofoqhc.com",
       password,
       role: "super_admin",
       status: "active",
@@ -38,7 +38,7 @@ async function seed() {
     });
     console.log("✅ تم إنشاء المدير الرئيسي:");
     console.log(`   📧 البريد: ${admin.email}`);
-    console.log(`   🔑 كلمة المرور: Ofoq@2025!`);
+    console.log(`   🔑 كلمة المرور: OFOQ@2026#`);
     console.log(`   ⚠️  غيّر كلمة المرور فور الدخول!\n`);
   }
 
@@ -293,8 +293,8 @@ async function seed() {
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log("🔑 بيانات الدخول للوحة التحكم:");
   console.log("   الرابط:  /admin/login");
-  console.log("   البريد:  admin@ofoq.sa");
-  console.log("   المرور:  Ofoq@2025!");
+  console.log("   البريد:  admin@ofoqhc.com");
+  console.log("   المرور:  OFOQ@2026#");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log("⚠️  غيّر كلمة المرور فور الدخول!\n");
 
