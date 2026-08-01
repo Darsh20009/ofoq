@@ -1,0 +1,431 @@
+import { Router } from "express";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import speakeasy from "speakeasy";
+import QRCode from "qrcode";
+import {
+  hashPassword, verifyPassword, signToken,
+  requireAuth, generateOtp, generateSecureToken, logAction
+} from "../auth.js";
+import { loginLimiter, otpLimiter, registerLimiter } from "../middleware/rateLimiter.js";
+import { validate, registerSchema, loginSchema } from "../middleware/validate.js";
+import { fireNotify, fireNotifyAdmins } from "../notify.js";
+import { sendOtpEmail, sendPasswordResetEmail, sendEmailVerification, sendWelcomeEmail } from "../email.js";
+import {
+  UserModel, Pending2FAModel, WebAuthnCredentialModel,
+  AuditLogModel
+} from "../models/index.js";
+
+export const authRouter = Router();
+
+// ── Register ─────────────────────────────────────────────────────
+authRouter.post("/register", registerLimiter, validate(registerSchema), async (req, res) => {
+  try {
+    const { fullName, email, password, phone, lang } = req.body;
+
+    const existing = await UserModel.findOne({ email });
+    if (existing) {
+      res.status(409).json({ error: "البريد الإلكتروني مستخدم بالفعل" });
+      return;
+    }
+
+    const hashedPass = await hashPassword(password);
+    const verifyToken = generateSecureToken();
+    const verifyExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    const user = await UserModel.create({
+      fullName,
+      email,
+      password: hashedPass,
+      phone,
+      lang: lang || "ar",
+      role: "client",
+      status: "active", // auto-activate; can require email verification
+      emailVerified: false,
+      emailVerificationToken: verifyToken,
+      emailVerificationExpiry: verifyExpiry,
+    });
+
+    const verifyLink = `${process.env.APP_URL}/verify-email?token=${verifyToken}`;
+    await sendEmailVerification(email, fullName, verifyLink);
+    await sendWelcomeEmail(email, fullName);
+    await fireNotifyAdmins(
+      "عميل جديد مسجّل",
+      `${fullName} سجّل حساباً جديداً`,
+      { type: "info", link: "/admin/users" }
+    );
+
+    const token = signToken({ userId: String(user._id), role: user.role, email: user.email });
+    await logAction(String(user._id), "register", "User", String(user._id), req);
+
+    res.status(201).json({
+      token,
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        lang: user.lang,
+        emailVerified: user.emailVerified,
+      },
+    });
+  } catch (err: any) {
+    console.error("[Auth] Register error:", err.message);
+    res.status(500).json({ error: "خطأ في إنشاء الحساب" });
+  }
+});
+
+// ── Login ─────────────────────────────────────────────────────────
+authRouter.post("/login", loginLimiter, validate(loginSchema), async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await UserModel.findOne({ email }).select("+password +totpSecret +recoveryPassphrase");
+    if (!user || !user.password) {
+      res.status(401).json({ error: "بريد إلكتروني أو كلمة مرور غير صحيحة" });
+      return;
+    }
+
+    const valid = await verifyPassword(password, user.password);
+    if (!valid) {
+      res.status(401).json({ error: "بريد إلكتروني أو كلمة مرور غير صحيحة" });
+      return;
+    }
+
+    if (user.status !== "active") {
+      res.status(403).json({ error: "الحساب غير مفعّل، تواصل مع الدعم" });
+      return;
+    }
+
+    // If 2FA enabled — return temp token
+    if (user.twoFactorEnabled && user.twoFactorMethods.length > 0) {
+      const tempToken = generateSecureToken();
+      await Pending2FAModel.create({
+        tempToken,
+        userId: String(user._id),
+        methods: user.twoFactorMethods,
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+        pushApproved: false,
+      });
+
+      res.json({
+        requires2FA: true,
+        tempToken,
+        methods: user.twoFactorMethods,
+        userId: user._id,
+      });
+      return;
+    }
+
+    // Normal login
+    await UserModel.findByIdAndUpdate(user._id, { lastLogin: new Date(), lastActivity: new Date() });
+    const token = signToken({ userId: String(user._id), role: user.role, email: user.email });
+    await logAction(String(user._id), "login", "User", String(user._id), req);
+
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        lang: user.lang,
+        avatar: user.avatar,
+        emailVerified: user.emailVerified,
+        twoFactorEnabled: user.twoFactorEnabled,
+        permissions: user.permissions,
+      },
+    });
+  } catch (err: any) {
+    console.error("[Auth] Login error:", err.message);
+    res.status(500).json({ error: "خطأ في تسجيل الدخول" });
+  }
+});
+
+// ── Verify 2FA ───────────────────────────────────────────────────
+authRouter.post("/verify-2fa", async (req, res) => {
+  try {
+    const { tempToken, method, code } = req.body;
+    const pending = await Pending2FAModel.findOne({ tempToken });
+    if (!pending || pending.expiresAt < new Date()) {
+      res.status(400).json({ error: "رمز التحقق منتهي أو غير صالح" });
+      return;
+    }
+
+    const user = await UserModel.findById(pending.userId).select("+totpSecret");
+    if (!user) {
+      res.status(404).json({ error: "المستخدم غير موجود" });
+      return;
+    }
+
+    let verified = false;
+
+    if (method === "totp" && user.totpSecret) {
+      verified = speakeasy.totp.verify({
+        secret: user.totpSecret,
+        encoding: "base32",
+        token: String(code),
+        window: 3,
+      });
+    } else if (method === "email") {
+      const stored = (pending as any).emailCode;
+      verified = stored && String(code) === String(stored);
+    } else if (method === "push") {
+      verified = pending.pushApproved;
+    }
+
+    if (!verified) {
+      res.status(401).json({ error: "رمز التحقق غير صحيح" });
+      return;
+    }
+
+    await Pending2FAModel.deleteOne({ tempToken });
+    await UserModel.findByIdAndUpdate(user._id, { lastLogin: new Date() });
+    const token = signToken({ userId: String(user._id), role: user.role, email: user.email });
+    await logAction(String(user._id), "login_2fa", "User", String(user._id), req, { method });
+
+    res.json({
+      token,
+      user: { id: user._id, fullName: user.fullName, email: user.email, role: user.role },
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: "خطأ في التحقق الثنائي" });
+  }
+});
+
+// ── Send Email OTP (for 2FA) ──────────────────────────────────────
+authRouter.post("/send-email-otp", otpLimiter, async (req, res) => {
+  try {
+    const { tempToken } = req.body;
+    const pending = await Pending2FAModel.findOne({ tempToken });
+    if (!pending) {
+      res.status(400).json({ error: "جلسة غير صالحة" });
+      return;
+    }
+
+    const user = await UserModel.findById(pending.userId);
+    if (!user) {
+      res.status(404).json({ error: "المستخدم غير موجود" });
+      return;
+    }
+
+    const otp = generateOtp(6);
+    await Pending2FAModel.updateOne({ tempToken }, { emailCode: otp });
+    await sendOtpEmail(user.email, user.fullName, otp);
+
+    res.json({ message: "تم إرسال رمز التحقق إلى بريدك الإلكتروني" });
+  } catch {
+    res.status(500).json({ error: "خطأ في إرسال الرمز" });
+  }
+});
+
+// ── Verify Email ─────────────────────────────────────────────────
+authRouter.post("/verify-email", async (req, res) => {
+  try {
+    const { token } = req.body;
+    const user = await UserModel.findOne({
+      emailVerificationToken: token,
+      emailVerificationExpiry: { $gt: new Date() },
+    });
+    if (!user) {
+      res.status(400).json({ error: "رابط التحقق غير صالح أو منتهي" });
+      return;
+    }
+    await UserModel.findByIdAndUpdate(user._id, {
+      emailVerified: true,
+      emailVerificationToken: undefined,
+      emailVerificationExpiry: undefined,
+    });
+    res.json({ message: "تم تأكيد البريد الإلكتروني بنجاح" });
+  } catch {
+    res.status(500).json({ error: "خطأ في تأكيد البريد" });
+  }
+});
+
+// ── Forgot Password ──────────────────────────────────────────────
+authRouter.post("/forgot-password", otpLimiter, async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await UserModel.findOne({ email });
+    // Always return 200 for security
+    if (!user) {
+      res.json({ message: "إذا كان البريد مسجّلاً، ستصلك رسالة إعادة التعيين" });
+      return;
+    }
+    const resetToken = generateSecureToken();
+    const resetExpiry = new Date(Date.now() + 60 * 60 * 1000);
+    await UserModel.findByIdAndUpdate(user._id, {
+      passwordResetToken: resetToken,
+      passwordResetExpiry: resetExpiry,
+    });
+    const resetLink = `${process.env.APP_URL}/reset-password?token=${resetToken}`;
+    await sendPasswordResetEmail(email, user.fullName, resetLink);
+    res.json({ message: "إذا كان البريد مسجّلاً، ستصلك رسالة إعادة التعيين" });
+  } catch {
+    res.status(500).json({ error: "خطأ في إرسال رابط إعادة التعيين" });
+  }
+});
+
+// ── Reset Password ────────────────────────────────────────────────
+authRouter.post("/reset-password", async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    const user = await UserModel.findOne({
+      passwordResetToken: token,
+      passwordResetExpiry: { $gt: new Date() },
+    });
+    if (!user) {
+      res.status(400).json({ error: "رابط إعادة التعيين غير صالح أو منتهي" });
+      return;
+    }
+    const hashed = await hashPassword(newPassword);
+    await UserModel.findByIdAndUpdate(user._id, {
+      password: hashed,
+      passwordResetToken: undefined,
+      passwordResetExpiry: undefined,
+    });
+    await logAction(String(user._id), "password_reset", "User", String(user._id), req);
+    res.json({ message: "تم تغيير كلمة المرور بنجاح" });
+  } catch {
+    res.status(500).json({ error: "خطأ في إعادة تعيين كلمة المرور" });
+  }
+});
+
+// ── Get Current User ─────────────────────────────────────────────
+authRouter.get("/me", requireAuth, async (req, res) => {
+  res.json({ user: (req as any).user });
+});
+
+// ── Logout ────────────────────────────────────────────────────────
+authRouter.post("/logout", requireAuth, async (req, res) => {
+  await logAction(String((req as any).user._id), "logout", "User", String((req as any).user._id), req);
+  (req as any).session?.destroy?.();
+  res.json({ message: "تم تسجيل الخروج بنجاح" });
+});
+
+// ── TOTP Setup ────────────────────────────────────────────────────
+authRouter.post("/totp/setup", requireAuth, async (req, res) => {
+  try {
+    const user = (req as any).user;
+    const secret = speakeasy.generateSecret({
+      name: `OFOQ (${user.email})`,
+      length: 32,
+    });
+    await UserModel.findByIdAndUpdate(user._id, {
+      totpSecret: secret.base32,
+      totpVerified: false,
+    });
+    const qrCode = await QRCode.toDataURL(secret.otpauth_url!);
+    res.json({ secret: secret.base32, qrCode });
+  } catch {
+    res.status(500).json({ error: "خطأ في إعداد المصادقة الثنائية" });
+  }
+});
+
+authRouter.post("/totp/verify-setup", requireAuth, async (req, res) => {
+  try {
+    const { code } = req.body;
+    const user = await UserModel.findById((req as any).user._id).select("+totpSecret");
+    if (!user?.totpSecret) {
+      res.status(400).json({ error: "لم يتم إعداد TOTP بعد" });
+      return;
+    }
+    const valid = speakeasy.totp.verify({
+      secret: user.totpSecret,
+      encoding: "base32",
+      token: String(code),
+      window: 2,
+    });
+    if (!valid) {
+      res.status(400).json({ error: "الرمز غير صحيح" });
+      return;
+    }
+    await UserModel.findByIdAndUpdate(user._id, {
+      totpVerified: true,
+      twoFactorEnabled: true,
+      $addToSet: { twoFactorMethods: "totp" },
+    });
+    res.json({ message: "تم تفعيل المصادقة الثنائية بنجاح" });
+  } catch {
+    res.status(500).json({ error: "خطأ في التحقق" });
+  }
+});
+
+// ── Disable TOTP ──────────────────────────────────────────────────
+authRouter.post("/totp/disable", requireAuth, async (req, res) => {
+  try {
+    const { code } = req.body;
+    const user = await UserModel.findById((req as any).user._id).select("+totpSecret");
+    if (!user?.totpVerified || !user.totpSecret) {
+      res.status(400).json({ error: "المصادقة الثنائية غير مفعّلة" });
+      return;
+    }
+    const valid = speakeasy.totp.verify({
+      secret: user.totpSecret,
+      encoding: "base32",
+      token: String(code),
+      window: 2,
+    });
+    if (!valid) {
+      res.status(400).json({ error: "الرمز غير صحيح" });
+      return;
+    }
+    await UserModel.findByIdAndUpdate(user._id, {
+      totpVerified: false,
+      twoFactorEnabled: false,
+      totpSecret: null,
+      $pull: { twoFactorMethods: "totp" },
+    });
+    res.json({ message: "تم تعطيل المصادقة الثنائية" });
+  } catch {
+    res.status(500).json({ error: "خطأ في تعطيل المصادقة الثنائية" });
+  }
+});
+
+// ── Barcode / QR Code Login ───────────────────────────────────────
+authRouter.post("/barcode-login", async (req, res) => {
+  try {
+    const { code } = req.body;
+    if (!code) { res.status(400).json({ error: "يرجى إدخال كود الموظف" }); return; }
+
+    const user = await UserModel.findOne({
+      employeeCode: String(code).trim().toUpperCase(),
+      status: "active",
+    });
+
+    if (!user) {
+      res.status(401).json({ error: "كود الموظف غير صحيح أو الحساب غير مفعّل" });
+      return;
+    }
+
+    await UserModel.findByIdAndUpdate(user._id, {
+      lastLogin: new Date(),
+      lastActivity: new Date(),
+    });
+
+    const token = signToken({
+      userId: String(user._id),
+      role: user.role,
+      email: user.email,
+    });
+
+    res.json({
+      message: "تم تسجيل الدخول بنجاح",
+      token,
+      user: {
+        _id: user._id,
+        name: user.fullName,
+        fullNameAr: user.fullNameAr,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+        department: user.department,
+        position: user.position,
+        twoFactorEnabled: user.twoFactorEnabled,
+        employeeCode: user.employeeCode,
+      },
+    });
+  } catch (err: any) {
+    console.error("[Auth] barcode-login error:", err.message);
+    res.status(500).json({ error: "خطأ في تسجيل الدخول" });
+  }
+});

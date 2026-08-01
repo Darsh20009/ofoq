@@ -1,0 +1,73 @@
+# Render deployment blueprint for OFOQ Business Solutions
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Deploy: push this repo to GitHub, then in Render click
+# "New" → "Blueprint" and point it at the repo. Render will read this file
+# and provision the web service automatically.
+#
+# IMPORTANT — required environment variables (set these as Render secrets,
+# they are intentionally NOT included here so no credentials ever get
+# committed to source control):
+#   MONGODB_URI          MongoDB Atlas connection string
+#   JWT_SECRET            long random string (session/auth token signing)
+#   SESSION_SECRET        long random string (express-session signing)
+#   CPANEL_SMTP_HOST      outgoing mail server host
+#   CPANEL_SMTP_PORT      usually 465 (SSL) or 587 (STARTTLS)
+#   CPANEL_SMTP_USER      mailbox username (e.g. info@yourdomain.com)
+#   CPANEL_SMTP_PASS      mailbox password
+#   EMAIL_SENDER_NAME     display name used in "From" (e.g. أفق لحلول الأعمال)
+#   VAPID_PUBLIC_KEY      web-push public key
+#   VAPID_PRIVATE_KEY     web-push private key
+#   VAPID_SUBJECT         mailto: address for web-push
+#   OPENAI_API_KEY        only if AI features are enabled
+#   GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET   only if Google login is enabled
+#   APPLE_CLIENT_ID / APPLE_TEAM_ID / APPLE_KEY_ID / APPLE_PRIVATE_KEY  only if Apple login is enabled
+#
+# PDF generation note: this app renders PDFs (invoices/contracts) with
+# Puppeteer. On Render's standard Linux runtime there is no system Chromium,
+# so the app automatically falls back to Puppeteer's own bundled Chromium
+# download (see server/services/pdf.service.ts). No extra Render
+# configuration is required, but the first deploy's `npm install` will take
+# a little longer while it downloads that browser (~170MB) and the instance
+# needs at least the Starter plan's memory to run Chromium reliably.
+
+services:
+  - type: web
+    name: ofoq-business-solutions
+    runtime: node
+    plan: starter
+    region: oregon
+    branch: main
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_URL
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: CPANEL_SMTP_HOST
+        sync: false
+      - key: CPANEL_SMTP_PORT
+        value: "465"
+      - key: CPANEL_SMTP_USER
+        sync: false
+      - key: CPANEL_SMTP_PASS
+        sync: false
+      - key: EMAIL_SENDER_NAME
+        value: أفق لحلول الأعمال
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_SUBJECT
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false

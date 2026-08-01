@@ -1,0 +1,71 @@
+modules = ["nodejs-20"]
+[nix]
+channel = "stable-25_05"
+
+[agent]
+expertMode = true
+
+[userenv]
+
+[userenv.shared]
+APP_NAME = "OFOQ Business Solutions"
+APP_NAME_AR = "أفق لحلول الأعمال"
+APP_URL = "https://ofoqhc.com"
+CPANEL_SMTP_HOST = "server222.web-hosting.com"
+CPANEL_SMTP_PORT = "465"
+CPANEL_SMTP_USER = "info@qirox.online"
+CPANEL_USERNAME = "rfpeddku"
+JWT_EXPIRES_IN = "7d"
+LANG_DEFAULT = "ar"
+NODE_ENV = "development"
+PORT = "5000"
+UPLOAD_MAX_SIZE = "10485760"
+MONGODB_URI = "mongodb+srv://qiroxsystem_db_user:1kiROcc0P5JgoJNv@ofoq.qfouece.mongodb.net/?appName=ofoq"
+CPANEL_SMTP_PASS = "~@xYym83F,=^Y}yT"
+JWT_SECRET = "retnegehtjyukty435u6yt5reqrgthjyhrgefwdqw456uy4"
+VAPID_PUBLIC_KEY = "BGSwdmZ9r9yYAov4Iq8AHqe7lLb-RSN9HgHo07AIQDLNFUb-_wb7jEkUigZTOJjztXqKZM-CqyxNFx0aDh7IVRw"
+VAPID_PRIVATE_KEY = "WzyoUN8ZYhet0yLG1no1sVp0zMym52F-GUiciH7ieZo"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "OFOQ Backend"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "OFOQ Frontend"
+
+[[workflows.workflow]]
+name = "OFOQ Backend"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+
+[[workflows.workflow]]
+name = "OFOQ Frontend"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev:client"
+
+[[ports]]
+localPort = 3000
+externalPort = 3000
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 5099
+externalPort = 3001

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- ── الرئيسية / Homepage ─────────────────────────── -->
+  <url>
+    <loc>https://ofoqhc.com/</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://ofoqhc.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ofoqhc.com/en/"/>
+    <image:image>
+      <image:loc>https://ofoqhc.com/icons/og-image.png</image:loc>
+      <image:title>أفق لحلول الأعمال — OFOQ Business Solutions</image:title>
+      <image:caption>منصة إدارة أعمال متكاملة للشركات السعودية</image:caption>
+    </image:image>
+  </url>
+
+  <!-- ── الخدمات / Services ──────────────────────────── -->
+  <url>
+    <loc>https://ofoqhc.com/services</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://ofoqhc.com/services"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ofoqhc.com/en/services"/>
+  </url>
+
+  <!-- ── من نحن / About ──────────────────────────────── -->
+  <url>
+    <loc>https://ofoqhc.com/about</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://ofoqhc.com/about"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ofoqhc.com/en/about"/>
+  </url>
+
+  <!-- ── المدونة / Blog ──────────────────────────────── -->
+  <url>
+    <loc>https://ofoqhc.com/blog</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://ofoqhc.com/blog"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ofoqhc.com/en/blog"/>
+  </url>
+
+  <!-- ── تواصل معنا / Contact ────────────────────────── -->
+  <url>
+    <loc>https://ofoqhc.com/contact</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://ofoqhc.com/contact"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ofoqhc.com/en/contact"/>
+  </url>
+
+</urlset>
