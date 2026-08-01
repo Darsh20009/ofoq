@@ -144,6 +144,12 @@ export default function ClientLoginPage() {
                 {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
               </div>
 
+              <div className="flex justify-end">
+                <Link to="/client/forgot-password" className="text-xs text-ofoq-navy hover:text-ofoq-red transition-colors">
+                  نسيت كلمة المرور؟
+                </Link>
+              </div>
+
               <button type="submit" disabled={loading}
                 className="w-full bg-ofoq-navy text-white py-3 rounded-xl font-semibold text-sm hover:bg-ofoq-red transition-all disabled:opacity-60 flex items-center justify-center gap-2">
                 {loading ? (

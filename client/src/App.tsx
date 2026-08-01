@@ -16,6 +16,8 @@ import EmployeePortalLoginPage from "./pages/employee/EmployeePortalLoginPage";
 // Client Portal
 import ClientLoginPage from "./pages/client/ClientLoginPage";
 import ClientRegisterPage from "./pages/client/ClientRegisterPage";
+import ClientForgotPasswordPage from "./pages/client/ClientForgotPasswordPage";
+import ClientResetPasswordPage from "./pages/client/ClientResetPasswordPage";
 import ClientDashboardPage from "./pages/client/ClientDashboardPage";
 import RequestsListPage from "./pages/client/RequestsListPage";
 import RequestDetailsPage from "./pages/client/RequestDetailsPage";
@@ -242,6 +244,8 @@ export default function App() {
             </RequireClientGuest>
           }
         />
+        <Route path="/client/forgot-password" element={<ClientForgotPasswordPage />} />
+        <Route path="/client/reset-password"  element={<ClientResetPasswordPage />} />
 
         {/* ── بوابة العملاء — صفحات محمية ────────────── */}
         <Route
