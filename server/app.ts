@@ -5,6 +5,7 @@ import helmet from "helmet";
 import compression from "compression";
 import morgan from "morgan";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import MongoStore from "connect-mongo";
 import passport from "./passport.js";
@@ -149,7 +150,6 @@ if (process.env.NODE_ENV !== "production") {
   app.use(express.static(clientDist));
 
   // ── OG Meta Tag Injection by Subdomain ───────────────────────
-  const fs = await import("fs");
   const indexHtmlPath = path.join(clientDist, "index.html");
 
   function buildOgMeta(opts: {
@@ -191,12 +191,13 @@ if (process.env.NODE_ENV !== "production") {
   // Pattern to replace OG block in index.html
   const OG_PATTERN = /<meta property="og:title[\s\S]*?(?=<\/head>)/;
 
-  app.get("*", (req, res) => {
+  app.get("*", (req: express.Request, res: express.Response) => {
     if (!fs.existsSync(indexHtmlPath)) {
-      return res.status(200).json({
+      res.status(200).json({
         status: "online", app: "OFOQ Business Solutions", version: "1.0.0",
         message: "Frontend not built yet. API is ready.",
       });
+      return;
     }
 
     let html = fs.readFileSync(indexHtmlPath, "utf-8");
