@@ -147,17 +147,77 @@ if (process.env.NODE_ENV !== "production") {
 } else {
   // Production: serve built files
   app.use(express.static(clientDist));
-  app.get("*", (_req, res) => {
-    res.sendFile(path.join(clientDist, "index.html"), (err) => {
-      if (err) {
-        res.status(200).json({
-          status: "online",
-          app: "OFOQ Business Solutions",
-          version: "1.0.0",
-          message: "Frontend not built yet. API is ready.",
-        });
-      }
-    });
+
+  // ── OG Meta Tag Injection by Subdomain ───────────────────────
+  const fs = await import("fs");
+  const indexHtmlPath = path.join(clientDist, "index.html");
+
+  function buildOgMeta(opts: {
+    title: string; description: string; url: string;
+    image?: string; siteName?: string;
+  }): string {
+    const img = opts.image || "https://ofoqhc.com/icons/og-image.png";
+    return [
+      `<meta property="og:title" content="${opts.title}" />`,
+      `<meta property="og:description" content="${opts.description}" />`,
+      `<meta property="og:url" content="${opts.url}" />`,
+      `<meta property="og:image" content="${img}" />`,
+      `<meta property="og:image:width" content="1024" />`,
+      `<meta property="og:image:height" content="1024" />`,
+      `<meta property="og:site_name" content="${opts.siteName || "أفق لحلول الأعمال"}" />`,
+      `<meta name="twitter:title" content="${opts.title}" />`,
+      `<meta name="twitter:description" content="${opts.description}" />`,
+      `<meta name="twitter:image" content="${img}" />`,
+    ].join("\n    ");
+  }
+
+  const OG_BY_SUBDOMAIN: Record<string, ReturnType<typeof buildOgMeta>> = {
+    employee: buildOgMeta({
+      title: "بوابة موظفي أفق | OFOQ Employee Portal",
+      description: "بوابة الموظفين الرسمية لشركة أفق لحلول الأعمال — عرض بطاقة الموظف وبياناتك.",
+      url: "https://employee.ofoqhc.com/",
+      image: "https://ofoqhc.com/icons/og-image.png",
+      siteName: "أفق — بوابة الموظفين",
+    }),
+    client: buildOgMeta({
+      title: "بوابة عملاء أفق | OFOQ Client Portal",
+      description: "تابع طلبات خدماتك، راسل الفريق، وتابع مستجدات مشاريعك مع أفق لحلول الأعمال.",
+      url: "https://ofoqhc.com/client/",
+      image: "https://ofoqhc.com/icons/og-image.png",
+      siteName: "أفق — بوابة العملاء",
+    }),
+  };
+
+  // Pattern to replace OG block in index.html
+  const OG_PATTERN = /<meta property="og:title[\s\S]*?(?=<\/head>)/;
+
+  app.get("*", (req, res) => {
+    if (!fs.existsSync(indexHtmlPath)) {
+      return res.status(200).json({
+        status: "online", app: "OFOQ Business Solutions", version: "1.0.0",
+        message: "Frontend not built yet. API is ready.",
+      });
+    }
+
+    let html = fs.readFileSync(indexHtmlPath, "utf-8");
+
+    // Detect subdomain from Host header
+    const host = req.headers.host || "";
+    const subdomain = host.split(".")[0].toLowerCase();
+    const ogBlock = OG_BY_SUBDOMAIN[subdomain];
+
+    if (ogBlock) {
+      // Replace all og: and twitter: meta tags with subdomain-specific ones
+      html = html
+        .replace(/<meta property="og:[^"]*"[^>]*\/>/g, "")
+        .replace(/<meta name="twitter:[^"]*"[^>]*\/>/g, "")
+        .replace("<!-- ══ Open Graph / Facebook ═", `<!-- ══ Open Graph / Facebook ═\n    ${ogBlock}\n    <!--`)
+        .replace("<!-- ══ Twitter / X Card", "<!--");
+    }
+
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache");
+    res.send(html);
   });
 }
 

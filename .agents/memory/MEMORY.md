@@ -1,2 +1,3 @@
 - [OFOQ Stack & Architecture](ofoq-stack.md) — Node.js/Express/TS + MongoDB + WebSocket; secrets needed before DB works
 - [OFOQ Frontend Setup](ofoq-frontend.md) — React 18 + Vite + Tailwind; dev on port 3000, proxies /api to port 5000
+- [OFOQ Client Portal](ofoq-client-portal.md) — client portal built: /client/*, clientApi, ServiceRequest model, SupportMessage, email functions
