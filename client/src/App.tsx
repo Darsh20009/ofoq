@@ -48,6 +48,9 @@ import ProfilePage from "./pages/admin/ProfilePage";
 import ContractsPage from "./pages/admin/contracts/ContractsPage";
 import EmployeeCardPage from "./pages/admin/employee/EmployeeCardPage";
 import EmployeeDashboardPage from "./pages/admin/employee/EmployeeDashboardPage";
+import ServiceRequestsPage from "./pages/admin/service-requests/ServiceRequestsPage";
+import ServiceRequestDetailPage from "./pages/admin/service-requests/ServiceRequestDetailPage";
+import AdminSupportPage from "./pages/admin/support/AdminSupportPage";
 
 // Page Transition Loader
 import PageLoader from "./components/PageLoader";
@@ -217,6 +220,9 @@ export default function App() {
           <Route path="employee/card" element={<EmployeeCardPage />} />
           <Route path="employee/dashboard" element={<EmployeeDashboardPage />} />
           <Route path="contact" element={<div className="card p-8 text-center text-gray-400">صفحة الاستشارات قيد الإنشاء — Task #9</div>} />
+          <Route path="service-requests" element={<ServiceRequestsPage />} />
+          <Route path="service-requests/:id" element={<ServiceRequestDetailPage />} />
+          <Route path="support" element={<AdminSupportPage />} />
         </Route>
 
         {/* ── بوابة العملاء — تسجيل دخول/إنشاء حساب ──── */}

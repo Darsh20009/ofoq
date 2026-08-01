@@ -5,6 +5,7 @@ import {
   FileText, Settings, Menu, X, Bell, LogOut,
   ChevronDown, TrendingUp, FileEdit, User,
   Building2, Target, ChevronRight, FileSignature, CreditCard, MessageSquare,
+  ClipboardList, HeadphonesIcon,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
@@ -118,8 +119,10 @@ export default function AdminLayout() {
     { href: "/admin/users",         label: t.admin.users,      icon: Users },
     { href: "/admin/cms",           label: t.admin.cms,        icon: FileEdit },
     { href: "/admin/settings",      label: t.admin.settings,   icon: Settings },
-    { href: "/admin/contact",       label: "الاستشارات",        icon: MessageSquare },
-    { href: "/admin/employee/card", label: t.admin.myCard,     icon: CreditCard },
+    { href: "/admin/service-requests", label: "طلبات الخدمة",   icon: ClipboardList },
+    { href: "/admin/support",          label: "دعم العملاء",    icon: HeadphonesIcon },
+    { href: "/admin/contact",          label: "الاستشارات",     icon: MessageSquare },
+    { href: "/admin/employee/card",    label: t.admin.myCard,   icon: CreditCard },
   ];
 
   // Load notifications — cached 60s, polling every 2 min (was a hot loop hitting wrong URL)
