@@ -5,19 +5,45 @@ import { motion, AnimatePresence } from "framer-motion";
 import OfoqLogo from "../components/OfoqLogo";
 import { useLang } from "../i18n/LangContext";
 
-/** أيقونة Qirox — حرف Q دائري بتدرج فضي مع ذيل قطري، بدون خلفية */
+/**
+ * Qirox Studio Group logo — metallic Q with diagonal geometric cut.
+ * Matches the official app icon: thick Q ring, dark-top-left → silver-bottom
+ * gradient, and a straight diagonal slash tail at bottom-right.
+ * No background (transparent).
+ */
 function QiroxIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="22" height="22" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="qirox-grad" x1="15" y1="15" x2="85" y2="85" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95"/>
-          <stop offset="55%" stopColor="#cccccc" stopOpacity="0.80"/>
-          <stop offset="100%" stopColor="#888888" stopOpacity="0.60"/>
+        {/* Main metallic gradient — dark charcoal top-left → bright silver mid → softer bottom-right */}
+        <linearGradient id="qx-metal" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
+          <stop offset="0%"   stopColor="#555555"/>
+          <stop offset="35%"  stopColor="#d0d0d0"/>
+          <stop offset="65%"  stopColor="#e8e8e8"/>
+          <stop offset="100%" stopColor="#9a9a9a"/>
         </linearGradient>
+        {/* Clip: mask out the bottom-right wedge to create the open gap in the Q */}
+        <clipPath id="qx-clip">
+          {/* Full square minus bottom-right triangle wedge */}
+          <polygon points="0,0 100,0 100,52 68,100 0,100"/>
+        </clipPath>
       </defs>
-      <circle cx="46" cy="46" r="30" stroke="url(#qirox-grad)" strokeWidth="11" fill="none"/>
-      <line x1="68" y1="68" x2="88" y2="90" stroke="url(#qirox-grad)" strokeWidth="10" strokeLinecap="round"/>
+
+      {/* ── Q ring ── thick circle, clipped to create the open gap at bottom-right */}
+      <circle
+        cx="46" cy="46" r="30"
+        stroke="url(#qx-metal)" strokeWidth="14"
+        fill="none"
+        clipPath="url(#qx-clip)"
+      />
+
+      {/* ── Diagonal tail — straight bar from gap to bottom-right corner ── */}
+      <line
+        x1="63" y1="63"
+        x2="87" y2="91"
+        stroke="url(#qx-metal)" strokeWidth="13"
+        strokeLinecap="square"
+      />
     </svg>
   );
 }
