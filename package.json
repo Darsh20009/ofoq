@@ -13,7 +13,8 @@
     "preview": "vite preview --config vite.config.ts",
     "start": "NODE_ENV=production node dist/server/index.js",
     "lint": "tsc --noEmit",
-    "seed": "tsx server/seed.ts"
+    "seed": "tsx server/seed.ts",
+    "postinstall": "if [ -n \"$RENDER\" ]; then npm run build; fi"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
