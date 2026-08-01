@@ -27,16 +27,34 @@ function getConfig(): EmailConfig {
   };
 }
 
-// ── Logo (embedded as CID attachment for reliable rendering in Gmail/Outlook) ──
-let cachedLogoBuffer: Buffer | null | undefined;
-function getLogoBuffer(): Buffer | null {
-  if (cachedLogoBuffer !== undefined) return cachedLogoBuffer;
+// ── Logo (base64-embedded for maximum compatibility across all email clients) ──
+let cachedLogoBase64: string | null | undefined;
+function getLogoBase64(): string | null {
+  if (cachedLogoBase64 !== undefined) return cachedLogoBase64;
   try {
-    cachedLogoBuffer = fs.readFileSync(path.join(process.cwd(), "public", "icons", "logo.png"));
+    // Try multiple paths: production dist, development, CWD-relative
+    const candidates = [
+      path.join(process.cwd(), "public", "icons", "logo.png"),
+      path.join(__dirname, "..", "..", "public", "icons", "logo.png"),
+      path.join(__dirname, "..", "public", "icons", "logo.png"),
+    ];
+    for (const p of candidates) {
+      if (fs.existsSync(p)) {
+        cachedLogoBase64 = fs.readFileSync(p).toString("base64");
+        return cachedLogoBase64;
+      }
+    }
+    cachedLogoBase64 = null;
   } catch {
-    cachedLogoBuffer = null;
+    cachedLogoBase64 = null;
   }
-  return cachedLogoBuffer;
+  return cachedLogoBase64;
+}
+
+// Keep backward-compat shim (used for CID attachment below)
+function getLogoBuffer(): Buffer | null {
+  const b64 = getLogoBase64();
+  return b64 ? Buffer.from(b64, "base64") : null;
 }
 
 // ── Core Mailer ──────────────────────────────────────────────────
@@ -152,10 +170,11 @@ function baseTemplate(opts: {
 }): string {
   const cfg = getConfig();
   const year = new Date().getFullYear();
-  const logo = getLogoBuffer();
-  const logoTag = logo
-    ? `<img src="cid:ofoq-logo" width="56" height="56" alt="OFOQ" style="display:block;border-radius:14px;" />`
-    : "";
+  const logoB64 = getLogoBase64();
+  const logoSrc = logoB64
+    ? `data:image/png;base64,${logoB64}`
+    : `${cfg.siteUrl}/icons/logo.png`;
+  const logoTag = `<img src="${logoSrc}" width="56" height="56" alt="OFOQ" style="display:block;border-radius:14px;" />`;
 
   return `<!DOCTYPE html>
 <html dir="rtl" lang="ar" xmlns="http://www.w3.org/1999/xhtml">
@@ -186,13 +205,55 @@ function baseTemplate(opts: {
 
           <!-- Header -->
           <tr>
-            <td align="center" bgcolor="${COLORS.navy}" style="background-color:${COLORS.navy};padding:34px 30px 30px;">
+            <td align="center" bgcolor="${COLORS.navy}" style="background-color:${COLORS.navy};padding:28px 30px 24px;">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td style="padding-inline-end:12px;" valign="middle">${logoTag}</td>
                   <td valign="middle" align="right">
                     <div style="font-family:Tahoma,Arial,sans-serif;font-size:19px;font-weight:bold;color:#ffffff;">أفق لحلول الأعمال</div>
                     <div style="font-family:Tahoma,Arial,sans-serif;font-size:11px;color:#B7B2CC;letter-spacing:.5px;margin-top:2px;">OFOQ BUSINESS SOLUTIONS</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Business Banner -->
+          <tr>
+            <td style="padding:0;font-size:0;line-height:0;" bgcolor="${COLORS.navy}">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background:linear-gradient(135deg,#0A1640 0%,#1C2B6E 40%,#0C1338 100%);">
+                <tr>
+                  <td style="padding:20px 30px 28px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <!-- Stats blocks -->
+                        <td align="center" style="padding:0 6px;">
+                          <div style="background:rgba(51,178,124,0.15);border:1px solid rgba(51,178,124,0.3);border-radius:10px;padding:10px 16px;text-align:center;">
+                            <div style="font-family:Tahoma,Arial,sans-serif;font-size:20px;font-weight:bold;color:#33B27C;">+١٠</div>
+                            <div style="font-family:Tahoma,Arial,sans-serif;font-size:10px;color:#B7B2CC;margin-top:2px;">دول</div>
+                          </div>
+                        </td>
+                        <td align="center" style="padding:0 6px;">
+                          <div style="background:rgba(229,254,4,0.1);border:1px solid rgba(229,254,4,0.25);border-radius:10px;padding:10px 16px;text-align:center;">
+                            <div style="font-family:Tahoma,Arial,sans-serif;font-size:20px;font-weight:bold;color:#E5FE04;">٨</div>
+                            <div style="font-family:Tahoma,Arial,sans-serif;font-size:10px;color:#B7B2CC;margin-top:2px;">خدمات</div>
+                          </div>
+                        </td>
+                        <td align="center" style="padding:0 6px;">
+                          <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 16px;text-align:center;">
+                            <div style="font-family:Tahoma,Arial,sans-serif;font-size:20px;font-weight:bold;color:#ffffff;">٣</div>
+                            <div style="font-family:Tahoma,Arial,sans-serif;font-size:10px;color:#B7B2CC;margin-top:2px;">باقات</div>
+                          </div>
+                        </td>
+                        <td align="right" style="padding-right:4px;">
+                          <div style="font-family:Tahoma,Arial,sans-serif;font-size:11px;color:#33B27C;font-weight:bold;line-height:1.6;">
+                            حلول أعمال متكاملة<br/>
+                            <span style="color:#B7B2CC;font-weight:normal;">من الاستراتيجية إلى التنفيذ</span>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>

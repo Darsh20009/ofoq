@@ -68,4 +68,21 @@ export function registerRoutes(app: Express): void {
       timestamp: new Date().toISOString(),
     });
   });
+
+  // ── Test Email (admin only) ───────────────────────────────────
+  app.post(`${API}/admin/test-email`, async (req: any, res: any) => {
+    try {
+      const { sendWelcomeEmail } = await import("../email.js");
+      const to   = (req.body?.to as string)   || "info@ofoqhc.com";
+      const name = (req.body?.name as string) || "مدير النظام";
+      const ok = await sendWelcomeEmail(to, name);
+      if (ok) {
+        res.json({ success: true, message: `تم إرسال البريد التجريبي إلى ${to}` });
+      } else {
+        res.status(500).json({ success: false, message: "فشل الإرسال — تحقق من إعدادات SMTP في متغيرات البيئة" });
+      }
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
 }

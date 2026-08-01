@@ -123,6 +123,15 @@ const PUBLIC_CACHE = { maxAge: "30d", immutable: false } as const;
 app.use(express.static(publicDir, PUBLIC_CACHE));
 app.use("/public", express.static(publicDir, PUBLIC_CACHE));
 
+// Vite hashed assets (dist/assets/*.js, *.css) — 1 year, immutable
+app.use(
+  "/dist/assets",
+  express.static(path.join(process.cwd(), "public", "dist", "assets"), {
+    maxAge: "1y",
+    immutable: true,
+  })
+);
+
 // ── Routes ───────────────────────────────────────────────────────
 registerRoutes(app);
 
