@@ -102,13 +102,13 @@ app.use(session({
     sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   },
-}));
+}) as any);
 
 // ── Passport (OAuth handshake only — JWTs are used for actual sessions) ──
-app.use(passport.initialize());
+app.use(passport.initialize() as any);
 
 // ── Rate Limiting ────────────────────────────────────────────────
-app.use(globalLimiter);
+app.use(globalLimiter as any);
 
 // ── Static Files ─────────────────────────────────────────────────
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));

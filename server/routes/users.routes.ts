@@ -77,7 +77,7 @@ usersRouter.patch("/profile", requireAuth, async (req, res) => {
 });
 
 // ── Upload Avatar ────────────────────────────────────────────────
-usersRouter.post("/avatar", requireAuth, uploadAvatar, async (req, res) => {
+usersRouter.post("/avatar", requireAuth, uploadAvatar as any, async (req, res) => {
   try {
     const file = req.file;
     if (!file) {

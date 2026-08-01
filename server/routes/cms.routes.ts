@@ -313,7 +313,7 @@ cmsRouter.post("/admin/settings", requireAuth, requireRole("super_admin", "admin
 // MEDIA / FILE UPLOAD (employees control all media)
 // ═══════════════════════════════════════════════════
 
-cmsRouter.post("/media/upload", requireAuth, uploadSingle, async (req, res) => {
+cmsRouter.post("/media/upload", requireAuth, uploadSingle as any, async (req, res) => {
   try {
     const file = req.file;
     if (!file) {
@@ -327,7 +327,7 @@ cmsRouter.post("/media/upload", requireAuth, uploadSingle, async (req, res) => {
   }
 });
 
-cmsRouter.post("/media/upload-multiple", requireAuth, uploadMultiple, async (req, res) => {
+cmsRouter.post("/media/upload-multiple", requireAuth, uploadMultiple as any, async (req, res) => {
   try {
     const files = req.files as Express.Multer.File[];
     const urls = files.map((f) => ({
