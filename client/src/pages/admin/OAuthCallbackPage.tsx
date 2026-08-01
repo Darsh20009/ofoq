@@ -31,7 +31,7 @@ export default function OAuthCallbackPage() {
     authApi.me()
       .then((res) => {
         setAuth(res.data.user, token);
-        toast.success(`مرحباً، ${res.data.user.fullName}!`);
+        toast.success(`مرحباً، ${res.data.user.name || res.data.user.fullName}!`);
         navigate("/admin", { replace: true });
       })
       .catch(() => {

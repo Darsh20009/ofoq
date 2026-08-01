@@ -25,8 +25,12 @@ api.interceptors.response.use(
         window.location.href = "/admin/login";
       }
     }
-    const msg = err.response?.data?.message || err.response?.data?.error || "حدث خطأ غير متوقع";
-    if (err.response?.status !== 401) toast.error(msg);
+    const status = err.response?.status;
+    // 401 → redirect handled above | 429 → silent (rate-limit; user doesn't need to see this)
+    if (status !== 401 && status !== 429) {
+      const msg = err.response?.data?.message || err.response?.data?.error || "حدث خطأ غير متوقع";
+      toast.error(msg);
+    }
     return Promise.reject(err);
   }
 );

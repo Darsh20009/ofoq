@@ -69,7 +69,7 @@ export default function LoginPage() {
       const verifyRes = await webauthnApi.loginVerify(asseResp);
       const { user, token } = verifyRes.data;
       setAuth(user, token);
-      toast.success(`مرحباً، ${user.fullName}!`);
+      toast.success(`مرحباً، ${user.name || user.fullName}!`);
       navigate("/admin");
     } catch (err: any) {
       if (err?.name !== "NotAllowedError") {

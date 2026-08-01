@@ -95,7 +95,12 @@ export default function AdminLayout() {
   const { user, clearAuth } = useAuthStore();
   const navigate = useNavigate();
   const notifRef = useRef<HTMLDivElement>(null);
-  const { t } = useLang();
+  const { t, lang, toggleLang } = useLang();
+
+  // Admin panel is Arabic-only — force Arabic if another lang leaked in
+  useEffect(() => {
+    if (lang !== "ar") toggleLang();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const navItems: NavItem[] = [
     { href: "/admin", label: t.admin.dashboard, icon: LayoutDashboard },
