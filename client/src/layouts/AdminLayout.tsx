@@ -9,6 +9,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
 import { authApi, usersApi } from "../api/client";
+import { useQuery } from "@tanstack/react-query";
 import type { Notification } from "../types";
 import OfoqLogo from "../components/OfoqLogo";
 import { useLang } from "../i18n/LangContext";
@@ -91,8 +92,6 @@ export default function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const { user, clearAuth } = useAuthStore();
   const navigate = useNavigate();
   const notifRef = useRef<HTMLDivElement>(null);
@@ -123,13 +122,17 @@ export default function AdminLayout() {
     { href: "/admin/employee/card", label: t.admin.myCard,     icon: CreditCard },
   ];
 
-  // Load notifications
-  useEffect(() => {
-    usersApi.notifications({ limit: 10 }).then((r) => {
-      setNotifications(r.data.data?.notifications || []);
-      setUnreadCount(r.data.data?.unread || 0);
-    }).catch(() => {});
-  }, []);
+  // Load notifications — cached 60s, polling every 2 min (was a hot loop hitting wrong URL)
+  const { data: notifData } = useQuery({
+    queryKey: ["admin-notifications"],
+    queryFn: () => usersApi.notifications({ limit: 10 }).then((r) => r.data),
+    staleTime:       60 * 1000,       // 1 min cache
+    refetchInterval: 2 * 60 * 1000,  // poll every 2 min max
+    refetchOnWindowFocus: false,      // don't hammer on tab switch
+    retry: false,
+  });
+  const notifications: Notification[] = notifData?.notifications || [];
+  const unreadCount: number           = notifData?.unreadCount    || 0;
 
   // Close menus on outside click
   useEffect(() => {

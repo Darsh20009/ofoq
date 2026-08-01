@@ -70,8 +70,8 @@ export const usersApi = {
   delete: (id: string) => api.delete(`/users/${id}`),
   changePassword: (data: { currentPassword: string; newPassword: string }) =>
     api.post("/users/change-password", data),
-  notifications: (params?: object) => api.get("/users/notifications/list", { params }),
-  markNotifRead: (id: string) => api.put(`/users/notifications/${id}/read`),
+  notifications: (params?: object) => api.get("/users/me/notifications", { params }),  // was: /notifications/list — wrong path
+  markNotifRead: (id: string) => api.patch(`/users/me/notifications/${id}/read`),        // was: /users/notifications/:id/read
 };
 
 /* ── CRM ──────────────────────────────────── */

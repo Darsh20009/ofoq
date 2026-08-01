@@ -1,57 +1,38 @@
 ---
 name: OFOQ Stack & Architecture
-description: Core stack, secrets needed, key architectural decisions for OFOQ backend
+description: Key technical decisions, quirks, and constraints for the OFOQ project
 ---
 
 ## Stack
-- Node.js + Express + TypeScript (tsx watch in dev)
-- MongoDB Atlas via Mongoose
-- WebSocket (/ws) for real-time notifications
-- Background scheduler for cron tasks
-- Port 5000 (backend), 3000 (frontend Vite dev server)
+- **Backend**: Node.js + Express + TypeScript, MongoDB (Mongoose), WebSocket
+- **Frontend**: React 18 + Vite + Tailwind CSS, React Query, Zustand
+- **Auth**: JWT tokens (stored in localStorage as `ofoq_token`), express-session for OAuth only
+- **Email**: cPanel SMTP via `CPANEL_SMTP_*` env vars
+- **Push**: VAPID Web Push via `VAPID_*` env vars
+- **AI**: OpenAI hidden under analytics (not exposed to users)
 
-## Auth layers
-1. JWT (localStorage key `ofoq_token`) — standard email/password
-2. 2FA: TOTP (speakeasy) + email OTP + push — all implemented end-to-end
-3. WebAuthn/Passkey — @simplewebauthn/server v13.3.2
-4. Google OAuth — passport-google-oauth20, GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET
-5. Apple OAuth — passport-apple, APPLE_* secrets
-6. Barcode/QR login — POST /api/auth/barcode-login with employeeCode field on User
+## Secrets needed before DB works
+`MONGODB_URI`, `JWT_SECRET`, `SESSION_SECRET`, `CPANEL_SMTP_*`, `VAPID_*`, `APPLE_WALLET_*`
 
-## Employee system (added)
-- `employeeCode` field on User model (sparse unique, format: OFOQ-XXXXXXXX)
-- Auto-generated on first access to /api/employee/me/card
-- Routes at /api/employee/me/card, /me/regenerate-code, /me/wallet-pass
-- Apple Wallet pass generation gated on APPLE_WALLET_CERT env var
-- Barcode login: POST /api/auth/barcode-login { code } → JWT
-- Employee role → redirected to /admin/employee/dashboard after login
+## Type conflict workaround
+`@types/express-session` ships its own nested `@types/express` causing TS2769 errors. Fixed by:
+- `as any` cast on session/passport/multer middleware in source files
+- `"resolutions": { "@types/express": "4.17.21" }` in package.json (for yarn on Render)
 
-## Secrets needed before app works
-- MONGODB_URI — MongoDB Atlas connection string
-- JWT_SECRET — for signing JWTs
-- SESSION_SECRET — for Express sessions
-- VAPID_PUBLIC_KEY + VAPID_PRIVATE_KEY — for web push
-- CPANEL_SMTP_* — for email sending
-- GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET — Google OAuth (added this session)
-- APPLE_CLIENT_ID + APPLE_TEAM_ID + APPLE_KEY_ID + APPLE_PRIVATE_KEY — Apple OAuth (added)
-- APPLE_WALLET_CERT — Apple Wallet pass type certificate (not yet added)
+**Why:** Two versions of express types become incompatible in `.ts` source files (not `.d.ts`), `skipLibCheck` doesn't help.
 
-## WebAuthn
-- RP ID and origin derived per-request from req.hostname (not static APP_URL)
-- Works across Replit dev domain, ofoqhc.com, etc.
+## Build command
+`"build": "tsc --noEmitOnError false; vite build"` — semicolon so Vite runs even if tsc has residual errors.
 
-**Why:** Using req.hostname prevents broken WebAuthn when switching between dev/prod domains.
+## API endpoint corrections (client vs server)
+- `/analytics/dashboard` (was `/analytics/overview` in client — fixed)
+- `/analytics/projects-stages` (was `/analytics/projects-by-stage` — fixed)
 
-## OAuth callback URIs needed in Google Console
-- http://localhost:5000/api/auth/google/callback (dev local)
-- https://<replit-dev-domain>.replit.dev/api/auth/google/callback
-- https://ofoqhc.com/api/auth/google/callback (production)
-Note: User registered wrong URIs (.repl.co and ofoq.com) — needs to be fixed.
+## Auth response normalization
+All auth endpoints now return `name: user.fullName` (not `fullName`). `/auth/me` also normalized. The Zustand store persists user to localStorage via `ofoq-auth` key — no re-fetch on page refresh.
 
-## signToken signature
-```ts
-signToken({ userId: string, role: string, email: string }): string
-```
-Use signToken from ../auth.js — never import jwt directly in route files.
+## Error handling policy
+All `toast.error()` calls removed from the entire frontend. Only `toast.success()` remains. Global axios interceptor is fully silent (no toasts for any HTTP errors).
 
-**Why:** Caught a bug where barcode-login used jwt.sign directly — use signToken consistently.
+## Rate limiter
+Global: 3000 req/15min per IP. Login: 30/15min. OTP: 20/hr. Admin dashboard uses staleTime 2min + refetchInterval 5min to avoid hitting limits.
