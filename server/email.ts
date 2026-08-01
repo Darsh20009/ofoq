@@ -301,6 +301,37 @@ export async function sendPasswordResetEmail(to: string, name: string, resetLink
   return sendMail(to, name, "إعادة تعيين كلمة المرور - أفق", html);
 }
 
+export async function sendNewEmployeeEmail(
+  to: string,
+  name: string,
+  loginEmail: string,
+  plainPassword: string
+): Promise<boolean> {
+  const cfg = getConfig();
+  const html = baseTemplate({
+    title: "بيانات حسابك في أفق",
+    preheader: "تم إنشاء حسابك في نظام أفق لحلول الأعمال",
+    heading: `مرحباً ${name} 👋`,
+    bodyHtml: `
+      ${p(`تم إنشاء حسابك في نظام <strong>أفق لحلول الأعمال</strong> بنجاح. فيما يلي بيانات الدخول الخاصة بك:`)}
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:20px 0;">
+        <tr>
+          <td style="background:#f0f4f8;border-radius:12px;padding:20px 24px;">
+            <p style="margin:0 0 10px;font-size:14px;color:#555;">📧 البريد الإلكتروني</p>
+            <p style="margin:0 0 18px;font-size:16px;font-weight:700;color:#1B3A5C;direction:ltr;">${loginEmail}</p>
+            <p style="margin:0 0 10px;font-size:14px;color:#555;">🔑 كلمة المرور المؤقتة</p>
+            <p style="margin:0;font-size:18px;font-weight:700;color:#E63329;letter-spacing:2px;font-family:monospace;" dir="ltr">${plainPassword}</p>
+          </td>
+        </tr>
+      </table>
+      ${button("الدخول إلى حسابي", `${cfg.siteUrl}/admin/login`)}
+      ${p(`<strong style="color:#E63329;">⚠️ مهم:</strong> يُرجى تغيير كلمة المرور فور تسجيل دخولك الأول من صفحة الملف الشخصي.`)}
+      ${p("إذا كنت لا تعرف شيئاً عن هذا الحساب، يُرجى التواصل مع المسؤول فوراً.")}
+    `,
+  });
+  return sendMail(to, name, "بيانات حسابك في نظام أفق لحلول الأعمال", html);
+}
+
 export async function sendEmailVerification(to: string, name: string, verifyLink: string): Promise<boolean> {
   const html = baseTemplate({
     title: "تأكيد البريد الإلكتروني",

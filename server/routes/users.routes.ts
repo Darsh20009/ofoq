@@ -3,6 +3,7 @@ import { requireAuth, requireRole, hashPassword, verifyPassword, logAction } fro
 import { uploadAvatar } from "../middleware/upload.js";
 import { UserModel, NotificationModel } from "../models/index.js";
 import { fireNotify } from "../notify.js";
+import { sendNewEmployeeEmail } from "../email.js";
 import path from "path";
 import fs from "fs";
 
@@ -142,6 +143,12 @@ usersRouter.post("/", requireAuth, requireRole("super_admin", "admin"), async (r
       status: "active", emailVerified: true,
     });
     await logAction(String((req as any).user._id), "create_user", "User", String(user._id), req);
+    // إرسال بريد الترحيب مع بيانات الدخول (بشكل غير متزامن — لا يوقف الاستجابة)
+    if (email && password) {
+      sendNewEmployeeEmail(email, fullName, email, password).catch((e) =>
+        console.warn("[Email] welcome email failed:", e?.message)
+      );
+    }
     res.status(201).json({ user: { id: user._id, fullName: user.fullName, email: user.email, role: user.role } });
   } catch (err: any) {
     res.status(500).json({ error: "خطأ في إنشاء المستخدم" });

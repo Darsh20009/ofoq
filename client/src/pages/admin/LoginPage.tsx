@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff, Lock, Mail, ShieldCheck, Fingerprint, QrCode, X } from "lucide-react";
 import { motion } from "framer-motion";
@@ -268,9 +268,9 @@ export default function LoginPage() {
                 </div>
 
                 <div className="flex justify-end">
-                  <a href="#" className="text-ofoq-red text-xs hover:underline">
+                  <Link to="/admin/forgot-password" className="text-ofoq-red text-xs hover:underline">
                     نسيت كلمة المرور؟
-                  </a>
+                  </Link>
                 </div>
 
                 {/* زر الدخول */}

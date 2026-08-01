@@ -3,14 +3,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, Phone, Mail, MapPin, ChevronUp, Globe } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import OfoqLogo from "../components/OfoqLogo";
-
-const navLinks = [
-  { href: "/", label: "الرئيسية" },
-  { href: "/services", label: "خدماتنا" },
-  { href: "/about", label: "من نحن" },
-  { href: "/blog", label: "المدونة" },
-  { href: "/contact", label: "تواصل معنا" },
-];
+import { useLang } from "../i18n/LangContext";
 
 /** أيقونة Qirox — حرف Q دائري بتدرج فضي مع ذيل قطري، بدون خلفية */
 function QiroxIcon() {
@@ -23,9 +16,7 @@ function QiroxIcon() {
           <stop offset="100%" stopColor="#888888" stopOpacity="0.60"/>
         </linearGradient>
       </defs>
-      {/* حلقة الـ Q */}
       <circle cx="46" cy="46" r="30" stroke="url(#qirox-grad)" strokeWidth="11" fill="none"/>
-      {/* الذيل القطري */}
       <line x1="68" y1="68" x2="88" y2="90" stroke="url(#qirox-grad)" strokeWidth="10" strokeLinecap="round"/>
     </svg>
   );
@@ -35,10 +26,16 @@ export default function PublicLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showTop, setShowTop] = useState(false);
-  const [lang, setLang] = useState<"ar" | "en">(() => {
-    return (localStorage.getItem("ofoq_lang") as "ar" | "en") || "ar";
-  });
   const { pathname } = useLocation();
+  const { lang, toggleLang, t } = useLang();
+
+  const navLinks = [
+    { href: "/",         label: t.nav.home },
+    { href: "/services", label: t.nav.services },
+    { href: "/about",    label: t.nav.about },
+    { href: "/blog",     label: t.nav.blog },
+    { href: "/contact",  label: t.nav.contact },
+  ];
 
   useEffect(() => {
     const onScroll = () => {
@@ -54,15 +51,6 @@ export default function PublicLayout() {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  // تطبيق اتجاه اللغة على الصفحة
-  useEffect(() => {
-    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
-    document.documentElement.lang = lang;
-    localStorage.setItem("ofoq_lang", lang);
-  }, [lang]);
-
-  const toggleLang = () => setLang((l) => (l === "ar" ? "en" : "ar"));
-
   return (
     <div className="min-h-screen flex flex-col">
       {/* ── Navbar ──────────────────────── */}
@@ -77,8 +65,12 @@ export default function PublicLayout() {
             <Link to="/" className="flex items-center gap-3 group">
               <OfoqLogo className="w-16 h-12 text-white" />
               <div>
-                <p className="text-white font-bold text-lg leading-none">أفق</p>
-                <p className="text-white/60 text-xs">لحلول الأعمال</p>
+                <p className="text-white font-bold text-lg leading-none">
+                  {lang === "ar" ? "أفق" : "OFOQ"}
+                </p>
+                <p className="text-white/60 text-xs">
+                  {lang === "ar" ? "لحلول الأعمال" : "Business Solutions"}
+                </p>
               </div>
             </Link>
 
@@ -103,7 +95,7 @@ export default function PublicLayout() {
               {/* زر تغيير اللغة */}
               <button
                 onClick={toggleLang}
-                title={lang === "ar" ? "Switch to English" : "التبديل للعربية"}
+                title={t.nav.switchLang}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/25 text-white/80 hover:text-white hover:bg-white/10 hover:border-white/50 transition-all text-xs font-semibold"
               >
                 <Globe size={13} />
@@ -114,7 +106,7 @@ export default function PublicLayout() {
                 to="/contact"
                 className="hidden md:flex btn-red text-xs px-4 py-2"
               >
-                احصل على عرض سعر
+                {t.nav.getQuote}
               </Link>
 
               {/* Mobile toggle */}
@@ -153,7 +145,7 @@ export default function PublicLayout() {
                   </Link>
                 ))}
                 <Link to="/contact" className="btn-red mt-2 justify-center">
-                  احصل على عرض سعر
+                  {t.nav.getQuote}
                 </Link>
               </nav>
             </motion.div>
@@ -175,12 +167,12 @@ export default function PublicLayout() {
               <div className="flex items-center gap-3 mb-4">
                 <OfoqLogo className="w-20 h-14 text-white" />
                 <div>
-                  <p className="font-bold text-xl">أفق لحلول الأعمال</p>
+                  <p className="font-bold text-xl">{t.footer.company}</p>
                   <p className="text-white/50 text-sm">OFOQ Business Solutions</p>
                 </div>
               </div>
               <p className="text-white/60 text-sm leading-relaxed max-w-sm">
-                نقدم حلولاً رقمية متكاملة تُمكّن الشركات من تحقيق أهدافها بكفاءة عالية، من الاستراتيجية إلى التنفيذ.
+                {t.footer.tagline}
               </p>
               <div className="flex items-center gap-3 mt-6">
                 {["twitter", "linkedin", "instagram"].map((s) => (
@@ -197,7 +189,7 @@ export default function PublicLayout() {
 
             {/* Links */}
             <div>
-              <h4 className="font-bold mb-4 text-white">روابط سريعة</h4>
+              <h4 className="font-bold mb-4 text-white">{t.footer.quickLinks}</h4>
               <ul className="space-y-2">
                 {navLinks.map((l) => (
                   <li key={l.href}>
@@ -214,29 +206,29 @@ export default function PublicLayout() {
 
             {/* Contact */}
             <div>
-              <h4 className="font-bold mb-4 text-white">تواصل معنا</h4>
+              <h4 className="font-bold mb-4 text-white">{t.footer.contactUs}</h4>
               <ul className="space-y-3">
                 <li className="flex items-center gap-2 text-white/60 text-sm">
                   <Phone size={14} className="text-ofoq-red flex-shrink-0" />
-                  <span>+966 XX XXX XXXX</span>
+                  <span>{t.footer.phone}</span>
                 </li>
                 <li className="flex items-center gap-2 text-white/60 text-sm">
                   <Mail size={14} className="text-ofoq-red flex-shrink-0" />
-                  <span>info@ofoq.sa</span>
+                  <span>{t.footer.email}</span>
                 </li>
                 <li className="flex items-start gap-2 text-white/60 text-sm">
                   <MapPin size={14} className="text-ofoq-red flex-shrink-0 mt-0.5" />
-                  <span>المملكة العربية السعودية</span>
+                  <span>{t.footer.location}</span>
                 </li>
               </ul>
             </div>
           </div>
 
           <div className="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-white/40 text-xs">
-            <p>© {new Date().getFullYear()} أفق لحلول الأعمال. جميع الحقوق محفوظة.</p>
+            <p>© {new Date().getFullYear()} {t.footer.company}. {t.footer.rights}</p>
             <div className="flex gap-4">
-              <a href="#" className="hover:text-white transition-colors">سياسة الخصوصية</a>
-              <a href="#" className="hover:text-white transition-colors">الشروط والأحكام</a>
+              <a href="#" className="hover:text-white transition-colors">{t.footer.privacy}</a>
+              <a href="#" className="hover:text-white transition-colors">{t.footer.terms}</a>
             </div>
           </div>
         </div>
@@ -245,7 +237,7 @@ export default function PublicLayout() {
       {/* ── Qirox Studio Attribution ──────────── */}
       <div className="bg-[#070710] border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-center gap-2.5">
-          <span className="text-white/25 text-xs">صُنع بواسطة</span>
+          <span className="text-white/25 text-xs">{t.footer.madeBy}</span>
           <a
             href="https://qiroxstudio.online"
             target="_blank"

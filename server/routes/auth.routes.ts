@@ -257,7 +257,7 @@ authRouter.post("/forgot-password", otpLimiter, async (req, res) => {
       passwordResetToken: resetToken,
       passwordResetExpiry: resetExpiry,
     });
-    const resetLink = `${process.env.APP_URL}/reset-password?token=${resetToken}`;
+    const resetLink = `${process.env.APP_URL}/admin/reset-password?token=${resetToken}`;
     await sendPasswordResetEmail(email, user.fullName, resetLink);
     res.json({ message: "إذا كان البريد مسجّلاً، ستصلك رسالة إعادة التعيين" });
   } catch {

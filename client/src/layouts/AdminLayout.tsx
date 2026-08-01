@@ -11,6 +11,7 @@ import { useAuthStore } from "../store/authStore";
 import { authApi, usersApi } from "../api/client";
 import type { Notification } from "../types";
 import OfoqLogo from "../components/OfoqLogo";
+import { useLang } from "../i18n/LangContext";
 
 interface NavItem {
   href?: string;
@@ -19,24 +20,7 @@ interface NavItem {
   children?: { href: string; label: string }[];
 }
 
-const navItems: NavItem[] = [
-  { href: "/admin", label: "لوحة القيادة", icon: LayoutDashboard },
-  {
-    label: "إدارة العلاقات",
-    icon: TrendingUp,
-    children: [
-      { href: "/admin/crm/leads", label: "الفرص التجارية" },
-      { href: "/admin/crm/customers", label: "العملاء" },
-    ],
-  },
-  { href: "/admin/projects", label: "المشاريع", icon: FolderKanban },
-  { href: "/admin/invoices", label: "الفواتير", icon: FileText },
-  { href: "/admin/contracts", label: "العقود", icon: FileSignature },
-  { href: "/admin/users", label: "المستخدمين", icon: Users },
-  { href: "/admin/cms", label: "المحتوى", icon: FileEdit },
-  { href: "/admin/settings", label: "الإعدادات", icon: Settings },
-  { href: "/admin/employee/card", label: "بطاقتي", icon: CreditCard },
-];
+// navItems built dynamically in the component using useLang — see buildNavItems()
 
 function NavLink({ item, collapsed, onNavigate }: {
   item: NavItem; collapsed: boolean; onNavigate: () => void;
@@ -111,6 +95,26 @@ export default function AdminLayout() {
   const { user, clearAuth } = useAuthStore();
   const navigate = useNavigate();
   const notifRef = useRef<HTMLDivElement>(null);
+  const { t } = useLang();
+
+  const navItems: NavItem[] = [
+    { href: "/admin", label: t.admin.dashboard, icon: LayoutDashboard },
+    {
+      label: t.admin.crm,
+      icon: TrendingUp,
+      children: [
+        { href: "/admin/crm/leads",     label: t.admin.leads },
+        { href: "/admin/crm/customers", label: t.admin.customers },
+      ],
+    },
+    { href: "/admin/projects",      label: t.admin.projects,   icon: FolderKanban },
+    { href: "/admin/invoices",      label: t.admin.invoices,   icon: FileText },
+    { href: "/admin/contracts",     label: t.admin.contracts,  icon: FileSignature },
+    { href: "/admin/users",         label: t.admin.users,      icon: Users },
+    { href: "/admin/cms",           label: t.admin.cms,        icon: FileEdit },
+    { href: "/admin/settings",      label: t.admin.settings,   icon: Settings },
+    { href: "/admin/employee/card", label: t.admin.myCard,     icon: CreditCard },
+  ];
 
   // Load notifications
   useEffect(() => {
@@ -163,8 +167,8 @@ export default function AdminLayout() {
            <OfoqLogo className="w-16 h-12 text-white flex-shrink-0" />
           {!collapsed && (
             <div className="overflow-hidden">
-              <p className="text-white font-bold text-sm leading-none whitespace-nowrap">أفق</p>
-              <p className="text-white/50 text-xs whitespace-nowrap">لوحة التحكم</p>
+              <p className="text-white font-bold text-sm leading-none whitespace-nowrap">{t.admin.brand}</p>
+              <p className="text-white/50 text-xs whitespace-nowrap">{t.admin.brandSub}</p>
             </div>
           )}
           <button
@@ -251,14 +255,14 @@ export default function AdminLayout() {
                     className="absolute top-12 left-0 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
                   >
                     <div className="p-4 border-b flex items-center justify-between">
-                      <span className="font-semibold text-sm text-navy-700">الإشعارات</span>
+                      <span className="font-semibold text-sm text-navy-700">{t.admin.notifications}</span>
                       {unreadCount > 0 && (
-                        <span className="badge-navy text-xs">{unreadCount} جديد</span>
+                        <span className="badge-navy text-xs">{unreadCount} {t.admin.newBadge}</span>
                       )}
                     </div>
                     <div className="max-h-80 overflow-y-auto">
                       {notifications.length === 0 ? (
-                        <p className="text-center text-gray-400 text-sm py-8">لا توجد إشعارات</p>
+                        <p className="text-center text-gray-400 text-sm py-8">{t.admin.noNotif}</p>
                       ) : (
                         notifications.map((n) => (
                           <div
@@ -307,7 +311,7 @@ export default function AdminLayout() {
                       className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-sm text-navy-700 transition-colors"
                     >
                       <User size={16} className="text-gray-400" />
-                      الملف الشخصي
+                      {t.admin.profile}
                     </Link>
                     <Link
                       to="/admin/settings"
@@ -315,14 +319,14 @@ export default function AdminLayout() {
                       className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-sm text-navy-700 transition-colors border-t"
                     >
                       <Settings size={16} className="text-gray-400" />
-                      الإعدادات
+                      {t.admin.settings}
                     </Link>
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-sm text-red-600 transition-colors border-t w-full text-right"
                     >
                       <LogOut size={16} />
-                      تسجيل الخروج
+                      {t.admin.logout}
                     </button>
                   </motion.div>
                 )}

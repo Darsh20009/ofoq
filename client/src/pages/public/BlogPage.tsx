@@ -2,50 +2,39 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Calendar, User, Tag, ChevronLeft } from "lucide-react";
 import { format } from "date-fns";
-import { arSA } from "date-fns/locale";
+import { arSA, enUS } from "date-fns/locale";
 import { Helmet } from "react-helmet-async";
 import { cmsApi } from "../../api/client";
 import type { BlogPost } from "../../types";
+import { useLang } from "../../i18n/LangContext";
 
 export default function BlogPage() {
+  const { t, lang } = useLang();
   const { data, isLoading } = useQuery({
     queryKey: ["public-blog"],
     queryFn: () => cmsApi.blog.list({ isPublished: true, limit: 20 }).then((r) => r.data),
   });
 
   const posts: BlogPost[] = data?.data?.posts || [];
+  const dateLocale = lang === "ar" ? arSA : enUS;
 
   return (
     <>
       <Helmet>
-        <title>المدونة | أفق لحلول الأعمال — مقالات التحول الرقمي والأعمال</title>
-        <meta name="description" content="مدونة أفق لحلول الأعمال — مقالات وأدلة متخصصة في التحول الرقمي، إدارة المشاريع، CRM، الفواتير الإلكترونية، وحلول الأعمال للشركات السعودية والخليجية." />
-        <meta name="keywords" content="مدونة أفق, مقالات التحول الرقمي, مقالات إدارة الأعمال, ofoq blog, مقالات CRM, إدارة المشاريع, حلول الأعمال السعودية, التحول الرقمي, رؤية 2030" />
+        <title>{t.blog.metaTitle}</title>
+        <meta name="description" content="مدونة أفق لحلول الأعمال — مقالات وأدلة متخصصة في التحول الرقمي وإدارة الأعمال للشركات السعودية والخليجية." />
         <link rel="canonical" href="https://ofoqhc.com/blog" />
-        <meta property="og:title" content="المدونة | أفق لحلول الأعمال" />
-        <meta property="og:description" content="مقالات وأدلة متخصصة في التحول الرقمي وحلول الأعمال للشركات السعودية والخليجية." />
+        <meta property="og:title" content={t.blog.metaTitle} />
         <meta property="og:url" content="https://ofoqhc.com/blog" />
-        <meta property="og:type" content="blog" />
-        <script type="application/ld+json">{JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Blog",
-          "name": "مدونة أفق لحلول الأعمال",
-          "url": "https://ofoqhc.com/blog",
-          "description": "مقالات وأدلة متخصصة في التحول الرقمي وإدارة الأعمال للشركات السعودية والخليجية.",
-          "publisher": { "@type": "Organization", "name": "أفق لحلول الأعمال", "url": "https://ofoqhc.com" },
-          "inLanguage": "ar"
-        })}</script>
       </Helmet>
 
       {/* Hero */}
       <section className="bg-hero pt-32 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <span className="badge bg-ofoq-green/20 text-ofoq-green mb-4">المدونة</span>
-            <h1 className="text-5xl font-black text-white mt-3 mb-4">مركز المعرفة</h1>
-            <p className="text-white/60 text-xl max-w-2xl mx-auto">
-              رؤى واستراتيجيات من خبرائنا لمساعدتك في مواكبة التحولات الرقمية
-            </p>
+            <span className="badge bg-ofoq-green/20 text-ofoq-green mb-4">{t.blog.badge}</span>
+            <h1 className="text-5xl font-black text-white mt-3 mb-4">{t.blog.heroTitle}</h1>
+            <p className="text-white/60 text-xl max-w-2xl mx-auto">{t.blog.heroSub}</p>
           </motion.div>
         </div>
       </section>
@@ -69,8 +58,8 @@ export default function BlogPage() {
               <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center mx-auto mb-4 shadow-card">
                 <Tag size={32} className="text-gray-300" />
               </div>
-              <h3 className="text-xl font-bold text-navy-700 mb-2">لا توجد مقالات بعد</h3>
-              <p className="text-gray-500">سيتم نشر المقالات قريباً. تابعنا!</p>
+              <h3 className="text-xl font-bold text-navy-700 mb-2">{t.blog.empty}</h3>
+              <p className="text-gray-500">{t.blog.emptySub}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -99,11 +88,11 @@ export default function BlogPage() {
                   {/* Content */}
                   <div className="p-5">
                     <h2 className="font-bold text-navy-700 text-lg mb-2 line-clamp-2 group-hover:text-ofoq-green transition-colors">
-                      {post.title.ar}
+                      {lang === "en" && post.title?.en ? post.title.en : post.title.ar}
                     </h2>
                     {post.excerpt?.ar && (
                       <p className="text-gray-500 text-sm leading-relaxed line-clamp-3 mb-4">
-                        {post.excerpt.ar}
+                        {lang === "en" && post.excerpt?.en ? post.excerpt.en : post.excerpt.ar}
                       </p>
                     )}
                     <div className="flex items-center justify-between text-xs text-gray-400 pt-3 border-t border-gray-100">
@@ -116,12 +105,12 @@ export default function BlogPage() {
                         {post.publishedAt && (
                           <span className="flex items-center gap-1">
                             <Calendar size={11} />
-                            {format(new Date(post.publishedAt), "d MMM yyyy", { locale: arSA })}
+                            {format(new Date(post.publishedAt), "d MMM yyyy", { locale: dateLocale })}
                           </span>
                         )}
                       </div>
                       <span className="text-ofoq-green font-medium flex items-center gap-1 hover:gap-2 transition-all cursor-pointer">
-                        قراءة <ChevronLeft size={12} />
+                        {t.blog.read} <ChevronLeft size={12} />
                       </span>
                     </div>
                   </div>

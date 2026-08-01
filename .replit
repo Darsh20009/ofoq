@@ -42,6 +42,10 @@ args = "OFOQ Backend"
 task = "workflow.run"
 args = "OFOQ Frontend"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "artifacts/mockup-sandbox: Component Preview Server"
+
 [[workflows.workflow]]
 name = "OFOQ Backend"
 author = "agent"
@@ -58,6 +62,19 @@ author = "agent"
 task = "shell.exec"
 args = "npm run dev:client"
 
+[[workflows.workflow]]
+name = "artifacts/mockup-sandbox: Component Preview Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd artifacts/mockup-sandbox && PORT=5173 BASE_PATH=/__mockup/ npm run dev"
+waitForPort = 5173
+
+[workflows.workflow.metadata]
+outputType = "console"
+isCanvasWorkflow = true
+
 [[ports]]
 localPort = 3000
 externalPort = 3000
@@ -69,3 +86,7 @@ externalPort = 80
 [[ports]]
 localPort = 5099
 externalPort = 3001
+
+[[ports]]
+localPort = 5173
+externalPort = 5173

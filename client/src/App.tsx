@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "./store/authStore";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
 
 // Layouts
@@ -16,6 +16,8 @@ import ContactPage from "./pages/public/ContactPage";
 
 // Admin Pages
 import LoginPage from "./pages/admin/LoginPage";
+import ForgotPasswordPage from "./pages/admin/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/admin/ResetPasswordPage";
 import OAuthCallbackPage from "./pages/admin/OAuthCallbackPage";
 import DashboardPage from "./pages/admin/DashboardPage";
 import LeadsPage from "./pages/admin/crm/LeadsPage";
@@ -46,26 +48,36 @@ function RequireGuest({ children }: { children: JSX.Element }) {
 export default function App() {
   const location = useLocation();
   const [showLoader, setShowLoader] = useState(false);
-  const [prevPath, setPrevPath] = useState(location.pathname);
+  const [loaderPath, setLoaderPath] = useState("");
+  const prevPathRef = useRef(location.pathname);
+  // نستخدم ref للـ nav ID حتى الـ callback يتجاهل التنقلات القديمة
+  const navIdRef = useRef(0);
 
-  // أظهر اللودر عند تغيّر المسار — ما عدا أول تحميل
   useEffect(() => {
-    if (location.pathname !== prevPath) {
+    if (location.pathname !== prevPathRef.current) {
+      prevPathRef.current = location.pathname;
+      navIdRef.current += 1;
       setShowLoader(true);
-      setPrevPath(location.pathname);
+      setLoaderPath(location.pathname);
     }
-  }, [location.pathname]); // eslint-disable-line
+  }, [location.pathname]);
 
-  const handleLoaderDone = useCallback(() => {
-    setShowLoader(false);
+  const handleLoaderDone = useCallback((capturedId: number) => {
+    // فقط أخر تنقل يمكنه إخفاء اللودر — التنقل السريع آمن
+    if (capturedId === navIdRef.current) {
+      setShowLoader(false);
+    }
   }, []);
 
   return (
     <>
       {/* ── Page Transition Loader ────────── */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {showLoader && (
-          <PageLoader key={location.pathname} onDone={handleLoaderDone} />
+          <PageLoader
+            key={loaderPath}
+            onDone={() => handleLoaderDone(navIdRef.current)}
+          />
         )}
       </AnimatePresence>
 
@@ -89,6 +101,8 @@ export default function App() {
           }
         />
         <Route path="/admin/oauth/callback" element={<OAuthCallbackPage />} />
+        <Route path="/admin/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/admin/reset-password" element={<ResetPasswordPage />} />
 
         {/* ── Admin Dashboard ──────────────────────────── */}
         <Route

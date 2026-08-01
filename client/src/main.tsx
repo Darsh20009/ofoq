@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import { HelmetProvider } from "react-helmet-async";
 import App from "./App";
+import { LangProvider } from "./i18n/LangContext";
 import "./styles/globals.css";
 
 const queryClient = new QueryClient({
@@ -118,10 +119,11 @@ setTimeout(() => {
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <App />
-          <Toaster
+      <LangProvider>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <App />
+            <Toaster
             position="top-center"
             toastOptions={{
               duration: 4000,
@@ -133,9 +135,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               success: { style: { background: "#33B27C", color: "#fff" } },
               error:   { style: { background: "#EF4444", color: "#fff" } },
             }}
-          />
-        </BrowserRouter>
-      </QueryClientProvider>
+            />
+          </BrowserRouter>
+        </QueryClientProvider>
+      </LangProvider>
     </HelmetProvider>
   </React.StrictMode>
 );

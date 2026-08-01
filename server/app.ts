@@ -117,21 +117,41 @@ app.use("/public", express.static(publicDir));
 // ── Routes ───────────────────────────────────────────────────────
 registerRoutes(app);
 
-// ── Serve Frontend (Production) ──────────────────────────────────
+// ── Serve Frontend ────────────────────────────────────────────────
 const clientDist = path.join(process.cwd(), "public", "dist");
-app.use(express.static(clientDist));
-app.get("*", (_req, res) => {
-  res.sendFile(path.join(clientDist, "index.html"), (err) => {
-    if (err) {
-      res.status(200).json({
-        status: "online",
-        app: "OFOQ Business Solutions",
-        version: "1.0.0",
-        message: "Frontend not built yet. API is ready.",
-      });
-    }
+
+if (process.env.NODE_ENV !== "production") {
+  // Development: proxy everything (except /api, /uploads, /public, /ws)
+  // to the Vite dev server running on port 3000
+  const { createProxyMiddleware } = await import("http-proxy-middleware");
+  app.use(
+    createProxyMiddleware({
+      target: "http://127.0.0.1:3000",
+      changeOrigin: true,
+      ws: false, // WebSocket handled separately on /ws
+      on: {
+        error: (_err, _req, res) => {
+          (res as express.Response).status(502).send("Frontend dev server not ready — ensure OFOQ Frontend workflow is running.");
+        },
+      },
+    })
+  );
+} else {
+  // Production: serve built files
+  app.use(express.static(clientDist));
+  app.get("*", (_req, res) => {
+    res.sendFile(path.join(clientDist, "index.html"), (err) => {
+      if (err) {
+        res.status(200).json({
+          status: "online",
+          app: "OFOQ Business Solutions",
+          version: "1.0.0",
+          message: "Frontend not built yet. API is ready.",
+        });
+      }
+    });
   });
-});
+}
 
 // ── Error Handler ────────────────────────────────────────────────
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
