@@ -49,13 +49,13 @@ export default function ClientRegisterPage() {
 
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}
-          <div className="bg-ofoq-navy p-7 text-center">
+          <Link to="/" className="block bg-ofoq-navy p-7 text-center hover:bg-[#1e1b38] transition-colors group">
             <div className="flex justify-center mb-3">
               <OfoqLogo className="w-16 h-11" />
             </div>
             <h1 className="text-white text-xl font-bold">إنشاء حساب جديد</h1>
-            <p className="text-white/50 text-sm mt-1">انضم لبوابة عملاء أفق</p>
-          </div>
+            <p className="text-white/50 text-sm mt-1 group-hover:text-white/70 transition-colors">انضم لبوابة عملاء أفق</p>
+          </Link>
 
           <div className="p-8">
             {err && (
