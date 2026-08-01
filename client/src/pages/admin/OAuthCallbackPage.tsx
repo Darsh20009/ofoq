@@ -29,9 +29,15 @@ export default function OAuthCallbackPage() {
     localStorage.setItem("ofoq_token", token);
     authApi.me()
       .then((res) => {
-        setAuth(res.data.user, token);
-        toast.success(`مرحباً، ${res.data.user.name || res.data.user.fullName}!`);
-        navigate("/admin", { replace: true });
+        const user = res.data.user;
+        setAuth(user, token);
+        toast.success(`مرحباً، ${user.name || user.fullName}!`);
+        // Route by role: clients → client portal, everyone else → admin
+        if (user.role === "client") {
+          navigate("/client/dashboard", { replace: true });
+        } else {
+          navigate("/admin", { replace: true });
+        }
       })
       .catch(() => {
         navigate("/admin/login", { replace: true });
