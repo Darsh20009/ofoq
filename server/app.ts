@@ -36,11 +36,13 @@ app.use(helmet({
 
 // ── CORS ─────────────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
-  process.env.APP_URL,
+  process.env.APP_URL,                       // e.g. https://ofoqhc.com
+  process.env.EMPLOYEE_URL,                  // e.g. https://employee.ofoqhc.com
+  "https://employee.ofoqhc.com",             // hardcoded fallback
+  "http://localhost:3000",
   "http://localhost:5000",
   "http://127.0.0.1:5000",
   process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : null,
-  // Allow *.replit.dev subdomains for dev previews
 ].filter((o): o is string => Boolean(o));
 
 app.use(cors({
@@ -49,8 +51,10 @@ app.use(cors({
     if (!origin) return cb(null, true);
     // Explicit allowlist
     if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-    // Allow all *.replit.dev origins in development (strip port before check)
-    const originHost = origin.replace(/:\d+$/, "");
+    // Allow all *.ofoqhc.com subdomains in production
+    const originHost = origin.replace(/:\d+$/, "").replace(/^https?:\/\//, "");
+    if (originHost.endsWith(".ofoqhc.com")) return cb(null, true);
+    // Allow all *.replit.dev origins in development
     if (process.env.NODE_ENV !== "production" && originHost.endsWith(".replit.dev")) return cb(null, true);
     return cb(new Error(`CORS: origin ${origin} not allowed`));
   },

@@ -2,10 +2,15 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "./store/authStore";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
+import { useSubdomain } from "./hooks/useSubdomain";
 
 // Layouts
 import PublicLayout from "./layouts/PublicLayout";
 import AdminLayout from "./layouts/AdminLayout";
+import EmployeeLayout from "./layouts/EmployeeLayout";
+
+// Employee Portal
+import EmployeePortalLoginPage from "./pages/employee/EmployeePortalLoginPage";
 
 // Public Pages
 import HomePage from "./pages/public/HomePage";
@@ -45,12 +50,23 @@ function RequireGuest({ children }: { children: JSX.Element }) {
   return isAuthenticated ? <Navigate to="/admin" replace /> : children;
 }
 
+/* ── Employee Portal Guards ───────────────────────────────────────── */
+function RequireEmployeeAuth({ children }: { children: JSX.Element }) {
+  const { isAuthenticated } = useAuthStore();
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+}
+
+function RequireEmployeeGuest({ children }: { children: JSX.Element }) {
+  const { isAuthenticated } = useAuthStore();
+  return isAuthenticated ? <Navigate to="/" replace /> : children;
+}
+
 export default function App() {
   const location = useLocation();
+  const { isEmployee } = useSubdomain();
   const [showLoader, setShowLoader] = useState(false);
   const [loaderPath, setLoaderPath] = useState("");
   const prevPathRef = useRef(location.pathname);
-  // نستخدم ref للـ nav ID حتى الـ callback يتجاهل التنقلات القديمة
   const navIdRef = useRef(0);
 
   useEffect(() => {
@@ -63,15 +79,62 @@ export default function App() {
   }, [location.pathname]);
 
   const handleLoaderDone = useCallback((capturedId: number) => {
-    // فقط أخر تنقل يمكنه إخفاء اللودر — التنقل السريع آمن
-    if (capturedId === navIdRef.current) {
-      setShowLoader(false);
-    }
+    if (capturedId === navIdRef.current) setShowLoader(false);
   }, []);
 
+  /* ════════════════════════════════════════════════════════════════
+     بوابة الموظفين — employee.ofoqhc.com
+     مسارات مستقلة تماماً، بدون سايدبار الأدمن
+  ════════════════════════════════════════════════════════════════ */
+  if (isEmployee) {
+    return (
+      <>
+        <AnimatePresence mode="wait">
+          {showLoader && (
+            <PageLoader
+              key={loaderPath}
+              onDone={() => handleLoaderDone(navIdRef.current)}
+            />
+          )}
+        </AnimatePresence>
+
+        <Routes>
+          {/* تسجيل الدخول */}
+          <Route
+            path="/login"
+            element={
+              <RequireEmployeeGuest>
+                <EmployeePortalLoginPage />
+              </RequireEmployeeGuest>
+            }
+          />
+
+          {/* بوابة الموظف — تحتاج تسجيل دخول */}
+          <Route
+            path="/"
+            element={
+              <RequireEmployeeAuth>
+                <EmployeeLayout />
+              </RequireEmployeeAuth>
+            }
+          >
+            <Route index element={<EmployeeDashboardPage />} />
+            <Route path="card" element={<EmployeeCardPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+          </Route>
+
+          {/* أي مسار غير معروف → الرئيسية */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </>
+    );
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     الموقع الرئيسي + لوحة الأدمن — ofoqhc.com
+  ════════════════════════════════════════════════════════════════ */
   return (
     <>
-      {/* ── Page Transition Loader ────────── */}
       <AnimatePresence mode="wait">
         {showLoader && (
           <PageLoader
@@ -82,7 +145,7 @@ export default function App() {
       </AnimatePresence>
 
       <Routes>
-        {/* ── Public Website ───────────────────────────── */}
+        {/* ── الموقع العام ─────────────────────────── */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/services" element={<ServicesPage />} />
@@ -91,7 +154,7 @@ export default function App() {
           <Route path="/contact" element={<ContactPage />} />
         </Route>
 
-        {/* ── Admin Auth ───────────────────────────────── */}
+        {/* ── تسجيل دخول الأدمن ───────────────────── */}
         <Route
           path="/admin/login"
           element={
@@ -104,7 +167,7 @@ export default function App() {
         <Route path="/admin/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/admin/reset-password" element={<ResetPasswordPage />} />
 
-        {/* ── Admin Dashboard ──────────────────────────── */}
+        {/* ── لوحة تحكم الأدمن ────────────────────── */}
         <Route
           path="/admin"
           element={
@@ -127,7 +190,7 @@ export default function App() {
           <Route path="employee/dashboard" element={<EmployeeDashboardPage />} />
         </Route>
 
-        {/* ── Fallback ─────────────────────────────────── */}
+        {/* ── Fallback ─────────────────────────────── */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>

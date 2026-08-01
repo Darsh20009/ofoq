@@ -69,5 +69,7 @@ services:
         sync: false
       - key: VAPID_SUBJECT
         sync: false
+      - key: EMPLOYEE_URL
+        value: "https://employee.ofoqhc.com"
       - key: OPENAI_API_KEY
         sync: false
