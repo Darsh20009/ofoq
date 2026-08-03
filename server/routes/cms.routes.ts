@@ -8,6 +8,92 @@ import path from "path";
 export const cmsRouter = Router();
 
 // ═══════════════════════════════════════════════════
+// BLOG
+// ═══════════════════════════════════════════════════
+
+// Public: list posts (admins see unpublished when isPublished not forced)
+cmsRouter.get("/blog", optionalAuth, async (req, res) => {
+  try {
+    const { isPublished, limit = "20", category } = req.query as Record<string, string>;
+    const filter: Record<string, unknown> = {};
+    if (isPublished === "true" || !(req as any).user) filter.isPublished = true;
+    if (category) filter.category = category;
+    const posts = await BlogPostModel.find(filter)
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .limit(Math.min(parseInt(limit) || 20, 100))
+      .populate("author", "name")
+      .lean();
+    res.json({ data: { posts } });
+  } catch {
+    res.status(500).json({ error: "خطأ في جلب المقالات" });
+  }
+});
+
+// Public: single post by id or slug
+cmsRouter.get("/blog/:id", optionalAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const byId = /^[0-9a-fA-F]{24}$/.test(id);
+    const post = await BlogPostModel.findOne(byId ? { _id: id } : { slug: id })
+      .populate("author", "name")
+      .lean();
+    if (!post || (!post.isPublished && !(req as any).user)) {
+      res.status(404).json({ error: "المقال غير موجود" });
+      return;
+    }
+    BlogPostModel.updateOne({ _id: post._id }, { $inc: { viewCount: 1 } }).catch(() => {});
+    res.json({ data: { post } });
+  } catch {
+    res.status(500).json({ error: "خطأ في جلب المقال" });
+  }
+});
+
+// Admin: create post
+cmsRouter.post("/blog", requireAuth, requireRole("super_admin", "admin", "manager", "employee"), async (req, res) => {
+  try {
+    const body = req.body || {};
+    const slug = body.slug || slugify(body.titleAr || body.title || "", { lower: true, strict: true }) || `post-${Date.now()}`;
+    const post = await BlogPostModel.create({
+      ...body,
+      slug,
+      author: (req as any).user._id,
+      publishedAt: body.isPublished ? new Date() : undefined,
+    });
+    res.status(201).json({ data: { post } });
+  } catch {
+    res.status(500).json({ error: "خطأ في إنشاء المقال" });
+  }
+});
+
+// Admin: update post
+cmsRouter.put("/blog/:id", requireAuth, requireRole("super_admin", "admin", "manager", "employee"), async (req, res) => {
+  try {
+    const body = req.body || {};
+    const existing = await BlogPostModel.findById(req.params.id);
+    if (!existing) {
+      res.status(404).json({ error: "المقال غير موجود" });
+      return;
+    }
+    if (body.isPublished && !existing.publishedAt) body.publishedAt = new Date();
+    Object.assign(existing, body);
+    await existing.save();
+    res.json({ data: { post: existing } });
+  } catch {
+    res.status(500).json({ error: "خطأ في تعديل المقال" });
+  }
+});
+
+// Admin: delete post
+cmsRouter.delete("/blog/:id", requireAuth, requireRole("super_admin", "admin", "manager"), async (req, res) => {
+  try {
+    await BlogPostModel.deleteOne({ _id: req.params.id });
+    res.json({ success: true });
+  } catch {
+    res.status(500).json({ error: "خطأ في حذف المقال" });
+  }
+});
+
+// ═══════════════════════════════════════════════════
 // PAGES (Full employee control of website content)
 // ═══════════════════════════════════════════════════
 

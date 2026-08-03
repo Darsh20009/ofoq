@@ -70,5 +70,7 @@ export const contactSchema = z.object({
   phone: z.string().optional(),
   company: z.string().optional(),
   serviceInterest: z.string().optional(),
+  interest: z.string().optional(),   // alias sent by public contact form
+  sector: z.string().optional(),     // sent by public contact form
   message: z.string().min(10, "الرسالة قصيرة جداً").max(2000),
 });

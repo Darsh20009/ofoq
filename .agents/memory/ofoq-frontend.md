@@ -4,7 +4,7 @@ description: React/Vite frontend conventions, port, proxy, and key component not
 ---
 
 ## Dev server
-- Port 3000, proxies `/api` to port 5000 (Express backend)
+- Vite dev on port 5000 (main preview, external 80); Express backend on port 3000. Vite proxies /api, /uploads, /ws to backend. Backend dev proxy sends non-API to 5000 and must NEVER proxy /api (loop risk).
 - `server.allowedHosts: true` for Replit iframe proxy
 
 ## Language/i18n

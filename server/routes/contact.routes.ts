@@ -11,10 +11,12 @@ export const contactRouter = Router();
 // ── Public: Submit Contact Form ───────────────────────────────────
 contactRouter.post("/", contactLimiter, validate(contactSchema), async (req, res) => {
   try {
-    const { name, email, phone, company, serviceInterest, message } = req.body;
+    const { name, email, phone, company, serviceInterest, interest, sector, message } = req.body;
 
     const request = await ContactRequestModel.create({
-      name, email, phone, company, serviceInterest, message,
+      name, email, phone, company,
+      serviceInterest: serviceInterest || interest,
+      message: sector ? `[القطاع: ${sector}]\n${message}` : message,
       ip: req.ip,
       source: req.headers.referer || "direct",
     });

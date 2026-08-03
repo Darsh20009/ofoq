@@ -5,8 +5,8 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "dev": "NODE_ENV=development tsx watch server/index.ts",
-    "dev:client": "vite --config vite.config.ts --port 3000 --host",
+    "dev": "NODE_ENV=development PORT=3000 tsx watch server/index.ts",
+    "dev:client": "vite --config vite.config.ts --port 5000 --host",
     "build": "tsc --noEmitOnError false; vite build --config vite.config.ts",
     "build:server": "tsc",
     "build:client": "vite build --config vite.config.ts",

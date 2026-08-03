@@ -140,11 +140,16 @@ const clientDist = path.join(process.cwd(), "public", "dist");
 
 if (process.env.NODE_ENV !== "production") {
   // Development: proxy everything (except /api, /uploads, /public, /ws)
-  // to the Vite dev server running on port 3000
+  // to the Vite dev server running on port 5000.
+  // IMPORTANT: never proxy /api here — unmatched API paths must 404,
+  // otherwise they bounce between Vite and this server in an infinite loop.
   const { createProxyMiddleware } = await import("http-proxy-middleware");
+  app.use("/api", (_req, res) => {
+    res.status(404).json({ error: "Not found" });
+  });
   app.use(
     createProxyMiddleware({
-      target: "http://127.0.0.1:3000",
+      target: "http://127.0.0.1:5000",
       changeOrigin: true,
       ws: false, // WebSocket handled separately on /ws
       on: {
