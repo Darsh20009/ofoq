@@ -12,7 +12,7 @@ interface Props {
  * - Small diagonal cursor element on the Q
  */
 export default function OfoqLogo({ className = "w-28 h-20", dark = false }: Props) {
-  const mark = dark ? "#1C2B6E" : "#FFFFFF";
+  const mark = dark ? "#2B273F" : "#FFFFFF";
   const red = "#C13229";
 
   return (

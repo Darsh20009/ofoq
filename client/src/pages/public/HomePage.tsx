@@ -24,14 +24,14 @@ function ArrowPill({
   return (
     <Link
       to={to}
-      className={`inline-flex items-center gap-3 rounded-full px-3 py-2 font-bold text-sm transition-all hover:gap-4 ${
+      className={`inline-flex items-center gap-4 rounded-full pr-7 pl-2.5 py-2.5 font-bold text-base transition-all hover:gap-5 ${
         dark
-          ? "bg-white text-ofoq-navy hover:shadow-lg"
-          : "bg-white/15 text-white border border-white/25 hover:bg-white/25"
+          ? "bg-gray-100 text-ofoq-navy hover:bg-gray-200"
+          : "bg-gray-100/95 text-ofoq-navy hover:bg-white"
       }`}
     >
-      <span className="w-9 h-9 rounded-full bg-ofoq-yellow flex items-center justify-center flex-shrink-0 shadow-ofoq-yellow">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2B273F" strokeWidth="2.5">
+      <span className="w-11 h-11 rounded-full bg-ofoq-green flex items-center justify-center flex-shrink-0">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
           <path d="m15 18-6-6 6-6" />
         </svg>
       </span>
@@ -171,16 +171,6 @@ export default function HomePage() {
         </div>
 
         <div className="max-w-5xl mx-auto px-5 sm:px-8 py-32 relative z-10 w-full">
-          {/* شارة */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 bg-ofoq-green/15 border border-ofoq-green/30 rounded-full px-4 py-1.5 mb-8"
-          >
-            <span className="w-2 h-2 rounded-full bg-ofoq-green animate-pulse" />
-            <span className="text-ofoq-green text-sm font-medium">شريكك الاستراتيجي في المملكة</span>
-          </motion.div>
-
           {/* العنوان الكبير */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
@@ -188,10 +178,9 @@ export default function HomePage() {
             transition={{ delay: 0.1 }}
             className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.15] mb-6 text-white"
           >
-            خدمات{" "}
-            <span className="text-ofoq-green">ترتقي</span>
+            خدمات ترتقي
             <br />
-            بالشركات
+            <span className="text-ofoq-green">بالشركات</span>
           </motion.h1>
 
           <motion.p

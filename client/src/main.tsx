@@ -47,7 +47,7 @@ Object.assign(splash.style, {
   position: "fixed",
   inset: "0",
   zIndex: "9999",
-  background: "#1C2B6E",
+  background: "#2B273F",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -112,8 +112,8 @@ setTimeout(() => {
 // Phase 3: التلاشي والإزالة
 setTimeout(() => {
   splash.style.opacity = "0";
-  setTimeout(() => splash.remove(), 500);
-}, 950);
+  setTimeout(() => splash.remove(), 400);
+}, 700);
 
 /* ── React Mount ─────────────────────────────── */
 ReactDOM.createRoot(document.getElementById("root")!).render(

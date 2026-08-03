@@ -149,12 +149,10 @@ export default function PublicLayout() {
   return (
     <div className="min-h-screen flex flex-col">
 
-      {/* ══ شريط التنقل ══════════════════════════════════════════════ */}
+      {/* ══ شريط التنقل — أبيض دائم مثل تسامي ═══════════════════════ */}
       <header
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-400 ${
-          scrolled || menuOpen
-            ? "bg-white shadow-md"
-            : "bg-transparent"
+        className={`fixed top-0 inset-x-0 z-50 bg-white transition-shadow duration-300 ${
+          scrolled ? "shadow-md" : "shadow-sm"
         }`}
       >
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
@@ -162,35 +160,25 @@ export default function PublicLayout() {
 
             {/* الشعار — RTL: يظهر على اليمين */}
             <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
-              <OfoqLogo className="w-12 h-9 sm:w-14 sm:h-10" />
-              <div className="hidden sm:block leading-none">
-                <p className={`font-black text-sm transition-colors ${scrolled || menuOpen ? "text-ofoq-navy" : "text-white"}`}>
-                  أفق
-                </p>
-                <p className={`text-[10px] transition-colors ${scrolled || menuOpen ? "text-gray-400" : "text-white/55"}`}>
-                  لحلول الأعمال
-                </p>
+              <OfoqLogo dark className="w-12 h-9 sm:w-14 sm:h-10" />
+              <div className="leading-none">
+                <p className="font-black text-base sm:text-lg text-ofoq-navy">أفق</p>
+                <p className="text-[9px] sm:text-[10px] text-gray-400 tracking-wide">لحلول الأعمال Business Solutions</p>
               </div>
             </Link>
 
-            {/* أزرار اليمين: اللغة + الهامبرغر */}
-            <div className="flex items-center gap-3">
+            {/* يسار: دخول العميل + الهامبرغر */}
+            <div className="flex items-center gap-5">
               <Link
                 to="/client/login"
-                className={`hidden md:inline-flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full border transition-all ${
-                  scrolled || menuOpen
-                    ? "border-ofoq-navy text-ofoq-navy hover:bg-ofoq-navy hover:text-white"
-                    : "border-white/40 text-white hover:border-white hover:bg-white/10"
-                }`}
+                className="text-sm font-semibold text-ofoq-navy hover:text-ofoq-green transition-colors"
               >
                 دخول العميل
               </Link>
 
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
-                className={`p-2 transition-colors ${
-                  scrolled || menuOpen ? "text-ofoq-navy" : "text-white"
-                }`}
+                className="p-2 text-ofoq-navy"
                 aria-label="القائمة"
               >
                 <HamburgerIcon open={menuOpen} />
@@ -200,6 +188,9 @@ export default function PublicLayout() {
         </div>
       </header>
 
+      {/* فاصل بارتفاع الهيدر الثابت */}
+      <div className="h-16 sm:h-20" />
+
       {/* ══ القائمة الكاملة ══════════════════════════════════════════ */}
       <AnimatePresence>
         {menuOpen && (
@@ -208,12 +199,12 @@ export default function PublicLayout() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 40 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="fixed inset-0 z-40 bg-white flex flex-col"
+            className="fixed inset-0 z-[60] bg-white flex flex-col"
           >
             {/* رأس القائمة */}
             <div className="flex items-center justify-between px-5 sm:px-8 h-16 sm:h-20 border-b border-gray-100 flex-shrink-0">
               <Link to="/" className="flex items-center gap-2.5">
-                <OfoqLogo className="w-12 h-9" />
+                <OfoqLogo dark className="w-12 h-9" />
                 <div className="leading-none">
                   <p className="font-black text-sm text-ofoq-navy">أفق</p>
                   <p className="text-[10px] text-gray-400">لحلول الأعمال</p>
