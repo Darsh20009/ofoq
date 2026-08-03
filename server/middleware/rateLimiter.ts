@@ -8,8 +8,11 @@ export const globalLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "طلبات كثيرة جداً، يُرجى الانتظار قليلاً" },
-  // Skip static assets entirely
+  // Skip static assets entirely; skip everything in development —
+  // behind the Replit dev proxy all clients share one IP, so the
+  // global bucket gets exhausted and every visitor sees 429s.
   skip: (req) =>
+    process.env.NODE_ENV !== "production" ||
     req.path.startsWith("/uploads") ||
     req.path.startsWith("/public") ||
     req.path.startsWith("/images") ||
