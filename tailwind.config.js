@@ -22,13 +22,17 @@ export default {
         },
         /* ── Brand tokens ─────────────────────────────────── */
         ofoq: {
-          navy:        "#1C2B6E",   /* primary brand navy — royal blue */
+          navy:        "#2B273F",   /* primary brand deep navy-purple */
+          "navy-alt":  "#1C2B6E",
           red:         "#C13229",   /* brand red from "F" in logo */
           "red-dark":  "#9B2820",
           "red-light": "#FDECEA",
-          yellow:      "#E5FE04",   /* accent yellow */
-          "navy-light":"#2A3F8A",
-          "navy-dark": "#0C1338",
+          yellow:      "#E5FE04",   /* accent neon yellow */
+          green:       "#33B27C",   /* brand green */
+          "green-dark":"#267A57",
+          "green-light":"#E6F7F1",
+          "navy-light":"#3A3558",
+          "navy-dark": "#1A1730",
         },
       },
       fontFamily: {

@@ -15,7 +15,7 @@ export default function PageLoader({ onDone }: { onDone: () => void }) {
   return (
     <motion.div
       className="fixed inset-0 z-[9998] flex items-center justify-center"
-      style={{ background: "#1C2B6E" }}
+      style={{ background: "#2B273F" }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
