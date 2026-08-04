@@ -58,7 +58,7 @@ const VALUES = [
 
 export default function AboutPage() {
   return (
-    <div dir="rtl">
+    <div>
       <Helmet>
         <title>من نحن — أفق لحلول الأعمال</title>
         <meta name="description" content="تعرّف على شركة أفق لحلول الأعمال — شريكك الموثوق في تقديم الحلول المتكاملة لقطاع الأعمال في المملكة العربية السعودية." />

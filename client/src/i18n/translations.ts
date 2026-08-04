@@ -5,6 +5,8 @@ export const translations = {
       home:      "الرئيسية",
       services:  "خدماتنا",
       about:     "من نحن",
+      packages:  "الباقات",
+      countries: "دول الاستقطاب",
       blog:      "المدونة",
       contact:   "تواصل معنا",
       getQuote:  "احصل على عرض سعر",
@@ -225,6 +227,8 @@ export const translations = {
       home:      "Home",
       services:  "Services",
       about:     "About Us",
+      packages:  "Packages",
+      countries: "Recruitment Countries",
       blog:      "Blog",
       contact:   "Contact",
       getQuote:  "Get a Quote",
@@ -433,5 +437,5 @@ export const translations = {
   },
 } as const;
 
-export type Lang = "ar" | "en";
+export type { LangCode as Lang } from "./extraLangs";
 export type Translations = typeof translations.ar;

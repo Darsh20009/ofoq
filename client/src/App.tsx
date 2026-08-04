@@ -27,6 +27,8 @@ import SupportPage from "./pages/client/SupportPage";
 // Public Pages
 import HomePage from "./pages/public/HomePage";
 import ServicesPage from "./pages/public/ServicesPage";
+import ServiceCategoryPage from "./pages/public/ServiceCategoryPage";
+import ServiceDetailPage from "./pages/public/ServiceDetailPage";
 import AboutPage from "./pages/public/AboutPage";
 import BlogPage from "./pages/public/BlogPage";
 import ContactPage from "./pages/public/ContactPage";
@@ -180,6 +182,8 @@ export default function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/services" element={<ServicesPage />} />
+          <Route path="/services/:categorySlug/:serviceSlug" element={<ServiceDetailPage />} />
+          <Route path="/services/:categorySlug" element={<ServiceCategoryPage />} />
           <Route path="/packages" element={<PackagesPage />} />
           <Route path="/countries" element={<CountriesPage />} />
           <Route path="/about" element={<AboutPage />} />

@@ -23,7 +23,7 @@ const COUNTRIES = [
 
 export default function CountriesPage() {
   return (
-    <div dir="rtl">
+    <div>
       <Helmet>
         <title>دول الاستقطاب — أفق لحلول الأعمال</title>
         <meta name="description" content="أفق لحلول الأعمال تستقطب الكفاءات من أبرز دول العمالة الماهرة حول العالم لدعم نمو شركتك في المملكة." />

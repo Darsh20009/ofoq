@@ -1,0 +1,18 @@
+import { Link, useParams } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Helmet } from "react-helmet-async";
+import WireframeCube from "../../components/WireframeCube";
+import { getCategory, getService, pick } from "../../data/servicesCatalog";
+import { useLang } from "../../i18n/LangContext";
+import { useState } from "react";
+
+export default function ServiceDetailPage() {
+  const { categorySlug, serviceSlug } = useParams(); const category = getCategory(categorySlug); const service = getService(categorySlug, serviceSlug); const { lang } = useLang(); const [open, setOpen] = useState<number | null>(0);
+  if (!category || !service) return <div className="p-20 text-center">Service not found</div>;
+  return <div className="bg-[#f4f2ed] text-[#2B273F]"><Helmet><title>{pick(service.title, lang)} | OFOQ</title></Helmet>
+    <section className="relative overflow-hidden bg-[#2B273F] px-6 py-24 text-white sm:px-10"><WireframeCube color="#33B27C" className="absolute -left-10 top-8 h-64 w-80 opacity-35" /><div className="relative mx-auto max-w-5xl"><Link to={`/services/${category.slug}`} className="text-sm text-white/50">{pick(category.title, lang)} /</Link><h1 className="mt-8 max-w-3xl text-5xl font-black sm:text-7xl">{pick(service.title, lang)}</h1><p className="mt-6 max-w-2xl text-lg leading-8 text-white/65">{pick(service.desc, lang)}</p><Link to={`/contact?service=${encodeURIComponent(pick(service.title, lang))}`} className="mt-9 inline-block rounded-full bg-[#E5FE04] px-7 py-4 font-black text-[#2B273F]">اطلب الخدمة</Link></div></section>
+    <main className="mx-auto grid max-w-5xl gap-16 px-6 py-16 sm:px-10 lg:grid-cols-[1.15fr_.85fr] lg:py-24">
+      <div><section><h2 className="mb-6 text-3xl font-black">كيف نعمل</h2><div className="space-y-3">{service.steps.map((step, i) => <motion.div key={i} initial={{ opacity: 0, x: 15 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * .08 }} className="flex gap-4 rounded-2xl bg-white p-5"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#33B27C] font-black text-white">{i + 1}</span><p className="pt-1 font-bold">{pick(step, lang)}</p></motion.div>)}</div></section><section className="mt-16"><h2 className="mb-6 text-3xl font-black">الأسئلة الشائعة</h2>{service.faq.map((item, i) => <div key={i} className="border-b border-[#2B273F]/15"><button onClick={() => setOpen(open === i ? null : i)} className="flex w-full items-center justify-between py-5 text-start font-black"><span>{pick(item.q, lang)}</span><span className="text-[#33B27C]">{open === i ? "−" : "+"}</span></button>{open === i && <p className="pb-5 text-sm leading-7 opacity-65">{pick(item.a, lang)}</p>}</div>)}</section></div>
+      <aside className="space-y-5"><div className="rounded-[2rem] bg-[#2B273F] p-7 text-white"><p className="text-xs font-bold tracking-[.18em] text-[#E5FE04]">SERVICE WINDOW</p><p className="mt-4 text-3xl font-black">{pick(service.duration, lang)}</p></div><div className="rounded-[2rem] bg-white p-7"><h3 className="text-xl font-black">لمن تناسب؟</h3><ul className="mt-5 space-y-3">{service.beneficiaries.map((x, i) => <li key={i} className="flex gap-3 text-sm"><span className="text-[#33B27C]">↗</span>{pick(x, lang)}</li>)}</ul><h3 className="mt-9 text-xl font-black">المتطلبات</h3><ul className="mt-5 space-y-3">{service.requirements.map((x, i) => <li key={i} className="flex gap-3 text-sm"><span className="text-[#33B27C]">•</span>{pick(x, lang)}</li>)}</ul></div></aside>
+    </main></div>;
+}

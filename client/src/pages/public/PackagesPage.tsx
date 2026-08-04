@@ -62,7 +62,7 @@ const PACKAGES = [
 
 export default function PackagesPage() {
   return (
-    <div dir="rtl">
+    <div>
       <Helmet>
         <title>الباقات — أفق لحلول الأعمال</title>
         <meta name="description" content="اختر باقتك من أفق لحلول الأعمال — الفضية والذهبية والبلاتينية. حلول مصممة لدعم نمو عملك." />

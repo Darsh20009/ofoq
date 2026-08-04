@@ -20,7 +20,7 @@ export default function BlogPage() {
   const posts: BlogPost[] = data?.data?.posts ?? [];
 
   return (
-    <div dir="rtl">
+    <div>
       <Helmet>
         <title>الأخبار — أفق لحلول الأعمال</title>
         <meta name="description" content="آخر أخبار ومقالات أفق لحلول الأعمال — رؤى وتقارير متخصصة في عالم الأعمال السعودي." />

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import OfoqLogo from "../components/OfoqLogo";
+import { useLang } from "../i18n/LangContext";
 
 /* ── روابط الشبكة الاجتماعية ── */
 const SOCIAL = [
@@ -45,13 +46,13 @@ const SOCIAL = [
 ];
 
 const NAV_LINKS = [
-  { href: "/",          label: "الرئيسية" },
-  { href: "/about",     label: "من نحن" },
-  { href: "/services",  label: "خدماتنا" },
-  { href: "/packages",  label: "الباقات" },
-  { href: "/countries", label: "دول الاستقطاب" },
-  { href: "/blog",      label: "الأخبار" },
-  { href: "/contact",   label: "تواصل معنا" },
+  { href: "/",          key: "home" as const },
+  { href: "/about",     key: "about" as const },
+  { href: "/services",  key: "services" as const },
+  { href: "/packages",  key: "packages" as const },
+  { href: "/countries", key: "countries" as const },
+  { href: "/blog",      key: "blog" as const },
+  { href: "/contact",   key: "contact" as const },
 ];
 
 /* ── أيقونة هامبرغر مخصصة ── */
@@ -128,6 +129,7 @@ export default function PublicLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { pathname } = useLocation();
+  const { lang, setLang, langs, t } = useLang();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -169,6 +171,9 @@ export default function PublicLayout() {
 
             {/* يسار: دخول العميل + الهامبرغر */}
             <div className="flex items-center gap-5">
+              <select value={lang} onChange={(e) => setLang(e.target.value as typeof lang)} aria-label="Language" className="bg-transparent text-xs font-bold text-ofoq-navy outline-none">
+                {langs.map((item) => <option key={item.code} value={item.code}>{item.label}</option>)}
+              </select>
               <Link
                 to="/client/login"
                 className="text-sm font-semibold text-ofoq-navy hover:text-ofoq-green transition-colors"
@@ -236,13 +241,17 @@ export default function PublicLayout() {
                           : "text-ofoq-navy hover:text-ofoq-green"
                       }`}
                     >
-                      {link.label}
+                      {t.nav[link.key]}
                     </Link>
                   </motion.li>
                 ))}
               </ul>
 
               <div className="mt-8">
+                <label className="mb-3 block text-xs font-bold uppercase tracking-widest text-gray-400">Language</label>
+                <select value={lang} onChange={(e) => setLang(e.target.value as typeof lang)} className="mb-5 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-ofoq-navy outline-none">
+                  {langs.map((item) => <option key={item.code} value={item.code}>{item.label}</option>)}
+                </select>
                 <Link
                   to="/client/login"
                   className="inline-flex items-center gap-2 bg-ofoq-navy text-white px-6 py-3 rounded-full font-bold text-sm hover:bg-ofoq-navy-light transition-colors"

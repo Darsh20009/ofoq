@@ -2,11 +2,11 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { contactApi } from "../../api/client";
 import WireframeCube from "../../components/WireframeCube";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 const fadeUp = {
   hidden:  { opacity: 0, y: 28 },
@@ -15,7 +15,14 @@ const fadeUp = {
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
+  const [searchParams] = useSearchParams();
+  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
+    defaultValues: { interest: searchParams.get("service") || "" },
+  });
+  useEffect(() => {
+    const svc = searchParams.get("service");
+    if (svc) setValue("interest", svc);
+  }, [searchParams, setValue]);
 
   const mut = useMutation({
     mutationFn: (data: object) => contactApi.submit(data),
@@ -23,7 +30,7 @@ export default function ContactPage() {
   });
 
   return (
-    <div dir="rtl">
+    <div>
       <Helmet>
         <title>تواصل معنا — أفق لحلول الأعمال</title>
         <meta name="description" content="تواصل مع فريق أفق لحلول الأعمال واحصل على استشارة مجانية. نرد خلال ٢٤ ساعة." />
@@ -237,6 +244,9 @@ export default function ContactPage() {
                           className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm transition-colors appearance-none cursor-pointer"
                         >
                           <option value="">اختر الخدمة</option>
+                          {searchParams.get("service") && (
+                            <option value={searchParams.get("service")!}>{searchParams.get("service")}</option>
+                          )}
                           <option>تأسيس الشركات</option>
                           <option>الخدمات القانونية</option>
                           <option>إدارة الموارد البشرية</option>
