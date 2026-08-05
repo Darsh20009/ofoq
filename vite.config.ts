@@ -27,6 +27,28 @@ export default defineConfig({
         target: "http://127.0.0.1:3000",
         changeOrigin: true,
       },
+      // The shared public assets live at the project root, not client/public.
+      // Proxy them to Express so Vite does not return index.html as a fallback.
+      "/images": {
+        target: "http://127.0.0.1:3000",
+        changeOrigin: true,
+      },
+      "/icons": {
+        target: "http://127.0.0.1:3000",
+        changeOrigin: true,
+      },
+      "/manifest.json": {
+        target: "http://127.0.0.1:3000",
+        changeOrigin: true,
+      },
+      "/favicon.ico": {
+        target: "http://127.0.0.1:3000",
+        changeOrigin: true,
+      },
+      "/sw.js": {
+        target: "http://127.0.0.1:3000",
+        changeOrigin: true,
+      },
       "/ws": {
         target: "ws://127.0.0.1:3000",
         ws: true,

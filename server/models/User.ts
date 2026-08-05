@@ -113,6 +113,11 @@ const UserSchema = new Schema<IUser>({
   },
 });
 
+// Login must fail immediately when MongoDB is unavailable instead of waiting
+// in Mongoose's operation buffer for the default ten-second timeout.
+UserSchema.set("bufferCommands", false);
+UserSchema.set("bufferTimeoutMS", 2000);
+
 UserSchema.index({ role: 1, status: 1 });
 UserSchema.index({ createdAt: -1 });
 

@@ -1,24 +1,51 @@
 import mongoose from "mongoose";
 
 let isConnected = false;
+let isConnecting = false;
+let reconnectTimer: NodeJS.Timeout | null = null;
+let connectionUri = "";
 
-export async function connectDB(): Promise<void> {
-  const uri = process.env.MONGODB_URI;
+// Configure this before any model is imported so no query can enter
+// Mongoose's default operation buffer while the database is unavailable.
+mongoose.set("strictQuery", false);
+mongoose.set("bufferCommands", false);
+mongoose.set("bufferTimeoutMS", 2000);
+
+mongoose.connection.on("disconnected", () => {
+  console.warn("⚠️  MongoDB disconnected");
+  isConnected = false;
+  if (connectionUri) scheduleReconnect(connectionUri);
+});
+
+mongoose.connection.on("reconnected", () => {
+  console.log("✅ MongoDB reconnected");
+  isConnected = true;
+});
+
+mongoose.connection.on("error", (err) => {
+  console.error("❌ MongoDB error:", err.message);
+});
+
+function scheduleReconnect(uri: string): void {
+  if (reconnectTimer || isConnected) return;
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null;
+    void connectDB(uri);
+  }, 10_000);
+}
+
+export async function connectDB(uri = process.env.MONGODB_URI): Promise<void> {
 
   if (!uri) {
     console.warn("⚠️  MONGODB_URI not set — running without database (limited functionality)");
     return;
   }
 
-  if (isConnected) return;
+  connectionUri = uri;
+  if (isConnected || isConnecting) return;
 
+  isConnecting = true;
   try {
-    mongoose.set("strictQuery", false);
-    // Never allow an unavailable production database to hold requests for
-    // Mongoose's default 10-second buffer timeout.
-    mongoose.set("bufferCommands", false);
-    mongoose.set("bufferTimeoutMS", 2000);
-
     await mongoose.connect(uri, {
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
@@ -29,24 +56,14 @@ export async function connectDB(): Promise<void> {
     isConnected = true;
     console.log("✅ MongoDB connected successfully");
 
-    mongoose.connection.on("disconnected", () => {
-      console.warn("⚠️  MongoDB disconnected");
-      isConnected = false;
-    });
-
-    mongoose.connection.on("reconnected", () => {
-      console.log("✅ MongoDB reconnected");
-      isConnected = true;
-    });
-
-    mongoose.connection.on("error", (err) => {
-      console.error("❌ MongoDB error:", err.message);
-    });
-
   } catch (error: any) {
     console.error("❌ MongoDB connection failed:", error.message);
     isConnected = false;
-    // Don't exit — allow app to run with degraded mode
+    scheduleReconnect(uri);
+    // Keep the server available for health checks and static assets while
+    // retrying in the background. Database routes return a clear 503.
+  } finally {
+    isConnecting = false;
   }
 }
 

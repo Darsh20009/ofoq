@@ -11,6 +11,7 @@ import { loginLimiter, otpLimiter, registerLimiter } from "../middleware/rateLim
 import { validate, registerSchema, loginSchema } from "../middleware/validate.js";
 import { fireNotify, fireNotifyAdmins } from "../notify.js";
 import { sendOtpEmail, sendPasswordResetEmail, sendEmailVerification, sendWelcomeEmail } from "../email.js";
+import { isDBConnected } from "../db.js";
 import {
   UserModel, Pending2FAModel, WebAuthnCredentialModel,
   AuditLogModel
@@ -77,6 +78,11 @@ authRouter.post("/register", registerLimiter, validate(registerSchema), async (r
 
 // ── Login ─────────────────────────────────────────────────────────
 authRouter.post("/login", loginLimiter, validate(loginSchema), async (req, res) => {
+  if (!isDBConnected()) {
+    res.status(503).json({ error: "قاعدة البيانات غير متاحة حالياً. حاول مرة أخرى بعد قليل." });
+    return;
+  }
+
   try {
     const { email, password } = req.body;
     const user = await UserModel.findOne({ email }).select("+password +totpSecret +recoveryPassphrase");
@@ -139,6 +145,10 @@ authRouter.post("/login", loginLimiter, validate(loginSchema), async (req, res) 
     });
   } catch (err: any) {
     console.error("[Auth] Login error:", err.message);
+    if (!isDBConnected() || /buffering timed out|topology|connect/i.test(err.message || "")) {
+      res.status(503).json({ error: "تعذر الاتصال بقاعدة البيانات. حاول مرة أخرى بعد قليل." });
+      return;
+    }
     res.status(500).json({ error: "خطأ في تسجيل الدخول" });
   }
 });
