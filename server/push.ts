@@ -22,9 +22,10 @@ export async function generateVapidKeys(): Promise<void> {
   // Auto-generate keys if not set
   console.log("⚠️  VAPID keys not found. Generating new keys...");
   const keys = webpush.generateVAPIDKeys();
-  console.log("📢 VAPID Public Key:", keys.publicKey);
-  console.log("🔑 VAPID Private Key:", keys.privateKey);
-  console.log("→ Set these as VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY secrets");
+  // Do not print either generated key: the private key must never appear in
+  // workflow logs. Persist both values in Replit/Render secrets for stable
+  // subscriptions in production.
+  console.log("→ Configure VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY as secrets for persistent push notifications");
 
   // Use generated keys for this session
   webpush.setVapidDetails(
