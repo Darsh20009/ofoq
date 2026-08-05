@@ -2,3 +2,4 @@
 - [OFOQ Frontend Setup](ofoq-frontend.md) — React 18 + Vite + Tailwind; dev on port 3000, proxies /api to port 5000
 - [OFOQ Client Portal](ofoq-client-portal.md) — client portal built: /client/*, clientApi, ServiceRequest model, SupportMessage, email functions
 - [Rate limiter & dev proxy](rate-limiter-dev-proxy.md) — sitewide 429s in dev were the shared-IP rate limiter; skipped outside production
+- [GitHub push authentication](github-push-auth.md) — managed GitHub pushes can return UNAUTHENTICATED even when a PAT secret is present; local commits remain ready
