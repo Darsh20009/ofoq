@@ -4,6 +4,7 @@ import { Lock, Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { authApi } from "../../api/client";
 import OfoqLogo from "../../components/OfoqLogo";
+import { useLang } from "../../i18n/LangContext";
 
 export default function ClientResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -16,6 +17,7 @@ export default function ClientResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+  const { ui, dir } = useLang();
 
   useEffect(() => {
     if (!token) navigate("/client/login", { replace: true });
@@ -32,8 +34,8 @@ export default function ClientResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirm) { setError("كلمتا المرور غير متطابقتين"); return; }
-    if (password.length < 8)  { setError("كلمة المرور يجب أن تكون 8 أحرف على الأقل"); return; }
+    if (password !== confirm) { setError(ui.auth.mismatch); return; }
+    if (password.length < 8)  { setError(ui.auth.minPassword); return; }
     setError("");
     setLoading(true);
     try {
@@ -41,14 +43,14 @@ export default function ClientResetPasswordPage() {
       setDone(true);
       setTimeout(() => navigate("/client/login", { replace: true }), 3000);
     } catch (err: any) {
-      setError(err?.response?.data?.error || "الرابط غير صالح أو منتهي الصلاحية");
+      setError(err?.response?.data?.error || ui.auth.invalidReset);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ofoq-navy via-[#1C1930] to-[#0f0d1f] flex items-center justify-center p-4" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-ofoq-navy via-[#1C1930] to-[#0f0d1f] flex items-center justify-center p-4" dir={dir}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}
@@ -56,8 +58,8 @@ export default function ClientResetPasswordPage() {
             <div className="flex justify-center mb-4">
               <OfoqLogo className="w-20 h-14" />
             </div>
-            <h1 className="text-white text-xl font-bold">تعيين كلمة مرور جديدة</h1>
-            <p className="text-white/50 text-sm mt-1">اختر كلمة مرور قوية لحسابك</p>
+            <h1 className="text-white text-xl font-bold">{ui.auth.resetTitle}</h1>
+            <p className="text-white/50 text-sm mt-1">{ui.auth.resetSubtitle}</p>
           </div>
 
           <div className="p-8">
@@ -66,10 +68,10 @@ export default function ClientResetPasswordPage() {
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle size={32} className="text-green-600" />
                 </div>
-                <h2 className="text-ofoq-navy font-bold text-lg mb-2">تم تغيير كلمة المرور!</h2>
-                <p className="text-gray-500 text-sm mb-4">سيتم تحويلك لصفحة الدخول خلال ثوانٍ...</p>
+                <h2 className="text-ofoq-navy font-bold text-lg mb-2">{ui.auth.passwordChanged}</h2>
+                <p className="text-gray-500 text-sm mb-4">{ui.auth.redirecting}</p>
                 <Link to="/client/login" className="text-ofoq-navy text-sm font-semibold hover:text-ofoq-red transition-colors">
-                  الذهاب لتسجيل الدخول الآن
+                  {ui.auth.goLogin}
                 </Link>
               </div>
             ) : (
@@ -82,7 +84,7 @@ export default function ClientResetPasswordPage() {
 
                 {/* كلمة المرور الجديدة */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">كلمة المرور الجديدة</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">{ui.auth.newPassword}</label>
                   <div className="relative">
                     <Lock size={16} className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-400" />
                     <input
@@ -106,7 +108,7 @@ export default function ClientResetPasswordPage() {
                         ))}
                       </div>
                       <p className="text-xs text-gray-400">
-                        القوة: <span className={`font-medium ${strength >= 3 ? "text-green-600" : strength === 2 ? "text-yellow-600" : "text-red-500"}`}>
+                         {ui.auth.passwordStrength}: <span className={`font-medium ${strength >= 3 ? "text-green-600" : strength === 2 ? "text-yellow-600" : "text-red-500"}`}>
                           {strengthLabel[strength]}
                         </span>
                       </p>
@@ -116,7 +118,7 @@ export default function ClientResetPasswordPage() {
 
                 {/* تأكيد كلمة المرور */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">تأكيد كلمة المرور</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">{ui.auth.confirmPassword}</label>
                   <div className="relative">
                     <Lock size={16} className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-400" />
                     <input
@@ -143,13 +145,13 @@ export default function ClientResetPasswordPage() {
                   className="w-full bg-ofoq-navy hover:bg-ofoq-red disabled:opacity-50 text-white font-semibold rounded-xl py-3 text-sm transition-all flex items-center justify-center gap-2"
                 >
                   {loading ? (
-                    <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> جاري الحفظ...</>
-                  ) : "حفظ كلمة المرور الجديدة"}
+                    <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> {ui.auth.saving}</>
+                  ) : ui.auth.savePassword}
                 </button>
 
                 <div className="text-center">
                   <Link to="/client/login" className="text-gray-400 text-sm hover:text-ofoq-navy transition-colors">
-                    العودة لتسجيل الدخول
+                    {ui.auth.backLogin}
                   </Link>
                 </div>
               </form>

@@ -129,7 +129,7 @@ export default function PublicLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { pathname } = useLocation();
-  const { lang, setLang, langs, t } = useLang();
+  const { lang, setLang, langs, t, ui } = useLang();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -178,13 +178,13 @@ export default function PublicLayout() {
                 to="/client/login"
                 className="text-sm font-semibold text-ofoq-navy hover:text-ofoq-green transition-colors"
               >
-                دخول العميل
+                 {ui.header.clientLogin}
               </Link>
 
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="p-2 text-ofoq-navy"
-                aria-label="القائمة"
+                 aria-label={ui.header.menu}
               >
                 <HamburgerIcon open={menuOpen} />
               </button>
@@ -248,7 +248,7 @@ export default function PublicLayout() {
               </ul>
 
               <div className="mt-8">
-                <label className="mb-3 block text-xs font-bold uppercase tracking-widest text-gray-400">Language</label>
+                 <label className="mb-3 block text-xs font-bold uppercase tracking-widest text-gray-400">{ui.header.language}</label>
                 <select value={lang} onChange={(e) => setLang(e.target.value as typeof lang)} className="mb-5 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-ofoq-navy outline-none">
                   {langs.map((item) => <option key={item.code} value={item.code}>{item.label}</option>)}
                 </select>
@@ -256,15 +256,15 @@ export default function PublicLayout() {
                   to="/client/login"
                   className="inline-flex items-center gap-2 bg-ofoq-navy text-white px-6 py-3 rounded-full font-bold text-sm hover:bg-ofoq-navy-light transition-colors"
                 >
-                  دخول العميل
+                   {ui.header.clientLogin}
                 </Link>
               </div>
             </nav>
 
             {/* أسفل القائمة — بيانات التواصل */}
             <div className="flex-shrink-0 px-5 sm:px-8 py-6 border-t border-gray-100">
-              <p className="text-xs text-gray-400 mb-1">المملكة العربية السعودية</p>
-              <p className="text-sm text-gray-600 mb-4">جدة — طريق الملك عبدالله</p>
+               <p className="text-xs text-gray-400 mb-1">Saudi Arabia</p>
+               <p className="text-sm text-gray-600 mb-4">{ui.footer.location}</p>
               <div className="flex items-center gap-3">
                 {SOCIAL.map((s) => (
                   <a
@@ -297,10 +297,9 @@ export default function PublicLayout() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div>
                 <h3 className="text-xl font-black mb-1">
-                  للتسجيل في{" "}
-                  <span className="text-ofoq-yellow">نشرتنا</span>
+                   {ui.footer.newsletter}
                 </h3>
-                <p className="text-white/55 text-sm">لمعرفة المزيد حول خدمات الأعمال المتقدمة</p>
+                 <p className="text-white/55 text-sm">{ui.footer.newsletterSub}</p>
               </div>
               <form
                 className="flex items-center gap-0 w-full sm:w-auto"
@@ -308,7 +307,7 @@ export default function PublicLayout() {
               >
                 <input
                   type="email"
-                  placeholder="بريدك الإلكتروني"
+                   placeholder={ui.footer.email}
                   className="bg-white/10 border border-white/20 text-white placeholder-white/35 text-sm px-5 py-3 rounded-r-full rounded-l-none outline-none focus:border-ofoq-yellow transition-colors min-w-[220px] flex-1"
                 />
                 <button
@@ -320,7 +319,7 @@ export default function PublicLayout() {
                       <path d="m15 18-6-6 6-6" />
                     </svg>
                   </span>
-                  انضم
+                   {ui.footer.join}
                 </button>
               </form>
             </div>
@@ -341,7 +340,7 @@ export default function PublicLayout() {
                 </div>
               </div>
               <p className="text-white/50 text-sm leading-relaxed max-w-sm mb-6">
-                شريكك الموثوق لأعمالك في السعودية — نقدم حلولاً شاملة لتسهيل أعمالك ونكون شريكًا استراتيجيًا في بناء مستقبل شركتك واستدامتها.
+                   {ui.footer.description}
               </p>
               <div className="flex items-center gap-2.5">
                 {SOCIAL.map((s) => (
@@ -361,35 +360,35 @@ export default function PublicLayout() {
             {/* أعمدة الأكورديون — موبايل */}
             <div className="lg:hidden lg:col-span-7 space-y-0">
               <FooterAccordion
-                title="من نحن"
+                 title={ui.footer.about}
                 links={[
-                  { label: "قصتنا", href: "/about" },
-                  { label: "رؤيتنا ومهمتنا", href: "/about" },
-                  { label: "لماذا أفق؟", href: "/about" },
+                   { label: ui.footer.story, href: "/about" },
+                   { label: ui.footer.vision, href: "/about" },
+                   { label: ui.footer.why, href: "/about" },
                 ]}
               />
               <FooterAccordion
-                title="الخدمات"
+                 title={ui.footer.services}
                 links={[
-                  { label: "تأسيس الشركات", href: "/services" },
-                  { label: "الخدمات القانونية", href: "/services" },
-                  { label: "إدارة الموارد البشرية", href: "/services" },
-                  { label: "المنصات الحكومية", href: "/services" },
+                   { label: ui.footer.formation, href: "/services" },
+                   { label: ui.footer.legal, href: "/services" },
+                   { label: ui.footer.hr, href: "/services" },
+                   { label: ui.footer.government, href: "/services" },
                 ]}
               />
               <FooterAccordion
-                title="الباقات"
+                 title={ui.footer.packages}
                 links={[
-                  { label: "الباقة الفضية", href: "/packages" },
-                  { label: "الباقة الذهبية", href: "/packages" },
-                  { label: "الباقة البلاتينية", href: "/packages" },
+                   { label: ui.footer.silver, href: "/packages" },
+                   { label: ui.footer.gold, href: "/packages" },
+                   { label: ui.footer.platinum, href: "/packages" },
                 ]}
               />
               <FooterAccordion
-                title="تواصل معنا"
+                 title={ui.footer.contact}
                 links={[
-                  { label: "نموذج التواصل", href: "/contact" },
-                  { label: "دخول العميل", href: "/client/login" },
+                   { label: ui.footer.form, href: "/contact" },
+                   { label: ui.header.clientLogin, href: "/client/login" },
                 ]}
               />
             </div>
@@ -397,14 +396,14 @@ export default function PublicLayout() {
             {/* أعمدة — ديسكتوب */}
             <div className="hidden lg:grid lg:col-span-7 grid-cols-3 gap-8">
               <div>
-                <h4 className="font-bold text-sm mb-4 text-white/80">الخدمات</h4>
+                 <h4 className="font-bold text-sm mb-4 text-white/80">{ui.footer.services}</h4>
                 <ul className="space-y-2">
                   {[
-                    { label: "تأسيس الشركات", href: "/services" },
-                    { label: "الخدمات القانونية", href: "/services" },
-                    { label: "الموارد البشرية", href: "/services" },
-                    { label: "المنصات الحكومية", href: "/services" },
-                    { label: "خدمات المستثمرين", href: "/services" },
+                     { label: ui.footer.formation, href: "/services" },
+                     { label: ui.footer.legal, href: "/services" },
+                     { label: ui.footer.hr, href: "/services" },
+                     { label: ui.footer.government, href: "/services" },
+                     { label: ui.footer.investors, href: "/services" },
                   ].map((l) => (
                     <li key={l.label}>
                       <Link to={l.href} className="text-white/45 hover:text-white text-xs transition-colors">
@@ -415,13 +414,13 @@ export default function PublicLayout() {
                 </ul>
               </div>
               <div>
-                <h4 className="font-bold text-sm mb-4 text-white/80">الباقات</h4>
+                 <h4 className="font-bold text-sm mb-4 text-white/80">{ui.footer.packages}</h4>
                 <ul className="space-y-2">
                   {[
-                    { label: "الباقة الفضية", href: "/packages" },
-                    { label: "الباقة الذهبية", href: "/packages" },
-                    { label: "الباقة البلاتينية", href: "/packages" },
-                    { label: "مقارنة الباقات", href: "/packages" },
+                     { label: ui.footer.silver, href: "/packages" },
+                     { label: ui.footer.gold, href: "/packages" },
+                     { label: ui.footer.platinum, href: "/packages" },
+                     { label: ui.footer.compare, href: "/packages" },
                   ].map((l) => (
                     <li key={l.label}>
                       <Link to={l.href} className="text-white/45 hover:text-white text-xs transition-colors">
@@ -432,22 +431,22 @@ export default function PublicLayout() {
                 </ul>
               </div>
               <div>
-                <h4 className="font-bold text-sm mb-4 text-white/80">التواصل</h4>
+                 <h4 className="font-bold text-sm mb-4 text-white/80">{ui.footer.contact}</h4>
                 <ul className="space-y-2 text-xs text-white/45">
                   <li><a href="mailto:info@ofoqhc.com" className="hover:text-white transition-colors">info@ofoqhc.com</a></li>
                   <li><a href="tel:+966500851177" className="hover:text-white transition-colors" dir="ltr">+966 500 851 177</a></li>
-                  <li className="leading-relaxed">جدة — طريق الملك عبدالله</li>
-                  <li><Link to="/contact" className="text-ofoq-yellow hover:text-white transition-colors">نموذج التواصل</Link></li>
+                   <li className="leading-relaxed">{ui.footer.location}</li>
+                   <li><Link to="/contact" className="text-ofoq-yellow hover:text-white transition-colors">{ui.footer.form}</Link></li>
                 </ul>
               </div>
             </div>
           </div>
 
           <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-white/30 text-xs">
-            <p>© {new Date().getFullYear()} أفق لحلول الأعمال. جميع الحقوق محفوظة.</p>
+             <p>© {new Date().getFullYear()} OFOQ Business Solutions. {ui.footer.rights}</p>
             <div className="flex gap-4">
-              <a href="#" className="hover:text-white transition-colors">سياسة الخصوصية</a>
-              <a href="#" className="hover:text-white transition-colors">الشروط والأحكام</a>
+               <a href="#" className="hover:text-white transition-colors">{ui.footer.privacy}</a>
+               <a href="#" className="hover:text-white transition-colors">{ui.footer.terms}</a>
             </div>
           </div>
         </div>
@@ -456,7 +455,7 @@ export default function PublicLayout() {
       {/* Qirox attribution */}
       <div className="bg-ofoq-navy-dark border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-center gap-2">
-          <span className="text-white/20 text-xs">صُنع بواسطة</span>
+           <span className="text-white/20 text-xs">{ui.footer.madeBy}</span>
           <a href="https://qiroxstudio.online" target="_blank" rel="noopener noreferrer"
             className="text-white/30 text-xs font-medium hover:text-white/60 transition-colors tracking-wide">
             Qirox Studio Group

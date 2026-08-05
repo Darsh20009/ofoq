@@ -16,19 +16,12 @@ function ArrowIcon({ className = "h-4 w-4" }: { className?: string }) {
 }
 
 export default function ServicesPage() {
-  const { lang } = useLang();
-  const rtl = lang === "ar" || lang === "ur";
+  const { lang, ui } = useLang();
 
   const T = {
-    pageTitle: rtl ? "الخدمات | OFOQ" : "Services | OFOQ",
-    heroBadge: "THE OFOQ CATALOG",
-    heroTitle1: rtl ? "خدمات مصممة" : "Services designed",
-    heroTitle2: rtl ? "لعملك بالكامل." : "for your business.",
-    heroSub: rtl
-      ? "من تأسيس الكيان إلى تشغيله يومياً، ننسّق التفاصيل عبر فريق واحد ومسار واضح."
-      : "From entity formation to daily operations, we coordinate details through one team and a clear path.",
-    viewServices: rtl ? "عرض الخدمات" : "View services",
-    moreLabel: rtl ? "خدمات أخرى" : "more",
+    pageTitle: ui.services.title, heroBadge: ui.services.badge, heroTitle1: ui.services.hero1,
+    heroTitle2: ui.services.hero2, heroSub: ui.services.heroSub, viewServices: ui.services.view,
+    moreLabel: ui.services.more,
   };
 
   return (

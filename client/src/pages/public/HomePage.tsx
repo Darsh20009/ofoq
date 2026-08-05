@@ -35,77 +35,27 @@ function ArrowIcon({ className = "h-4 w-4" }: { className?: string }) {
 }
 
 export default function HomePage() {
-  const { lang } = useLang();
+  const { lang, ui } = useLang();
   const rtl = lang === "ar" || lang === "ur";
 
   const T = {
-    badge: "OFOQ / SAUDI BUSINESS CONCIERGE",
-    hero1: rtl ? "نرتّب التفاصيل،" : "We handle",
-    hero2: rtl ? "لتتفرغ للنمو." : "the details.",
-    heroSub: rtl
-      ? "شريكك الموثوق في الموارد البشرية، الخدمات الحكومية، التأشيرات وتأسيس الشركات في المملكة."
-      : "Your trusted partner for HR, government services, visas, and company formation in Saudi Arabia.",
-    cta1: rtl ? "اطلب خدمة" : "Request Service",
-    cta2: rtl ? "استكشف الخدمات" : "Explore Services",
-    aboutBadge: rtl ? "عن أفق" : "About OFOQ",
-    aboutTitle1: rtl ? "شريك عملك في" : "Your business partner",
-    aboutTitle2: rtl ? "المملكة العربية السعودية" : "in Saudi Arabia",
-    aboutDesc: rtl
-      ? "نحمل عنك الإجراءات الحكومية وإدارة الموارد البشرية ومتطلبات التأسيس — حتى تتفرغ تماماً لنمو أعمالك."
-      : "We handle government procedures, HR management, and formation requirements — so you can focus entirely on growing your business.",
-    aboutCta: rtl ? "اعرف المزيد" : "Learn more",
-    servicesBadge: rtl ? "خدماتنا" : "Our Services",
-    servicesTitle1: rtl ? "خدمات متكاملة" : "Comprehensive",
-    servicesTitle2: rtl ? "وشاملة" : "services",
-    servicesAll: rtl ? "عرض جميع الخدمات" : "View all services",
-    moreServices: rtl ? "خدمات أخرى" : "more services",
-    whyBadge: rtl ? "لماذا أفق؟" : "Why OFOQ?",
-    whyTitle: rtl ? "نبني معك خطوة بخطوة" : "We build with you, step by step",
-    ctaTitle1: rtl ? "لنعزز نموكم" : "Let's boost your",
-    ctaTitle2: rtl ? "المستدام" : "sustainable growth",
-    ctaDesc: rtl
-      ? "تواصل معنا اليوم وابدأ رحلة شراكة حقيقية."
-      : "Contact us today and start a real partnership journey.",
-    contact: rtl ? "تواصل معنا" : "Contact us",
+    badge: ui.home.badge, hero1: ui.home.hero1, hero2: ui.home.hero2, heroSub: ui.home.heroSub,
+    cta1: ui.home.request, cta2: ui.home.explore, aboutBadge: ui.home.aboutBadge,
+    aboutTitle1: ui.home.aboutTitle1, aboutTitle2: ui.home.aboutTitle2, aboutDesc: ui.home.aboutDesc,
+    aboutCta: ui.home.aboutCta, servicesBadge: ui.home.servicesBadge, servicesTitle1: ui.home.servicesTitle1,
+    servicesTitle2: ui.home.servicesTitle2, servicesAll: ui.home.servicesAll, moreServices: ui.home.more,
+    whyBadge: ui.home.whyBadge, whyTitle: ui.home.whyTitle, ctaTitle1: ui.home.ctaTitle1,
+    ctaTitle2: ui.home.ctaTitle2, ctaDesc: ui.home.ctaDesc, contact: ui.home.contact,
   };
 
   const stats = [
-    { n: 200, suffix: "+", label: rtl ? "عميل تخدمهم أفق" : "Clients served" },
-    { n: 98, suffix: "%", label: rtl ? "نسبة رضا العملاء" : "Client satisfaction" },
-    { n: 50, suffix: "+", label: rtl ? "خبير متخصص" : "Specialists" },
-    { n: 7, suffix: "", label: rtl ? "تصنيفات خدمية" : "Service categories" },
+    { n: 200, suffix: "+", label: ui.home.stats[0] },
+    { n: 98, suffix: "%", label: ui.home.stats[1] },
+    { n: 50, suffix: "+", label: ui.home.stats[2] },
+    { n: 7, suffix: "", label: ui.home.stats[3] },
   ];
 
-  const reasons = [
-    {
-      n: "01",
-      title: rtl ? "فريق متخصص" : "Expert team",
-      desc: rtl
-        ? "مختصون في كل مجال من مجالات خدماتنا في السوق السعودي."
-        : "Specialists across every area of our services in the Saudi market.",
-    },
-    {
-      n: "02",
-      title: rtl ? "متابعة كاملة" : "Full follow-up",
-      desc: rtl
-        ? "نتابع ملفك حتى الإغلاق مع تحديثات دورية لك."
-        : "We follow your file through to closure with regular updates.",
-    },
-    {
-      n: "03",
-      title: rtl ? "تجربة رقمية" : "Digital experience",
-      desc: rtl
-        ? "بوابة عميل متكاملة لمتابعة طلباتك أينما كنت."
-        : "A full client portal to track your requests from anywhere.",
-    },
-    {
-      n: "04",
-      title: rtl ? "خبرة محلية" : "Local expertise",
-      desc: rtl
-        ? "نفهم الأنظمة والجهات الحكومية السعودية عن قرب."
-        : "Deep knowledge of Saudi regulations and government bodies.",
-    },
-  ];
+  const reasons = ui.home.reasons.map((reason, i) => ({ n: `0${i + 1}`, ...reason }));
 
   return (
     <div className="bg-white text-[#2B273F]">
@@ -113,9 +63,7 @@ export default function HomePage() {
         <title>أفق لحلول الأعمال | OFOQ Business Solutions</title>
         <meta
           name="description"
-          content={rtl
-            ? "أفق لحلول الأعمال شريكك في الموارد البشرية، الخدمات الحكومية، التأشيرات وتأسيس الشركات في المملكة العربية السعودية."
-            : "OFOQ Business Solutions coordinates HR, government services, visas, and company formation for businesses in Saudi Arabia."}
+          content={ui.home.heroSub}
         />
         <link rel="canonical" href="https://ofoqhc.com/" />
       </Helmet>

@@ -19,7 +19,7 @@ function ArrowIcon({ className = "h-4 w-4" }: { className?: string }) {
 export default function ServiceCategoryPage() {
   const { categorySlug } = useParams();
   const category = getCategory(categorySlug);
-  const { lang } = useLang();
+  const { lang, ui } = useLang();
   const [view, setView] = useState<"grid" | "list">("grid");
 
   if (!category) {
@@ -28,10 +28,10 @@ export default function ServiceCategoryPage() {
         <div>
           <p className="text-5xl font-black text-[#33B27C]">404</p>
           <p className="mt-4 text-xl font-bold">
-            {lang === "ar" ? "الخدمة غير موجودة" : "Service not found"}
+            {ui.detail.details}
           </p>
           <Link to="/services" className="mt-6 inline-block font-black text-[#33B27C] underline">
-            {lang === "ar" ? "العودة للخدمات" : "Back to services"}
+            {ui.category.services}
           </Link>
         </div>
       </div>
@@ -73,11 +73,11 @@ export default function ServiceCategoryPage() {
             className="mb-10 flex flex-wrap items-center gap-2 text-sm text-white/40"
           >
             <Link to="/" className="transition-colors hover:text-[#E5FE04]">
-              {rtl ? "الرئيسية" : "Home"}
+              {ui.category.home}
             </Link>
             <span>/</span>
             <Link to="/services" className="transition-colors hover:text-[#E5FE04]">
-              {rtl ? "الخدمات" : "Services"}
+              {ui.category.services}
             </Link>
             <span>/</span>
             <span className="text-white">{pick(category.title, lang)}</span>
@@ -90,7 +90,7 @@ export default function ServiceCategoryPage() {
             className="mb-5 flex items-center gap-3 text-[11px] font-black uppercase tracking-[.3em] text-[#E5FE04]"
           >
             <span className="h-px w-8 bg-[#E5FE04]" />
-            {rtl ? "تصنيف الخدمة" : "Service category"}
+            {ui.category.badge}
           </motion.p>
 
           <motion.h1
@@ -118,7 +118,7 @@ export default function ServiceCategoryPage() {
             className="mt-5 text-sm text-white/35"
           >
             {category.services.length}&nbsp;
-            {rtl ? "خدمة متاحة" : "services available"}
+            {ui.category.available}
           </motion.p>
         </div>
       </section>
@@ -129,20 +129,20 @@ export default function ServiceCategoryPage() {
         <div className="mb-10 flex items-center justify-between">
           <p className="text-sm text-[#2B273F]/45">
             {category.services.length}&nbsp;
-            {rtl ? "خدمة" : "services"}
+            {ui.category.service}
           </p>
           <div className="flex rounded-full border border-[#2B273F]/15 p-1 text-xs font-black">
             <button
               onClick={() => setView("grid")}
               className={`rounded-full px-4 py-2 transition-colors ${view === "grid" ? "bg-[#2B273F] text-white" : "text-[#2B273F]/45 hover:text-[#2B273F]"}`}
             >
-              {rtl ? "شبكة" : "Grid"}
+              {ui.category.grid}
             </button>
             <button
               onClick={() => setView("list")}
               className={`rounded-full px-4 py-2 transition-colors ${view === "list" ? "bg-[#2B273F] text-white" : "text-[#2B273F]/45 hover:text-[#2B273F]"}`}
             >
-              {rtl ? "قائمة" : "List"}
+              {ui.category.list}
             </button>
           </div>
         </div>
@@ -180,7 +180,7 @@ export default function ServiceCategoryPage() {
                       <span className="grid h-7 w-7 place-items-center rounded-full bg-[#33B27C]/12 transition-colors group-hover:bg-white/20">
                         <ArrowIcon className="h-3 w-3 text-[#33B27C] group-hover:text-white" />
                       </span>
-                      {rtl ? "التفاصيل" : "Details"}
+                      {ui.category.details}
                     </div>
                   </Link>
                 </motion.div>
@@ -231,14 +231,8 @@ export default function ServiceCategoryPage() {
       <div className="bg-[#f4f2ed] px-6 py-14 sm:px-10">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-6">
           <div>
-            <p className="text-xl font-black">
-              {rtl ? "هل تحتاج هذه الخدمات؟" : "Need these services?"}
-            </p>
-            <p className="mt-2 text-sm text-[#2B273F]/55">
-              {rtl
-                ? "تواصل معنا وسنساعدك في تحديد الخدمة المناسبة لاحتياجاتك."
-                : "Contact us and we'll help you identify the right service for your needs."}
-            </p>
+            <p className="text-xl font-black">{ui.category.need}</p>
+            <p className="mt-2 text-sm text-[#2B273F]/55">{ui.category.needDesc}</p>
           </div>
           <Link
             to="/client/requests/new"
@@ -247,7 +241,7 @@ export default function ServiceCategoryPage() {
             <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15 transition-colors group-hover:bg-white/25">
               <ArrowIcon />
             </span>
-            {rtl ? "اطلب خدمة" : "Request service"}
+            {ui.category.request}
           </Link>
         </div>
       </div>

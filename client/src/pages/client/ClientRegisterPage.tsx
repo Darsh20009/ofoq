@@ -6,6 +6,7 @@ import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuthStore } from "../../store/authStore";
 import OfoqLogo from "../../components/OfoqLogo";
+import { useLang } from "../../i18n/LangContext";
 
 interface Form {
   fullName: string;
@@ -25,6 +26,7 @@ export default function ClientRegisterPage() {
   const [params] = useSearchParams();
   const redirect = params.get("redirect") || "/client/dashboard";
   const password = watch("password");
+  const { ui, dir, lang } = useLang();
 
   async function onSubmit(data: Form) {
     setLoading(true); setErr("");
@@ -34,18 +36,18 @@ export default function ClientRegisterPage() {
         email:    data.email,
         phone:    data.phone,
         password: data.password,
-        lang:     "ar",
+         lang,
       });
       const { token, user } = res.data;
       setAuth({ id: user.id, name: user.name, email: user.email, role: user.role, lang: user.lang }, token);
       navigate(redirect, { replace: true });
     } catch (e: any) {
-      setErr(e.response?.data?.error || "خطأ في إنشاء الحساب. يرجى المحاولة مجدداً.");
+      setErr(e.response?.data?.error || ui.auth.invalid);
     } finally { setLoading(false); }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ofoq-navy via-[#1C1930] to-[#0f0d1f] flex items-center justify-center p-4" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-ofoq-navy via-[#1C1930] to-[#0f0d1f] flex items-center justify-center p-4" dir={dir}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md">
 
@@ -55,8 +57,8 @@ export default function ClientRegisterPage() {
             <div className="flex justify-center mb-3">
               <OfoqLogo className="w-16 h-11" />
             </div>
-            <h1 className="text-white text-xl font-bold">إنشاء حساب جديد</h1>
-            <p className="text-white/50 text-sm mt-1 group-hover:text-white/70 transition-colors">انضم لبوابة عملاء أفق</p>
+            <h1 className="text-white text-xl font-bold">{ui.auth.registerTitle}</h1>
+            <p className="text-white/50 text-sm mt-1 group-hover:text-white/70 transition-colors">{ui.auth.registerSubtitle}</p>
           </Link>
 
           <div className="p-8">
@@ -69,18 +71,18 @@ export default function ClientRegisterPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {/* Full name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">الاسم الكامل</label>
-                <input {...register("fullName", { required: "الاسم مطلوب", minLength: { value: 2, message: "الاسم قصير جداً" } })}
-                  placeholder="محمد عبدالله"
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{ui.auth.fullName}</label>
+                <input {...register("fullName", { required: ui.request.required, minLength: { value: 2, message: ui.request.required } })}
+                  placeholder={ui.auth.fullName}
                   className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 transition-all ${errors.fullName ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`} />
                 {errors.fullName && <p className="mt-1 text-xs text-red-500">{errors.fullName.message}</p>}
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">البريد الإلكتروني</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{ui.auth.email}</label>
                 <input type="email" dir="ltr"
-                  {...register("email", { required: "البريد مطلوب" })}
+                  {...register("email", { required: ui.request.required })}
                   placeholder="example@email.com"
                   className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 transition-all ${errors.email ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`} />
                 {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
@@ -88,9 +90,9 @@ export default function ClientRegisterPage() {
 
               {/* Phone */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">رقم الهاتف</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{ui.auth.phone}</label>
                 <input type="tel" dir="ltr"
-                  {...register("phone", { required: "رقم الهاتف مطلوب" })}
+                  {...register("phone", { required: ui.request.required })}
                   placeholder="+966 5x xxx xxxx"
                   className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 transition-all ${errors.phone ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`} />
                 {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone.message}</p>}
@@ -98,10 +100,10 @@ export default function ClientRegisterPage() {
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">كلمة المرور</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{ui.auth.password}</label>
                 <div className="relative">
                   <input type={showPass ? "text" : "password"} dir="ltr"
-                    {...register("password", { required: "كلمة المرور مطلوبة", minLength: { value: 6, message: "6 أحرف على الأقل" } })}
+                    {...register("password", { required: ui.request.required, minLength: { value: 6, message: ui.auth.minPassword } })}
                     placeholder="••••••••"
                     className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 transition-all pr-10 ${errors.password ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`} />
                   <button type="button" onClick={() => setShowPass(!showPass)}
@@ -114,11 +116,11 @@ export default function ClientRegisterPage() {
 
               {/* Confirm password */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">تأكيد كلمة المرور</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{ui.auth.confirmPassword}</label>
                 <input type={showPass ? "text" : "password"} dir="ltr"
                   {...register("confirmPassword", {
-                    required: "تأكيد كلمة المرور مطلوب",
-                    validate: (v) => v === password || "كلمتا المرور غير متطابقتان",
+                    required: ui.request.required,
+                    validate: (v) => v === password || ui.auth.mismatch,
                   })}
                   placeholder="••••••••"
                   className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 transition-all ${errors.confirmPassword ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`} />
@@ -133,22 +135,22 @@ export default function ClientRegisterPage() {
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
                 ) : (
-                  <><UserPlus size={16} /> إنشاء الحساب</>
+                  <><UserPlus size={16} /> {ui.auth.createAccount}</>
                 )}
               </button>
             </form>
 
             <p className="mt-6 text-center text-sm text-gray-500">
-              لديك حساب بالفعل؟{" "}
+              {ui.auth.haveAccount}{" "}
               <Link to="/client/login" className="text-ofoq-navy font-semibold hover:text-ofoq-red transition-colors">
-                تسجيل الدخول
+                {ui.auth.login}
               </Link>
             </p>
           </div>
         </div>
 
         <p className="mt-6 text-center text-white/30 text-xs">
-          © 2025 أفق لحلول الأعمال
+          © {new Date().getFullYear()} OFOQ Business Solutions
         </p>
       </motion.div>
     </div>

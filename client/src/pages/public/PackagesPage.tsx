@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import WireframeCube from "../../components/WireframeCube";
+import { useLang } from "../../i18n/LangContext";
 
 const fadeUp = {
   hidden:  { opacity: 0, y: 28 },
@@ -61,11 +62,32 @@ const PACKAGES = [
 ];
 
 export default function PackagesPage() {
+  const { ui, dir } = useLang();
+  const featureIndex: Record<string, number> = {
+    "وزارة التجارة": 0, "Ministry of Commerce": 0,
+    "منصة سلامة": 1, "Salama platform": 1,
+    "التأمينات الاجتماعية": 2, "Social insurance": 2,
+    "خدمات التأمين الطبي": 3, "Medical insurance services": 3,
+    "خدمات الزكاة والضريبة": 4, "Zakat and tax services": 4,
+    "منصة أبشر ومقيم": 5, "Absher and Muqeem platforms": 5,
+    "خدمات الاستشارات": 6, "Consulting services": 6,
+    "وزارة الإعلام": 7, "Ministry of Media": 7,
+    "منصة بلدي": 8, "Balady platform": 8,
+    "خدمة تخفيف الأعباء": 9, "Burden relief service": 9,
+    "التدريب والتطوير": 10, "Training and development": 10,
+  };
+  const packages = PACKAGES.map((pkg, index) => ({
+    ...pkg,
+    name: ui.packages.names[index],
+    tagline: ui.packages.taglines[index],
+    badge: ui.packages.badges[index] || null,
+    features: pkg.features.map((feature) => ui.packages.features[featureIndex[feature] ?? 0]),
+  }));
   return (
-    <div>
+    <div dir={dir}>
       <Helmet>
-        <title>الباقات — أفق لحلول الأعمال</title>
-        <meta name="description" content="اختر باقتك من أفق لحلول الأعمال — الفضية والذهبية والبلاتينية. حلول مصممة لدعم نمو عملك." />
+        <title>{ui.packages.title}</title>
+        <meta name="description" content={ui.packages.heroSub} />
         <link rel="canonical" href="https://ofoqhc.com/packages" />
       </Helmet>
 
@@ -84,17 +106,17 @@ export default function PackagesPage() {
         </div>
         <div className="max-w-5xl mx-auto px-5 sm:px-8 pb-14 relative z-10 w-full">
           <div className="flex items-center gap-2 text-white/45 text-xs mb-4">
-            <Link to="/" className="hover:text-white transition-colors">الرئيسية</Link>
+            <Link to="/" className="hover:text-white transition-colors">{ui.footer.about}</Link>
             <span>/</span>
-            <span className="text-white/70">الباقات</span>
+            <span className="text-white/70">{ui.packages.badge}</span>
           </div>
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-5xl sm:text-6xl font-black text-white"
           >
-            اصنع مسار{" "}
-            <span className="text-ofoq-yellow">نجاحك</span>
+            {ui.packages.heroTitle}{" "}
+            <span className="text-ofoq-yellow">{ui.packages.heroHighlight}</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
@@ -102,7 +124,7 @@ export default function PackagesPage() {
             transition={{ delay: 0.15 }}
             className="text-white/55 text-base mt-2"
           >
-            اختر الباقة التي تناسب احتياجات عملك
+            {ui.packages.heroSub}
           </motion.p>
         </div>
       </section>
@@ -111,7 +133,7 @@ export default function PackagesPage() {
       <section className="py-16 sm:py-20 bg-gray-50">
         <div className="max-w-5xl mx-auto px-5 sm:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {PACKAGES.map((pkg, i) => (
+            {packages.map((pkg, i) => (
               <motion.div
                 key={i}
                 variants={fadeUp}
@@ -121,14 +143,14 @@ export default function PackagesPage() {
                 viewport={{ once: true }}
                 className={`relative rounded-3xl overflow-hidden ${
                   pkg.dark ? "bg-ofoq-navy text-white" : "bg-white text-ofoq-navy"
-                } ${pkg.badge === "الأكثر طلباً" ? "ring-2 ring-ofoq-green shadow-xl" : "shadow-md"}`}
+                } ${i === 1 ? "ring-2 ring-ofoq-green shadow-xl" : "shadow-md"}`}
               >
                 {/* شارة */}
                 {pkg.badge && (
                   <div className="absolute top-4 left-4">
                     <span
                       className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
-                        pkg.badge === "الأكثر طلباً"
+                        i === 1
                           ? "bg-ofoq-green text-white"
                           : "bg-ofoq-yellow/20 text-ofoq-navy"
                       }`}
@@ -184,7 +206,7 @@ export default function PackagesPage() {
                         <path d="m15 18-6-6 6-6" />
                       </svg>
                     </span>
-                    اشترك الآن
+                     {ui.packages.subscribe}
                   </Link>
                 </div>
 
@@ -207,16 +229,16 @@ export default function PackagesPage() {
             viewport={{ once: true }}
             className="mt-14"
           >
-            <h2 className="text-2xl font-black text-ofoq-navy mb-6 text-center">مقارنة الباقات</h2>
+             <h2 className="text-2xl font-black text-ofoq-navy mb-6 text-center">{ui.packages.compare}</h2>
             <div className="bg-white rounded-3xl overflow-hidden shadow-md">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="bg-ofoq-navy text-white">
-                      <th className="text-right px-6 py-4 font-bold text-sm">الخدمة</th>
-                      <th className="text-center px-4 py-4 font-bold text-sm">فضية</th>
-                      <th className="text-center px-4 py-4 font-bold text-sm text-ofoq-yellow">ذهبية</th>
-                      <th className="text-center px-4 py-4 font-bold text-sm">بلاتينية</th>
+                       <th className="text-right px-6 py-4 font-bold text-sm">{ui.packages.service}</th>
+                       <th className="text-center px-4 py-4 font-bold text-sm">{ui.packages.silver}</th>
+                       <th className="text-center px-4 py-4 font-bold text-sm text-ofoq-yellow">{ui.packages.gold}</th>
+                       <th className="text-center px-4 py-4 font-bold text-sm">{ui.packages.platinum}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -269,10 +291,9 @@ export default function PackagesPage() {
           <WireframeCube className="w-72 h-52 text-ofoq-green" color="#33B27C" />
         </div>
         <div className="max-w-5xl mx-auto px-5 sm:px-8 relative z-10 text-center">
-          <p className="text-white/40 text-sm mb-3">هل تحتاج إلى مساعدة في الاختيار؟</p>
+           <p className="text-white/40 text-sm mb-3">{ui.packages.help}</p>
           <h2 className="text-3xl sm:text-4xl font-black text-white mb-6">
-            فريقنا{" "}
-            <span className="text-ofoq-yellow">يساعدك</span>
+             {ui.packages.helpTitle}
           </h2>
           <Link
             to="/client/requests/new"
@@ -283,7 +304,7 @@ export default function PackagesPage() {
                 <path d="m15 18-6-6 6-6" />
               </svg>
             </span>
-            <span className="pl-2">تواصل معنا</span>
+             <span className="pl-2">{ui.packages.contact}</span>
           </Link>
         </div>
       </section>

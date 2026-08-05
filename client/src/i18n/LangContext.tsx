@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { translations } from "./translations";
 import { LANGS, extraLangs, deepMerge, type LangCode } from "./extraLangs";
+import { getUiCopy, type UiCopy } from "./ui";
 
 export type Lang = LangCode;
 
@@ -11,6 +12,7 @@ interface LangCtx {
   t: typeof translations.ar;
   dir: "rtl" | "ltr";
   langs: typeof LANGS;
+  ui: UiCopy;
 }
 
 const LangContext = createContext<LangCtx>({
@@ -20,6 +22,7 @@ const LangContext = createContext<LangCtx>({
   t: translations.ar,
   dir: "rtl",
   langs: LANGS,
+  ui: getUiCopy("ar"),
 });
 
 const RTL: Lang[] = ["ar", "ur"];
@@ -49,6 +52,7 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
     // Other languages: English pack + partial overrides
     return deepMerge(translations.en as typeof translations.ar, extraLangs[lang]);
   }, [lang]);
+  const ui = useMemo(() => getUiCopy(lang), [lang]);
 
   const toggleLang = () => setLang((current) => {
     const index = LANGS.findIndex((item) => item.code === current);
@@ -56,7 +60,7 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
   });
 
   return (
-    <LangContext.Provider value={{ lang, setLang, toggleLang, t, dir, langs: LANGS }}>
+    <LangContext.Provider value={{ lang, setLang, toggleLang, t, dir, langs: LANGS, ui }}>
       {children}
     </LangContext.Provider>
   );

@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { authApi } from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
 import OfoqLogo from "../../components/OfoqLogo";
+import { useLang } from "../../i18n/LangContext";
 
 interface LoginForm { email: string; password: string; }
 
@@ -30,6 +31,7 @@ export default function EmployeePortalLoginPage() {
 
   const { setAuth } = useAuthStore();
   const navigate    = useNavigate();
+  const { ui, dir } = useLang();
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>();
 
   const goHome = () => navigate("/", { replace: true });
@@ -43,14 +45,14 @@ export default function EmployeePortalLoginPage() {
       const { user, token, requires2FA, tempToken, method, methods } = res.data;
       if (requires2FA) {
         setTwoFA({ tempToken, method: method || methods?.[0] || "totp" });
-        toast("أدخل رمز التحقق الثنائي", { icon: "🔐" });
+        toast(ui.employee.twoFactor, { icon: "🔐" });
       } else {
         setAuth(user, token);
         toast.success(`مرحباً، ${user.name}!`);
         goHome();
       }
     } catch (e: any) {
-      setError(e.response?.data?.error || "تعذر تسجيل الدخول. تحقق من البيانات وحاول مرة أخرى.");
+      setError(e.response?.data?.error || ui.employee.invalid);
     } finally {
       setLoading(false);
     }
@@ -67,7 +69,7 @@ export default function EmployeePortalLoginPage() {
       toast.success(`مرحباً، ${user.name}!`);
       goHome();
     } catch (e: any) {
-      setError(e.response?.data?.error || "رمز التحقق غير صحيح.");
+      setError(e.response?.data?.error || ui.employee.invalid);
     } finally {
       setLoading(false);
     }
@@ -127,7 +129,7 @@ export default function EmployeePortalLoginPage() {
   return (
     <div
       className="min-h-screen bg-[#0C1338] flex flex-col items-center justify-center px-4"
-      dir="rtl"
+      dir={dir}
     >
       {/* Logo */}
       <motion.div
@@ -137,7 +139,7 @@ export default function EmployeePortalLoginPage() {
       >
         <OfoqLogo className="w-20 h-14" />
         <div className="text-center">
-          <h1 className="text-white text-2xl font-bold">بوابة الموظفين</h1>
+          <h1 className="text-white text-2xl font-bold">{ui.employee.portal}</h1>
           <p className="text-white/50 text-sm mt-1">OFOQ Employee Portal</p>
         </div>
       </motion.div>
@@ -158,13 +160,13 @@ export default function EmployeePortalLoginPage() {
           /* 2FA step */
           <div className="space-y-5">
             <h2 className="text-center font-bold text-navy-700 text-lg">
-              التحقق الثنائي
+              {ui.employee.twoFactor}
             </h2>
             <input
               type="text"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
-              placeholder="رمز التحقق"
+              placeholder={ui.employee.code}
               maxLength={6}
               className="w-full input text-center text-2xl tracking-widest"
               onKeyDown={(e) => e.key === "Enter" && handle2FA()}
@@ -174,26 +176,26 @@ export default function EmployeePortalLoginPage() {
               disabled={loading}
               className="btn-primary w-full"
             >
-              {loading ? "جارٍ التحقق..." : "تأكيد"}
+              {loading ? ui.employee.verifying : ui.employee.verify}
             </button>
             <button
               onClick={() => { setTwoFA(null); setOtp(""); }}
               className="text-xs text-gray-400 w-full text-center hover:underline"
             >
-              رجوع
+              {ui.employee.back}
             </button>
           </div>
         ) : (
           /* Login form */
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <h2 className="text-center font-bold text-navy-700 text-xl mb-2">
-              تسجيل الدخول
+              {ui.employee.login}
             </h2>
 
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                البريد الإلكتروني
+                {ui.employee.email}
               </label>
               <div className="relative">
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -201,7 +203,7 @@ export default function EmployeePortalLoginPage() {
                 </span>
                 <input
                   type="email"
-                  {...register("email", { required: "البريد مطلوب" })}
+                  {...register("email", { required: ui.employee.emailRequired })}
                   placeholder="name@ofoqhc.com"
                   className="input pr-9 w-full"
                 />
@@ -214,7 +216,7 @@ export default function EmployeePortalLoginPage() {
             {/* Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                كلمة المرور
+                {ui.employee.password}
               </label>
               <div className="relative">
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -222,7 +224,7 @@ export default function EmployeePortalLoginPage() {
                 </span>
                 <input
                   type={showPass ? "text" : "password"}
-                  {...register("password", { required: "كلمة المرور مطلوبة" })}
+                  {...register("password", { required: ui.employee.passwordRequired })}
                   placeholder="••••••••"
                   className="input pr-9 pl-9 w-full"
                 />
@@ -244,7 +246,7 @@ export default function EmployeePortalLoginPage() {
               disabled={loading}
               className="btn-primary w-full"
             >
-              {loading ? "جارٍ الدخول..." : "دخول"}
+              {loading ? ui.employee.verifying : ui.employee.login}
             </button>
 
             {/* Divider */}
@@ -261,7 +263,7 @@ export default function EmployeePortalLoginPage() {
               className="w-full flex items-center justify-center gap-2 border border-gray-200 rounded-xl py-2.5 text-sm text-navy-700 hover:bg-gray-50 transition-colors"
             >
               <QrCode size={16} />
-              دخول بباركود البطاقة
+              {ui.employee.barcode}
             </button>
           </form>
         )}
@@ -269,7 +271,7 @@ export default function EmployeePortalLoginPage() {
 
       {/* Barcode Modal */}
       {barcodeOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" dir="rtl">
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" dir={dir}>
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

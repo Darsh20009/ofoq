@@ -12,9 +12,9 @@ import { clientApi } from "../api/clientApi";
 import { useLang } from "../i18n/LangContext";
 
 const NAV = [
-  { href: "/client/dashboard", label: "الرئيسية",   icon: LayoutDashboard },
-  { href: "/client/requests",  label: "طلباتي",      icon: FolderOpen },
-  { href: "/client/support",   label: "الدعم",       icon: MessageCircle },
+  { href: "/client/dashboard", icon: LayoutDashboard },
+  { href: "/client/requests",  icon: FolderOpen },
+  { href: "/client/support",   icon: MessageCircle },
 ];
 
 export default function ClientLayout() {
@@ -23,7 +23,8 @@ export default function ClientLayout() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const { dir } = useLang();
+  const { dir, ui } = useLang();
+  const navLabels = [ui.client.dashboard, ui.client.requests, ui.client.support];
 
   const { data: unreadData } = useQuery({
     queryKey: ["client-support-unread"],
@@ -42,21 +43,21 @@ export default function ClientLayout() {
     <div className="min-h-screen bg-gray-50 flex" dir={dir}>
 
       {/* ── Sidebar (desktop) ──────────────────────────────── */}
-      <aside className="hidden lg:flex flex-col w-64 bg-ofoq-navy text-white fixed inset-y-0 right-0 shadow-2xl z-30">
+      <aside className={`hidden lg:flex flex-col w-64 bg-ofoq-navy text-white fixed inset-y-0 shadow-2xl z-30 ${dir === "rtl" ? "right-0" : "left-0"}`}>
         {/* Logo */}
         <div className="p-6 border-b border-white/10">
           <Link to="/client/dashboard" className="flex items-center gap-3">
             <OfoqLogo className="w-14 h-10" />
             <div>
               <p className="font-bold text-sm leading-none">أفق</p>
-              <p className="text-white/40 text-xs">بوابة العملاء</p>
+              <p className="text-white/40 text-xs">{ui.client.portal}</p>
             </div>
           </Link>
         </div>
 
         {/* Nav */}
         <nav className="flex-1 p-4 space-y-1">
-          {NAV.map(({ href, label, icon: Icon }) => {
+          {NAV.map(({ href, icon: Icon }, index) => {
             const active = pathname === href || pathname.startsWith(href + "/");
             return (
               <Link key={href} to={href}
@@ -66,7 +67,7 @@ export default function ClientLayout() {
                     : "text-white/65 hover:text-white hover:bg-white/10"
                 }`}>
                 <Icon size={18} />
-                <span>{label}</span>
+                <span>{navLabels[index]}</span>
                 {href === "/client/support" && unread > 0 && (
                   <span className="mr-auto bg-ofoq-red text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
                     {unread}
@@ -90,7 +91,7 @@ export default function ClientLayout() {
           </div>
           <button onClick={handleLogout}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-white/60 hover:text-white hover:bg-white/10 text-sm transition-all">
-            <LogOut size={15} /> تسجيل الخروج
+             <LogOut size={15} /> {ui.client.logout}
           </button>
         </div>
       </aside>
@@ -100,7 +101,7 @@ export default function ClientLayout() {
         <div className="flex items-center justify-between px-4 h-14">
           <Link to="/client/dashboard" className="flex items-center gap-2">
             <OfoqLogo className="w-10 h-7" />
-            <span className="font-bold text-sm">بوابة العملاء</span>
+            <span className="font-bold text-sm">{ui.client.portal}</span>
           </Link>
           <div className="flex items-center gap-2">
             {unread > 0 && (
@@ -118,17 +119,17 @@ export default function ClientLayout() {
             <motion.nav initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }}
               className="overflow-hidden border-t border-white/10 bg-ofoq-navy">
               <div className="p-3 space-y-1">
-                {NAV.map(({ href, label, icon: Icon }) => (
+                {NAV.map(({ href, icon: Icon }, index) => (
                   <Link key={href} to={href} onClick={() => setMobileOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                       pathname === href ? "bg-ofoq-red text-white" : "text-white/65 hover:bg-white/10 hover:text-white"
                     }`}>
-                    <Icon size={16} /> {label}
+                    <Icon size={16} /> {navLabels[index]}
                   </Link>
                 ))}
                 <button onClick={handleLogout}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/60 hover:text-white hover:bg-white/10">
-                  <LogOut size={16} /> تسجيل الخروج
+                  <LogOut size={16} /> {ui.client.logout}
                 </button>
               </div>
             </motion.nav>
@@ -137,7 +138,7 @@ export default function ClientLayout() {
       </header>
 
       {/* ── Main content ───────────────────────────────────── */}
-      <main className="flex-1 lg:mr-64 mt-14 lg:mt-0 min-h-screen">
+      <main className={`flex-1 mt-14 lg:mt-0 min-h-screen ${dir === "rtl" ? "lg:mr-64" : "lg:ml-64"}`}>
         {/* Top bar (desktop) */}
         <div className="hidden lg:flex items-center justify-between h-16 px-8 bg-white border-b border-gray-100 sticky top-0 z-20">
           <div />
@@ -163,7 +164,7 @@ export default function ClientLayout() {
                     className="absolute left-0 top-full mt-1 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
                     <button onClick={handleLogout}
                       className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors">
-                      <LogOut size={14} /> تسجيل الخروج
+                       <LogOut size={14} /> {ui.client.logout}
                     </button>
                   </motion.div>
                 )}

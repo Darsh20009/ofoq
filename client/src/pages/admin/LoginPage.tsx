@@ -9,6 +9,7 @@ import { authApi, webauthnApi } from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
 import OfoqLogo from "../../components/OfoqLogo";
 import jsQR from "jsqr";
+import { useLang } from "../../i18n/LangContext";
 
 function GoogleIcon() {
   return (
@@ -52,6 +53,7 @@ export default function LoginPage() {
   const scanningRef = useRef(false);
   const { setAuth } = useAuthStore();
   const navigate = useNavigate();
+  const { ui, dir } = useLang();
 
   const { register, handleSubmit, formState: { errors }, watch } = useForm<LoginForm>();
   const emailValue = watch("email");
@@ -70,7 +72,7 @@ export default function LoginPage() {
       const verifyRes = await webauthnApi.loginVerify(asseResp);
       const { user, token } = verifyRes.data;
       setAuth(user, token);
-      toast.success(`مرحباً، ${user.name || user.fullName}!`);
+        toast.success(`${user.name || user.fullName}`);
       navigate("/admin");
     } catch {
       // silent
@@ -85,14 +87,14 @@ export default function LoginPage() {
       const { user, token, requires2FA, tempToken, method, methods } = res.data;
       if (requires2FA) {
         setTwoFAStep({ tempToken, method: method || methods?.[0] || "totp" });
-        toast("أدخل رمز التحقق الثنائي", { icon: "🔐" });
+        toast(ui.adminLogin.twoFactor, { icon: "🔐" });
       } else {
         setAuth(user, token);
-        toast.success(`مرحباً، ${user.name}!`);
+        toast.success(user.name);
         navigate(user.role === "employee" ? "/admin/employee/dashboard" : "/admin");
       }
     } catch (e: any) {
-      setError(e.response?.data?.error || "تعذر تسجيل الدخول. تحقق من البيانات وحاول مرة أخرى.");
+      setError(e.response?.data?.error || ui.adminLogin.invalid);
     } finally {
       setLoading(false);
     }
@@ -105,7 +107,7 @@ export default function LoginPage() {
       const res = await authApi.verify2FA({ tempToken: twoFAStep.tempToken, method: twoFAStep.method, code: otpCode });
       const { user, token } = res.data;
       setAuth(user, token);
-      toast.success(`مرحباً، ${user.name}!`);
+      toast.success(user.name);
       navigate(user.role === "employee" ? "/admin/employee/dashboard" : "/admin");
     } catch (e: any) {
       setError(e.response?.data?.error || "رمز التحقق غير صحيح.");
@@ -124,10 +126,10 @@ export default function LoginPage() {
       setAuth(user, token);
       stopCamera();
       setBarcodeOpen(false);
-      toast.success(`مرحباً، ${user.name}!`);
+      toast.success(user.name);
       navigate("/admin/employee/dashboard");
     } catch (e: any) {
-      setError(e.response?.data?.error || "تعذر تسجيل الدخول بالباركود.");
+      setError(e.response?.data?.error || ui.adminLogin.invalid);
     } finally {
       setBarcodeLoading(false);
     }
@@ -210,7 +212,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-stretch" dir="rtl">
+    <div className="min-h-screen bg-white flex items-stretch" dir={dir}>
 
       {/* ── الجانب الأيسر — صورة خلفية + بطاقات ── */}
       <div
@@ -219,8 +221,8 @@ export default function LoginPage() {
       >
         <div className="text-center text-white">
           <OfoqLogo className="w-40 h-28 mx-auto mb-8 text-white" />
-          <h2 className="text-5xl font-black">أفق لحلول الأعمال</h2>
-          <p className="text-white/65 text-lg mt-4">نحوّل الطموح إلى أثر ملموس</p>
+          <h2 className="text-5xl font-black">{ui.adminLogin.title}</h2>
+          <p className="text-white/65 text-lg mt-4">{ui.home.heroSub}</p>
           <div className="mt-14 flex gap-4 justify-center">
             <div className="glass rounded-2xl px-6 py-4">
               <b className="text-2xl block text-ofoq-yellow">٢٠٠+</b>
@@ -263,19 +265,19 @@ export default function LoginPage() {
             {/* اللوجو والعنوان */}
             <div className="text-center mb-8">
               <OfoqLogo className="w-24 h-16 mx-auto mb-4" dark />
-              <h1 className="text-ofoq-navy text-2xl font-bold">مرحباً بعودتك</h1>
-              <p className="text-gray-500 text-sm mt-1">سجّل دخولك إلى لوحة تحكم أفق</p>
+              <h1 className="text-ofoq-navy text-2xl font-bold">{ui.adminLogin.login}</h1>
+              <p className="text-gray-500 text-sm mt-1">{ui.adminLogin.subtitle}</p>
             </div>
 
             {!twoFAStep ? (
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {/* البريد الإلكتروني */}
                 <div>
-                  <label className="label">البريد الإلكتروني</label>
+                  <label className="label">{ui.adminLogin.email}</label>
                   <div className="relative">
                     <Mail size={16} className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-400" />
                     <input
-                      {...register("email", { required: "البريد مطلوب" })}
+                      {...register("email", { required: ui.adminLogin.emailRequired })}
                       type="email"
                       placeholder="admin@ofoq.sa"
                       className="input-field pr-10"
@@ -289,11 +291,11 @@ export default function LoginPage() {
 
                 {/* كلمة المرور */}
                 <div>
-                  <label className="label">كلمة المرور</label>
+                  <label className="label">{ui.adminLogin.password}</label>
                   <div className="relative">
                     <Lock size={16} className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-400" />
                     <input
-                      {...register("password", { required: "كلمة المرور مطلوبة" })}
+                      {...register("password", { required: ui.adminLogin.passwordRequired })}
                       type={showPass ? "text" : "password"}
                       placeholder="••••••••"
                       className="input-field pr-10 pl-10"
@@ -313,7 +315,7 @@ export default function LoginPage() {
 
                 <div className="flex justify-end">
                   <Link to="/admin/forgot-password" className="text-ofoq-red text-xs hover:underline">
-                    نسيت كلمة المرور؟
+                    {ui.adminLogin.forgot}
                   </Link>
                 </div>
 
@@ -326,10 +328,10 @@ export default function LoginPage() {
                   {loading ? (
                     <span className="flex items-center gap-2">
                       <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      جاري التحقق...
+                      {ui.adminLogin.verifying}
                     </span>
                   ) : (
-                    "تسجيل الدخول"
+                    ui.adminLogin.login
                   )}
                 </button>
 
@@ -341,7 +343,7 @@ export default function LoginPage() {
                   className="w-full flex items-center justify-center gap-2 bg-ofoq-navy/5 border border-gray-200 text-ofoq-navy rounded-xl py-3 text-sm hover:bg-ofoq-navy/10 transition-all"
                 >
                   <Fingerprint size={17} className="text-ofoq-green" />
-                  {passkeyLoading ? "جاري التحقق..." : "الدخول بمفتاح المرور (Passkey)"}
+                  {passkeyLoading ? ui.adminLogin.verifying : "Sign in with passkey"}
                 </button>
 
                 {/* OAuth */}
@@ -349,7 +351,7 @@ export default function LoginPage() {
                   <>
                     <div className="flex items-center gap-3 py-1">
                       <div className="flex-1 h-px bg-gray-200" />
-                      <span className="text-gray-400 text-xs">أو</span>
+                      <span className="text-gray-400 text-xs">or</span>
                       <div className="flex-1 h-px bg-gray-200" />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
@@ -379,9 +381,9 @@ export default function LoginPage() {
                 <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
                   <ShieldCheck size={20} className="text-emerald-600 flex-shrink-0" />
                   <p className="text-gray-700 text-sm">
-                    {twoFAStep.method === "totp"
-                      ? "أدخل الرمز من تطبيق المصادقة"
-                      : "تم إرسال رمز التحقق إلى بريدك الإلكتروني"}
+                     {twoFAStep.method === "totp"
+                       ? ui.adminLogin.twoFactor
+                       : ui.adminLogin.code}
                   </p>
                 </div>
                 <input
@@ -397,13 +399,13 @@ export default function LoginPage() {
                   disabled={loading || otpCode.length < 6}
                   className="w-full btn-primary justify-center py-3.5"
                 >
-                  {loading ? "جاري التحقق..." : "تأكيد"}
+                  {loading ? ui.adminLogin.verifying : ui.adminLogin.verify}
                 </button>
                 <button
                   onClick={() => setTwoFAStep(null)}
                   className="w-full text-gray-400 text-sm hover:text-ofoq-navy transition-colors"
                 >
-                  العودة لتسجيل الدخول
+                  {ui.adminLogin.back}
                 </button>
               </div>
             )}
@@ -416,12 +418,12 @@ export default function LoginPage() {
               className="w-full flex items-center justify-center gap-2 text-gray-400 hover:text-ofoq-navy text-xs mt-4 py-2 transition-colors border border-transparent hover:border-gray-200 rounded-xl"
             >
               <QrCode size={14} />
-              تسجيل الدخول بباركود الموظف
+              {ui.adminLogin.employeeBarcode}
             </button>
           )}
 
           <p className="text-center text-gray-400 text-xs mt-4">
-            © {new Date().getFullYear()} أفق لحلول الأعمال
+            © {new Date().getFullYear()} {ui.adminLogin.title}
           </p>
         </motion.div>
       </div>
@@ -440,7 +442,7 @@ export default function LoginPage() {
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2">
                 <QrCode size={20} className="text-ofoq-green" />
-                <h3 className="text-white font-bold">تسجيل دخول الموظف</h3>
+                <h3 className="text-white font-bold">{ui.adminLogin.employeeLogin}</h3>
               </div>
               <button
                 onClick={() => { stopCamera(); setBarcodeOpen(false); }}
@@ -464,7 +466,7 @@ export default function LoginPage() {
                   </div>
                 </div>
                 <p className="absolute bottom-3 left-0 right-0 text-center text-white/60 text-xs">
-                  وجّه الكاميرا نحو باركود البطاقة
+                  {ui.adminLogin.employeeBarcode}
                 </p>
               </div>
             ) : (
@@ -473,13 +475,13 @@ export default function LoginPage() {
                 className="w-full flex items-center justify-center gap-2 bg-white/5 border border-white/15 text-white/70 hover:bg-white/10 hover:text-white rounded-2xl py-4 mb-4 transition-all text-sm"
               >
                 <QrCode size={18} className="text-ofoq-green" />
-                مسح الباركود بالكاميرا
+                {ui.adminLogin.employeeBarcode}
               </button>
             )}
 
             <div className="flex items-center gap-2 mb-3">
               <div className="flex-1 h-px bg-white/15" />
-              <span className="text-white/40 text-xs">أو أدخل الكود يدوياً</span>
+              <span className="text-white/40 text-xs">or enter the code manually</span>
               <div className="flex-1 h-px bg-white/15" />
             </div>
 
@@ -500,9 +502,9 @@ export default function LoginPage() {
               {barcodeLoading ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  جاري التحقق...
+                   {ui.adminLogin.verifying}
                 </span>
-              ) : "تسجيل الدخول"}
+              ) : ui.adminLogin.login}
             </button>
           </motion.div>
         </motion.div>

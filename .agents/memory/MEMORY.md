@@ -4,3 +4,4 @@
 - [Rate limiter & dev proxy](rate-limiter-dev-proxy.md) — sitewide 429s in dev were the shared-IP rate limiter; skipped outside production
 - [GitHub push authentication](github-push-auth.md) — managed GitHub pushes can return UNAUTHENTICATED even when a PAT secret is present; local commits remain ready
 - [Development asset proxy](development-asset-proxy.md) — Vite must proxy root-level images, icons, favicon, manifest, and service worker to Express
+- [Localization architecture](localization-architecture.md) — shared UI copy drives language, direction, and portal authentication surfaces

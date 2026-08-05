@@ -4,11 +4,13 @@ import { Mail, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { authApi } from "../../api/client";
 import OfoqLogo from "../../components/OfoqLogo";
+import { useLang } from "../../i18n/LangContext";
 
 export default function ClientForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const { ui, dir } = useLang();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +28,7 @@ export default function ClientForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ofoq-navy via-[#1C1930] to-[#0f0d1f] flex items-center justify-center p-4" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-ofoq-navy via-[#1C1930] to-[#0f0d1f] flex items-center justify-center p-4" dir={dir}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}
@@ -34,8 +36,8 @@ export default function ClientForgotPasswordPage() {
             <div className="flex justify-center mb-4">
               <OfoqLogo className="w-20 h-14" />
             </div>
-            <h1 className="text-white text-xl font-bold">نسيت كلمة المرور؟</h1>
-            <p className="text-white/50 text-sm mt-1">أدخل بريدك وسنرسل لك رابط الاسترداد</p>
+            <h1 className="text-white text-xl font-bold">{ui.auth.forgotTitle}</h1>
+            <p className="text-white/50 text-sm mt-1">{ui.auth.forgotSubtitle}</p>
           </div>
 
           <div className="p-8">
@@ -44,22 +46,22 @@ export default function ClientForgotPasswordPage() {
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Mail size={28} className="text-green-600" />
                 </div>
-                <h2 className="text-ofoq-navy font-bold text-lg mb-2">تحقق من بريدك الإلكتروني</h2>
+                <h2 className="text-ofoq-navy font-bold text-lg mb-2">{ui.auth.checkEmail}</h2>
                 <p className="text-gray-500 text-sm leading-relaxed mb-4">
                   إذا كان البريد <span className="font-medium text-ofoq-navy" dir="ltr">{email}</span> مسجّلاً لدينا،
-                  ستصلك رسالة بها رابط إعادة التعيين خلال دقائق.
+                   {ui.auth.checkEmailDesc}
                 </p>
-                <p className="text-gray-400 text-xs mb-6">تحقق من مجلد Spam إذا لم تجد الرسالة</p>
+                <p className="text-gray-400 text-xs mb-6">{ui.auth.spam}</p>
                 <Link to="/client/login"
                   className="inline-flex items-center gap-2 text-ofoq-navy text-sm font-semibold hover:text-ofoq-red transition-colors">
                   <ArrowRight size={14} />
-                  العودة لتسجيل الدخول
+                  {ui.auth.backLogin}
                 </Link>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">البريد الإلكتروني</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{ui.auth.email}</label>
                   <div className="relative">
                     <Mail size={16} className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-400" />
                     <input
@@ -80,15 +82,15 @@ export default function ClientForgotPasswordPage() {
                   className="w-full bg-ofoq-navy hover:bg-ofoq-red disabled:opacity-50 text-white font-semibold rounded-xl py-3 text-sm transition-all flex items-center justify-center gap-2"
                 >
                   {loading ? (
-                    <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> جاري الإرسال...</>
-                  ) : "إرسال رابط الاسترداد"}
+                    <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> {ui.auth.sending}</>
+                  ) : ui.auth.sendReset}
                 </button>
 
                 <div className="text-center">
                   <Link to="/client/login"
                     className="inline-flex items-center gap-1.5 text-gray-400 text-sm hover:text-ofoq-navy transition-colors">
                     <ArrowRight size={13} />
-                    العودة لتسجيل الدخول
+                    {ui.auth.backLogin}
                   </Link>
                 </div>
               </form>

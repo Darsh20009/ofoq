@@ -166,9 +166,9 @@ export default function AdminLayout() {
       </AnimatePresence>
 
       <aside
-        className={`fixed top-0 right-0 h-full z-50 flex flex-col transition-all duration-300 bg-navy-gradient
+        className={`fixed top-0 ${dir === "rtl" ? "right-0" : "left-0"} h-full z-50 flex flex-col transition-all duration-300 bg-navy-gradient
           ${collapsed ? "w-16" : "w-64"}
-          ${sidebarOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
+          ${sidebarOpen ? "translate-x-0" : dir === "rtl" ? "translate-x-full lg:translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
         {/* Logo */}
@@ -182,7 +182,7 @@ export default function AdminLayout() {
           )}
           <button
             onClick={() => setSidebarOpen(false)}
-            className="mr-auto text-white/50 hover:text-white lg:hidden"
+            className={`${dir === "rtl" ? "mr-auto" : "ml-auto"} text-white/50 hover:text-white lg:hidden`}
           >
             <X size={18} />
           </button>
@@ -228,7 +228,7 @@ export default function AdminLayout() {
       </aside>
 
       {/* ── Main content ─────────────────── */}
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${collapsed ? "lg:mr-16" : "lg:mr-64"}`}>
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${dir === "rtl" ? (collapsed ? "lg:mr-16" : "lg:mr-64") : (collapsed ? "lg:ml-16" : "lg:ml-64")}`}>
         {/* Top bar */}
         <header className="h-16 bg-white border-b border-gray-100 flex items-center px-4 sm:px-6 gap-4 sticky top-0 z-30 shadow-sm">
           <button

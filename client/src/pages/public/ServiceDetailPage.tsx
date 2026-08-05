@@ -20,7 +20,7 @@ export default function ServiceDetailPage() {
   const { categorySlug, serviceSlug } = useParams();
   const category = getCategory(categorySlug);
   const service = getService(categorySlug, serviceSlug);
-  const { lang } = useLang();
+  const { lang, ui } = useLang();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const requestTypeByCategory: Record<string, string> = {
     formation: "company_formation",
@@ -37,10 +37,10 @@ export default function ServiceDetailPage() {
         <div>
           <p className="text-5xl font-black text-[#33B27C]">404</p>
           <p className="mt-4 text-xl font-bold">
-            {lang === "ar" ? "الخدمة غير موجودة" : "Service not found"}
+            {ui.detail.details}
           </p>
           <Link to="/services" className="mt-6 inline-block font-black text-[#33B27C] underline">
-            {lang === "ar" ? "العودة للخدمات" : "Back to services"}
+            {ui.detail.services}
           </Link>
         </div>
       </div>
@@ -50,16 +50,16 @@ export default function ServiceDetailPage() {
   const rtl = lang === "ar" || lang === "ur";
 
   const T = {
-    home: rtl ? "الرئيسية" : "Home",
-    services: rtl ? "الخدمات" : "Services",
-    serviceBadge: rtl ? "تفاصيل الخدمة" : "Service details",
-    requestService: rtl ? "اطلب الخدمة" : "Request Service",
-    howWeWork: rtl ? "كيف نعمل" : "How we work",
-    faqTitle: rtl ? "الأسئلة الشائعة" : "Frequently asked questions",
-    windowTitle: rtl ? "مدة التنفيذ" : "Service window",
-    suitableFor: rtl ? "لمن تناسب؟" : "Who is it for?",
-    requirements: rtl ? "المتطلبات" : "Requirements",
-    relatedServices: rtl ? "خدمات أخرى من نفس التصنيف" : "Other services in this category",
+    home: ui.detail.home,
+    services: ui.detail.services,
+    serviceBadge: ui.detail.badge,
+    requestService: ui.detail.request,
+    howWeWork: ui.detail.how,
+    faqTitle: ui.detail.faq,
+    windowTitle: ui.detail.window,
+    suitableFor: ui.detail.suitable,
+    requirements: ui.detail.requirements,
+    relatedServices: ui.detail.related,
   };
 
   return (
@@ -305,7 +305,7 @@ export default function ServiceDetailPage() {
                         {pick(s.desc, lang).split(".")[0]}.
                       </p>
                       <span className="mt-4 text-xs font-black text-[#33B27C]">
-                        {rtl ? "التفاصيل ←" : "Details →"}
+                        {ui.detail.details} →
                       </span>
                     </Link>
                   </motion.div>

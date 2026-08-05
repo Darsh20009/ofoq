@@ -19,13 +19,14 @@ export default function EmployeeLayout() {
   const { user, clearAuth } = useAuthStore();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const { dir } = useLang();
+  const { dir, ui } = useLang();
+  const navLabels = [ui.employee.dashboard, ui.employee.card, ui.employee.profile];
 
   const handleLogout = async () => {
     try { await authApi.logout(); } catch {}
     clearAuth();
     navigate("/login", { replace: true });
-    toast.success("تم تسجيل الخروج");
+    toast.success(ui.employee.logout);
   };
 
   return (
@@ -39,7 +40,7 @@ export default function EmployeeLayout() {
           <Link to="/" className="flex items-center gap-2">
             <OfoqLogo className="w-8 h-6" />
             <div className="hidden sm:block">
-              <p className="text-white font-bold text-sm leading-none">بوابة الموظفين</p>
+              <p className="text-white font-bold text-sm leading-none">{ui.employee.portal}</p>
               <p className="text-white/50 text-[10px]">OFOQ Employee Portal</p>
             </div>
           </Link>
@@ -59,7 +60,7 @@ export default function EmployeeLayout() {
                   }`}
                 >
                   <item.icon size={15} />
-                  {item.label}
+                  {navLabels[NAV.indexOf(item)]}
                 </Link>
               );
             })}
@@ -73,7 +74,7 @@ export default function EmployeeLayout() {
             {user?.avatar ? (
               <img
                 src={user.avatar}
-                alt={user?.name || "صورة الموظف"}
+                alt={user?.name || ui.employee.employeePhoto}
                 className="w-9 h-9 rounded-full object-cover border-2 border-[#33B27C]/40"
               />
             ) : (
@@ -86,7 +87,7 @@ export default function EmployeeLayout() {
                 {user?.name}
               </p>
               <p className="text-white/50 text-xs mt-0.5">
-                {user?.position || "موظف"}
+                {user?.position || ui.employee.employee}
               </p>
             </div>
           </div>
@@ -97,7 +98,7 @@ export default function EmployeeLayout() {
             className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl text-white/70 hover:bg-red-500/20 hover:text-red-300 transition-all text-sm"
           >
             <LogOut size={16} />
-            خروج
+            {ui.employee.logout}
           </button>
 
           {/* Mobile Hamburger */}
@@ -126,7 +127,7 @@ export default function EmployeeLayout() {
                   </div>
                   <div>
                     <p className="text-white text-sm font-semibold">{user?.name}</p>
-                    <p className="text-white/50 text-xs">{user?.position || "موظف"}</p>
+                    <p className="text-white/50 text-xs">{user?.position || ui.employee.employee}</p>
                   </div>
                 </div>
                 {NAV.map((item) => {
@@ -143,7 +144,7 @@ export default function EmployeeLayout() {
                       }`}
                     >
                       <item.icon size={16} />
-                      {item.label}
+                      {navLabels[NAV.indexOf(item)]}
                     </Link>
                   );
                 })}
@@ -152,7 +153,7 @@ export default function EmployeeLayout() {
                   className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm text-red-300 hover:bg-red-500/20 transition-all"
                 >
                   <LogOut size={16} />
-                  تسجيل الخروج
+                  {ui.employee.logout}
                 </button>
               </div>
             </motion.div>
@@ -167,7 +168,7 @@ export default function EmployeeLayout() {
 
       {/* ── Footer ──────────────────────────────── */}
       <footer className="text-center py-6 text-gray-400 text-xs border-t border-gray-200 mt-10">
-        © {new Date().getFullYear()} أفق لحلول الأعمال — بوابة الموظفين
+        © {new Date().getFullYear()} OFOQ Business Solutions — {ui.employee.portal}
       </footer>
     </div>
   );

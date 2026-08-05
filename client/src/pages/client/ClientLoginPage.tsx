@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { useAuthStore } from "../../store/authStore";
 import OfoqLogo from "../../components/OfoqLogo";
 import { authApi } from "../../api/client";
+import { useLang } from "../../i18n/LangContext";
 
 function GoogleIcon() {
   return (
@@ -39,6 +40,7 @@ export default function ClientLoginPage() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const redirect = params.get("redirect") || "/client/dashboard";
+  const { ui, dir } = useLang();
 
   useEffect(() => {
     authApi.oauthStatus()
@@ -52,20 +54,20 @@ export default function ClientLoginPage() {
       const res = await axios.post("/api/auth/login", data);
       const { token, user } = res.data;
       if (user.role !== "client") {
-        setErr("هذه البوابة مخصصة للعملاء فقط. للدخول كمسؤول يرجى استخدام لوحة الإدارة.");
+        setErr(ui.auth.invalid);
         setLoading(false); return;
       }
       setAuth({ id: user.id, name: user.name, email: user.email, role: user.role, lang: user.lang }, token);
       navigate(redirect, { replace: true });
     } catch (e: any) {
-      setErr(e.response?.data?.error || "بريد إلكتروني أو كلمة مرور غير صحيحة");
+      setErr(e.response?.data?.error || ui.auth.invalid);
     } finally { setLoading(false); }
   }
 
   const hasOAuth = oauthStatus.google || oauthStatus.apple;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ofoq-navy via-[#1C1930] to-[#0f0d1f] flex items-center justify-center p-4" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-ofoq-navy via-[#1C1930] to-[#0f0d1f] flex items-center justify-center p-4" dir={dir}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md">
 
@@ -76,8 +78,8 @@ export default function ClientLoginPage() {
             <div className="flex justify-center mb-4">
               <OfoqLogo className="w-20 h-14" />
             </div>
-            <h1 className="text-white text-xl font-bold">بوابة العملاء</h1>
-            <p className="text-white/50 text-sm mt-1">سجّل دخولك لمتابعة طلباتك</p>
+            <h1 className="text-white text-xl font-bold">{ui.auth.clientTitle}</h1>
+            <p className="text-white/50 text-sm mt-1">{ui.auth.clientSubtitle}</p>
           </div>
 
           {/* Form */}
@@ -95,19 +97,19 @@ export default function ClientLoginPage() {
                   <a href="/api/auth/google"
                     className="flex items-center justify-center gap-3 w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-all text-sm font-medium text-gray-700 shadow-sm">
                     <GoogleIcon />
-                    المتابعة مع Google
+                    Continue with Google
                   </a>
                 )}
                 {oauthStatus.apple && (
                   <a href="/api/auth/apple"
                     className="flex items-center justify-center gap-3 w-full py-2.5 px-4 rounded-xl border border-gray-900 bg-gray-900 hover:bg-black transition-all text-sm font-medium text-white shadow-sm">
                     <AppleIcon />
-                    المتابعة مع Apple
+                    Continue with Apple
                   </a>
                 )}
                 <div className="flex items-center gap-3 my-1">
                   <div className="flex-1 h-px bg-gray-200" />
-                  <span className="text-xs text-gray-400">أو</span>
+                  <span className="text-xs text-gray-400">or</span>
                   <div className="flex-1 h-px bg-gray-200" />
                 </div>
               </div>
@@ -116,9 +118,9 @@ export default function ClientLoginPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">البريد الإلكتروني</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{ui.auth.email}</label>
                 <input type="email" dir="ltr"
-                  {...register("email", { required: "البريد مطلوب" })}
+                  {...register("email", { required: ui.request.required })}
                   placeholder="example@email.com"
                   className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 transition-all ${
                     errors.email ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"
@@ -128,10 +130,10 @@ export default function ClientLoginPage() {
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">كلمة المرور</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{ui.auth.password}</label>
                 <div className="relative">
                   <input type={showPass ? "text" : "password"} dir="ltr"
-                    {...register("password", { required: "كلمة المرور مطلوبة" })}
+                    {...register("password", { required: ui.request.required })}
                     placeholder="••••••••"
                     className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 transition-all pr-10 ${
                       errors.password ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"
@@ -146,7 +148,7 @@ export default function ClientLoginPage() {
 
               <div className="flex justify-end">
                 <Link to="/client/forgot-password" className="text-xs text-ofoq-navy hover:text-ofoq-red transition-colors">
-                  نسيت كلمة المرور؟
+                  {ui.auth.forgot}
                 </Link>
               </div>
 
@@ -158,15 +160,15 @@ export default function ClientLoginPage() {
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
                 ) : (
-                  <><LogIn size={16} /> تسجيل الدخول</>
+                  <><LogIn size={16} /> {ui.auth.login}</>
                 )}
               </button>
             </form>
 
             <div className="mt-6 text-center text-sm text-gray-500">
-              ليس لديك حساب؟{" "}
+              {ui.auth.noAccount}{" "}
               <Link to="/client/register" className="text-ofoq-navy font-semibold hover:text-ofoq-red transition-colors">
-                إنشاء حساب جديد
+                {ui.auth.create}
               </Link>
             </div>
           </div>

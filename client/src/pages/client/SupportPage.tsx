@@ -4,9 +4,11 @@ import { Send, Loader2, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { clientApi } from "../../api/clientApi";
+import { useLang } from "../../i18n/LangContext";
 import { useAuthStore } from "../../store/authStore";
 
 export default function SupportPage() {
+  const { dir, ui, lang } = useLang();
   const { user } = useAuthStore();
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
@@ -34,7 +36,7 @@ export default function SupportPage() {
       qc.invalidateQueries({ queryKey: ["client-support"] });
       qc.invalidateQueries({ queryKey: ["client-support-unread"] });
     } catch {
-      toast.error("خطأ في إرسال الرسالة");
+      toast.error(ui.client.sendError);
     } finally { setSending(false); }
   }
 
@@ -43,10 +45,10 @@ export default function SupportPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto" dir="rtl">
+    <div className="max-w-2xl mx-auto" dir={dir}>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-ofoq-navy">الدعم والمساعدة</h1>
-        <p className="text-gray-500 text-sm mt-1">تواصل مباشرة مع فريق أفق — نرد خلال أوقات الدوام</p>
+        <h1 className="text-2xl font-bold text-ofoq-navy">{ui.client.support}</h1>
+        <p className="text-gray-500 text-sm mt-1">{ui.client.supportSub}</p>
       </div>
 
       {/* Chat box */}
@@ -60,8 +62,8 @@ export default function SupportPage() {
           ) : messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center py-8">
               <MessageCircle size={40} className="text-gray-200 mb-3" />
-              <p className="text-gray-400 text-sm font-medium">لا توجد رسائل بعد</p>
-              <p className="text-gray-300 text-xs mt-1">أرسل رسالتك الأولى وسيرد عليك فريقنا قريباً</p>
+              <p className="text-gray-400 text-sm font-medium">{ui.client.noMessages}</p>
+              <p className="text-gray-300 text-xs mt-1">{ui.client.noMessagesSub}</p>
             </div>
           ) : (
             <AnimatePresence>
@@ -73,7 +75,7 @@ export default function SupportPage() {
                     className={`flex ${isClient ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-[78%] ${isClient ? "items-end" : "items-start"} flex flex-col gap-1`}>
                       <span className="text-xs text-gray-400 px-1">
-                        {isClient ? (user?.name || "أنت") : msg.senderName}
+                        {isClient ? (user?.name || ui.client.you) : msg.senderName}
                       </span>
                       <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${
                         isClient
@@ -83,7 +85,7 @@ export default function SupportPage() {
                         {msg.text}
                       </div>
                       <span className="text-xs text-gray-300 px-1">
-                        {new Date(msg.createdAt).toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit" })}
+                         {new Date(msg.createdAt).toLocaleTimeString(lang, { hour: "2-digit", minute: "2-digit" })}
                       </span>
                     </div>
                   </motion.div>
@@ -102,7 +104,7 @@ export default function SupportPage() {
               onChange={(e) => setText(e.target.value)}
               onKeyDown={handleKey}
               rows={1}
-              placeholder="اكتب رسالتك... (Enter للإرسال)"
+              placeholder={ui.client.supportPlaceholder}
               className="flex-1 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white text-sm focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 resize-none max-h-24"
               style={{ minHeight: "46px" }}
             />
@@ -112,7 +114,7 @@ export default function SupportPage() {
             </button>
           </div>
           <p className="text-xs text-gray-300 mt-1.5 text-center">
-            نرد عادةً خلال 24 ساعة في أيام العمل
+             {ui.client.supportSub}
           </p>
         </div>
       </div>

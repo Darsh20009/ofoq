@@ -7,6 +7,7 @@ import { Helmet } from "react-helmet-async";
 import { contactApi } from "../../api/client";
 import WireframeCube from "../../components/WireframeCube";
 import { Link, useSearchParams } from "react-router-dom";
+import { useLang } from "../../i18n/LangContext";
 
 const fadeUp = {
   hidden:  { opacity: 0, y: 28 },
@@ -14,6 +15,10 @@ const fadeUp = {
 };
 
 export default function ContactPage() {
+  const { t, dir, lang } = useLang();
+  const sectors = lang === "ar"
+    ? ["التجزئة", "المقاولات", "الخدمات المهنية", "التقنية", "الصحة", "التعليم", "أخرى"]
+    : ["Retail", "Construction", "Professional services", "Technology", "Healthcare", "Education", "Other"];
   const [submitted, setSubmitted] = useState(false);
   const [searchParams] = useSearchParams();
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
@@ -30,10 +35,10 @@ export default function ContactPage() {
   });
 
   return (
-    <div>
+    <div dir={dir}>
       <Helmet>
-        <title>تواصل معنا — أفق لحلول الأعمال</title>
-        <meta name="description" content="تواصل مع فريق أفق لحلول الأعمال واحصل على استشارة مجانية. نرد خلال ٢٤ ساعة." />
+        <title>{t.contact.metaTitle}</title>
+        <meta name="description" content={t.contact.heroSub} />
         <link rel="canonical" href="https://ofoqhc.com/contact" />
       </Helmet>
 
@@ -52,18 +57,16 @@ export default function ContactPage() {
         </div>
         <div className="max-w-5xl mx-auto px-5 sm:px-8 pb-14 relative z-10 w-full">
           <div className="flex items-center gap-2 text-white/45 text-xs mb-4">
-            <Link to="/" className="hover:text-white transition-colors">الرئيسية</Link>
+            <Link to="/" className="hover:text-white transition-colors">{t.nav.home}</Link>
             <span>/</span>
-            <span className="text-white/70">تواصل معنا</span>
+            <span className="text-white/70">{t.contact.badge}</span>
           </div>
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="text-5xl sm:text-6xl font-black text-white leading-tight">
-              تواصل
-              <br />
-              <span className="text-ofoq-yellow">معنا</span>
+              {t.contact.heroTitle}
             </h1>
             <p className="text-white/50 text-sm mt-3">
-              ترجى تعبئة هذا النموذج، وسيعود فريقنا للتواصل معك في أقرب وقت.
+              {t.contact.heroSub}
             </p>
           </motion.div>
         </div>
@@ -79,7 +82,7 @@ export default function ContactPage() {
               {/* الخريطة */}
               <div className="rounded-3xl overflow-hidden h-48 bg-ofoq-navy/10">
                 <iframe
-                  title="موقع أفق لحلول الأعمال"
+                  title={t.contact.infoTitle}
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3713.3!2d39.17!3d21.53!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjHCsDMxJzQ4LjAiTiAzOcKwMTAnMTIuMCJF!5e0!3m2!1sar!2ssa!4v1"
                   className="w-full h-full border-0"
                   loading="lazy"
@@ -94,7 +97,7 @@ export default function ContactPage() {
                     <Phone size={16} className="text-ofoq-green group-hover:text-white transition-colors" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400 mb-0.5">رقم الجوال</p>
+                    <p className="text-xs text-gray-400 mb-0.5">{t.contact.phone}</p>
                     <p className="font-bold text-ofoq-navy text-sm" dir="ltr">+966 500 851 177</p>
                   </div>
                 </a>
@@ -103,7 +106,7 @@ export default function ContactPage() {
                     <Mail size={16} className="text-ofoq-green group-hover:text-white transition-colors" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400 mb-0.5">البريد الإلكتروني</p>
+                    <p className="text-xs text-gray-400 mb-0.5">{t.contact.emailLabel}</p>
                     <p className="font-bold text-ofoq-navy text-sm">info@ofoqhc.com</p>
                   </div>
                 </a>
@@ -112,8 +115,8 @@ export default function ContactPage() {
                     <MapPin size={16} className="text-ofoq-green" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400 mb-0.5">الموقع</p>
-                    <p className="font-bold text-ofoq-navy text-sm">جدة — طريق الملك عبدالله</p>
+                    <p className="text-xs text-gray-400 mb-0.5">{t.contact.locationLabel}</p>
+                    <p className="font-bold text-ofoq-navy text-sm">{t.contact.locationVal}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -121,8 +124,8 @@ export default function ContactPage() {
                     <Clock size={16} className="text-ofoq-green" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400 mb-0.5">ساعات العمل</p>
-                    <p className="font-bold text-ofoq-navy text-sm">الأحد–الخميس: ٩ص–٥م</p>
+                    <p className="text-xs text-gray-400 mb-0.5">{t.contact.hoursLabel}</p>
+                    <p className="font-bold text-ofoq-navy text-sm">{t.contact.hoursVal}</p>
                   </div>
                 </div>
               </div>
@@ -133,13 +136,13 @@ export default function ContactPage() {
                   <WireframeCube className="w-40 h-30 text-ofoq-green" color="#33B27C" />
                 </div>
                 <div className="relative z-10">
-                  <h4 className="font-black text-white mb-2">استشارة مجانية</h4>
+                   <h4 className="font-black text-white mb-2">{t.contact.consultTitle}</h4>
                   <p className="text-white/55 text-sm leading-relaxed">
-                    فريقنا متاح لتقديم استشارة مجانية حول احتياجات عملك.
+                     {t.contact.consultDesc}
                   </p>
                   <div className="mt-4 flex items-center gap-2 text-ofoq-yellow text-sm font-bold">
                     <span className="w-2 h-2 rounded-full bg-ofoq-green animate-pulse" />
-                    متاح الآن
+                     {t.contact.available}
                   </div>
                 </div>
               </div>
@@ -158,8 +161,8 @@ export default function ContactPage() {
                       <path d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-black text-ofoq-navy mb-2">تم الإرسال بنجاح!</h3>
-                  <p className="text-gray-500 text-sm">سيتواصل معك فريقنا خلال ٢٤ ساعة.</p>
+                   <h3 className="text-2xl font-black text-ofoq-navy mb-2">{t.contact.successTitle}</h3>
+                   <p className="text-gray-500 text-sm">{t.contact.successDesc}</p>
                 </motion.div>
               ) : (
                 <motion.div
@@ -169,33 +172,33 @@ export default function ContactPage() {
                   viewport={{ once: true }}
                   className="bg-white rounded-3xl p-6 sm:p-8"
                 >
-                  <h3 className="font-black text-ofoq-navy text-xl mb-8">نموذج التواصل</h3>
+                   <h3 className="font-black text-ofoq-navy text-xl mb-8">{t.contact.formTitle}</h3>
                   <form onSubmit={handleSubmit((d) => mut.mutate(d))} className="space-y-0">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
                       {/* الاسم */}
                       <div className="mb-6">
-                        <label className="block text-ofoq-navy font-bold text-sm mb-2">الاسم الكامل</label>
+                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{t.contact.nameLabel}</label>
                         <input
                           {...register("name", { required: true })}
-                          placeholder="محمد الأحمد"
+                           placeholder={t.contact.namePlaceholder}
                           className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm placeholder-gray-300 transition-colors"
                         />
-                        {errors.name && <p className="text-red-500 text-xs mt-1">هذا الحقل مطلوب</p>}
+                         {errors.name && <p className="text-red-500 text-xs mt-1">{t.contact.required}</p>}
                       </div>
 
                       {/* الشركة */}
                       <div className="mb-6">
-                        <label className="block text-ofoq-navy font-bold text-sm mb-2">الشركة / المؤسسة</label>
+                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{t.contact.companyLabel}</label>
                         <input
                           {...register("company")}
-                          placeholder="اسم الشركة"
+                           placeholder={t.contact.companyPlaceholder}
                           className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm placeholder-gray-300 transition-colors"
                         />
                       </div>
 
                       {/* البريد */}
                       <div className="mb-6">
-                        <label className="block text-ofoq-navy font-bold text-sm mb-2">البريد الإلكتروني</label>
+                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{t.contact.emailFormLabel}</label>
                         <input
                           {...register("email", { required: true, pattern: /^\S+@\S+$/ })}
                           type="email"
@@ -203,12 +206,12 @@ export default function ContactPage() {
                           dir="ltr"
                           className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm placeholder-gray-300 transition-colors"
                         />
-                        {errors.email && <p className="text-red-500 text-xs mt-1">بريد إلكتروني غير صالح</p>}
+                         {errors.email && <p className="text-red-500 text-xs mt-1">{t.contact.emailError}</p>}
                       </div>
 
                       {/* الجوال */}
                       <div className="mb-6">
-                        <label className="block text-ofoq-navy font-bold text-sm mb-2">رقم الجوال</label>
+                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{t.contact.phoneFormLabel}</label>
                         <input
                           {...register("phone")}
                           type="tel"
@@ -220,50 +223,39 @@ export default function ContactPage() {
 
                       {/* قطاع المؤسسة */}
                       <div className="mb-6">
-                        <label className="block text-ofoq-navy font-bold text-sm mb-2">قطاع المؤسسة</label>
+                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{t.contact.infoTitle}</label>
                         <select
                           {...register("sector")}
                           className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm transition-colors appearance-none cursor-pointer"
                         >
-                          <option value="">اختر القطاع</option>
-                          <option>التجزئة</option>
-                          <option>المقاولات</option>
-                          <option>الخدمات المهنية</option>
-                          <option>التقنية</option>
-                          <option>الصحة</option>
-                          <option>التعليم</option>
-                          <option>أخرى</option>
+                           <option value="">Select a sector</option>
+                           {sectors.map((sector) => <option key={sector}>{sector}</option>)}
                         </select>
                       </div>
 
                       {/* أنا مهتم بـ */}
                       <div className="mb-6">
-                        <label className="block text-ofoq-navy font-bold text-sm mb-2">أنا مهتم بـ</label>
+                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{t.contact.serviceLabel}</label>
                         <select
                           {...register("interest")}
                           className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm transition-colors appearance-none cursor-pointer"
                         >
-                          <option value="">اختر الخدمة</option>
+                           <option value="">{t.contact.serviceDefault}</option>
                           {searchParams.get("service") && (
                             <option value={searchParams.get("service")!}>{searchParams.get("service")}</option>
                           )}
-                          <option>تأسيس الشركات</option>
-                          <option>الخدمات القانونية</option>
-                          <option>إدارة الموارد البشرية</option>
-                          <option>المنصات الحكومية</option>
-                          <option>خدمات المستثمرين</option>
-                          <option>أخرى</option>
+                           {t.contact.services.map((service) => <option key={service}>{service}</option>)}
                         </select>
                       </div>
                     </div>
 
                     {/* الرسالة */}
                     <div className="mb-8">
-                      <label className="block text-ofoq-navy font-bold text-sm mb-2">الرسالة</label>
+                       <label className="block text-ofoq-navy font-bold text-sm mb-2">{t.contact.messageLabel}</label>
                       <textarea
                         {...register("message")}
                         rows={4}
-                        placeholder="اكتب رسالتك هنا..."
+                         placeholder={t.contact.messagePlaceholder}
                         className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm placeholder-gray-300 transition-colors resize-none"
                       />
                     </div>
@@ -279,7 +271,7 @@ export default function ContactPage() {
                         </svg>
                       </span>
                       <span className="pl-2">
-                        {mut.isPending ? "جارٍ الإرسال..." : "إرسال الرسالة"}
+                         {mut.isPending ? t.common.sending : t.common.send}
                       </span>
                     </button>
                   </form>
