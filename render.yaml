@@ -46,11 +46,11 @@ services:
       - key: NODE_ENV
         value: production
       - key: APP_URL
-        sync: false
+        value: "https://www.ofoqhc.com"
       # Public origin used for Google/Apple callbacks. Keep this on the
-      # Render service when the marketing domain is hosted elsewhere.
+      # public application domain.
       - key: OAUTH_BASE_URL
-        value: "https://employee.ofoqhc.com"
+        value: "https://www.ofoqhc.com"
       - key: MONGODB_URI
         sync: false
       - key: JWT_SECRET

@@ -8,9 +8,8 @@ export const oauthRouter = Router();
 // service. APP_URL may point to a separate marketing domain.
 const OAUTH_BASE_URL = (
   process.env.OAUTH_BASE_URL ||
-  process.env.EMPLOYEE_URL ||
   process.env.APP_URL ||
-  "http://localhost:5000"
+  "https://www.ofoqhc.com"
 ).replace(/\/$/, "");
 
 function issueAndRedirect(req: any, res: any) {

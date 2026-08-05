@@ -28,9 +28,8 @@ passport.deserializeUser((user: any, done) => done(null, user));
 // from APP_URL because the public marketing domain may be hosted elsewhere.
 const BASE_URL = (
   process.env.OAUTH_BASE_URL ||
-  process.env.EMPLOYEE_URL ||
   process.env.APP_URL ||
-  "https://employee.ofoqhc.com"
+  "https://www.ofoqhc.com"
 ).replace(/\/$/, "");
 
 if (googleEnabled) {
