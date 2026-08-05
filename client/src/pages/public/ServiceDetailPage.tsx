@@ -1,18 +1,309 @@
 import { Link, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import WireframeCube from "../../components/WireframeCube";
 import { getCategory, getService, pick } from "../../data/servicesCatalog";
 import { useLang } from "../../i18n/LangContext";
 import { useState } from "react";
 
+const ease = [0.22, 1, 0.36, 1] as const;
+
+function ArrowIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export default function ServiceDetailPage() {
-  const { categorySlug, serviceSlug } = useParams(); const category = getCategory(categorySlug); const service = getService(categorySlug, serviceSlug); const { lang } = useLang(); const [open, setOpen] = useState<number | null>(0);
-  if (!category || !service) return <div className="p-20 text-center">Service not found</div>;
-  return <div className="bg-[#f4f2ed] text-[#2B273F]"><Helmet><title>{pick(service.title, lang)} | OFOQ</title></Helmet>
-    <section className="relative overflow-hidden bg-[#2B273F] px-6 py-24 text-white sm:px-10"><WireframeCube color="#33B27C" className="absolute -left-10 top-8 h-64 w-80 opacity-35" /><div className="relative mx-auto max-w-5xl"><Link to={`/services/${category.slug}`} className="text-sm text-white/50">{pick(category.title, lang)} /</Link><h1 className="mt-8 max-w-3xl text-5xl font-black sm:text-7xl">{pick(service.title, lang)}</h1><p className="mt-6 max-w-2xl text-lg leading-8 text-white/65">{pick(service.desc, lang)}</p><Link to={`/contact?service=${encodeURIComponent(pick(service.title, lang))}`} className="mt-9 inline-block rounded-full bg-[#E5FE04] px-7 py-4 font-black text-[#2B273F]">اطلب الخدمة</Link></div></section>
-    <main className="mx-auto grid max-w-5xl gap-16 px-6 py-16 sm:px-10 lg:grid-cols-[1.15fr_.85fr] lg:py-24">
-      <div><section><h2 className="mb-6 text-3xl font-black">كيف نعمل</h2><div className="space-y-3">{service.steps.map((step, i) => <motion.div key={i} initial={{ opacity: 0, x: 15 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * .08 }} className="flex gap-4 rounded-2xl bg-white p-5"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#33B27C] font-black text-white">{i + 1}</span><p className="pt-1 font-bold">{pick(step, lang)}</p></motion.div>)}</div></section><section className="mt-16"><h2 className="mb-6 text-3xl font-black">الأسئلة الشائعة</h2>{service.faq.map((item, i) => <div key={i} className="border-b border-[#2B273F]/15"><button onClick={() => setOpen(open === i ? null : i)} className="flex w-full items-center justify-between py-5 text-start font-black"><span>{pick(item.q, lang)}</span><span className="text-[#33B27C]">{open === i ? "−" : "+"}</span></button>{open === i && <p className="pb-5 text-sm leading-7 opacity-65">{pick(item.a, lang)}</p>}</div>)}</section></div>
-      <aside className="space-y-5"><div className="rounded-[2rem] bg-[#2B273F] p-7 text-white"><p className="text-xs font-bold tracking-[.18em] text-[#E5FE04]">SERVICE WINDOW</p><p className="mt-4 text-3xl font-black">{pick(service.duration, lang)}</p></div><div className="rounded-[2rem] bg-white p-7"><h3 className="text-xl font-black">لمن تناسب؟</h3><ul className="mt-5 space-y-3">{service.beneficiaries.map((x, i) => <li key={i} className="flex gap-3 text-sm"><span className="text-[#33B27C]">↗</span>{pick(x, lang)}</li>)}</ul><h3 className="mt-9 text-xl font-black">المتطلبات</h3><ul className="mt-5 space-y-3">{service.requirements.map((x, i) => <li key={i} className="flex gap-3 text-sm"><span className="text-[#33B27C]">•</span>{pick(x, lang)}</li>)}</ul></div></aside>
-    </main></div>;
+  const { categorySlug, serviceSlug } = useParams();
+  const category = getCategory(categorySlug);
+  const service = getService(categorySlug, serviceSlug);
+  const { lang } = useLang();
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+
+  if (!category || !service) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center text-center">
+        <div>
+          <p className="text-5xl font-black text-[#33B27C]">404</p>
+          <p className="mt-4 text-xl font-bold">
+            {lang === "ar" ? "الخدمة غير موجودة" : "Service not found"}
+          </p>
+          <Link to="/services" className="mt-6 inline-block font-black text-[#33B27C] underline">
+            {lang === "ar" ? "العودة للخدمات" : "Back to services"}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const rtl = lang === "ar" || lang === "ur";
+
+  const T = {
+    home: rtl ? "الرئيسية" : "Home",
+    services: rtl ? "الخدمات" : "Services",
+    serviceBadge: rtl ? "تفاصيل الخدمة" : "Service details",
+    requestService: rtl ? "اطلب الخدمة" : "Request Service",
+    howWeWork: rtl ? "كيف نعمل" : "How we work",
+    faqTitle: rtl ? "الأسئلة الشائعة" : "Frequently asked questions",
+    windowTitle: rtl ? "مدة التنفيذ" : "Service window",
+    suitableFor: rtl ? "لمن تناسب؟" : "Who is it for?",
+    requirements: rtl ? "المتطلبات" : "Requirements",
+    relatedServices: rtl ? "خدمات أخرى من نفس التصنيف" : "Other services in this category",
+  };
+
+  return (
+    <div className="bg-white text-[#2B273F]">
+      <Helmet>
+        <title>{pick(service.title, lang)} | OFOQ</title>
+      </Helmet>
+
+      {/* ── Hero ──────────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-[#2B273F] px-6 py-28 text-white sm:px-10 sm:py-36">
+        {/* Category image */}
+        <img
+          src={category.image}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-15"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#2B273F]/95 via-[#2B273F]/85 to-[#2B273F]" />
+
+        {/* Wireframe */}
+        <WireframeCube color="#33B27C" className="absolute -left-12 bottom-0 h-72 w-96 opacity-25" />
+
+        <div className="relative mx-auto max-w-5xl">
+          {/* Breadcrumb */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-10 flex flex-wrap items-center gap-2 text-sm text-white/40"
+          >
+            <Link to="/" className="transition-colors hover:text-[#E5FE04]">{T.home}</Link>
+            <span>/</span>
+            <Link to="/services" className="transition-colors hover:text-[#E5FE04]">{T.services}</Link>
+            <span>/</span>
+            <Link to={`/services/${category.slug}`} className="transition-colors hover:text-[#E5FE04]">
+              {pick(category.title, lang)}
+            </Link>
+            <span>/</span>
+            <span className="text-white/70">{pick(service.title, lang)}</span>
+          </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease }}
+            className="mb-5 flex items-center gap-3 text-[11px] font-black uppercase tracking-[.3em] text-[#E5FE04]"
+          >
+            <span className="h-px w-8 bg-[#E5FE04]" />
+            {T.serviceBadge}
+          </motion.p>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.75, delay: 0.1, ease }}
+            className="max-w-3xl text-5xl font-black sm:text-6xl"
+          >
+            {pick(service.title, lang)}
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.75, delay: 0.2, ease }}
+            className="mt-7 max-w-2xl text-lg leading-9 text-white/60"
+          >
+            {pick(service.desc, lang)}
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.75, delay: 0.3, ease }}
+            className="mt-10"
+          >
+            <Link
+              to={`/contact?service=${encodeURIComponent(pick(service.title, lang))}`}
+              className="group inline-flex items-center gap-3 rounded-full bg-[#E5FE04] px-8 py-4 font-black text-[#2B273F] shadow-lg transition-all hover:-translate-y-1 hover:bg-white hover:shadow-2xl"
+            >
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-[#2B273F] transition-colors group-hover:bg-[#33B27C]">
+                <ArrowIcon className="h-4 w-4 text-[#E5FE04] group-hover:text-white" />
+              </span>
+              {T.requestService}
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── Main content ──────────────────────────────── */}
+      <main className="mx-auto max-w-5xl px-6 py-16 sm:px-10 lg:py-24">
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_.8fr] lg:gap-12">
+
+          {/* ── Left: steps + FAQ ─────────────────────── */}
+          <div className="space-y-16">
+
+            {/* Steps */}
+            <section>
+              <h2 className="mb-8 text-3xl font-black">{T.howWeWork}</h2>
+              <div className="space-y-3">
+                {service.steps.map((step, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: rtl ? 20 : -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.08, duration: 0.55, ease }}
+                    className="flex items-start gap-4 rounded-2xl bg-[#f4f2ed] p-5 transition-colors hover:bg-[#33B27C]/10"
+                  >
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#33B27C] font-black text-white">
+                      {i + 1}
+                    </span>
+                    <p className="pt-1 text-sm leading-7 font-bold">{pick(step, lang)}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </section>
+
+            {/* FAQ */}
+            <section>
+              <h2 className="mb-8 text-3xl font-black">{T.faqTitle}</h2>
+              <div className="space-y-1">
+                {service.faq.map((item, i) => (
+                  <div key={i} className="overflow-hidden rounded-2xl border border-[#2B273F]/10">
+                    <button
+                      onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                      className="flex w-full items-center justify-between gap-4 bg-white px-6 py-5 text-start font-black transition-colors hover:bg-[#f4f2ed]"
+                    >
+                      <span className="text-sm">{pick(item.q, lang)}</span>
+                      <motion.span
+                        animate={{ rotate: openFaq === i ? 45 : 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#33B27C] text-white text-xl"
+                      >
+                        +
+                      </motion.span>
+                    </button>
+                    <AnimatePresence>
+                      {openFaq === i && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3, ease }}
+                        >
+                          <p className="bg-[#f4f2ed] px-6 pb-5 pt-3 text-sm leading-7 text-[#2B273F]/65">
+                            {pick(item.a, lang)}
+                          </p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          {/* ── Right: sidebar ────────────────────────── */}
+          <aside className="space-y-5">
+            {/* Duration card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease }}
+              className="relative overflow-hidden rounded-[2rem] bg-[#2B273F] p-8 text-white"
+            >
+              <WireframeCube color="#33B27C" className="absolute -bottom-8 -right-8 h-36 w-44 opacity-20" />
+              <p className="text-[11px] font-black uppercase tracking-[.2em] text-[#E5FE04]">
+                {T.windowTitle}
+              </p>
+              <p className="mt-5 text-4xl font-black leading-tight">
+                {pick(service.duration, lang)}
+              </p>
+            </motion.div>
+
+            {/* Who it's for */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1, ease }}
+              className="rounded-[2rem] border border-[#2B273F]/10 bg-white p-8"
+            >
+              <h3 className="mb-5 text-lg font-black">{T.suitableFor}</h3>
+              <ul className="space-y-3">
+                {service.beneficiaries.map((x, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm">
+                    <span className="mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#33B27C]/15">
+                      <span className="h-2 w-2 rounded-full bg-[#33B27C]" />
+                    </span>
+                    {pick(x, lang)}
+                  </li>
+                ))}
+              </ul>
+
+              <h3 className="mb-5 mt-9 text-lg font-black">{T.requirements}</h3>
+              <ul className="space-y-3">
+                {service.requirements.map((x, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm">
+                    <span className="mt-1 text-[#33B27C]">•</span>
+                    <span className="text-[#2B273F]/70">{pick(x, lang)}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+
+            {/* Request CTA */}
+            <Link
+              to={`/contact?service=${encodeURIComponent(pick(service.title, lang))}`}
+              className="group flex items-center justify-between rounded-[2rem] bg-[#33B27C] p-6 text-white transition-all hover:bg-[#2B273F]"
+            >
+              <span className="font-black">{T.requestService}</span>
+              <span className="grid h-10 w-10 place-items-center rounded-full bg-white/20 transition-colors group-hover:bg-white/30">
+                <ArrowIcon />
+              </span>
+            </Link>
+          </aside>
+        </div>
+
+        {/* ── Related services ──────────────────────── */}
+        {category.services.filter((s) => s.slug !== service.slug).length > 0 && (
+          <section className="mt-20">
+            <h2 className="mb-8 text-2xl font-black">{T.relatedServices}</h2>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {category.services
+                .filter((s) => s.slug !== service.slug)
+                .slice(0, 3)
+                .map((s, i) => (
+                  <motion.div
+                    key={s.slug}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.07, duration: 0.5 }}
+                  >
+                    <Link
+                      to={`/services/${category.slug}/${s.slug}`}
+                      className="group flex flex-col rounded-2xl border border-[#2B273F]/10 bg-white p-6 transition-all hover:border-[#33B27C] hover:shadow-lg"
+                    >
+                      <h3 className="font-black">{pick(s.title, lang)}</h3>
+                      <p className="mt-2 text-xs leading-6 text-[#2B273F]/45">
+                        {pick(s.desc, lang).split(".")[0]}.
+                      </p>
+                      <span className="mt-4 text-xs font-black text-[#33B27C]">
+                        {rtl ? "التفاصيل ←" : "Details →"}
+                      </span>
+                    </Link>
+                  </motion.div>
+                ))}
+            </div>
+          </section>
+        )}
+      </main>
+    </div>
+  );
 }
