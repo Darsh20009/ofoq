@@ -50,20 +50,40 @@ export interface WalletPassUser {
   email:       string;
 }
 
-export async function generateWalletPass(user: WalletPassUser): Promise<Buffer> {
-  const certB64 = process.env.APPLE_WALLET_CERT_B64;
-  const keyB64  = process.env.APPLE_WALLET_KEY_B64;
-  const wwdrB64 = process.env.APPLE_WALLET_WWDR_B64;
-  const passId  = process.env.APPLE_WALLET_PASS_ID  || "pass.com.qirox.employee";
-  const teamId  = process.env.APPLE_WALLET_TEAM_ID  || "V4K6RM59LS";
-
-  if (!certB64 || !keyB64 || !wwdrB64) {
-    throw new Error("Apple Wallet certificates not configured");
+function certificateBuffer(value: string): Buffer {
+  // Accept both PEM text and Base64-encoded PEM so Render secrets can use
+  // either format without requiring certificate files on the server.
+  if (value.includes("-----BEGIN")) {
+    return Buffer.from(value, "utf8");
   }
 
-  const signerCert = Buffer.from(certB64, "base64").toString("utf8");
-  const signerKey  = Buffer.from(keyB64,  "base64").toString("utf8");
-  const wwdr       = Buffer.from(wwdrB64, "base64").toString("utf8");
+  const decoded = Buffer.from(value, "base64");
+  return decoded.toString("utf8").includes("-----BEGIN")
+    ? decoded
+    : Buffer.from(value, "utf8");
+}
+
+export async function generateWalletPass(user: WalletPassUser): Promise<Buffer> {
+  const certValue = process.env.APPLE_WALLET_CERT_B64 || process.env.APPLE_PASS_CERT;
+  const keyValue  = process.env.APPLE_WALLET_KEY_B64  || process.env.APPLE_PASS_KEY;
+  const wwdrValue = process.env.APPLE_WALLET_WWDR_B64 || process.env.APPLE_WWDR_CERT;
+  const passId    = process.env.APPLE_WALLET_PASS_ID;
+  const teamId    = process.env.APPLE_WALLET_TEAM_ID || process.env.APPLE_TEAM_ID;
+
+  if (!certValue || !keyValue || !wwdrValue) {
+    throw new Error(
+      "Apple Wallet certificates not configured: set APPLE_PASS_CERT, APPLE_PASS_KEY, and APPLE_WWDR_CERT"
+    );
+  }
+  if (!passId || !teamId) {
+    throw new Error(
+      "Apple Wallet identifiers not configured: set APPLE_WALLET_PASS_ID and APPLE_TEAM_ID"
+    );
+  }
+
+  const signerCert = certificateBuffer(certValue).toString("utf8");
+  const signerKey  = certificateBuffer(keyValue).toString("utf8");
+  const wwdr       = certificateBuffer(wwdrValue).toString("utf8");
 
   const displayName = user.fullNameAr || user.fullName;
   const initial     = displayName.charAt(0);
