@@ -5,3 +5,4 @@
 - [GitHub push authentication](github-push-auth.md) — managed GitHub pushes can return UNAUTHENTICATED even when a PAT secret is present; local commits remain ready
 - [Development asset proxy](development-asset-proxy.md) — Vite must proxy root-level images, icons, favicon, manifest, and service worker to Express
 - [Localization architecture](localization-architecture.md) — shared UI copy drives language, direction, and portal authentication surfaces
+- [OAuth deployment routing](oauth-deployment-routing.md) — OAuth callbacks must use the deployed API origin, separate from the marketing APP_URL
