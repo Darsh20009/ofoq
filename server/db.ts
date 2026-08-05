@@ -37,7 +37,11 @@ function scheduleReconnect(uri: string): void {
 export async function connectDB(uri = process.env.MONGODB_URI): Promise<void> {
 
   if (!uri) {
-    console.warn("⚠️  MONGODB_URI not set — running without database (limited functionality)");
+    const message = "MONGODB_URI is required to run the production server";
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(`❌ ${message}`);
+    }
+    console.warn(`⚠️  ${message} — running without database (development only)`);
     return;
   }
 
