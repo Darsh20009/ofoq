@@ -181,7 +181,7 @@ if (process.env.NODE_ENV !== "production") {
     title: string; description: string; url: string;
     image?: string; siteName?: string;
   }): string {
-    const img = opts.image || "https://ofoqhc.com/icons/og-image.png";
+    const img = opts.image || "https://www.ofoqhc.com/icons/og-image.png";
     return [
       `<meta property="og:title" content="${opts.title}" />`,
       `<meta property="og:description" content="${opts.description}" />`,
@@ -201,14 +201,14 @@ if (process.env.NODE_ENV !== "production") {
       title: "بوابة موظفي أفق | OFOQ Employee Portal",
       description: "بوابة الموظفين الرسمية لشركة أفق لحلول الأعمال — عرض بطاقة الموظف وبياناتك.",
       url: "https://employee.ofoqhc.com/",
-      image: "https://ofoqhc.com/icons/og-image.png",
+      image: "https://www.ofoqhc.com/icons/og-image.png",
       siteName: "أفق — بوابة الموظفين",
     }),
     client: buildOgMeta({
       title: "بوابة عملاء أفق | OFOQ Client Portal",
       description: "تابع طلبات خدماتك، راسل الفريق، وتابع مستجدات مشاريعك مع أفق لحلول الأعمال.",
-      url: "https://ofoqhc.com/client/",
-      image: "https://ofoqhc.com/icons/og-image.png",
+      url: "https://www.ofoqhc.com/client/",
+      image: "https://www.ofoqhc.com/icons/og-image.png",
       siteName: "أفق — بوابة العملاء",
     }),
   };

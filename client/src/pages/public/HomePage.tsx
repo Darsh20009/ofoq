@@ -76,12 +76,11 @@ export default function HomePage() {
         <img
           src="/images/riyadh-business-district.jpg"
           alt="Riyadh skyline"
-            fetchpriority="high"
-            decoding="async"
-          className="absolute inset-0 h-full w-full object-cover opacity-35 mix-blend-luminosity"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.58]"
         />
         {/* Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#2B273F] via-[#2B273F]/85 to-[#2B273F]/60" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#2B273F]/75 via-[#2B273F]/38 to-[#2B273F]/12" />
 
         {/* Wireframe decorations */}
         <WireframeCube
