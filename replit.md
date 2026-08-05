@@ -102,6 +102,36 @@ npm install
 npm run dev
 ```
 
+## Running on Replit
+
+Two workflows must be running:
+
+| Workflow | Command | Port |
+|---|---|---|
+| **OFOQ Backend** | `npm run dev` | 3000 |
+| **OFOQ Frontend** | `npm run dev:client` | 5000 |
+
+The **preview pane should be set to port 5000** (the Vite frontend). The frontend proxies `/api`, `/uploads`, and `/ws` to the backend on port 3000.
+
+### Required Secrets (Replit Secrets tab)
+
+| Secret | Description |
+|---|---|
+| `MONGODB_URI` | MongoDB connection string — app runs in degraded mode without it |
+| `SESSION_SECRET` | Already configured |
+| `CPANEL_SMTP_PASS` | SMTP password for email delivery (nodemailer) |
+| `OPENAI_API_KEY` | Optional — AI features degrade gracefully without it |
+| `GOOGLE_CLIENT_ID` | Optional — enables Google OAuth login |
+| `GOOGLE_CLIENT_SECRET` | Optional — enables Google OAuth login |
+| `VAPID_PUBLIC_KEY` | Optional — auto-generated at startup if not set |
+| `VAPID_PRIVATE_KEY` | Optional — auto-generated at startup if not set |
+
+### First-time setup
+1. Install dependencies: `npm install`
+2. Add `MONGODB_URI` to Replit Secrets
+3. Start both workflows above
+4. (Optional) Run `npm run seed` to populate sample data
+
 ## User Preferences
 - اللغة العربية أساسية في جميع الردود والكود (تعليقات عربية)
 - هيكل ملفات واضح: backend/frontend/middleware/services منفصلة
