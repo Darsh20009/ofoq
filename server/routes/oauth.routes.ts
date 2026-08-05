@@ -4,12 +4,19 @@ import { signToken, logAction } from "../auth.js";
 
 export const oauthRouter = Router();
 
-const APP_URL = process.env.APP_URL || "http://localhost:5000";
+// OAuth callbacks and their final redirects must stay on the deployed API
+// service. APP_URL may point to a separate marketing domain.
+const OAUTH_BASE_URL = (
+  process.env.OAUTH_BASE_URL ||
+  process.env.EMPLOYEE_URL ||
+  process.env.APP_URL ||
+  "http://localhost:5000"
+).replace(/\/$/, "");
 
 function issueAndRedirect(req: any, res: any) {
   const user = req.user;
   if (!user) {
-    res.redirect(`${APP_URL}/admin/login?error=oauth_failed`);
+    res.redirect(`${OAUTH_BASE_URL}/admin/login?error=oauth_failed`);
     return;
   }
   const token = signToken({ userId: String(user._id), role: user.role, email: user.email });
@@ -17,7 +24,7 @@ function issueAndRedirect(req: any, res: any) {
   // Hand the token to the SPA via a short redirect — the frontend route
   // /admin/oauth/callback reads it from the query string and stores it, then
   // navigates to the dashboard.
-  res.redirect(`${APP_URL}/admin/oauth/callback?token=${token}`);
+  res.redirect(`${OAUTH_BASE_URL}/admin/oauth/callback?token=${token}`);
 }
 
 // ── Google ─────────────────────────────────────────────────────────
@@ -33,10 +40,10 @@ oauthRouter.get(
   "/google/callback",
   (req, res, next) => {
     if (!googleEnabled) {
-      res.redirect(`${APP_URL}/admin/login?error=oauth_not_configured`);
+      res.redirect(`${OAUTH_BASE_URL}/admin/login?error=oauth_not_configured`);
       return;
     }
-    passport.authenticate("google", { session: false, failureRedirect: `${APP_URL}/admin/login?error=oauth_failed` })(req, res, next);
+    passport.authenticate("google", { session: false, failureRedirect: `${OAUTH_BASE_URL}/admin/login?error=oauth_failed` })(req, res, next);
   },
   issueAndRedirect
 );
@@ -55,10 +62,10 @@ oauthRouter.post(
   "/apple/callback",
   (req, res, next) => {
     if (!appleEnabled) {
-      res.redirect(`${APP_URL}/admin/login?error=oauth_not_configured`);
+      res.redirect(`${OAUTH_BASE_URL}/admin/login?error=oauth_not_configured`);
       return;
     }
-    passport.authenticate("apple", { session: false, failureRedirect: `${APP_URL}/admin/login?error=oauth_failed` })(req, res, next);
+    passport.authenticate("apple", { session: false, failureRedirect: `${OAUTH_BASE_URL}/admin/login?error=oauth_failed` })(req, res, next);
   },
   issueAndRedirect
 );

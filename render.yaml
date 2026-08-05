@@ -47,6 +47,10 @@ services:
         value: production
       - key: APP_URL
         sync: false
+      # Public origin used for Google/Apple callbacks. Keep this on the
+      # Render service when the marketing domain is hosted elsewhere.
+      - key: OAUTH_BASE_URL
+        value: "https://employee.ofoqhc.com"
       - key: MONGODB_URI
         sync: false
       - key: JWT_SECRET

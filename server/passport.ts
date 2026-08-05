@@ -24,7 +24,14 @@ export const appleEnabled = Boolean(
 passport.serializeUser((user: any, done) => done(null, user));
 passport.deserializeUser((user: any, done) => done(null, user));
 
-const BASE_URL = (process.env.APP_URL || "https://ofoqhc.com").replace(/\/$/, "");
+// OAuth callbacks must point to the running API service. Keep this separate
+// from APP_URL because the public marketing domain may be hosted elsewhere.
+const BASE_URL = (
+  process.env.OAUTH_BASE_URL ||
+  process.env.EMPLOYEE_URL ||
+  process.env.APP_URL ||
+  "https://employee.ofoqhc.com"
+).replace(/\/$/, "");
 
 if (googleEnabled) {
   passport.use(new GoogleStrategy(
