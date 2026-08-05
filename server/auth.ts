@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import type { Request, Response, NextFunction } from "express";
+import { isDBConnected } from "./db.js";
 
 const JWT_SECRET = (() => {
   const secret = process.env.JWT_SECRET;
@@ -63,6 +64,10 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   }
 
   try {
+    if (!isDBConnected()) {
+      res.status(503).json({ error: "قاعدة البيانات غير متاحة حالياً. حاول مرة أخرى بعد قليل." });
+      return;
+    }
     const { UserModel } = await import("./models/index.js");
     const user = await UserModel.findById(decoded.userId).select("-password").lean();
     if (!user) {

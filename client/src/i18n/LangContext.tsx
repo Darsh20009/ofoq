@@ -7,7 +7,7 @@ export type Lang = LangCode;
 interface LangCtx {
   lang: Lang;
   setLang: (l: Lang) => void;
-  toggleLang: () => void; // legacy: cycles ar <-> en
+  toggleLang: () => void;
   t: typeof translations.ar;
   dir: "rtl" | "ltr";
   langs: typeof LANGS;
@@ -50,7 +50,10 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
     return deepMerge(translations.en as typeof translations.ar, extraLangs[lang]);
   }, [lang]);
 
-  const toggleLang = () => setLang((l) => (l === "ar" ? "en" : "ar"));
+  const toggleLang = () => setLang((current) => {
+    const index = LANGS.findIndex((item) => item.code === current);
+    return LANGS[(index + 1) % LANGS.length].code;
+  });
 
   return (
     <LangContext.Provider value={{ lang, setLang, toggleLang, t, dir, langs: LANGS }}>

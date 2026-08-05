@@ -17,6 +17,7 @@ interface LoginForm { email: string; password: string; }
 export default function EmployeePortalLoginPage() {
   const [showPass, setShowPass]       = useState(false);
   const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState("");
   const [twoFA, setTwoFA]             = useState<{ tempToken: string; method: string } | null>(null);
   const [otp, setOtp]                 = useState("");
   const [barcodeOpen, setBarcodeOpen] = useState(false);
@@ -36,21 +37,23 @@ export default function EmployeePortalLoginPage() {
   /* ── Login ─────────────────────── */
   const onSubmit = async (data: LoginForm) => {
     setLoading(true);
+    setError("");
     try {
       const res = await authApi.login(data.email, data.password);
-      const { user, token, requires2FA, tempToken, method } = res.data.data;
+      const { user, token, requires2FA, tempToken, method, methods } = res.data;
       if (requires2FA) {
-        setTwoFA({ tempToken, method });
+        setTwoFA({ tempToken, method: method || methods?.[0] || "totp" });
         toast("أدخل رمز التحقق الثنائي", { icon: "🔐" });
       } else {
         setAuth(user, token);
         toast.success(`مرحباً، ${user.name}!`);
         goHome();
       }
-    } catch {
-      // silent
+    } catch (e: any) {
+      setError(e.response?.data?.error || "تعذر تسجيل الدخول. تحقق من البيانات وحاول مرة أخرى.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   /* ── 2FA ───────────────────────── */
@@ -58,15 +61,16 @@ export default function EmployeePortalLoginPage() {
     if (!twoFA || !otp.trim()) return;
     setLoading(true);
     try {
-      const res = await authApi.verify2FA({ tempToken: twoFA.tempToken, code: otp });
-      const { user, token } = res.data.data;
+      const res = await authApi.verify2FA({ tempToken: twoFA.tempToken, method: twoFA.method, code: otp });
+      const { user, token } = res.data;
       setAuth(user, token);
       toast.success(`مرحباً، ${user.name}!`);
       goHome();
-    } catch {
-      // silent
+    } catch (e: any) {
+      setError(e.response?.data?.error || "رمز التحقق غير صحيح.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   /* ── Barcode Login ─────────────── */
@@ -131,7 +135,7 @@ export default function EmployeePortalLoginPage() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8 flex flex-col items-center gap-3"
       >
-        <OfoqLogo size={60} />
+        <OfoqLogo className="w-20 h-14" />
         <div className="text-center">
           <h1 className="text-white text-2xl font-bold">بوابة الموظفين</h1>
           <p className="text-white/50 text-sm mt-1">OFOQ Employee Portal</p>
@@ -145,6 +149,11 @@ export default function EmployeePortalLoginPage() {
         transition={{ delay: 0.1 }}
         className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8"
       >
+        {error && (
+          <div role="alert" className="mb-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
         {twoFA ? (
           /* 2FA step */
           <div className="space-y-5">

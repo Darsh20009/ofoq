@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
@@ -22,6 +22,8 @@ export default function ClientRegisterPage() {
   const [showPass, setShowPass] = useState(false);
   const { setAuth } = useAuthStore();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const redirect = params.get("redirect") || "/client/dashboard";
   const password = watch("password");
 
   async function onSubmit(data: Form) {
@@ -36,7 +38,7 @@ export default function ClientRegisterPage() {
       });
       const { token, user } = res.data;
       setAuth({ id: user.id, name: user.name, email: user.email, role: user.role, lang: user.lang }, token);
-      navigate("/client/dashboard", { replace: true });
+      navigate(redirect, { replace: true });
     } catch (e: any) {
       setErr(e.response?.data?.error || "خطأ في إنشاء الحساب. يرجى المحاولة مجدداً.");
     } finally { setLoading(false); }

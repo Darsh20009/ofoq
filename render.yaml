@@ -73,3 +73,25 @@ services:
         value: "https://employee.ofoqhc.com"
       - key: OPENAI_API_KEY
         sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: APPLE_CLIENT_ID
+        sync: false
+      - key: APPLE_TEAM_ID
+        sync: false
+      - key: APPLE_KEY_ID
+        sync: false
+      - key: APPLE_PRIVATE_KEY
+        sync: false
+      - key: APPLE_WALLET_CERT_B64
+        sync: false
+      - key: APPLE_WALLET_KEY_B64
+        sync: false
+      - key: APPLE_WALLET_PASS_ID
+        sync: false
+      - key: APPLE_WALLET_TEAM_ID
+        sync: false
+      - key: APPLE_WALLET_WWDR_B64
+        sync: false

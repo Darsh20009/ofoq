@@ -14,6 +14,7 @@ import { oauthRouter } from "./oauth.routes.js";
 import { webauthnRouter } from "./webauthn.routes.js";
 import { employeeRouter } from "./employee.routes.js";
 import { clientRouter } from "./client.routes.js";
+import { isDBConnected } from "../db.js";
 
 export function registerRoutes(app: Express): void {
   const API = "/api";
@@ -61,8 +62,10 @@ export function registerRoutes(app: Express): void {
 
   // ── Health Check ─────────────────────────────────────────────
   app.get(`${API}/health`, (_req, res) => {
-    res.json({
-      status: "ok",
+    const ready = isDBConnected();
+    res.status(ready ? 200 : 503).json({
+      status: ready ? "ok" : "degraded",
+      database: ready ? "connected" : "unavailable",
       app: "OFOQ Business Solutions",
       version: "1.0.0",
       timestamp: new Date().toISOString(),

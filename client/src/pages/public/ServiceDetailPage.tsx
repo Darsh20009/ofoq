@@ -22,6 +22,14 @@ export default function ServiceDetailPage() {
   const service = getService(categorySlug, serviceSlug);
   const { lang } = useLang();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const requestTypeByCategory: Record<string, string> = {
+    formation: "company_formation",
+    legal: "legal_services",
+    government: "government_services",
+    visas: "government_services",
+    hr: "hr_management",
+    business: "hr_management",
+  };
 
   if (!category || !service) {
     return (
@@ -65,7 +73,9 @@ export default function ServiceDetailPage() {
         {/* Category image */}
         <img
           src={category.image}
-          alt=""
+            alt={pick(service.title, lang)}
+            loading="eager"
+            decoding="async"
           className="absolute inset-0 h-full w-full object-cover opacity-15"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#2B273F]/95 via-[#2B273F]/85 to-[#2B273F]" />
@@ -127,7 +137,7 @@ export default function ServiceDetailPage() {
             className="mt-10"
           >
             <Link
-              to={`/contact?service=${encodeURIComponent(pick(service.title, lang))}`}
+              to={`/client/requests/new?service=${requestTypeByCategory[category.slug] || ""}`}
               className="group inline-flex items-center gap-3 rounded-full bg-[#E5FE04] px-8 py-4 font-black text-[#2B273F] shadow-lg transition-all hover:-translate-y-1 hover:bg-white hover:shadow-2xl"
             >
               <span className="grid h-8 w-8 place-items-center rounded-full bg-[#2B273F] transition-colors group-hover:bg-[#33B27C]">
@@ -259,7 +269,7 @@ export default function ServiceDetailPage() {
 
             {/* Request CTA */}
             <Link
-              to={`/contact?service=${encodeURIComponent(pick(service.title, lang))}`}
+              to={`/client/requests/new?service=${requestTypeByCategory[category.slug] || ""}`}
               className="group flex items-center justify-between rounded-[2rem] bg-[#33B27C] p-6 text-white transition-all hover:bg-[#2B273F]"
             >
               <span className="font-black">{T.requestService}</span>

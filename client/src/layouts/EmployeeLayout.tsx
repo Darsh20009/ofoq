@@ -6,6 +6,7 @@ import { useAuthStore } from "../store/authStore";
 import { authApi } from "../api/client";
 import OfoqLogo from "../components/OfoqLogo";
 import toast from "react-hot-toast";
+import { useLang } from "../i18n/LangContext";
 
 const NAV = [
   { href: "/",        label: "لوحتي",    icon: LayoutDashboard },
@@ -18,6 +19,7 @@ export default function EmployeeLayout() {
   const { user, clearAuth } = useAuthStore();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { dir } = useLang();
 
   const handleLogout = async () => {
     try { await authApi.logout(); } catch {}
@@ -27,7 +29,7 @@ export default function EmployeeLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 font-cairo" dir="rtl">
+    <div className="min-h-screen bg-gray-50 font-cairo" dir={dir}>
 
       {/* ── Top Bar ─────────────────────────────── */}
       <header className="bg-[#1C2B6E] shadow-md sticky top-0 z-40">
@@ -35,7 +37,7 @@ export default function EmployeeLayout() {
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <OfoqLogo size={32} />
+            <OfoqLogo className="w-8 h-6" />
             <div className="hidden sm:block">
               <p className="text-white font-bold text-sm leading-none">بوابة الموظفين</p>
               <p className="text-white/50 text-[10px]">OFOQ Employee Portal</p>
@@ -71,7 +73,7 @@ export default function EmployeeLayout() {
             {user?.avatar ? (
               <img
                 src={user.avatar}
-                alt=""
+                alt={user?.name || "صورة الموظف"}
                 className="w-9 h-9 rounded-full object-cover border-2 border-[#33B27C]/40"
               />
             ) : (

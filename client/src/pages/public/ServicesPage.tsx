@@ -127,7 +127,9 @@ export default function ServicesPage() {
                 <div className="hidden w-52 shrink-0 overflow-hidden sm:block">
                   <img
                     src={category.image}
-                    alt=""
+                    alt={pick(category.title, lang)}
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0"
                   />
                 </div>

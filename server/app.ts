@@ -11,6 +11,7 @@ import MongoStore from "connect-mongo";
 import passport from "./passport.js";
 import { loginLimiter, globalLimiter } from "./middleware/rateLimiter.js";
 import { registerRoutes } from "./routes/index.js";
+import { isDBConnected } from "./db.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -133,6 +134,16 @@ app.use(
 );
 
 // ── Routes ───────────────────────────────────────────────────────
+// Fail fast and consistently when MongoDB is not ready. This prevents every
+// authenticated/data request from reaching Mongoose's buffering queue.
+app.use("/api", (req, res, next) => {
+  if (req.path === "/health" || req.path === "/auth/status") return next();
+  if (!isDBConnected()) {
+    res.status(503).json({ error: "قاعدة البيانات غير متاحة حالياً. حاول مرة أخرى بعد قليل." });
+    return;
+  }
+  next();
+});
 registerRoutes(app);
 
 // ── Serve Frontend ────────────────────────────────────────────────

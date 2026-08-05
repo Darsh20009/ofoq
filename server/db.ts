@@ -14,10 +14,14 @@ export async function connectDB(): Promise<void> {
 
   try {
     mongoose.set("strictQuery", false);
+    // Never allow an unavailable production database to hold requests for
+    // Mongoose's default 10-second buffer timeout.
+    mongoose.set("bufferCommands", false);
+    mongoose.set("bufferTimeoutMS", 2000);
 
     await mongoose.connect(uri, {
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
       family: 4,
     });
@@ -41,6 +45,7 @@ export async function connectDB(): Promise<void> {
 
   } catch (error: any) {
     console.error("❌ MongoDB connection failed:", error.message);
+    isConnected = false;
     // Don't exit — allow app to run with degraded mode
   }
 }

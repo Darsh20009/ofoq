@@ -286,7 +286,7 @@ export default function AboutPage() {
             <span className="text-ofoq-yellow">لأعمالك</span>
           </h2>
           <Link
-            to="/contact"
+            to="/client/requests/new"
             className="inline-flex items-center gap-3 bg-white text-ofoq-navy font-bold text-sm px-4 py-3 rounded-full hover:shadow-lg transition-all"
           >
             <span className="w-9 h-9 rounded-full bg-ofoq-yellow flex items-center justify-center flex-shrink-0">

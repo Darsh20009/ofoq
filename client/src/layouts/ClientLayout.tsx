@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
 import OfoqLogo from "../components/OfoqLogo";
 import { clientApi } from "../api/clientApi";
+import { useLang } from "../i18n/LangContext";
 
 const NAV = [
   { href: "/client/dashboard", label: "الرئيسية",   icon: LayoutDashboard },
@@ -22,6 +23,7 @@ export default function ClientLayout() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const { dir } = useLang();
 
   const { data: unreadData } = useQuery({
     queryKey: ["client-support-unread"],
@@ -37,7 +39,7 @@ export default function ClientLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex" dir="rtl">
+    <div className="min-h-screen bg-gray-50 flex" dir={dir}>
 
       {/* ── Sidebar (desktop) ──────────────────────────────── */}
       <aside className="hidden lg:flex flex-col w-64 bg-ofoq-navy text-white fixed inset-y-0 right-0 shadow-2xl z-30">

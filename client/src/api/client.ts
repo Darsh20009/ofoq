@@ -42,7 +42,7 @@ export const authApi = {
   forgotPassword: (email: string) => api.post("/auth/forgot-password", { email }),
   resetPassword: (token: string, password: string) =>
     api.post("/auth/reset-password", { token, newPassword: password }),
-  verify2FA: (data: object) => api.post("/auth/2fa/verify", data),
+  verify2FA: (data: object) => api.post("/auth/verify-2fa", data),
   oauthStatus: () => api.get("/auth/status"),
   totpSetup: () => api.post("/auth/totp/setup"),
   totpVerify: (code: string) => api.post("/auth/totp/verify-setup", { code }),

@@ -21,7 +21,9 @@ export default function OfoqLogo({ className = "w-28 h-20", dark = false }: Prop
       viewBox="0 0 210 148"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      role="img"
       aria-label="OFOQ لحلول الأعمال"
+      focusable="false"
     >
       {/* ── Big O: tall portrait rounded rectangle ─────── */}
       <rect x="6" y="5" width="58" height="90" rx="11" stroke={mark} strokeWidth="9" fill="none" />

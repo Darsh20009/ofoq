@@ -111,6 +111,13 @@ export default function HomePage() {
     <div className="bg-white text-[#2B273F]">
       <Helmet>
         <title>أفق لحلول الأعمال | OFOQ Business Solutions</title>
+        <meta
+          name="description"
+          content={rtl
+            ? "أفق لحلول الأعمال شريكك في الموارد البشرية، الخدمات الحكومية، التأشيرات وتأسيس الشركات في المملكة العربية السعودية."
+            : "OFOQ Business Solutions coordinates HR, government services, visas, and company formation for businesses in Saudi Arabia."}
+        />
+        <link rel="canonical" href="https://ofoqhc.com/" />
       </Helmet>
 
       {/* ══════════════════════════════════════════════════════
@@ -121,6 +128,8 @@ export default function HomePage() {
         <img
           src="/images/riyadh-business-district.jpg"
           alt="Riyadh skyline"
+            fetchpriority="high"
+            decoding="async"
           className="absolute inset-0 h-full w-full object-cover opacity-35 mix-blend-luminosity"
         />
         {/* Gradient */}
@@ -170,7 +179,7 @@ export default function HomePage() {
             <motion.div variants={fadeUp} className="mt-10 flex flex-wrap gap-4">
               {/* Primary */}
               <Link
-                to="/contact"
+                to="/client/requests/new"
                 className="group flex items-center gap-3 rounded-full bg-[#E5FE04] px-8 py-4 font-black text-[#2B273F] shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-2xl"
               >
                 <span className="grid h-8 w-8 place-items-center rounded-full bg-[#2B273F] transition-colors group-hover:bg-[#33B27C]">
@@ -442,7 +451,7 @@ export default function HomePage() {
             className="mt-10"
           >
             <Link
-              to="/contact"
+              to="/client/requests/new"
               className="group inline-flex items-center gap-3 rounded-full bg-[#E5FE04] px-10 py-5 font-black text-[#2B273F] shadow-xl transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-2xl"
             >
               <span className="grid h-9 w-9 place-items-center rounded-full bg-[#2B273F] transition-colors group-hover:bg-[#33B27C]">

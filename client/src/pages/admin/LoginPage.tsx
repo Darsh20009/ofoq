@@ -40,6 +40,7 @@ export default function LoginPage() {
   const [passkeyLoading, setPasskeyLoading] = useState(false);
   const [twoFAStep, setTwoFAStep] = useState<{ tempToken: string; method: string } | null>(null);
   const [otpCode, setOtpCode] = useState("");
+  const [error, setError] = useState("");
   const [oauthStatus, setOauthStatus] = useState<{ google: boolean; apple: boolean }>({ google: false, apple: false });
   const [barcodeOpen, setBarcodeOpen] = useState(false);
   const [barcodeCode, setBarcodeCode] = useState("");
@@ -78,7 +79,7 @@ export default function LoginPage() {
   };
 
   const onSubmit = async (data: LoginForm) => {
-    setLoading(true);
+    setLoading(true); setError("");
     try {
       const res = await authApi.login(data.email, data.password);
       const { user, token, requires2FA, tempToken, method, methods } = res.data;
@@ -90,25 +91,27 @@ export default function LoginPage() {
         toast.success(`مرحباً، ${user.name}!`);
         navigate(user.role === "employee" ? "/admin/employee/dashboard" : "/admin");
       }
-    } catch {
-      // silent
+    } catch (e: any) {
+      setError(e.response?.data?.error || "تعذر تسجيل الدخول. تحقق من البيانات وحاول مرة أخرى.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handle2FA = async () => {
     if (!twoFAStep || !otpCode.trim()) return;
     setLoading(true);
     try {
-      const res = await authApi.verify2FA({ tempToken: twoFAStep.tempToken, code: otpCode });
+      const res = await authApi.verify2FA({ tempToken: twoFAStep.tempToken, method: twoFAStep.method, code: otpCode });
       const { user, token } = res.data;
       setAuth(user, token);
       toast.success(`مرحباً، ${user.name}!`);
       navigate(user.role === "employee" ? "/admin/employee/dashboard" : "/admin");
-    } catch {
-      // silent
+    } catch (e: any) {
+      setError(e.response?.data?.error || "رمز التحقق غير صحيح.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleBarcodeLogin = async (code?: string) => {
@@ -123,10 +126,11 @@ export default function LoginPage() {
       setBarcodeOpen(false);
       toast.success(`مرحباً، ${user.name}!`);
       navigate("/admin/employee/dashboard");
-    } catch {
-      // silent
+    } catch (e: any) {
+      setError(e.response?.data?.error || "تعذر تسجيل الدخول بالباركود.");
+    } finally {
+      setBarcodeLoading(false);
     }
-    setBarcodeLoading(false);
   };
 
   const startCamera = async () => {

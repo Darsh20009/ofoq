@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, CheckCircle2, Building2, Briefcase, FileText, Loader2 } from "lucide-react";
@@ -45,7 +45,12 @@ export default function ServiceRequestPage() {
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<Form>();
+  const [params] = useSearchParams();
+  const requestedService = params.get("service") || "";
+  const initialService = SERVICES.some((s) => s.value === requestedService) ? requestedService : "";
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<Form>({
+    defaultValues: { serviceType: initialService },
+  });
   const all = watch();
 
   async function onSubmit(data: Form) {

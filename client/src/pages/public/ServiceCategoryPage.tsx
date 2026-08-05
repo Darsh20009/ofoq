@@ -51,7 +51,9 @@ export default function ServiceCategoryPage() {
         {/* Background image */}
         <img
           src={category.image}
-          alt=""
+            alt={pick(category.title, lang)}
+            loading="eager"
+            decoding="async"
           className="absolute inset-0 h-full w-full object-cover opacity-20"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#2B273F]/90 via-[#2B273F]/80 to-[#2B273F]" />
@@ -239,7 +241,7 @@ export default function ServiceCategoryPage() {
             </p>
           </div>
           <Link
-            to="/contact"
+            to="/client/requests/new"
             className="group flex items-center gap-3 rounded-full bg-[#2B273F] px-7 py-4 font-black text-white transition-all hover:bg-[#33B27C]"
           >
             <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15 transition-colors group-hover:bg-white/25">

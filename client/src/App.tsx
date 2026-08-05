@@ -83,7 +83,11 @@ function RequireEmployeeGuest({ children }: { children: JSX.Element }) {
 /* ── Client Portal Guards ─────────────────────────────────────────── */
 function RequireClientAuth({ children }: { children: JSX.Element }) {
   const { isAuthenticated, user } = useAuthStore();
-  if (!isAuthenticated) return <Navigate to="/client/login" replace />;
+  const location = useLocation();
+  if (!isAuthenticated) {
+    const returnTo = `${location.pathname}${location.search}`;
+    return <Navigate to={`/client/login?redirect=${encodeURIComponent(returnTo)}`} replace />;
+  }
   // Allow clients and admins (admins can preview the portal)
   return children;
 }
@@ -135,6 +139,14 @@ export default function App() {
           {/* تسجيل الدخول */}
           <Route
             path="/login"
+            element={
+              <RequireEmployeeGuest>
+                <EmployeePortalLoginPage />
+              </RequireEmployeeGuest>
+            }
+          />
+          <Route
+            path="/admin/login"
             element={
               <RequireEmployeeGuest>
                 <EmployeePortalLoginPage />
