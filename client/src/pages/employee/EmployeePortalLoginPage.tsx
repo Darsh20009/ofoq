@@ -249,6 +249,13 @@ export default function EmployeePortalLoginPage() {
               {loading ? ui.employee.verifying : ui.employee.login}
             </button>
 
+            <a
+              href="https://www.ofoqhc.com/admin/login"
+              className="block text-center text-xs text-gray-400 hover:text-navy-700 hover:underline transition-colors"
+            >
+              دخول لوحة الإدارة
+            </a>
+
             {/* Divider */}
             <div className="flex items-center gap-3 text-gray-300">
               <div className="flex-1 h-px bg-gray-200" />

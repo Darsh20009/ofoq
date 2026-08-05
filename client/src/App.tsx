@@ -80,6 +80,13 @@ function RequireEmployeeGuest({ children }: { children: JSX.Element }) {
   return isAuthenticated ? <Navigate to="/" replace /> : children;
 }
 
+function EmployeeAdminRedirect() {
+  if (typeof window !== "undefined") {
+    window.location.replace("https://www.ofoqhc.com/admin/login");
+  }
+  return null;
+}
+
 /* ── Client Portal Guards ─────────────────────────────────────────── */
 function RequireClientAuth({ children }: { children: JSX.Element }) {
   const { isAuthenticated, user } = useAuthStore();
@@ -147,11 +154,7 @@ export default function App() {
           />
           <Route
             path="/admin/login"
-            element={
-              <RequireEmployeeGuest>
-                <EmployeePortalLoginPage />
-              </RequireEmployeeGuest>
-            }
+            element={<EmployeeAdminRedirect />}
           />
 
           {/* بوابة الموظف — تحتاج تسجيل دخول */}
