@@ -6,22 +6,18 @@ import toast from "react-hot-toast";
 import { crmApi } from "../../../api/client";
 import type { Lead } from "../../../types";
 import LeadModal from "./LeadModal";
-
-const STAGE_LABELS: Record<string, { label: string; color: string }> = {
-  new: { label: "جديد", color: "badge-blue" },
-  contacted: { label: "تم التواصل", color: "badge-navy" },
-  qualified: { label: "مؤهّل", color: "badge-green" },
-  proposal: { label: "عرض سعر", color: "badge-yellow" },
-  negotiation: { label: "تفاوض", color: "badge-yellow" },
-  won: { label: "مُغلق (فوز)", color: "badge-green" },
-  lost: { label: "مُغلق (خسارة)", color: "badge-red" },
-};
-
-const PRIORITY_LABELS: Record<string, string> = {
-  low: "منخفضة", medium: "متوسطة", high: "عالية", urgent: "عاجلة",
-};
+import { useLang } from "../../../i18n/LangContext";
 
 export default function LeadsPage() {
+  const { ui, lang } = useLang();
+  const copy = ui.adminPages.leads;
+  const stageLabels: Record<string, { label: string; color: string }> = {
+    new: { label: copy.new, color: "badge-blue" }, contacted: { label: copy.contacted, color: "badge-navy" },
+    qualified: { label: copy.qualified, color: "badge-green" }, proposal: { label: copy.proposal, color: "badge-yellow" },
+    negotiation: { label: copy.negotiation, color: "badge-yellow" }, won: { label: copy.won, color: "badge-green" },
+    lost: { label: copy.lost, color: "badge-red" },
+  };
+  const priorityLabels: Record<string, string> = { low: copy.low, medium: copy.medium, high: copy.high, urgent: copy.urgent };
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [stage, setStage] = useState("");
@@ -38,7 +34,7 @@ export default function LeadsPage() {
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => crmApi.leads.delete(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["leads"] }); toast.success("تم حذف الفرصة"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["leads"] }); toast.success(copy.deleted); },
   });
 
   const convertMut = useMutation({
@@ -46,7 +42,7 @@ export default function LeadsPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["leads"] });
       qc.invalidateQueries({ queryKey: ["customers"] });
-      toast.success("تم تحويل الفرصة إلى عميل");
+       toast.success(copy.convert);
     },
   });
 
@@ -57,11 +53,11 @@ export default function LeadsPage() {
     <div className="space-y-6">
       <div className="page-header">
         <div>
-          <h1 className="page-title">الفرص التجارية</h1>
-          <p className="page-subtitle">{pagination?.total || 0} فرصة في قاعدة البيانات</p>
+           <h1 className="page-title">{copy.title}</h1>
+           <p className="page-subtitle">{pagination?.total || 0} {copy.count}</p>
         </div>
         <button onClick={() => { setEditLead(null); setModalOpen(true); }} className="btn-primary">
-          <Plus size={16} /> إضافة فرصة
+           <Plus size={16} /> {copy.add}
         </button>
       </div>
 
@@ -72,7 +68,7 @@ export default function LeadsPage() {
           <input
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            placeholder="بحث بالاسم أو البريد أو الشركة..."
+             placeholder={copy.search}
             className="input-field pr-10"
           />
         </div>
@@ -83,8 +79,8 @@ export default function LeadsPage() {
             onChange={(e) => { setStage(e.target.value); setPage(1); }}
             className="input-field pr-10 min-w-44"
           >
-            <option value="">كل المراحل</option>
-            {Object.entries(STAGE_LABELS).map(([v, { label }]) => (
+             <option value="">{copy.allStages}</option>
+             {Object.entries(stageLabels).map(([v, { label }]) => (
               <option key={v} value={v}>{label}</option>
             ))}
           </select>
@@ -104,26 +100,21 @@ export default function LeadsPage() {
             <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
               <Target size={28} className="text-gray-300" />
             </div>
-            <p className="text-gray-400 font-medium">لا توجد فرص تجارية</p>
-            <p className="text-gray-300 text-sm mt-1">أضف أول فرصة لبدء التتبع</p>
+             <p className="text-gray-400 font-medium">{copy.empty}</p>
+             <p className="text-gray-300 text-sm mt-1">{copy.emptySub}</p>
           </div>
         ) : (
           <div className="table-wrapper">
             <table className="table">
               <thead>
                 <tr>
-                  <th>الاسم</th>
-                  <th>الشركة</th>
-                  <th>المرحلة</th>
-                  <th>الأولوية</th>
-                  <th>الميزانية</th>
-                  <th>المصدر</th>
-                  <th>الإجراءات</th>
+                   <th>{copy.name}</th><th>{copy.company}</th><th>{copy.stage}</th><th>{copy.priority}</th>
+                   <th>{copy.budget}</th><th>{copy.source}</th><th>{copy.actions}</th>
                 </tr>
               </thead>
               <tbody>
                 {leads.map((lead) => {
-                  const stageMeta = STAGE_LABELS[lead.stage] || { label: lead.stage, color: "badge-gray" };
+                  const stageMeta = stageLabels[lead.stage] || { label: lead.stage, color: "badge-gray" };
                   return (
                     <motion.tr
                       key={lead._id}
@@ -148,11 +139,11 @@ export default function LeadsPage() {
                           lead.priority === "high" ? "badge-yellow" :
                           lead.priority === "medium" ? "badge-navy" : "badge-gray"
                         }`}>
-                          {PRIORITY_LABELS[lead.priority]}
+                           {priorityLabels[lead.priority]}
                         </span>
                       </td>
                       <td className="font-medium">
-                        {lead.budget ? `${lead.budget.toLocaleString("ar")} ${lead.currency}` : "—"}
+                         {lead.budget ? `${lead.budget.toLocaleString(lang)} ${lead.currency}` : "—"}
                       </td>
                       <td className="text-gray-500 text-xs">{lead.source}</td>
                       <td>
@@ -167,14 +158,14 @@ export default function LeadsPage() {
                             <button
                               onClick={() => convertMut.mutate(lead._id)}
                               className="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600"
-                              title="تحويل لعميل"
+                               title={copy.convert}
                             >
                               <UserCheck size={14} />
                             </button>
                           )}
                           <button
                             onClick={() => {
-                              if (confirm("هل أنت متأكد من الحذف؟"))
+                               if (confirm(copy.deleteConfirm))
                                 deleteMut.mutate(lead._id);
                             }}
                             className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500"
@@ -195,7 +186,7 @@ export default function LeadsPage() {
         {pagination && pagination.pages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
             <p className="text-xs text-gray-400">
-              صفحة {pagination.page} من {pagination.pages} ({pagination.total} نتيجة)
+               {copy.page} {pagination.page} / {pagination.pages} ({pagination.total} {copy.result})
             </p>
             <div className="flex gap-2">
               <button
