@@ -165,7 +165,7 @@ export default function PublicLayout() {
               <OfoqLogo dark className="w-12 h-9 sm:w-14 sm:h-10" />
               <div className="leading-none">
                 <p className="font-black text-base sm:text-lg text-ofoq-navy">أفق</p>
-                <p className="text-[9px] sm:text-[10px] text-gray-400 tracking-wide">لحلول الأعمال Business Solutions</p>
+                <p className="text-[9px] sm:text-[10px] text-gray-400 tracking-wide">{ui.footer.company}</p>
               </div>
             </Link>
 
@@ -212,7 +212,7 @@ export default function PublicLayout() {
                 <OfoqLogo dark className="w-12 h-9" />
                 <div className="leading-none">
                   <p className="font-black text-sm text-ofoq-navy">أفق</p>
-                  <p className="text-[10px] text-gray-400">لحلول الأعمال</p>
+                    <p className="text-[10px] text-gray-400">{ui.footer.company}</p>
                 </div>
               </Link>
               <button
@@ -263,7 +263,7 @@ export default function PublicLayout() {
 
             {/* أسفل القائمة — بيانات التواصل */}
             <div className="flex-shrink-0 px-5 sm:px-8 py-6 border-t border-gray-100">
-               <p className="text-xs text-gray-400 mb-1">Saudi Arabia</p>
+               <p className="text-xs text-gray-400 mb-1">{ui.footer.location.split(" — ")[0]}</p>
                <p className="text-sm text-gray-600 mb-4">{ui.footer.location}</p>
               <div className="flex items-center gap-3">
                 {SOCIAL.map((s) => (

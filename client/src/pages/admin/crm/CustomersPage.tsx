@@ -8,6 +8,7 @@ import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { crmApi } from "../../../api/client";
 import type { Customer } from "../../../types";
+import { useLang } from "../../../i18n/LangContext";
 
 const TIER_COLORS: Record<string, string> = {
   bronze: "badge-gray",
@@ -15,11 +16,9 @@ const TIER_COLORS: Record<string, string> = {
   gold: "badge-yellow",
   platinum: "badge-green",
 };
-const TIER_LABELS: Record<string, string> = {
-  bronze: "برونزي", silver: "فضي", gold: "ذهبي", platinum: "بلاتيني",
-};
-
 export default function CustomersPage() {
+  const { ui, lang } = useLang();
+  const copy = ui.adminPages.customers;
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -32,7 +31,7 @@ export default function CustomersPage() {
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => crmApi.customers.delete(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["customers"] }); toast.success("تم الحذف"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["customers"] }); toast.success(copy.deleteConfirm.replace("؟", "")); },
   });
 
   const customers: Customer[] = data?.data?.customers || [];
@@ -41,11 +40,11 @@ export default function CustomersPage() {
     <div className="space-y-6">
       <div className="page-header">
         <div>
-          <h1 className="page-title">العملاء</h1>
-          <p className="page-subtitle">{customers.length} عميل مسجّل</p>
+           <h1 className="page-title">{copy.title}</h1>
+           <p className="page-subtitle">{customers.length} {copy.count}</p>
         </div>
         <button onClick={() => { setEditCustomer(null); setModalOpen(true); }} className="btn-primary">
-          <Plus size={16} /> إضافة عميل
+           <Plus size={16} /> {copy.add}
         </button>
       </div>
 
@@ -54,7 +53,7 @@ export default function CustomersPage() {
         <div className="relative">
           <Search size={16} className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-400" />
           <input value={search} onChange={(e) => setSearch(e.target.value)}
-            placeholder="بحث بالاسم أو البريد أو الشركة..."
+             placeholder={copy.search}
             className="input-field pr-10" />
         </div>
       </div>
@@ -67,7 +66,7 @@ export default function CustomersPage() {
       ) : customers.length === 0 ? (
         <div className="card py-16 text-center">
           <Star size={40} className="mx-auto text-gray-200 mb-3" />
-          <p className="text-gray-400">لا يوجد عملاء بعد</p>
+           <p className="text-gray-400">{copy.empty}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -84,22 +83,22 @@ export default function CustomersPage() {
                     <p className="text-xs text-gray-400">{c.company || c.email}</p>
                   </div>
                 </div>
-                <span className={TIER_COLORS[c.tier] || "badge-gray"}>{TIER_LABELS[c.tier]}</span>
+                 <span className={TIER_COLORS[c.tier] || "badge-gray"}>{copy[c.tier as "bronze" | "silver" | "gold" | "platinum"] || c.tier}</span>
               </div>
               <div className="space-y-1 text-sm text-gray-500">
                 <p>📧 {c.email}</p>
                 {c.phone && <p>📱 {c.phone}</p>}
                 {c.industry && <p>🏢 {c.industry}</p>}
                 <p className="font-semibold text-navy-700 pt-1">
-                  💰 {c.totalRevenue.toLocaleString("ar")} {c.currency}
+                   💰 {c.totalRevenue.toLocaleString(lang)} {c.currency}
                 </p>
               </div>
               <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button onClick={() => { setEditCustomer(c); setModalOpen(true); }}
                   className="btn-ghost text-xs flex-1 justify-center">
-                  <Edit2 size={13} /> تعديل
+                   <Edit2 size={13} /> {copy.edit}
                 </button>
-                <button onClick={() => { if (confirm("حذف العميل؟")) deleteMut.mutate(c._id); }}
+                 <button onClick={() => { if (confirm(copy.deleteConfirm)) deleteMut.mutate(c._id); }}
                   className="p-2 rounded-lg hover:bg-red-50 text-red-400 transition-colors">
                   <Trash2 size={14} />
                 </button>
@@ -119,6 +118,8 @@ export default function CustomersPage() {
 function CustomerModal({ open, onClose, customer, onSaved }: {
   open: boolean; onClose: () => void; customer: Customer | null; onSaved: () => void;
 }) {
+  const { ui } = useLang();
+  const copy = ui.adminPages.customers;
   const { register, handleSubmit, reset } = useForm();
   useEffect(() => {
     if (customer) reset(customer);
@@ -128,7 +129,7 @@ function CustomerModal({ open, onClose, customer, onSaved }: {
   const mut = useMutation({
     mutationFn: (data: object) =>
       customer ? crmApi.customers.update(customer._id, data) : crmApi.customers.create(data),
-    onSuccess: () => { toast.success(customer ? "تم التحديث" : "تمت الإضافة"); onSaved(); },
+    onSuccess: () => { toast.success(customer ? copy.update : copy.save); onSaved(); },
   });
 
   return (
@@ -141,53 +142,53 @@ function CustomerModal({ open, onClose, customer, onSaved }: {
             exit={{ opacity: 0, scale: 0.96 }}
             className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="font-bold text-navy-700">{customer ? "تعديل عميل" : "إضافة عميل"}</h2>
+               <h2 className="font-bold text-navy-700">{customer ? `${copy.edit} ${copy.title.slice(0, -1)}` : copy.add}</h2>
               <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400"><X size={18} /></button>
             </div>
             <form onSubmit={handleSubmit((d) => mut.mutate(d))} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <label className="label">الاسم *</label>
+                   <label className="label">{copy.name} *</label>
                   <input {...register("name", { required: true })} className="input-field" />
                 </div>
                 <div>
-                  <label className="label">البريد *</label>
+                   <label className="label">{copy.email} *</label>
                   <input {...register("email", { required: true })} type="email" className="input-field" dir="ltr" />
                 </div>
                 <div>
-                  <label className="label">الهاتف</label>
+                   <label className="label">{copy.phone}</label>
                   <input {...register("phone")} className="input-field" dir="ltr" />
                 </div>
                 <div>
-                  <label className="label">الشركة</label>
+                   <label className="label">{copy.company}</label>
                   <input {...register("company")} className="input-field" />
                 </div>
                 <div>
-                  <label className="label">القطاع</label>
+                   <label className="label">{copy.industry}</label>
                   <input {...register("industry")} className="input-field" />
                 </div>
                 <div>
-                  <label className="label">التصنيف</label>
+                   <label className="label">{copy.tier}</label>
                   <select {...register("tier")} className="input-field">
-                    <option value="bronze">برونزي</option>
-                    <option value="silver">فضي</option>
-                    <option value="gold">ذهبي</option>
-                    <option value="platinum">بلاتيني</option>
+                     <option value="bronze">{copy.bronze}</option>
+                     <option value="silver">{copy.silver}</option>
+                     <option value="gold">{copy.gold}</option>
+                     <option value="platinum">{copy.platinum}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="label">الحالة</label>
+                   <label className="label">{copy.status}</label>
                   <select {...register("status")} className="input-field">
-                    <option value="active">نشط</option>
-                    <option value="inactive">غير نشط</option>
+                     <option value="active">{copy.active}</option>
+                     <option value="inactive">{copy.inactive}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="label">الدولة</label>
-                  <input {...register("country")} className="input-field" placeholder="السعودية" />
+                   <label className="label">{copy.country}</label>
+                   <input {...register("country")} className="input-field" placeholder={copy.country} />
                 </div>
                 <div>
-                  <label className="label">العملة</label>
+                   <label className="label">{copy.currency}</label>
                   <select {...register("currency")} className="input-field">
                     <option value="SAR">SAR</option>
                     <option value="USD">USD</option>
@@ -197,9 +198,9 @@ function CustomerModal({ open, onClose, customer, onSaved }: {
               </div>
               <div className="flex gap-3 pt-2">
                 <button type="submit" disabled={mut.isPending} className="btn-primary flex-1 justify-center">
-                  {mut.isPending ? "..." : customer ? "تحديث" : "إضافة"}
+                   {mut.isPending ? "..." : customer ? copy.update : copy.save}
                 </button>
-                <button type="button" onClick={onClose} className="btn-ghost">إلغاء</button>
+                 <button type="button" onClick={onClose} className="btn-ghost">{copy.cancel}</button>
               </div>
             </form>
           </motion.div>

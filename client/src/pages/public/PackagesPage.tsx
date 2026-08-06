@@ -243,21 +243,21 @@ export default function PackagesPage() {
                   </thead>
                   <tbody>
                     {[
-                      { label: "وزارة التجارة",          s: true,  g: true,  p: true  },
-                      { label: "منصة سلامة",              s: true,  g: true,  p: true  },
-                      { label: "التأمينات الاجتماعية",     s: true,  g: true,  p: true  },
-                      { label: "خدمات التأمين الطبي",      s: true,  g: true,  p: true  },
-                      { label: "خدمات الزكاة والضريبة",    s: true,  g: true,  p: true  },
-                      { label: "منصة أبشر ومقيم",          s: false, g: true,  p: true  },
-                      { label: "خدمات الاستشارات",         s: false, g: true,  p: true  },
-                      { label: "وزارة الإعلام",            s: false, g: false, p: true  },
-                      { label: "منصة بلدي",               s: false, g: false, p: true  },
-                      { label: "خدمة تخفيف الأعباء",       s: false, g: false, p: true  },
-                      { label: "التدريب والتطوير",          s: false, g: false, p: true  },
+                      { index: 0, s: true,  g: true,  p: true  },
+                      { index: 1, s: true,  g: true,  p: true  },
+                      { index: 2, s: true,  g: true,  p: true  },
+                      { index: 3, s: true,  g: true,  p: true  },
+                      { index: 4, s: true,  g: true,  p: true  },
+                      { index: 5, s: false, g: true,  p: true  },
+                      { index: 6, s: false, g: true,  p: true  },
+                      { index: 7, s: false, g: false, p: true  },
+                      { index: 8, s: false, g: false, p: true  },
+                      { index: 9, s: false, g: false, p: true  },
+                      { index: 10, s: false, g: false, p: true  },
                     ].map((row, i) => (
                       <tr key={i} className={i % 2 === 0 ? "bg-gray-50/50" : "bg-white"}>
                         <td className="px-6 py-3.5 text-sm text-ofoq-navy font-medium border-b border-gray-50">
-                          {row.label}
+                           {ui.packages.features[row.index]}
                         </td>
                         {[row.s, row.g, row.p].map((val, j) => (
                           <td key={j} className="px-4 py-3.5 text-center border-b border-gray-50">

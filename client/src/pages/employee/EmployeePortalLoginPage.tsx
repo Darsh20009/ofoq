@@ -290,24 +290,24 @@ export default function EmployeePortalLoginPage() {
               className="w-full flex items-center justify-center gap-2 border border-[#1C2B6E]/15 bg-[#1C2B6E]/5 text-[#1C2B6E] rounded-xl py-3 text-sm hover:bg-[#1C2B6E]/10 transition-colors"
             >
               <Fingerprint size={17} className="text-[#33B27C]" />
-              {passkeyLoading ? ui.employee.verifying : "الدخول بالبصمة أو مفتاح المرور"}
+              {passkeyLoading ? ui.employee.verifying : ui.employee.passkey}
             </button>
 
             <p className="text-center text-[11px] text-gray-400 -mt-2">
-              لتسجيل مفتاح جديد: ادخل أولاً ثم افتح «ملفي» واختر «إضافة مفتاح».
+              {ui.employee.passkeyHint}
             </p>
 
             <a
               href="https://www.ofoqhc.com/admin/login"
               className="block text-center text-xs text-gray-400 hover:text-navy-700 hover:underline transition-colors"
             >
-              دخول لوحة الإدارة
+              {ui.employee.adminLogin}
             </a>
 
             {/* Divider */}
             <div className="flex items-center gap-3 text-gray-300">
               <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-xs">أو</span>
+              <span className="text-xs">{ui.employee.or}</span>
               <div className="flex-1 h-px bg-gray-200" />
             </div>
 
@@ -333,7 +333,7 @@ export default function EmployeePortalLoginPage() {
             className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-navy-700">دخول بالباركود</h3>
+               <h3 className="font-bold text-navy-700">{ui.employee.barcodeTitle}</h3>
               <button onClick={() => { stopCamera(); setBarcodeOpen(false); }}>
                 <X size={18} className="text-gray-400 hover:text-gray-700" />
               </button>
@@ -352,7 +352,7 @@ export default function EmployeePortalLoginPage() {
                 className="w-full aspect-square rounded-xl bg-gray-100 flex flex-col items-center justify-center gap-3 mb-4 hover:bg-gray-200 transition-colors"
               >
                 <QrCode size={48} className="text-gray-400" />
-                <span className="text-sm text-gray-500">اضغط لتفعيل الكاميرا</span>
+                 <span className="text-sm text-gray-500">{ui.employee.cameraHint}</span>
               </button>
             )}
 
@@ -370,7 +370,7 @@ export default function EmployeePortalLoginPage() {
                 disabled={barcodeLoading || !barcodeCode}
                 className="btn-primary px-4"
               >
-                {barcodeLoading ? "..." : "دخول"}
+                 {barcodeLoading ? "..." : ui.employee.barcodeSubmit}
               </button>
             </div>
           </motion.div>

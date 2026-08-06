@@ -7,17 +7,16 @@ import { format } from "date-fns";
 import { arSA } from "date-fns/locale";
 import { invoicesApi } from "../../../api/client";
 import type { Invoice } from "../../../types";
-
-const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  draft:     { label: "مسودة",          color: "badge-gray"  },
-  sent:      { label: "مُرسلة",          color: "badge-blue"  },
-  viewed:    { label: "مُشاهَدة",        color: "badge-navy"  },
-  paid:      { label: "مدفوعة",          color: "badge-green" },
-  overdue:   { label: "متأخرة",          color: "badge-red"   },
-  cancelled: { label: "ملغاة",           color: "badge-gray"  },
-};
+import { useLang } from "../../../i18n/LangContext";
 
 export default function InvoicesPage() {
+  const { ui, lang } = useLang();
+  const copy = ui.adminPages.invoices;
+  const statusConfig: Record<string, { label: string; color: string }> = {
+    draft: { label: copy.draft, color: "badge-gray" }, sent: { label: copy.sent, color: "badge-blue" },
+    viewed: { label: copy.viewed, color: "badge-navy" }, paid: { label: copy.paid, color: "badge-green" },
+    overdue: { label: copy.overdueStatus, color: "badge-red" }, cancelled: { label: copy.cancelled, color: "badge-gray" },
+  };
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -30,17 +29,17 @@ export default function InvoicesPage() {
 
   const sendMut = useMutation({
     mutationFn: (id: string) => invoicesApi.send(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["invoices"] }); toast.success("تم إرسال الفاتورة للعميل"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["invoices"] }); toast.success(copy.send); },
   });
 
   const paidMut = useMutation({
     mutationFn: (id: string) => invoicesApi.markPaid(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["invoices"] }); toast.success("تم تسجيل الدفعة"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["invoices"] }); toast.success(copy.markPaid); },
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => invoicesApi.delete(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["invoices"] }); toast.success("تم الحذف"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["invoices"] }); toast.success(copy.deleteConfirm.replace("؟", "")); },
   });
 
   const downloadPdf = async (id: string, number: string) => {
@@ -71,11 +70,11 @@ export default function InvoicesPage() {
     <div className="space-y-6">
       <div className="page-header">
         <div>
-          <h1 className="page-title">الفواتير</h1>
-          <p className="page-subtitle">{invoices.length} فاتورة</p>
+           <h1 className="page-title">{copy.title}</h1>
+           <p className="page-subtitle">{invoices.length} {copy.count}</p>
         </div>
         <button className="btn-primary">
-          <Plus size={16} /> فاتورة جديدة
+           <Plus size={16} /> {copy.new}
         </button>
       </div>
 
@@ -84,22 +83,22 @@ export default function InvoicesPage() {
         <div className="card flex items-center gap-4">
           <div className="stat-icon bg-ofoq-green"><CheckCircle size={20} className="text-white" /></div>
           <div>
-            <p className="text-xs text-gray-400">إجمالي المحصّل</p>
-            <p className="text-xl font-bold text-navy-700">{totalRevenue.toLocaleString("ar")} ر.س</p>
+             <p className="text-xs text-gray-400">{copy.collected}</p>
+             <p className="text-xl font-bold text-navy-700">{totalRevenue.toLocaleString(lang)} {lang === "id" ? "SAR" : "ر.س"}</p>
           </div>
         </div>
         <div className="card flex items-center gap-4">
           <div className="stat-icon bg-amber-500"><FileText size={20} className="text-white" /></div>
           <div>
-            <p className="text-xs text-gray-400">في الانتظار</p>
-            <p className="text-xl font-bold text-navy-700">{pending.toLocaleString("ar")} ر.س</p>
+             <p className="text-xs text-gray-400">{copy.pending}</p>
+             <p className="text-xl font-bold text-navy-700">{pending.toLocaleString(lang)} {lang === "id" ? "SAR" : "ر.س"}</p>
           </div>
         </div>
         <div className="card flex items-center gap-4">
           <div className="stat-icon bg-red-500"><FileText size={20} className="text-white" /></div>
           <div>
-            <p className="text-xs text-gray-400">فواتير متأخرة</p>
-            <p className="text-xl font-bold text-navy-700">{overdue} فاتورة</p>
+             <p className="text-xs text-gray-400">{copy.overdue}</p>
+             <p className="text-xl font-bold text-navy-700">{overdue} {copy.count}</p>
           </div>
         </div>
       </div>
@@ -109,12 +108,12 @@ export default function InvoicesPage() {
         <div className="relative flex-1">
           <Search size={16} className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-400" />
           <input value={search} onChange={(e) => setSearch(e.target.value)}
-            placeholder="بحث برقم الفاتورة أو العميل..."
+             placeholder={copy.search}
             className="input-field pr-10" />
         </div>
         <select value={status} onChange={(e) => setStatus(e.target.value)} className="input-field min-w-40">
-          <option value="">كل الحالات</option>
-          {Object.entries(STATUS_CONFIG).map(([v, { label }]) => (
+           <option value="">{copy.allStatuses}</option>
+           {Object.entries(statusConfig).map(([v, { label }]) => (
             <option key={v} value={v}>{label}</option>
           ))}
         </select>
@@ -129,24 +128,20 @@ export default function InvoicesPage() {
         ) : invoices.length === 0 ? (
           <div className="py-16 text-center">
             <FileText size={40} className="mx-auto text-gray-200 mb-3" />
-            <p className="text-gray-400">لا توجد فواتير</p>
+             <p className="text-gray-400">{copy.empty}</p>
           </div>
         ) : (
           <div className="table-wrapper">
             <table className="table">
               <thead>
                 <tr>
-                  <th>رقم الفاتورة</th>
-                  <th>العميل</th>
-                  <th>الإجمالي</th>
-                  <th>تاريخ الاستحقاق</th>
-                  <th>الحالة</th>
-                  <th>الإجراءات</th>
+                   <th>{copy.number}</th><th>{copy.customer}</th><th>{copy.total}</th>
+                   <th>{copy.dueDate}</th><th>{copy.status}</th><th>{copy.actions}</th>
                 </tr>
               </thead>
               <tbody>
                 {invoices.map((inv, i) => {
-                  const s = STATUS_CONFIG[inv.status] || { label: inv.status, color: "badge-gray" };
+                   const s = statusConfig[inv.status] || { label: inv.status, color: "badge-gray" };
                   const isOverdue = new Date(inv.dueDate) < now && !["paid", "cancelled"].includes(inv.status);
                   return (
                     <motion.tr key={inv._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -154,7 +149,7 @@ export default function InvoicesPage() {
                       <td className="font-mono text-sm font-semibold text-navy-700">{inv.invoiceNumber}</td>
                       <td>{inv.customer?.name || "—"}</td>
                       <td className="font-bold text-navy-700">
-                        {inv.total.toLocaleString("ar")} {inv.currency}
+                         {inv.total.toLocaleString(lang)} {inv.currency}
                       </td>
                       <td>
                         <span className={isOverdue ? "text-red-500 font-semibold" : "text-gray-600"}>
@@ -166,21 +161,21 @@ export default function InvoicesPage() {
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           {inv.status === "draft" && (
                             <button onClick={() => sendMut.mutate(inv._id)}
-                              className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600" title="إرسال">
+                               className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600" title={copy.send}>
                               <Send size={14} />
                             </button>
                           )}
                           {["sent", "viewed", "overdue"].includes(inv.status) && (
                             <button onClick={() => paidMut.mutate(inv._id)}
-                              className="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600" title="تسجيل الدفع">
+                               className="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600" title={copy.markPaid}>
                               <CheckCircle size={14} />
                             </button>
                           )}
                           <button onClick={() => downloadPdf(inv._id, inv.invoiceNumber)}
-                            className="p-1.5 rounded-lg hover:bg-purple-50 text-gray-400 hover:text-purple-600" title="تحميل PDF">
+                             className="p-1.5 rounded-lg hover:bg-purple-50 text-gray-400 hover:text-purple-600" title={copy.download}>
                             <Download size={14} />
                           </button>
-                          <button onClick={() => { if (confirm("حذف الفاتورة؟")) deleteMut.mutate(inv._id); }}
+                           <button onClick={() => { if (confirm(copy.deleteConfirm)) deleteMut.mutate(inv._id); }}
                             className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500">
                             <Trash2 size={14} />
                           </button>

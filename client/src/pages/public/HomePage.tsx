@@ -60,7 +60,7 @@ export default function HomePage() {
   return (
     <div className="bg-white text-[#2B273F]">
       <Helmet>
-        <title>أفق لحلول الأعمال | OFOQ Business Solutions</title>
+        <title>{ui.home.metaTitle}</title>
         <meta
           name="description"
           content={ui.home.heroSub}
@@ -75,7 +75,7 @@ export default function HomePage() {
         {/* Background image */}
         <img
           src="/images/riyadh-business-district.jpg"
-          alt="Riyadh skyline"
+          alt={ui.home.strip1}
           decoding="async"
           className="absolute inset-0 h-full w-full object-cover opacity-[0.58]"
         />
@@ -273,13 +273,21 @@ export default function HomePage() {
                   to={`/services/${cat.slug}`}
                   className="group relative flex min-h-[300px] flex-col justify-between overflow-hidden rounded-[1.75rem] bg-white/[0.06] p-6 transition-all duration-500 hover:bg-[#33B27C] hover:shadow-2xl"
                 >
+                  <img
+                    src={cat.image}
+                    alt={pick(cat.title, lang)}
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 h-full w-full object-cover opacity-25 grayscale transition-all duration-700 group-hover:scale-105 group-hover:opacity-35 group-hover:grayscale-0"
+                  />
+                  <span className="absolute inset-0 bg-[#2B273F]/65 transition-colors group-hover:bg-[#33B27C]/70" />
                   {/* Number */}
-                  <span className="text-[11px] font-black tracking-widest text-[#E5FE04] transition-colors group-hover:text-white/70">
+                  <span className="relative z-10 text-[11px] font-black tracking-widest text-[#E5FE04] transition-colors group-hover:text-white/70">
                     0{i + 1}
                   </span>
 
                   {/* Content */}
-                  <div>
+                  <div className="relative z-10">
                     <h3 className="mb-5 text-xl font-black text-white">
                       {pick(cat.title, lang)}
                     </h3>

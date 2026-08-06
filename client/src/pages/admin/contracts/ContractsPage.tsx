@@ -7,14 +7,7 @@ import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { arSA } from "date-fns/locale";
 import { contractsApi, crmApi } from "../../../api/client";
-
-const STATUS = {
-  draft:     { label: "مسودة",    color: "badge-gray"  },
-  sent:      { label: "مُرسل",    color: "badge-blue"  },
-  signed:    { label: "موقّع",    color: "badge-green" },
-  expired:   { label: "منتهي",   color: "badge-red"   },
-  cancelled: { label: "ملغي",    color: "badge-gray"  },
-};
+import { useLang } from "../../../i18n/LangContext";
 
 async function downloadContractPdf(id: string, number: string) {
   const token = localStorage.getItem("ofoq_token");
@@ -40,6 +33,13 @@ interface ContractForm {
 }
 
 export default function ContractsPage() {
+  const { ui, lang } = useLang();
+  const copy = ui.adminPages.contracts;
+  const statusConfig = {
+    draft: { label: copy.draft, color: "badge-gray" }, sent: { label: copy.sent, color: "badge-blue" },
+    signed: { label: copy.signedStatus, color: "badge-green" }, expired: { label: copy.expired, color: "badge-red" },
+    cancelled: { label: copy.cancelled, color: "badge-gray" },
+  };
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -62,31 +62,31 @@ export default function ContractsPage() {
 
   const createMut = useMutation({
     mutationFn: (data: object) => contractsApi.create(data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success("تم إنشاء العقد"); closeModal(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success(copy.create); closeModal(); },
     onError: () => {},
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, data }: { id: string; data: object }) => contractsApi.update(id, data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success("تم التحديث"); closeModal(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success(copy.save); closeModal(); },
     onError: () => {},
   });
 
   const sendMut = useMutation({
     mutationFn: (id: string) => contractsApi.send(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success("تم إرسال العقد للعميل"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success(copy.send); },
     onError: () => {},
   });
 
   const signMut = useMutation({
     mutationFn: (id: string) => contractsApi.sign(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success("تم توثيق التوقيع"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success(copy.certify); },
     onError: () => {},
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => contractsApi.delete(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success("تم الحذف"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success(copy.deleteConfirm.replace("؟", "")); },
     onError: () => {},
   });
 
@@ -132,21 +132,21 @@ export default function ContractsPage() {
     <div className="space-y-6">
       <div className="page-header">
         <div>
-          <h1 className="page-title">العقود</h1>
-          <p className="page-subtitle">{contracts.length} عقد</p>
+           <h1 className="page-title">{copy.title}</h1>
+           <p className="page-subtitle">{contracts.length} {copy.count}</p>
         </div>
         <button onClick={openCreate} className="btn-primary">
-          <Plus size={16} /> عقد جديد
+           <Plus size={16} /> {copy.new}
         </button>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "إجمالي العقود", value: stats.total, icon: FileText, color: "bg-blue-500" },
-          { label: "مسودات", value: stats.draft, icon: FileSignature, color: "bg-amber-500" },
-          { label: "موقّعة", value: stats.signed, icon: CheckSquare, color: "bg-ofoq-green" },
-          { label: "إجمالي القيمة", value: `${stats.totalValue.toLocaleString("ar")} ر.س`, icon: FileText, color: "bg-navy-600" },
+           { label: copy.total, value: stats.total, icon: FileText, color: "bg-blue-500" },
+           { label: copy.drafts, value: stats.draft, icon: FileSignature, color: "bg-amber-500" },
+           { label: copy.signed, value: stats.signed, icon: CheckSquare, color: "bg-ofoq-green" },
+           { label: copy.totalValue, value: `${stats.totalValue.toLocaleString(lang)} ${lang === "id" ? "SAR" : "ر.س"}`, icon: FileText, color: "bg-navy-600" },
         ].map((s) => (
           <div key={s.label} className="card flex items-center gap-3">
             <div className={`stat-icon ${s.color}`}><s.icon size={18} className="text-white" /></div>
@@ -164,11 +164,11 @@ export default function ContractsPage() {
           <div className="relative flex-1 min-w-48">
             <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input value={search} onChange={(e) => setSearch(e.target.value)}
-              placeholder="بحث برقم العقد..." className="input-field pr-9 text-sm" />
+               placeholder={copy.search} className="input-field pr-9 text-sm" />
           </div>
           <select value={status} onChange={(e) => setStatus(e.target.value)} className="input-field text-sm w-36">
-            <option value="">كل الحالات</option>
-            {Object.entries(STATUS).map(([v, { label }]) => (
+             <option value="">{copy.allStatuses}</option>
+             {Object.entries(statusConfig).map(([v, { label }]) => (
               <option key={v} value={v}>{label}</option>
             ))}
           </select>
@@ -184,25 +184,20 @@ export default function ContractsPage() {
         ) : contracts.length === 0 ? (
           <div className="text-center py-16">
             <FileSignature size={40} className="text-gray-200 mx-auto mb-3" />
-            <p className="text-gray-400">لا توجد عقود بعد</p>
+             <p className="text-gray-400">{copy.empty}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="table">
               <thead>
                 <tr>
-                  <th>رقم العقد</th>
-                  <th>العنوان</th>
-                  <th>العميل</th>
-                  <th>القيمة</th>
-                  <th>تاريخ الانتهاء</th>
-                  <th>الحالة</th>
-                  <th>الإجراءات</th>
+                   <th>{copy.number}</th><th>{copy.contractTitle}</th><th>{copy.customer}</th>
+                   <th>{copy.value}</th><th>{copy.endDate}</th><th>{copy.status}</th><th>{copy.actions}</th>
                 </tr>
               </thead>
               <tbody>
                 {contracts.map((c: any, i: number) => {
-                  const s = STATUS[c.status as keyof typeof STATUS] || { label: c.status, color: "badge-gray" };
+                   const s = statusConfig[c.status as keyof typeof statusConfig] || { label: c.status, color: "badge-gray" };
                   return (
                     <motion.tr key={c._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.03 }} className="group">
@@ -210,7 +205,7 @@ export default function ContractsPage() {
                       <td className="max-w-40 truncate">{c.title}</td>
                       <td>{c.customerId?.name || c.customerId?.companyName || "—"}</td>
                       <td className="font-semibold">
-                        {c.value ? `${c.value.toLocaleString("ar")} ${c.currency || "SAR"}` : "—"}
+                         {c.value ? `${c.value.toLocaleString(lang)} ${c.currency || "SAR"}` : "—"}
                       </td>
                       <td>
                         {c.endDate
@@ -222,32 +217,32 @@ export default function ContractsPage() {
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           {/* Edit */}
                           <button onClick={() => openEdit(c)}
-                            className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-navy-600" title="تعديل">
+                             className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-navy-600" title={copy.edit}>
                             <FileSignature size={14} />
                           </button>
                           {/* Send */}
                           {c.status === "draft" && (
                             <button onClick={() => sendMut.mutate(c._id)}
-                              className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600" title="إرسال">
+                               className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600" title={copy.send}>
                               <Send size={14} />
                             </button>
                           )}
                           {/* Sign */}
-                          {c.status === "sent" && (
-                            <button onClick={() => { if (confirm("توثيق توقيع العقد؟")) signMut.mutate(c._id); }}
-                              className="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600" title="توثيق">
+                           {c.status === "sent" && (
+                             <button onClick={() => { if (confirm(copy.certify)) signMut.mutate(c._id); }}
+                               className="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600" title={copy.certify}>
                               <CheckSquare size={14} />
                             </button>
                           )}
                           {/* PDF */}
                           <button onClick={() => downloadContractPdf(c._id, c.contractNumber)}
-                            className="p-1.5 rounded-lg hover:bg-purple-50 text-gray-400 hover:text-purple-600" title="تحميل PDF">
+                             className="p-1.5 rounded-lg hover:bg-purple-50 text-gray-400 hover:text-purple-600" title={copy.download}>
                             <Download size={14} />
                           </button>
                           {/* Delete */}
                           {c.status === "draft" && (
-                            <button onClick={() => { if (confirm("حذف العقد؟")) deleteMut.mutate(c._id); }}
-                              className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500" title="حذف">
+                             <button onClick={() => { if (confirm(copy.deleteConfirm)) deleteMut.mutate(c._id); }}
+                               className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500" title={copy.deleteConfirm}>
                               <Trash2 size={14} />
                             </button>
                           )}
@@ -276,7 +271,7 @@ export default function ContractsPage() {
             >
               <div className="flex items-center justify-between p-6 border-b">
                 <h3 className="text-lg font-bold text-navy-700">
-                  {editing ? "تعديل العقد" : "عقد جديد"}
+                   {editing ? copy.editTitle : copy.new}
                 </h3>
                 <button onClick={closeModal} className="p-2 hover:bg-gray-100 rounded-lg">
                   <X size={18} />
@@ -286,16 +281,16 @@ export default function ContractsPage() {
               <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
                 {/* Title */}
                 <div>
-                  <label className="label">عنوان العقد <span className="text-red-500">*</span></label>
-                  <input {...register("title", { required: "مطلوب" })} className="input-field" placeholder="عقد تطوير نظام..." />
+                   <label className="label">{copy.titleLabel} <span className="text-red-500">*</span></label>
+                   <input {...register("title", { required: copy.required })} className="input-field" placeholder={copy.titleLabel} />
                   {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>}
                 </div>
 
                 {/* Customer */}
                 <div>
-                  <label className="label">العميل <span className="text-red-500">*</span></label>
-                  <select {...register("customerId", { required: "مطلوب" })} className="input-field">
-                    <option value="">اختر العميل...</option>
+                   <label className="label">{copy.customer} <span className="text-red-500">*</span></label>
+                   <select {...register("customerId", { required: copy.required })} className="input-field">
+                     <option value="">{copy.chooseCustomer}</option>
                     {customers.map((c: any) => (
                       <option key={c._id} value={c._id}>{c.name || c.companyName}</option>
                     ))}
@@ -306,12 +301,12 @@ export default function ContractsPage() {
                 {/* Value + Currency */}
                 <div className="grid grid-cols-3 gap-3">
                   <div className="col-span-2">
-                    <label className="label">قيمة العقد</label>
+                     <label className="label">{copy.value}</label>
                     <input {...register("value", { valueAsNumber: true })} type="number" min="0" step="0.01"
                       className="input-field" placeholder="0.00" />
                   </div>
                   <div>
-                    <label className="label">العملة</label>
+                     <label className="label">{copy.currency}</label>
                     <select {...register("currency")} className="input-field">
                       <option value="SAR">ر.س</option>
                       <option value="USD">USD</option>
@@ -323,28 +318,28 @@ export default function ContractsPage() {
                 {/* Dates */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="label">تاريخ البدء</label>
+                     <label className="label">{copy.startDate}</label>
                     <input {...register("startDate")} type="date" className="input-field" />
                   </div>
                   <div>
-                    <label className="label">تاريخ الانتهاء</label>
+                     <label className="label">{copy.endDate}</label>
                     <input {...register("endDate")} type="date" className="input-field" />
                   </div>
                 </div>
 
                 {/* Content */}
                 <div>
-                  <label className="label">محتوى العقد</label>
+                   <label className="label">{copy.content}</label>
                   <textarea {...register("content")} rows={5}
-                    className="input-field resize-none" placeholder="بنود العقد والتفاصيل..." />
+                     className="input-field resize-none" placeholder={copy.content} />
                 </div>
 
                 <div className="flex gap-3 pt-2">
-                  <button type="button" onClick={closeModal} className="btn-secondary flex-1">إلغاء</button>
+                   <button type="button" onClick={closeModal} className="btn-secondary flex-1">{copy.cancel}</button>
                   <button type="submit"
                     disabled={createMut.isPending || updateMut.isPending}
                     className="btn-primary flex-1">
-                    {(createMut.isPending || updateMut.isPending) ? "جاري الحفظ..." : editing ? "حفظ التعديلات" : "إنشاء العقد"}
+                     {(createMut.isPending || updateMut.isPending) ? "..." : editing ? copy.save : copy.create}
                   </button>
                 </div>
               </form>

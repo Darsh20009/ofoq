@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { startRegistration } from "@simplewebauthn/browser";
 import { useAuthStore } from "../../store/authStore";
 import { usersApi, webauthnApi, authApi } from "../../api/client";
+import { useLang } from "../../i18n/LangContext";
 
 type TotpState = "idle" | "setting_up" | "verifying" | "enabled" | "disabling";
 
@@ -28,6 +29,8 @@ function apiErrorMessage(error: any, fallback: string): string {
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuthStore();
+  const { ui, lang } = useLang();
+  const copy = ui.adminPages.adminPortal;
   const queryClient = useQueryClient();
 
   // ── Profile form ────────────────────────────────────────────
@@ -76,21 +79,21 @@ export default function ProfilePage() {
       fd.append("avatar", file);
       return usersApi.update(user!._id, fd as any);
     },
-    onSuccess: (res) => { updateUser(res.data.data?.user || res.data.user || res.data); toast.success("تم تحديث الصورة"); },
-    onError: (error) => toast.error(apiErrorMessage(error, "تعذر تحديث الصورة")),
+    onSuccess: (res) => { updateUser(res.data.data?.user || res.data.user || res.data); toast.success(copy.passkeyAdded); },
+    onError: (error) => toast.error(apiErrorMessage(error, copy.loadError)),
   });
 
   const updateMut = useMutation({
     mutationFn: (data: object) => usersApi.update(user!._id, data),
-    onSuccess: (res) => { updateUser(res.data.data?.user || res.data.user || res.data); toast.success("تم تحديث الملف الشخصي"); },
-    onError: (error) => toast.error(apiErrorMessage(error, "تعذر تحديث الملف الشخصي")),
+    onSuccess: (res) => { updateUser(res.data.data?.user || res.data.user || res.data); toast.success(copy.profileTitle); },
+    onError: (error) => toast.error(apiErrorMessage(error, copy.loadError)),
   });
 
   const pwdMut = useMutation({
     mutationFn: (data: { currentPassword: string; newPassword: string }) =>
       usersApi.changePassword(data),
-    onSuccess: () => { resetPwd(); toast.success("تم تغيير كلمة المرور بنجاح"); },
-    onError: (error) => toast.error(apiErrorMessage(error, "تعذر تغيير كلمة المرور")),
+    onSuccess: () => { resetPwd(); toast.success(copy.updatePassword); },
+    onError: (error) => toast.error(apiErrorMessage(error, copy.loadError)),
   });
 
   const totpSetupMut = useMutation({
@@ -102,7 +105,7 @@ export default function ProfilePage() {
     },
     onError: (error) => {
       setTotpState("idle");
-      toast.error(apiErrorMessage(error, "تعذر بدء إعداد المصادقة الثنائية"));
+      toast.error(apiErrorMessage(error, copy.loadError));
     },
   });
 
@@ -113,10 +116,10 @@ export default function ProfilePage() {
       setTotpState(enabled ? "enabled" : "idle");
       setTotpQr(""); setTotpCode("");
       updateUser({ twoFactorEnabled: enabled } as any);
-      toast.success("تم تفعيل المصادقة الثنائية 🎉");
+      toast.success(copy.totpConfirmed);
     },
     onError: (error) => {
-      toast.error(apiErrorMessage(error, "رمز التحقق غير صحيح"));
+      toast.error(apiErrorMessage(error, copy.loadError));
     },
   });
 
@@ -127,10 +130,10 @@ export default function ProfilePage() {
       setTotpState(enabled ? "enabled" : "idle");
       setTotpCode("");
       updateUser({ twoFactorEnabled: enabled } as any);
-      toast.success("تم تعطيل المصادقة الثنائية");
+      toast.success(copy.totpDisable);
     },
     onError: (error) => {
-      toast.error(apiErrorMessage(error, "تعذر تعطيل المصادقة الثنائية"));
+      toast.error(apiErrorMessage(error, copy.loadError));
     },
   });
 
@@ -141,13 +144,13 @@ export default function ProfilePage() {
       const deviceName = navigator.userAgent.split(") ")[0].split(" (").join(" · ").slice(0, 60);
       return webauthnApi.registerVerify(attResp, deviceName);
     },
-    onSuccess: () => { toast.success("تم إضافة مفتاح المرور"); queryClient.invalidateQueries({ queryKey: ["webauthn-credentials"] }); },
+    onSuccess: () => { toast.success(copy.passkeyAdded); queryClient.invalidateQueries({ queryKey: ["webauthn-credentials"] }); },
     onError: () => {},
   });
 
   const deletePasskeyMut = useMutation({
     mutationFn: (id: string) => webauthnApi.deleteCredential(id),
-    onSuccess: () => { toast.success("تم الحذف"); queryClient.invalidateQueries({ queryKey: ["webauthn-credentials"] }); },
+    onSuccess: () => { toast.success(copy.passkeyDeleted); queryClient.invalidateQueries({ queryKey: ["webauthn-credentials"] }); },
   });
 
   const togglePwd = (key: string) => setShowPwd((p) => ({ ...p, [key]: !p[key] }));
@@ -155,8 +158,8 @@ export default function ProfilePage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="page-title">الملف الشخصي</h1>
-        <p className="page-subtitle">إدارة معلوماتك وإعدادات الأمان</p>
+        <h1 className="page-title">{copy.profileTitle}</h1>
+        <p className="page-subtitle">{copy.profileSubtitle}</p>
       </div>
 
       {/* ── Avatar ──────────────────────────────────────────── */}
@@ -180,7 +183,7 @@ export default function ProfilePage() {
           <p className="font-bold text-xl text-navy-700">{user?.name}</p>
           <p className="text-gray-500 text-sm">{user?.email}</p>
           <span className="badge-green mt-1 inline-block">
-            {user?.role === "super_admin" ? "مدير عام" : user?.role === "admin" ? "مدير" : user?.role === "manager" ? "مشرف" : "موظف"}
+            {user?.role === "super_admin" ? copy.roleSuperAdmin : user?.role === "admin" ? copy.roleAdmin : user?.role === "manager" ? copy.roleManager : copy.roleEmployee}
           </span>
         </div>
       </div>
@@ -189,34 +192,34 @@ export default function ProfilePage() {
       <div className="card">
         <div className="flex items-center gap-2 mb-6">
           <User size={18} className="text-ofoq-green" />
-          <h3 className="font-bold text-navy-700">المعلومات الشخصية</h3>
+          <h3 className="font-bold text-navy-700">{copy.personalInfo}</h3>
         </div>
         <form onSubmit={handleSubmit((d) => updateMut.mutate(d))} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="label">الاسم (إنجليزي)</label>
+              <label className="label">{copy.nameEn}</label>
               <input {...register("fullName")} className="input-field" dir="ltr" />
             </div>
             <div>
-              <label className="label">الاسم (عربي)</label>
+              <label className="label">{copy.nameUr}</label>
               <input {...register("fullNameAr")} className="input-field" />
             </div>
             <div>
-              <label className="label">رقم الهاتف</label>
+              <label className="label">{copy.phone}</label>
               <input {...register("phone")} className="input-field" dir="ltr" placeholder="+966..." />
             </div>
             <div>
-              <label className="label">القسم</label>
-              <input {...register("department")} className="input-field" placeholder="التسويق، التقنية..." />
+              <label className="label">{copy.department}</label>
+              <input {...register("department")} className="input-field" placeholder={copy.department} />
             </div>
             <div className="col-span-2">
-              <label className="label">المسمى الوظيفي</label>
-              <input {...register("position")} className="input-field" placeholder="مدير مشروع..." />
+              <label className="label">{copy.position}</label>
+              <input {...register("position")} className="input-field" placeholder={copy.position} />
             </div>
           </div>
           <div className="flex justify-end">
             <button type="submit" disabled={updateMut.isPending} className="btn-primary">
-              {updateMut.isPending ? "جاري الحفظ..." : "حفظ التغييرات"}
+              {updateMut.isPending ? copy.saving : copy.saveChanges}
             </button>
           </div>
         </form>
@@ -226,14 +229,14 @@ export default function ProfilePage() {
       <div className="card">
         <div className="flex items-center gap-2 mb-6">
           <Lock size={18} className="text-ofoq-green" />
-          <h3 className="font-bold text-navy-700">تغيير كلمة المرور</h3>
+          <h3 className="font-bold text-navy-700">{copy.changePassword}</h3>
         </div>
         <form onSubmit={handlePwd((d) => {
           if (d.newPassword !== d.confirmPassword) { return; }
           pwdMut.mutate({ currentPassword: d.currentPassword, newPassword: d.newPassword });
         })} className="space-y-4">
           <div className="relative">
-            <label className="label">كلمة المرور الحالية</label>
+            <label className="label">{copy.currentPassword}</label>
             <input {...regPwd("currentPassword", { required: true })}
               type={showPwd.current ? "text" : "password"} className="input-field pl-10" />
             <button type="button" onClick={() => togglePwd("current")}
@@ -242,7 +245,7 @@ export default function ProfilePage() {
             </button>
           </div>
           <div className="relative">
-            <label className="label">كلمة المرور الجديدة</label>
+            <label className="label">{copy.newPassword}</label>
             <input {...regPwd("newPassword", { required: true, minLength: 8 })}
               type={showPwd.new ? "text" : "password"} className="input-field pl-10" />
             <button type="button" onClick={() => togglePwd("new")}
@@ -251,9 +254,9 @@ export default function ProfilePage() {
             </button>
           </div>
           <div className="relative">
-            <label className="label">تأكيد كلمة المرور الجديدة</label>
+            <label className="label">{copy.confirmPassword}</label>
             <input {...regPwd("confirmPassword", { required: true,
-              validate: (v) => v === newPwd || "كلمتا المرور غير متطابقتين" })}
+              validate: (v) => v === newPwd || copy.passwordMismatch })}
               type={showPwd.confirm ? "text" : "password"} className="input-field pl-10" />
             <button type="button" onClick={() => togglePwd("confirm")}
               className="absolute left-3 top-9 text-gray-400 hover:text-gray-600">
@@ -262,7 +265,7 @@ export default function ProfilePage() {
           </div>
           <div className="flex justify-end">
             <button type="submit" disabled={pwdMut.isPending} className="btn-secondary">
-              {pwdMut.isPending ? "..." : "تحديث كلمة المرور"}
+              {pwdMut.isPending ? "..." : copy.updatePassword}
             </button>
           </div>
         </form>
@@ -272,9 +275,9 @@ export default function ProfilePage() {
       <div className="card">
         <div className="flex items-center gap-2 mb-4">
           <Shield size={18} className="text-ofoq-green" />
-          <h3 className="font-bold text-navy-700">المصادقة الثنائية (2FA)</h3>
+          <h3 className="font-bold text-navy-700">{copy.totpTitle}</h3>
           {(totpState === "enabled") && (
-            <span className="badge-green mr-auto">مفعّلة</span>
+            <span className="badge-green mr-auto">{copy.totpEnabled}</span>
           )}
         </div>
 
@@ -283,13 +286,13 @@ export default function ProfilePage() {
           {totpState === "idle" && (
             <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <p className="text-sm text-gray-500 mb-4">
-                أضف طبقة حماية إضافية باستخدام تطبيق المصادقة (Google Authenticator، Authy، إلخ).
+                {copy.totpHint}
               </p>
               <button onClick={() => { setTotpState("setting_up"); totpSetupMut.mutate(); }}
                 disabled={totpSetupMut.isPending}
                 className="btn-primary">
                 <Shield size={16} />
-                {totpSetupMut.isPending ? "جاري الإعداد..." : "تفعيل المصادقة الثنائية"}
+                {totpSetupMut.isPending ? copy.totpSettingUp : copy.totpSetup}
               </button>
             </motion.div>
           )}
@@ -305,9 +308,7 @@ export default function ProfilePage() {
           {totpState === "verifying" && (
             <motion.div key="verifying" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="space-y-4">
-              <p className="text-sm text-gray-600">
-                افتح تطبيق <strong>Google Authenticator</strong> أو <strong>Authy</strong> وامسح الكود:
-              </p>
+                <p className="text-sm text-gray-600">{copy.totpGoogleAuth}</p>
               {totpQr && (
                 <div className="flex justify-center">
                   <div className="bg-white p-3 rounded-2xl shadow-md border border-gray-100">
@@ -316,22 +317,22 @@ export default function ProfilePage() {
                 </div>
               )}
               <div className="bg-gray-50 rounded-xl p-3">
-                <p className="text-xs text-gray-500 mb-1">أو أدخل الكود يدوياً:</p>
+                <p className="text-xs text-gray-500 mb-1">{copy.totpEnterManually}</p>
                 <p className="font-mono text-sm text-navy-700 tracking-widest break-all">{totpSecret}</p>
               </div>
               <div>
-                <label className="label">أدخل الرمز من التطبيق للتحقق</label>
+                <label className="label">{copy.totpCodeLabel}</label>
                 <input value={totpCode} onChange={(e) => setTotpCode(normalizeOtpInput(e.target.value))}
                   className="input-field text-center text-2xl font-mono tracking-widest" maxLength={6}
                   placeholder="000000" dir="ltr" />
               </div>
               <div className="flex gap-3">
                 <button onClick={() => { setTotpState("idle"); setTotpQr(""); setTotpCode(""); }}
-                  className="btn-secondary flex-1">إلغاء</button>
+                  className="btn-secondary flex-1">{copy.totpCancel}</button>
                 <button onClick={() => totpVerifyMut.mutate(totpCode)}
                   disabled={totpCode.length !== 6 || totpVerifyMut.isPending}
                   className="btn-primary flex-1">
-                  {totpVerifyMut.isPending ? "جاري التحقق..." : "تأكيد وتفعيل"}
+                  {totpVerifyMut.isPending ? copy.totpVerifying : copy.totpVerify}
                 </button>
               </div>
             </motion.div>
@@ -344,14 +345,14 @@ export default function ProfilePage() {
               <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
                 <CheckCircle size={20} className="text-emerald-600 flex-shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-emerald-700">المصادقة الثنائية مفعّلة</p>
-                  <p className="text-xs text-emerald-600">حسابك محمي بطبقة أمان إضافية</p>
+                  <p className="text-sm font-semibold text-emerald-700">{copy.totpConfirmed}</p>
+                  <p className="text-xs text-emerald-600">{copy.totpActive}</p>
                 </div>
               </div>
               <button onClick={() => { setTotpState("disabling"); setTotpCode(""); }}
                 className="btn-danger">
                 <Shield size={16} />
-                تعطيل المصادقة الثنائية
+                {copy.totpDisable}
               </button>
             </motion.div>
           )}
@@ -362,21 +363,21 @@ export default function ProfilePage() {
               className="space-y-4">
               <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3">
                 <AlertCircle size={16} className="text-amber-600 flex-shrink-0" />
-                <p className="text-xs text-amber-700">لتعطيل الحماية، أدخل الرمز الحالي من تطبيق المصادقة:</p>
+                <p className="text-xs text-amber-700">{copy.totpDisableHint}</p>
               </div>
               <div>
-                <label className="label">رمز التطبيق</label>
+                <label className="label">{copy.totpAppCode}</label>
                 <input value={totpCode} onChange={(e) => setTotpCode(normalizeOtpInput(e.target.value))}
                   className="input-field text-center text-2xl font-mono tracking-widest" maxLength={6}
                   placeholder="000000" dir="ltr" />
               </div>
               <div className="flex gap-3">
                 <button onClick={() => { setTotpState("enabled"); setTotpCode(""); }}
-                  className="btn-secondary flex-1">إلغاء</button>
+                  className="btn-secondary flex-1">{copy.totpCancel}</button>
                 <button onClick={() => totpDisableMut.mutate(totpCode)}
                   disabled={totpCode.length !== 6 || totpDisableMut.isPending}
                   className="btn-danger flex-1">
-                  {totpDisableMut.isPending ? "..." : "تأكيد التعطيل"}
+                  {totpDisableMut.isPending ? copy.totpDisabling : copy.totpDisableConfirm}
                 </button>
               </div>
             </motion.div>
@@ -389,19 +390,17 @@ export default function ProfilePage() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Fingerprint size={18} className="text-ofoq-green" />
-            <h3 className="font-bold text-navy-700">مفاتيح المرور (Passkeys)</h3>
+            <h3 className="font-bold text-navy-700">{copy.passkeysTitle}</h3>
           </div>
           <button onClick={() => addPasskeyMut.mutate()} disabled={addPasskeyMut.isPending}
             className="btn-secondary text-sm">
             <Plus size={15} />
-            {addPasskeyMut.isPending ? "جاري الإضافة..." : "إضافة مفتاح"}
+            {addPasskeyMut.isPending ? copy.passkeysLoading : copy.addPasskey}
           </button>
         </div>
-        <p className="text-sm text-gray-500 mb-4">
-          سجّل دخولك بدون كلمة مرور باستخدام بصمتك أو وجهك أو مفتاح أمان الجهاز.
-        </p>
+          <p className="text-sm text-gray-500 mb-4">{copy.passkeysSubtitle}</p>
         {passkeys.length === 0 ? (
-          <p className="text-sm text-gray-400 py-2">لا توجد مفاتيح مرور مسجّلة بعد.</p>
+          <p className="text-sm text-gray-400 py-2">{copy.passkeysEmpty}</p>
         ) : (
           <div className="space-y-2">
             {passkeys.map((c: any) => (
@@ -409,8 +408,8 @@ export default function ProfilePage() {
                 <div>
                   <p className="text-sm font-medium text-navy-700">{c.deviceName}</p>
                   <p className="text-xs text-gray-400">
-                    أُضيف {new Date(c.createdAt).toLocaleDateString("ar-SA")}
-                    {c.lastUsed ? ` · آخر استخدام ${new Date(c.lastUsed).toLocaleDateString("ar-SA")}` : ""}
+                    {new Date(c.createdAt).toLocaleDateString(lang === "ar" || lang === "ur" ? `${lang}-SA` : lang)}
+                    {c.lastUsed ? ` · ${new Date(c.lastUsed).toLocaleDateString(lang === "ar" || lang === "ur" ? `${lang}-SA` : lang)}` : ""}
                   </p>
                 </div>
                 <button onClick={() => deletePasskeyMut.mutate(c._id)}
@@ -430,12 +429,12 @@ export default function ProfilePage() {
             <CreditCard size={22} className="text-[#33B27C]" />
           </div>
           <div className="flex-1">
-            <p className="font-bold">بطاقة الموظف</p>
-            <p className="text-white/50 text-sm">اعرض بطاقتك الرسمية وباركود الدخول إلى النظام</p>
+            <p className="font-bold">{copy.cardTitle}</p>
+            <p className="text-white/50 text-sm">{copy.cardSubtitle}</p>
           </div>
           <Link to="/admin/employee/card" className="btn-primary text-sm flex-shrink-0">
             <QrCode size={15} />
-            عرض البطاقة
+            {copy.viewCard}
           </Link>
         </div>
       </div>

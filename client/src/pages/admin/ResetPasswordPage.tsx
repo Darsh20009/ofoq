@@ -5,8 +5,11 @@ import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { authApi } from "../../api/client";
 import OfoqLogo from "../../components/OfoqLogo";
+import { useLang } from "../../i18n/LangContext";
 
 export default function ResetPasswordPage() {
+  const { ui, lang } = useLang();
+  const copy = ui.auth;
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get("token") || "";
@@ -29,7 +32,13 @@ export default function ResetPasswordPage() {
     : /[A-Z]/.test(password) && /[0-9]/.test(password) ? 4
     : 3;
 
-  const strengthLabel = ["", "ضعيفة جداً", "ضعيفة", "مقبولة", "قوية"];
+  const strengthLabels: Record<string, string[]> = {
+    en: ["", "Very weak", "Weak", "Fair", "Strong"],
+    ar: ["", "ضعيفة جداً", "ضعيفة", "مقبولة", "قوية"],
+    ur: ["", "بہت کمزور", "کمزور", "مناسب", "مضبوط"],
+    id: ["", "Sangat lemah", "Lemah", "Cukup", "Kuat"],
+  };
+  const strengthLabel = strengthLabels[lang] || strengthLabels.en;
   const strengthColor = ["", "bg-red-500", "bg-orange-400", "bg-yellow-400", "bg-green-500"];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,8 +52,8 @@ export default function ResetPasswordPage() {
       setDone(true);
       setTimeout(() => navigate("/admin/login", { replace: true }), 3000);
     } catch (err: any) {
-      const msg = err?.response?.data?.error || "الرابط غير صالح أو منتهي الصلاحية";
-      // silent
+      const msg = err?.response?.data?.error || copy.invalidReset;
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -61,8 +70,8 @@ export default function ResetPasswordPage() {
         <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-xl">
           <div className="text-center mb-8">
             <OfoqLogo className="w-24 h-16 mx-auto mb-4" dark />
-            <h1 className="text-ofoq-navy text-2xl font-bold">تعيين كلمة مرور جديدة</h1>
-            <p className="text-gray-500 text-sm mt-1">اختر كلمة مرور قوية لحسابك</p>
+            <h1 className="text-ofoq-navy text-2xl font-bold">{copy.resetTitle}</h1>
+            <p className="text-gray-500 text-sm mt-1">{copy.resetSubtitle}</p>
           </div>
 
           {done ? (
@@ -70,17 +79,17 @@ export default function ResetPasswordPage() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle size={32} className="text-green-600" />
               </div>
-              <h2 className="text-ofoq-navy font-bold text-lg mb-2">تم تغيير كلمة المرور!</h2>
-              <p className="text-gray-500 text-sm mb-4">سيتم تحويلك لصفحة الدخول خلال ثوانٍ...</p>
+               <h2 className="text-ofoq-navy font-bold text-lg mb-2">{copy.passwordChanged}</h2>
+               <p className="text-gray-500 text-sm mb-4">{copy.redirecting}</p>
               <Link to="/admin/login" className="text-ofoq-red text-sm font-medium hover:underline">
-                الذهاب لتسجيل الدخول الآن
+                 {copy.goLogin}
               </Link>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* كلمة المرور الجديدة */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">كلمة المرور الجديدة</label>
+                 <label className="block text-sm font-medium text-gray-700 mb-1.5">{copy.newPassword}</label>
                 <div className="relative">
                   <Lock size={16} className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-400" />
                   <input
@@ -104,14 +113,14 @@ export default function ResetPasswordPage() {
                         <div key={i} className={`h-1 flex-1 rounded-full transition-all ${i <= strength ? strengthColor[strength] : "bg-gray-200"}`} />
                       ))}
                     </div>
-                    <p className="text-xs text-gray-400">القوة: <span className={`font-medium ${strength >= 3 ? "text-green-600" : strength === 2 ? "text-yellow-600" : "text-red-500"}`}>{strengthLabel[strength]}</span></p>
+                     <p className="text-xs text-gray-400">{copy.passwordStrength}: <span className={`font-medium ${strength >= 3 ? "text-green-600" : strength === 2 ? "text-yellow-600" : "text-red-500"}`}>{strengthLabel[strength]}</span></p>
                   </div>
                 )}
               </div>
 
               {/* تأكيد كلمة المرور */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">تأكيد كلمة المرور</label>
+                 <label className="block text-sm font-medium text-gray-700 mb-1.5">{copy.confirmPassword}</label>
                 <div className="relative">
                   <Lock size={16} className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-400" />
                   <input
@@ -140,14 +149,14 @@ export default function ResetPasswordPage() {
                 {loading ? (
                   <>
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    جاري الحفظ...
+                     {copy.saving}
                   </>
-                ) : "حفظ كلمة المرور الجديدة"}
+                 ) : copy.savePassword}
               </button>
 
               <div className="text-center">
                 <Link to="/admin/login" className="text-gray-400 text-sm hover:text-ofoq-navy transition-colors">
-                  العودة لتسجيل الدخول
+                   {copy.backLogin}
                 </Link>
               </div>
             </form>

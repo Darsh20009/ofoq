@@ -1,4 +1,6 @@
-export type Bilingual = { ar: string; en: string };
+import { catalogSentence, catalogText } from "../i18n/catalogTranslations";
+
+export type Bilingual = { ar: string; en: string; ur?: string; id?: string };
 
 export type ServiceItem = {
   slug: string;
@@ -19,7 +21,12 @@ export type ServiceCategory = {
   services: ServiceItem[];
 };
 
-const bi = (ar: string, en: string): Bilingual => ({ ar, en });
+const bi = (ar: string, en: string): Bilingual => ({
+  ar,
+  en,
+  ur: catalogText(en, "ur"),
+  id: catalogText(en, "id"),
+});
 const make = (
   slug: string,
   ar: string,
@@ -29,10 +36,12 @@ const make = (
 ): ServiceItem => ({
   slug,
   title: bi(ar, en),
-  desc: bi(
-    `نتولى ${ar} باحترافية، مع متابعة دقيقة للمتطلبات والجهات ذات العلاقة في المملكة. ننسّق الخطوات نيابةً عنك ونبقيك على اطلاع حتى اكتمال المعاملة.`,
-    `We manage ${en} with careful coordination across the relevant Saudi authorities. Our team handles the workflow on your behalf and keeps you informed until completion.`,
-  ),
+  desc: {
+    ar: `نتولى ${ar} باحترافية، مع متابعة دقيقة للمتطلبات والجهات ذات العلاقة في المملكة. ننسّق الخطوات نيابةً عنك ونبقيك على اطلاع حتى اكتمال المعاملة.`,
+    en: `We manage ${en} with careful coordination across the relevant Saudi authorities. Our team handles the workflow on your behalf and keeps you informed until completion.`,
+    ur: catalogSentence(`We manage ${en} with careful coordination across the relevant Saudi authorities. Our team handles the workflow on your behalf and keeps you informed until completion.`, "ur"),
+    id: catalogSentence(`We manage ${en} with careful coordination across the relevant Saudi authorities. Our team handles the workflow on your behalf and keeps you informed until completion.`, "id"),
+  },
   beneficiaries: [
     bi("الشركات الناشئة ورواد الأعمال", "Startups and founders"),
     bi("الشركات القائمة التي توسّع عملياتها", "Established companies scaling operations"),
@@ -41,10 +50,20 @@ const make = (
   requirements: [
     bi("بيانات المنشأة والسجل التجاري إن وجد", "Company details and commercial registration, if available"),
     bi("هوية المفوض وبيانات التواصل", "Authorized representative ID and contact details"),
-    bi(`تفاصيل الطلب والوثائق الخاصة بخدمة ${ar}`, `Request details and documents related to ${en.toLowerCase()}`),
+      {
+        ar: `تفاصيل الطلب والوثائق الخاصة بخدمة ${ar}`,
+        en: `Request details and documents related to ${en.toLowerCase()}`,
+        ur: catalogSentence(`Request details and documents related to ${en}`, "ur"),
+        id: catalogSentence(`Request details and documents related to ${en}`, "id"),
+      },
     bi("تفويض إلكتروني عند الحاجة", "Electronic authorization where required"),
   ],
-  duration: bi(duration.split(" / ")[0], duration.split(" / ")[1] ?? duration),
+  duration: {
+    ar: duration.split(" / ")[0],
+    en: duration.split(" / ")[1] ?? duration,
+    ur: duration.split(" / ")[0].replace(/أيام عمل|يوم عمل/g, "کاروباری دن"),
+    id: (duration.split(" / ")[1] ?? duration).replace(/business days/g, "hari kerja"),
+  },
   steps: [
     bi("جلسة فهم الاحتياج وتدقيق البيانات", "Discovery call and data review"),
     bi("إعداد المتطلبات والتفويضات اللازمة", "Prepare requirements and authorizations"),
@@ -128,4 +147,9 @@ const categories: ServiceCategory[] = [
 export const servicesCatalog = categories;
 export const getCategory = (slug?: string) => categories.find((category) => category.slug === slug);
 export const getService = (categorySlug?: string, serviceSlug?: string) => getCategory(categorySlug)?.services.find((service) => service.slug === serviceSlug);
-export const pick = (value: Bilingual, lang: string) => lang === "ar" ? value.ar : value.en;
+export const pick = (value: Bilingual, lang: string) => {
+  if (lang === "ar") return value.ar;
+  if (lang === "ur") return value.ur || catalogText(value.en, "ur");
+  if (lang === "id") return value.id || catalogText(value.en, "id");
+  return value.en;
+};

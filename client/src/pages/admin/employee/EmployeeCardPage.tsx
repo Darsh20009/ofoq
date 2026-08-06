@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { employeeApi } from "../../../api/client";
 import { useAuthStore } from "../../../store/authStore";
 import OfoqLogo from "../../../components/OfoqLogo";
+import { useLang } from "../../../i18n/LangContext";
 
 // ── iOS / Android detection ───────────────────────────────────────────
 const isIOS     = typeof navigator !== "undefined" && /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -37,9 +38,9 @@ async function downloadWalletPass(setLoading: (v: boolean) => void) {
       try {
         const text = await (res.data as Blob).text();
         const json = JSON.parse(text);
-        toast.error(json.detail || json.error || "خطأ في توليد البطاقة");
+        toast.error(json.detail || json.error || "Unable to generate card");
       } catch {
-        toast.error("تعذّر توليد بطاقة Apple Wallet");
+        toast.error("Unable to generate Apple Wallet card");
       }
       return;
     }
@@ -59,7 +60,7 @@ async function downloadWalletPass(setLoading: (v: boolean) => void) {
       a.click();
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      toast.success("تم تحميل بطاقة Apple Wallet ✓");
+      toast.success("Apple Wallet card downloaded");
     }
   } catch (err: any) {
     // Try reading blob error from axios response
@@ -67,15 +68,15 @@ async function downloadWalletPass(setLoading: (v: boolean) => void) {
       try {
         const text = await err.response.data.text();
         const json = JSON.parse(text);
-        toast.error(json.detail || json.error || "خطأ في توليد البطاقة");
+        toast.error(json.detail || json.error || "Unable to generate card");
       } catch {
-        toast.error("تعذّر توليد بطاقة Apple Wallet");
+        toast.error("Unable to generate Apple Wallet card");
       }
     } else {
       toast.error(
         err?.response?.data?.detail ||
         err?.response?.data?.error ||
-        "تعذّر توليد بطاقة Apple Wallet"
+        "Unable to generate Apple Wallet card"
       );
     }
   } finally {
@@ -86,6 +87,8 @@ async function downloadWalletPass(setLoading: (v: boolean) => void) {
 // ─────────────────────────────────────────────────────────────────────
 export default function EmployeeCardPage() {
   const { user } = useAuthStore();
+  const { ui } = useLang();
+  const copy = ui.adminPages.adminPortal;
   const [flipped, setFlipped]           = useState(false);
   const [walletLoading, setWalletLoading] = useState(false);
   const frontRef = useRef<HTMLDivElement | null>(null);
@@ -99,13 +102,13 @@ export default function EmployeeCardPage() {
 
   const regenMut = useMutation({
     mutationFn: () => employeeApi.regenerateCode(),
-    onSuccess:  () => { toast.success("تم تجديد الباركود — الكود القديم لم يعد صالحاً"); refetch(); },
+    onSuccess:  () => { toast.success(copy.barcodeRegenerated); refetch(); },
   });
 
   const card        = data;
   const avatarUrl   = card?.avatar || user?.avatar;
   const displayName = card?.fullNameAr || card?.fullName || user?.name || "—";
-  const position    = card?.position   || "موظف";
+  const position    = card?.position   || copy.roleEmployee;
   const department  = card?.department || "";
   const code        = card?.employeeCode || "—";
   const qrCode      = card?.qrCode;   // data URL from server
@@ -113,20 +116,20 @@ export default function EmployeeCardPage() {
   return (
     <div className="max-w-lg mx-auto space-y-6">
       <div>
-        <h1 className="page-title">بطاقة الموظف</h1>
-        <p className="page-subtitle">بطاقتك الرسمية • امسح الباركود للتحقق من الهوية</p>
+        <h1 className="page-title">{copy.employeeCardTitle}</h1>
+        <p className="page-subtitle">{copy.employeeCardSubtitle}</p>
       </div>
 
       {isLoading ? (
         <div className="flex flex-col items-center gap-3 py-20">
           <div className="w-10 h-10 border-4 border-ofoq-green border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-gray-400">جاري تحميل البطاقة...</p>
+          <p className="text-sm text-gray-400">{copy.loadingCard}</p>
         </div>
       ) : !card ? (
         <div className="card text-center py-12 space-y-3">
           <AlertCircle size={36} className="mx-auto text-red-400" />
-          <p className="text-navy-700 font-semibold">تعذّر تحميل بيانات البطاقة</p>
-          <button onClick={() => refetch()} className="btn-primary text-sm">إعادة المحاولة</button>
+          <p className="text-navy-700 font-semibold">{copy.loadError}</p>
+          <button onClick={() => refetch()} className="btn-primary text-sm">{copy.retry}</button>
         </div>
       ) : (
         <>
@@ -135,7 +138,7 @@ export default function EmployeeCardPage() {
             className="cursor-pointer select-none"
             style={{ perspective: 1400 }}
             onClick={() => setFlipped(!flipped)}
-            title={flipped ? "اضغط للعودة للأمام" : "اضغط لعرض الباركود"}
+             title={flipped ? copy.clickToBack : copy.clickToBarcode}
           >
             <motion.div
               animate={{ rotateY: flipped ? 180 : 0 }}
@@ -186,7 +189,7 @@ export default function EmployeeCardPage() {
                     {/* Logo */}
                     <div className="flex items-center gap-2">
                       <OfoqLogo className="w-14 h-10" />
-                      <p className="text-white/30 text-[9px] leading-tight">أفق لحلول الأعمال</p>
+                      <p className="text-white/30 text-[9px] leading-tight">{copy.companyBrand}</p>
                     </div>
 
                     {/* Name */}
@@ -206,7 +209,7 @@ export default function EmployeeCardPage() {
                     </div>
 
                     {/* Hint */}
-                    <p className="text-white/20 text-[9px]">اضغط لعرض باركود الدخول ↩</p>
+                    <p className="text-white/20 text-[9px]">{copy.clickToBarcode} ↩</p>
                   </div>
                 </div>
               </div>
@@ -222,7 +225,7 @@ export default function EmployeeCardPage() {
                 </svg>
 
                 <div className="relative flex flex-col items-center justify-center h-full gap-3 py-4">
-                  <p className="text-white/40 text-xs tracking-widest uppercase">Scan to Verify</p>
+                   <p className="text-white/40 text-xs tracking-widest uppercase">{copy.scanToVerify}</p>
 
                   {/* QR Code */}
                   {qrCode ? (
@@ -232,7 +235,7 @@ export default function EmployeeCardPage() {
                   ) : (
                     <div className="w-32 h-32 bg-white/10 rounded-2xl flex flex-col items-center justify-center gap-2 border border-white/10">
                       <QrCode size={36} className="text-white/30" />
-                      <p className="text-white/30 text-[9px]">جاري التوليد...</p>
+                       <p className="text-white/30 text-[9px]">{copy.generating}</p>
                     </div>
                   )}
 
@@ -253,7 +256,7 @@ export default function EmployeeCardPage() {
 
           {/* Flip hint */}
           <p className="text-center text-xs text-gray-400">
-            {flipped ? "← اضغط للعودة للواجهة الأمامية" : "اضغط على البطاقة لعرض باركود الدخول →"}
+             {flipped ? `← ${copy.clickToBack}` : `${copy.clickToBarcode} →`}
           </p>
 
           {/* ── Action buttons ──────────────────────────────── */}
@@ -263,7 +266,7 @@ export default function EmployeeCardPage() {
               className="btn-secondary text-sm gap-2"
             >
               <QrCode size={16} />
-              {flipped ? "الواجهة الأمامية" : "عرض الباركود"}
+               {flipped ? copy.frontSide : copy.showBarcode}
             </button>
 
             <button
@@ -271,12 +274,12 @@ export default function EmployeeCardPage() {
               className="btn-secondary text-sm gap-2"
             >
               <Download size={16} />
-              تحميل البطاقة
+               {copy.downloadCard}
             </button>
 
             <button
               onClick={() => {
-                if (window.confirm("هل تريد تجديد الباركود؟\nالكود القديم لن يعمل بعد ذلك.")) {
+                 if (window.confirm(copy.regenerateConfirm)) {
                   regenMut.mutate();
                 }
               }}
@@ -284,7 +287,7 @@ export default function EmployeeCardPage() {
               className="btn-secondary text-sm gap-2"
             >
               <RefreshCw size={16} className={regenMut.isPending ? "animate-spin" : ""} />
-              تجديد الباركود
+               {copy.regenerateBarcode}
             </button>
           </div>
 
@@ -303,8 +306,8 @@ export default function EmployeeCardPage() {
               {/* Header */}
               <div className="flex items-center justify-between px-4 pt-4 pb-2">
                 <div>
-                  <p className="text-white/40 text-[9px] uppercase tracking-[0.15em]">Employee Card</p>
-                  <p className="text-white font-bold text-sm">أفق لحلول الأعمال</p>
+                   <p className="text-white/40 text-[9px] uppercase tracking-[0.15em]">{copy.cardLabel}</p>
+                   <p className="text-white font-bold text-sm">{copy.companyBrand}</p>
                 </div>
                 <OfoqLogo className="w-16 h-11" />
               </div>
@@ -335,7 +338,7 @@ export default function EmployeeCardPage() {
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className="text-white/40 text-[9px] uppercase tracking-wider">Employee Code</p>
+                   <p className="text-white/40 text-[9px] uppercase tracking-wider">{copy.employeeCode}</p>
                   <p className="text-white font-mono text-sm font-bold tracking-widest truncate">{code}</p>
                 </div>
               </div>
@@ -357,21 +360,21 @@ export default function EmployeeCardPage() {
               )}
               <span>
                 {walletLoading
-                  ? "جاري التوليد..."
+                   ? copy.generating
                   : isIOS
-                  ? "إضافة إلى Apple Wallet"
+                   ? copy.addToWallet
                   : isAndroid
-                  ? "تحميل بطاقة الموظف (.pkpass)"
-                  : "تحميل بطاقة Apple Wallet (.pkpass)"}
+                   ? copy.walletDownload
+                   : copy.walletDownload}
               </span>
             </button>
 
             {/* Platform note */}
             <p className="text-center text-xs text-gray-400 flex items-center justify-center gap-1.5">
               {isIOS ? (
-                <><CheckCircle size={12} className="text-emerald-500" /> سيتم فتح التطبيق تلقائياً</>
+                 <><CheckCircle size={12} className="text-emerald-500" /> {copy.platformNoteIos}</>
               ) : (
-                <><AlertCircle size={12} /> على iPhone: افتح الملف من التنزيلات لإضافته إلى Wallet</>
+                 <><AlertCircle size={12} /> {copy.platformNoteOther}</>
               )}
             </p>
           </motion.div>

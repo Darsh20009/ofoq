@@ -8,18 +8,20 @@ import { X } from "lucide-react";
 import { usersApi } from "../../../api/client";
 import type { User } from "../../../types";
 import { useAuthStore } from "../../../store/authStore";
-
-const ROLE_CONFIG: Record<string, { label: string; color: string }> = {
-  super_admin: { label: "مدير عام",    color: "badge-red"   },
-  admin:       { label: "مدير",         color: "badge-navy"  },
-  manager:     { label: "مشرف",         color: "badge-blue"  },
-  employee:    { label: "موظف",         color: "badge-green" },
-  client:      { label: "عميل",         color: "badge-gray"  },
-};
+import { useLang } from "../../../i18n/LangContext";
 
 export default function UsersPage() {
   const qc = useQueryClient();
   const { user: me } = useAuthStore();
+  const { ui } = useLang();
+  const copy = ui.adminPages.adminPortal;
+  const roleConfig: Record<string, { label: string; color: string }> = {
+    super_admin: { label: copy.roleSuperAdmin, color: "badge-red" },
+    admin: { label: copy.roleAdmin, color: "badge-navy" },
+    manager: { label: copy.roleManager, color: "badge-blue" },
+    employee: { label: copy.roleEmployee, color: "badge-green" },
+    client: { label: copy.roleClient, color: "badge-gray" },
+  };
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<User | null>(null);
@@ -31,7 +33,7 @@ export default function UsersPage() {
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => usersApi.delete(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["users"] }); toast.success("تم حذف المستخدم"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["users"] }); toast.success(copy.userDeleted || "Deleted"); },
   });
 
   const users: User[] = data?.data?.users || [];
@@ -40,11 +42,11 @@ export default function UsersPage() {
     <div className="space-y-6">
       <div className="page-header">
         <div>
-          <h1 className="page-title">المستخدمون</h1>
-          <p className="page-subtitle">{users.length} مستخدم مسجّل</p>
+          <h1 className="page-title">{copy.usersTitle}</h1>
+          <p className="page-subtitle">{users.length} {copy.usersCount}</p>
         </div>
         <button onClick={() => { setEditUser(null); setModalOpen(true); }} className="btn-primary">
-          <Plus size={16} /> إضافة مستخدم
+          <Plus size={16} /> {copy.addUser}
         </button>
       </div>
 
@@ -52,7 +54,7 @@ export default function UsersPage() {
         <div className="relative">
           <Search size={16} className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-400" />
           <input value={search} onChange={(e) => setSearch(e.target.value)}
-            placeholder="بحث بالاسم أو البريد..." className="input-field pr-10" />
+            placeholder={copy.searchUsers} className="input-field pr-10" />
         </div>
       </div>
 
@@ -66,17 +68,17 @@ export default function UsersPage() {
             <table className="table">
               <thead>
                 <tr>
-                  <th>المستخدم</th>
-                  <th>الصلاحية</th>
-                  <th>الحالة</th>
-                  <th>القسم</th>
-                  <th>التحقق الثنائي</th>
-                  <th>الإجراءات</th>
+                  <th>{copy.userColumn}</th>
+                  <th>{copy.roleColumn}</th>
+                  <th>{copy.statusColumn}</th>
+                  <th>{copy.departmentColumn}</th>
+                  <th>{copy.twoFactorColumn}</th>
+                  <th>{copy.actionsColumn}</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((u, i) => {
-                  const role = ROLE_CONFIG[u.role] || { label: u.role, color: "badge-gray" };
+                  const role = roleConfig[u.role] || { label: u.role, color: "badge-gray" };
                   return (
                     <motion.tr key={u._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.03 }} className="group">
@@ -94,17 +96,17 @@ export default function UsersPage() {
                       <td><span className={role.color}>{role.label}</span></td>
                       <td>
                         <span className={u.status === "active" ? "badge-green" : "badge-red"}>
-                          {u.status === "active" ? "نشط" : "معطّل"}
+                          {u.status === "active" ? copy.userActive : copy.userInactive}
                         </span>
                       </td>
                       <td className="text-gray-500 text-sm">{u.department || "—"}</td>
                       <td>
                         {u.twoFactorEnabled ? (
                           <span className="flex items-center gap-1 text-emerald-600 text-xs font-medium">
-                            <Shield size={12} /> مفعّل
+                            <Shield size={12} /> {copy.userEnabled}
                           </span>
                         ) : (
-                          <span className="text-gray-400 text-xs">غير مفعّل</span>
+                          <span className="text-gray-400 text-xs">{copy.userDisabled}</span>
                         )}
                       </td>
                       <td>
@@ -114,7 +116,7 @@ export default function UsersPage() {
                             <Edit2 size={14} />
                           </button>
                           {u._id !== me?._id && (
-                            <button onClick={() => { if (confirm("حذف المستخدم؟")) deleteMut.mutate(u._id); }}
+                            <button onClick={() => { if (confirm(copy.deleteUserConfirm)) deleteMut.mutate(u._id); }}
                               className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500">
                               <Trash2 size={14} />
                             </button>
@@ -141,13 +143,15 @@ function UserModal({ open, onClose, user, onSaved }: {
 }) {
   const { register, handleSubmit, reset, watch } = useForm();
   const isEdit = !!user;
+  const { ui } = useLang();
+  const copy = ui.adminPages.adminPortal;
 
   useState(() => { if (user) reset(user); else reset({ role: "employee", status: "active" }); });
 
   const mut = useMutation({
     mutationFn: (data: object) =>
       user ? usersApi.update(user._id, data) : usersApi.create(data),
-    onSuccess: () => { toast.success(user ? "تم التحديث" : "تمت الإضافة"); onSaved(); },
+    onSuccess: () => { toast.success(user ? copy.editUser : copy.createUser); onSaved(); },
   });
 
   return (
@@ -160,61 +164,61 @@ function UserModal({ open, onClose, user, onSaved }: {
             exit={{ opacity: 0, scale: 0.96 }}
             className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="font-bold text-navy-700">{user ? "تعديل مستخدم" : "إضافة مستخدم"}</h2>
+              <h2 className="font-bold text-navy-700">{user ? copy.editUser : copy.createUser}</h2>
               <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400"><X size={18} /></button>
             </div>
             <form onSubmit={handleSubmit((d) => mut.mutate(d))} className="p-6 space-y-4">
               <div>
-                <label className="label">الاسم الكامل *</label>
-                <input {...register("name", { required: true })} className="input-field" placeholder="الاسم الكامل" />
+                <label className="label">{copy.fullName} *</label>
+                <input {...register("name", { required: true })} className="input-field" placeholder={copy.fullName} />
               </div>
               <div>
-                <label className="label">البريد الإلكتروني *</label>
+                <label className="label">{copy.email} *</label>
                 <input {...register("email", { required: true })} type="email" className="input-field" dir="ltr" />
               </div>
               {!isEdit && (
                 <div>
-                  <label className="label">كلمة المرور *</label>
+                  <label className="label">{copy.password} *</label>
                   <input {...register("password", { required: !isEdit })} type="password" className="input-field" />
                 </div>
               )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="label">الصلاحية</label>
+                  <label className="label">{copy.roleLabel}</label>
                   <select {...register("role")} className="input-field">
-                    <option value="employee">موظف</option>
-                    <option value="manager">مشرف</option>
-                    <option value="admin">مدير</option>
-                    <option value="super_admin">مدير عام</option>
-                    <option value="client">عميل</option>
+                    <option value="employee">{copy.roleEmployee}</option>
+                    <option value="manager">{copy.roleManager}</option>
+                    <option value="admin">{copy.roleAdmin}</option>
+                    <option value="super_admin">{copy.roleSuperAdmin}</option>
+                    <option value="client">{copy.roleClient}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="label">الحالة</label>
+                  <label className="label">{copy.statusLabel}</label>
                   <select {...register("status")} className="input-field">
-                    <option value="active">نشط</option>
-                    <option value="inactive">غير نشط</option>
-                    <option value="suspended">موقوف</option>
+                    <option value="active">{copy.userActive}</option>
+                    <option value="inactive">{copy.userInactive}</option>
+                    <option value="suspended">{copy.userSuspended}</option>
                   </select>
                 </div>
               </div>
               <div>
-                <label className="label">القسم</label>
-                <input {...register("department")} className="input-field" placeholder="التسويق، المبيعات، التقنية..." />
+                <label className="label">{copy.departmentColumn}</label>
+                <input {...register("department")} className="input-field" placeholder={copy.departmentColumn} />
               </div>
               <div>
-                <label className="label">المسمى الوظيفي</label>
-                <input {...register("position")} className="input-field" placeholder="مدير مشروع، مطور..." />
+                <label className="label">{copy.position}</label>
+                <input {...register("position")} className="input-field" placeholder={copy.position} />
               </div>
               <div>
-                <label className="label">رقم الهاتف</label>
+                <label className="label">{copy.phone}</label>
                 <input {...register("phone")} className="input-field" dir="ltr" />
               </div>
               <div className="flex gap-3 pt-2">
                 <button type="submit" disabled={mut.isPending} className="btn-primary flex-1 justify-center">
-                  {mut.isPending ? "..." : user ? "تحديث" : "إضافة"}
+                  {mut.isPending ? "..." : user ? copy.editUser : copy.createUser}
                 </button>
-                <button type="button" onClick={onClose} className="btn-ghost">إلغاء</button>
+                <button type="button" onClick={onClose} className="btn-ghost">{ui.adminPages.contracts.cancel}</button>
               </div>
             </form>
           </motion.div>

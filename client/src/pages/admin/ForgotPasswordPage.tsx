@@ -5,8 +5,11 @@ import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { authApi } from "../../api/client";
 import OfoqLogo from "../../components/OfoqLogo";
+import { useLang } from "../../i18n/LangContext";
 
 export default function ForgotPasswordPage() {
+  const { ui } = useLang();
+  const copy = ui.auth;
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -37,8 +40,8 @@ export default function ForgotPasswordPage() {
           {/* Logo */}
           <div className="text-center mb-8">
             <OfoqLogo className="w-24 h-16 mx-auto mb-4" dark />
-            <h1 className="text-ofoq-navy text-2xl font-bold">نسيت كلمة المرور؟</h1>
-            <p className="text-gray-500 text-sm mt-1">أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين</p>
+            <h1 className="text-ofoq-navy text-2xl font-bold">{copy.forgotTitle}</h1>
+            <p className="text-gray-500 text-sm mt-1">{copy.forgotSubtitle}</p>
           </div>
 
           {sent ? (
@@ -46,24 +49,22 @@ export default function ForgotPasswordPage() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Mail size={28} className="text-green-600" />
               </div>
-              <h2 className="text-ofoq-navy font-bold text-lg mb-2">تحقق من بريدك الإلكتروني</h2>
-              <p className="text-gray-500 text-sm leading-relaxed mb-6">
-                إذا كان البريد <span className="font-medium text-ofoq-navy" dir="ltr">{email}</span> مسجّلاً لدينا،
-                ستصلك رسالة بها رابط إعادة تعيين كلمة المرور خلال دقائق.
-              </p>
-              <p className="text-gray-400 text-xs mb-6">تحقق من مجلد Spam إذا لم تجد الرسالة</p>
+               <h2 className="text-ofoq-navy font-bold text-lg mb-2">{copy.checkEmail}</h2>
+               <p className="text-gray-500 text-sm leading-relaxed mb-3">{copy.checkEmailDesc}</p>
+               <p className="font-medium text-ofoq-navy text-sm mb-6" dir="ltr">{email}</p>
+               <p className="text-gray-400 text-xs mb-6">{copy.spam}</p>
               <Link
                 to="/admin/login"
                 className="inline-flex items-center gap-2 text-ofoq-red text-sm font-medium hover:underline"
               >
                 <ArrowRight size={14} />
-                العودة لتسجيل الدخول
+                 {copy.backLogin}
               </Link>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">البريد الإلكتروني</label>
+                 <label className="block text-sm font-medium text-gray-700 mb-1.5">{copy.email}</label>
                 <div className="relative">
                   <Mail size={16} className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-400" />
                   <input
@@ -86,9 +87,9 @@ export default function ForgotPasswordPage() {
                 {loading ? (
                   <>
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    جاري الإرسال...
+                     {copy.sending}
                   </>
-                ) : "إرسال رابط الاسترداد"}
+                 ) : copy.sendReset}
               </button>
 
               <div className="text-center">
@@ -97,7 +98,7 @@ export default function ForgotPasswordPage() {
                   className="inline-flex items-center gap-1.5 text-gray-400 text-sm hover:text-ofoq-navy transition-colors"
                 >
                   <ArrowRight size={13} />
-                  العودة لتسجيل الدخول
+                   {copy.backLogin}
                 </Link>
               </div>
             </form>

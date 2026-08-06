@@ -115,9 +115,9 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
     { href: pagePath("users"),         label: t.admin.users,      icon: Users },
     { href: pagePath("cms"),           label: t.admin.cms,        icon: FileEdit },
     { href: pagePath("settings"),      label: t.admin.settings,   icon: Settings },
-    { href: pagePath("service-requests"), label: "طلبات الخدمة",   icon: ClipboardList },
-    { href: pagePath("support"),          label: "دعم العملاء",    icon: HeadphonesIcon },
-    { href: pagePath("contact"),          label: "الاستشارات",     icon: MessageSquare },
+    { href: pagePath("service-requests"), label: t.client.newRequest,   icon: ClipboardList },
+    { href: pagePath("support"),          label: t.client.support,       icon: HeadphonesIcon },
+    { href: pagePath("contact"),          label: t.contact.consultTitle, icon: MessageSquare },
     { href: pagePath("employee/card"),    label: t.admin.myCard,   icon: CreditCard },
   ];
 

@@ -12,10 +12,16 @@ import { motion } from "framer-motion";
 import { analyticsApi } from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
 import { Link } from "react-router-dom";
+import { useLang } from "../../i18n/LangContext";
 
 const COLORS = ["#C13229", "#1C2B6E", "#E5FE04", "#33B27C", "#F97316", "#8B5CF6"];
 
-const ARABIC_MONTHS = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+const MONTHS: Record<string, string[]> = {
+  ar: ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"],
+  ur: ["جنوری","فروری","مارچ","اپریل","مئی","جون","جولائی","اگست","ستمبر","اکتوبر","نومبر","دسمبر"],
+  id: ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"],
+  en: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+};
 
 function StatCard({
   title, value, sub, icon: Icon, color, trend, delay = 0, href,
@@ -52,6 +58,8 @@ function StatCard({
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
+  const { lang, ui } = useLang();
+  const copy = ui.adminPages.dashboard;
 
   const { data: overview, isLoading } = useQuery({
     queryKey: ["dashboard-overview"],
@@ -80,7 +88,7 @@ export default function DashboardPage() {
 
   // ── Transform server responses to chart-friendly shapes ───────────
   const revenueChartData = (revenueRaw || []).map((r: { _id: { year: number; month: number }; total: number }) => ({
-    month: ARABIC_MONTHS[(r._id?.month ?? 1) - 1],
+    month: (MONTHS[lang] || MONTHS.en)[(r._id?.month ?? 1) - 1],
     revenue: r.total || 0,
   }));
 
@@ -109,7 +117,7 @@ export default function DashboardPage() {
 
   const greetingHour = new Date().getHours();
   const greeting =
-    greetingHour < 12 ? "صباح الخير" : greetingHour < 17 ? "مساء الخير" : "مساء النور";
+    greetingHour < 12 ? copy.morning : greetingHour < 17 ? copy.afternoon : copy.evening;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -118,7 +126,7 @@ export default function DashboardPage() {
         <h1 className="page-title">
           {greeting}، {user?.name?.split(" ")[0]} 👋
         </h1>
-        <p className="page-subtitle">إليك ملخص أداء منظومة أفق اليوم</p>
+        <p className="page-subtitle">{copy.subtitle}</p>
       </div>
 
       {/* AI Insight Banner */}
@@ -132,7 +140,7 @@ export default function DashboardPage() {
             <Zap size={20} className="text-ofoq-yellow" />
           </div>
           <div>
-            <p className="text-ofoq-yellow text-xs font-semibold mb-1">رؤية ذكية</p>
+            <p className="text-ofoq-yellow text-xs font-semibold mb-1">{copy.smartInsight}</p>
             <p className="text-white text-sm leading-relaxed">{insights.summary}</p>
             {insights.actions?.slice(0, 2).map((a: string, i: number) => (
               <p key={i} className="text-white/60 text-xs mt-1">• {a}</p>
@@ -155,38 +163,38 @@ export default function DashboardPage() {
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard href="/admin/users"
-            title="فريق العمل" value={team.total || 0}
-            sub="المستخدمون النشطون"
+             title={copy.team} value={team.total || 0}
+             sub={copy.activeUsers}
             icon={Users} color="bg-ofoq-navy" delay={0} />
           <StatCard href="/admin/crm/leads"
-            title="الفرص التجارية" value={leads.total || 0}
-            sub={`${leads.thisMonth || 0} جديدة هذا الشهر — معدل الإغلاق ${wonRate}%`}
+             title={copy.leads} value={leads.total || 0}
+             sub={`${leads.thisMonth || 0} ${copy.newThisMonth} — ${copy.closeRate} ${wonRate}%`}
             icon={Target} color="bg-ofoq-red"
             trend={wonRate ? { value: wonRate, up: wonRate > 20 } : undefined} delay={0.05} />
           <StatCard href="/admin/crm/customers"
-            title="العملاء النشطون" value={customers.active || 0}
-            sub={`من أصل ${customers.total || 0} عميل — ${customers.newThisMonth || 0} جديد`}
+             title={copy.activeCustomers} value={customers.active || 0}
+             sub={`${copy.fromTotal} ${customers.total || 0} — ${customers.newThisMonth || 0} ${copy.newCustomer}`}
             icon={CheckCircle2} color="bg-indigo-500" delay={0.1} />
           <StatCard href="/admin/projects"
-            title="المشاريع الجارية" value={projects.active || 0}
-            sub={tasks.overdue ? `⚠️ ${tasks.overdue} مهمة متأخرة` : `${projects.completed || 0} مكتمل`}
+             title={copy.activeProjects} value={projects.active || 0}
+             sub={tasks.overdue ? `⚠️ ${tasks.overdue} ${copy.overdueTasks}` : `${projects.completed || 0} ${copy.completed}`}
             icon={FolderKanban} color="bg-orange-500"
             trend={tasks.overdue ? { value: tasks.overdue, up: false } : undefined} delay={0.15} />
           <StatCard href="/admin/invoices"
-            title="إيرادات هذا الشهر" value={`${(revenue.thisMonth || 0).toLocaleString("ar")} ر.س`}
-            sub="الفواتير المدفوعة"
+             title={copy.revenueThisMonth} value={`${(revenue.thisMonth || 0).toLocaleString(lang)} ${lang === "id" ? "SAR" : "ر.س"}`}
+             sub={copy.paidInvoices}
             icon={DollarSign} color="bg-ofoq-red" delay={0.2} />
           <StatCard href="/admin/invoices"
-            title="إجمالي الإيرادات" value={`${(revenue.total || 0).toLocaleString("ar")} ر.س`}
-            sub="جميع الفواتير المدفوعة"
+             title={copy.totalRevenue} value={`${(revenue.total || 0).toLocaleString(lang)} ${lang === "id" ? "SAR" : "ر.س"}`}
+             sub={copy.allPaidInvoices}
             icon={TrendingUp} color="bg-purple-500" delay={0.25} />
           <StatCard href="/admin/projects"
-            title="إجمالي المشاريع" value={projects.total || 0}
-            sub={`${projects.completed || 0} مكتمل`}
+             title={copy.totalProjects} value={projects.total || 0}
+             sub={`${projects.completed || 0} ${copy.completed}`}
             icon={FileText} color="bg-teal-500" delay={0.3} />
           <StatCard href="/admin/contact"
-            title="طلبات التواصل" value="—"
-            sub="اضغط لعرض الاستشارات"
+             title={copy.contactRequests} value="—"
+             sub={copy.viewConsultations}
             icon={MessageSquare} color="bg-yellow-500" delay={0.35} />
         </div>
       )}
@@ -200,8 +208,8 @@ export default function DashboardPage() {
         >
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="font-bold text-navy-700">منحنى الإيرادات</h3>
-              <p className="text-xs text-gray-400 mt-0.5">آخر 6 أشهر</p>
+               <h3 className="font-bold text-navy-700">{copy.revenueCurve}</h3>
+               <p className="text-xs text-gray-400 mt-0.5">{copy.lastSixMonths}</p>
             </div>
           </div>
           {revenueChartData.length > 0 ? (
@@ -218,7 +226,7 @@ export default function DashboardPage() {
                 <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
                 <Tooltip
                   contentStyle={{ fontFamily: "Cairo", fontSize: 12, borderRadius: 12, border: "none", boxShadow: "0 4px 24px rgba(0,0,0,0.1)" }}
-                  formatter={(v: number) => [`${v.toLocaleString("ar")} ر.س`, "الإيرادات"]}
+                   formatter={(v: number) => [`${v.toLocaleString(lang)} ${lang === "id" ? "SAR" : "ر.س"}`, copy.revenue]}
                 />
                 <Area type="monotone" dataKey="revenue" stroke="#C13229" strokeWidth={2.5}
                   fill="url(#rev)" dot={{ fill: "#C13229", r: 4 }} activeDot={{ r: 6 }} />
@@ -228,7 +236,7 @@ export default function DashboardPage() {
             <div className="h-[220px] flex items-center justify-center text-gray-400 text-sm">
               <div className="text-center">
                 <TrendingUp size={32} className="mx-auto mb-2 text-gray-300" />
-                <p>لا توجد إيرادات مسجّلة بعد</p>
+                 <p>{copy.noRevenue}</p>
               </div>
             </div>
           )}
@@ -239,7 +247,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45 }} className="card"
         >
-          <h3 className="font-bold text-navy-700 mb-4">توزيع الفرص</h3>
+           <h3 className="font-bold text-navy-700 mb-4">{copy.pipeline}</h3>
           {funnelChartData.length > 0 ? (
             <>
               <ResponsiveContainer width="100%" height={160}>
@@ -273,7 +281,7 @@ export default function DashboardPage() {
             <div className="h-[220px] flex items-center justify-center text-gray-400 text-sm text-center">
               <div>
                 <Target size={32} className="mx-auto mb-2 text-gray-300" />
-                <p>لا توجد فرص بعد</p>
+                 <p>{copy.noLeads}</p>
               </div>
             </div>
           )}
@@ -283,7 +291,7 @@ export default function DashboardPage() {
       {/* Projects by stage */}
       {stagesData.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="card">
-          <h3 className="font-bold text-navy-700 mb-4">مراحل المشاريع</h3>
+           <h3 className="font-bold text-navy-700 mb-4">{copy.projectStages}</h3>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-3">
             {stagesData.map((s: { stage: string; count: number }, i: number) => (
               <div key={i} className="text-center p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
@@ -304,8 +312,8 @@ export default function DashboardPage() {
         {recentLeads.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }} className="card">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-navy-700">آخر الفرص التجارية</h3>
-              <Link to="/admin/crm/leads" className="text-xs text-ofoq-green hover:underline">عرض الكل</Link>
+               <h3 className="font-bold text-navy-700">{copy.recentLeads}</h3>
+               <Link to="/admin/crm/leads" className="text-xs text-ofoq-green hover:underline">{copy.viewAll}</Link>
             </div>
             <div className="space-y-3">
               {recentLeads.slice(0, 4).map((lead: any, i: number) => (
@@ -318,7 +326,7 @@ export default function DashboardPage() {
                     <p className="text-xs text-gray-400">{lead.status}</p>
                   </div>
                   <span className="text-xs text-gray-400">
-                    {new Date(lead.createdAt).toLocaleDateString("ar-SA")}
+                     {new Date(lead.createdAt).toLocaleDateString(lang === "ar" || lang === "ur" ? `${lang}-SA` : lang)}
                   </span>
                 </div>
               ))}
@@ -330,8 +338,8 @@ export default function DashboardPage() {
         {recentProjects.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="card">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-navy-700">المشاريع الجارية</h3>
-              <Link to="/admin/projects" className="text-xs text-ofoq-green hover:underline">عرض الكل</Link>
+               <h3 className="font-bold text-navy-700">{copy.recentProjects}</h3>
+               <Link to="/admin/projects" className="text-xs text-ofoq-green hover:underline">{copy.viewAll}</Link>
             </div>
             <div className="space-y-3">
               {recentProjects.slice(0, 4).map((proj: any, i: number) => (
@@ -362,10 +370,10 @@ export default function DashboardPage() {
           className="card border border-red-100 bg-red-50 flex items-center gap-4">
           <AlertTriangle size={20} className="text-red-500 flex-shrink-0" />
           <p className="text-sm text-red-700 flex-1">
-            <strong>{tasks.overdue}</strong> مهمة متأخرة تحتاج إلى متابعة فورية
+             <strong>{tasks.overdue}</strong> {copy.overdueAlert}
           </p>
           <Link to="/admin/projects" className="text-xs font-semibold text-red-600 hover:underline flex-shrink-0">
-            عرض المهام
+             {copy.viewTasks}
           </Link>
         </motion.div>
       )}
