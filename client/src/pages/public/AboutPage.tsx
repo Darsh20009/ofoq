@@ -18,8 +18,6 @@ const VALUES = [
         <circle cx="24" cy="24" r="24" stroke="currentColor" strokeWidth="1" opacity=".25"/>
       </svg>
     ),
-    title: "الموثوقية",
-    desc: "نبني علاقات طويلة الأمد مع عملائنا قائمة على الثقة والشفافية التامة في كل تعامل.",
   },
   {
     icon: (
@@ -29,8 +27,6 @@ const VALUES = [
         <circle cx="24" cy="24" r="3" fill="currentColor"/>
       </svg>
     ),
-    title: "القيمة",
-    desc: "تحويل الأفكار والابتكار إلى نتائج أعمال قابلة للقياس ونمو متواصل.",
   },
   {
     icon: (
@@ -40,8 +36,6 @@ const VALUES = [
         <circle cx="24" cy="13" r="8" stroke="currentColor" strokeWidth="2"/>
       </svg>
     ),
-    title: "تميّز الخدمة",
-    desc: "تقديم نتائج تركز على العميل بعناية واحترافية واهتمام بالتفاصيل وبناء الثقة على المدى الطويل.",
   },
   {
     icon: (
@@ -52,24 +46,17 @@ const VALUES = [
         <rect x="26" y="26" width="14" height="14" stroke="currentColor" strokeWidth="2"/>
       </svg>
     ),
-    title: "التكامل",
-    desc: "نفهم احتياجات القطاعات المختلفة ونوفر مستشارين ومتخصصين في مجالات متعددة لتلبية متطلبات كل عميل.",
   },
 ];
 
 export default function AboutPage() {
-  const { t, dir } = useLang();
-  const values = [
-    { title: t.about.val0t, desc: t.about.val0d },
-    { title: t.about.val1t, desc: t.about.val1d },
-    { title: t.about.val2t, desc: t.about.val2d },
-    { title: t.about.val3t, desc: t.about.val3d },
-  ];
+  const { ui, dir } = useLang();
+  const values = ui.about.values;
   return (
     <div dir={dir}>
       <Helmet>
-        <title>{t.about.metaTitle}</title>
-        <meta name="description" content={t.about.heroSub} />
+        <title>{ui.about.metaTitle}</title>
+        <meta name="description" content={ui.about.heroSub} />
         <link rel="canonical" href="https://ofoqhc.com/about" />
       </Helmet>
 
@@ -94,20 +81,20 @@ export default function AboutPage() {
         <div className="max-w-5xl mx-auto px-5 sm:px-8 pb-14 relative z-10 w-full">
           {/* breadcrumb */}
           <div className="flex items-center gap-2 text-white/45 text-xs mb-4">
-            <Link to="/" className="hover:text-white transition-colors">{t.nav.home}</Link>
+            <Link to="/" className="hover:text-white transition-colors">{ui.category.home}</Link>
             <span>/</span>
-            <span className="text-white/70">{t.about.badge}</span>
+            <span className="text-white/70">{ui.about.badge}</span>
           </div>
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="text-5xl sm:text-6xl font-black text-white leading-tight">
-              {t.about.heroTitle1}{" "}
-              <span className="text-ofoq-yellow">{t.about.heroTitle2}</span>
+              {ui.about.heroTitle1}{" "}
+              <span className="text-ofoq-yellow">{ui.about.heroTitle2}</span>
             </h1>
             <div className="flex items-center gap-2 text-white/55 text-sm mt-3">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M12 5v14M5 12l7 7 7-7" />
               </svg>
-              {t.about.badge}
+              {ui.about.badge}
             </div>
           </motion.div>
         </div>
@@ -123,10 +110,10 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="max-w-3xl"
           >
-            <p className="text-ofoq-green font-bold text-sm mb-3">{t.about.storyTitle}</p>
+            <p className="text-ofoq-green font-bold text-sm mb-3">{ui.about.storyTitle}</p>
             <h2 className="text-3xl sm:text-4xl font-black text-ofoq-navy mb-6">
-              {t.about.storyTitle}{" "}
-              <span className="text-ofoq-green">{t.footer.company}</span>
+              {ui.about.storyTitle}{" "}
+              <span className="text-ofoq-green">OFOQ</span>
             </h2>
           </motion.div>
 
@@ -139,16 +126,16 @@ export default function AboutPage() {
               className="space-y-5 text-gray-600 leading-relaxed text-base"
             >
               <p>
-                {t.about.storyP1} {t.about.storyVision} {t.about.storyP2}
+                {ui.about.storyP1} {ui.about.storyVision} {ui.about.storyP2}
               </p>
               <p>
-                {t.about.storyP3}
+                {ui.about.storyP3}
               </p>
               <p>
-                {t.about.storyP4}
+                {ui.about.storyP4}
               </p>
               <p>
-                {t.about.heroSub}
+                {ui.about.heroSub}
               </p>
             </motion.div>
 
@@ -165,15 +152,15 @@ export default function AboutPage() {
                   <WireframeCube className="w-48 h-36 text-ofoq-green" color="#33B27C" />
                 </div>
                 <div className="relative z-10">
-                  <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">{t.about.storyVision}</p>
+                  <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">{ui.about.storyVision}</p>
                   <p className="text-white text-xl font-bold leading-relaxed">
-                    {t.about.storyVision}
+                    {ui.about.storyVision}
                   </p>
                 </div>
                 <div className="relative z-10 border-t border-white/10 pt-5 mt-5">
-                   <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">{t.about.valuesTitle}</p>
+                   <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">{ui.about.valuesTitle}</p>
                   <p className="text-white/70 text-sm leading-relaxed">
-                    {t.about.valuesSub}
+                     {ui.about.valuesSub}
                   </p>
                 </div>
               </div>
@@ -234,9 +221,9 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="mb-12"
           >
-            <p className="text-ofoq-green font-bold text-sm mb-2">{t.about.valuesTitle}</p>
+            <p className="text-ofoq-green font-bold text-sm mb-2">{ui.about.valuesTitle}</p>
             <h2 className="text-3xl sm:text-4xl font-black text-ofoq-navy">
-              {t.about.teamTitle}
+              {ui.about.teamTitle}
             </h2>
           </motion.div>
 
@@ -271,9 +258,9 @@ export default function AboutPage() {
           <WireframeCube className="w-64 h-48 text-ofoq-green" color="#33B27C" />
         </div>
         <div className="max-w-5xl mx-auto px-5 sm:px-8 relative z-10 text-center">
-          <p className="text-white/40 text-sm mb-3">{t.about.ctaTitle}</p>
+          <p className="text-white/40 text-sm mb-3">{ui.about.ctaTitle}</p>
           <h2 className="text-3xl sm:text-4xl font-black text-white mb-6">
-            {t.about.ctaTitle}
+            {ui.about.ctaTitle}
           </h2>
           <Link
             to="/client/requests/new"
@@ -284,7 +271,7 @@ export default function AboutPage() {
                 <path d="m15 18-6-6 6-6" />
               </svg>
             </span>
-            <span className="pl-2">{t.nav.contact}</span>
+            <span className="pl-2">{ui.footer.contact}</span>
           </Link>
         </div>
       </section>

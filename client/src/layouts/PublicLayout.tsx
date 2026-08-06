@@ -171,7 +171,7 @@ export default function PublicLayout() {
 
             {/* يسار: دخول العميل + الهامبرغر */}
             <div className="flex items-center gap-5">
-              <select value={lang} onChange={(e) => setLang(e.target.value as typeof lang)} aria-label="Language" className="bg-transparent text-xs font-bold text-ofoq-navy outline-none">
+              <select value={lang} onChange={(e) => setLang(e.target.value as typeof lang)} aria-label={ui.header.language} className="bg-transparent text-xs font-bold text-ofoq-navy outline-none">
                 {langs.map((item) => <option key={item.code} value={item.code}>{item.label}</option>)}
               </select>
               <Link
@@ -336,7 +336,7 @@ export default function PublicLayout() {
                 <OfoqLogo className="w-16 h-12" />
                 <div>
                   <p className="font-black text-lg">أفق لحلول الأعمال</p>
-                  <p className="text-white/35 text-xs">OFOQ Business Solutions</p>
+                  <p className="text-white/35 text-xs">OFOQ</p>
                 </div>
               </div>
               <p className="text-white/50 text-sm leading-relaxed max-w-sm mb-6">
@@ -443,7 +443,7 @@ export default function PublicLayout() {
           </div>
 
           <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-white/30 text-xs">
-             <p>© {new Date().getFullYear()} OFOQ Business Solutions. {ui.footer.rights}</p>
+              <p>© {new Date().getFullYear()} OFOQ. {ui.footer.rights}</p>
             <div className="flex gap-4">
                <a href="#" className="hover:text-white transition-colors">{ui.footer.privacy}</a>
                <a href="#" className="hover:text-white transition-colors">{ui.footer.terms}</a>

@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { cmsApi } from "../../api/client";
 import type { BlogPost } from "../../types";
 import WireframeCube from "../../components/WireframeCube";
+import { useLang } from "../../i18n/LangContext";
 
 const fadeUp = {
   hidden:  { opacity: 0, y: 28 },
@@ -12,6 +13,7 @@ const fadeUp = {
 };
 
 export default function BlogPage() {
+  const { ui, lang, dir } = useLang();
   const { data, isLoading } = useQuery({
     queryKey: ["public-blog"],
     queryFn: () => cmsApi.blog.list({ isPublished: true, limit: 20 }).then((r) => r.data),
@@ -20,10 +22,10 @@ export default function BlogPage() {
   const posts: BlogPost[] = data?.data?.posts ?? [];
 
   return (
-    <div>
+    <div dir={dir}>
       <Helmet>
-        <title>الأخبار — أفق لحلول الأعمال</title>
-        <meta name="description" content="آخر أخبار ومقالات أفق لحلول الأعمال — رؤى وتقارير متخصصة في عالم الأعمال السعودي." />
+        <title>{ui.blog.metaTitle}</title>
+        <meta name="description" content={ui.blog.metaDescription} />
         <link rel="canonical" href="https://ofoqhc.com/blog" />
       </Helmet>
 
@@ -45,17 +47,17 @@ export default function BlogPage() {
         </div>
         <div className="max-w-5xl mx-auto px-5 sm:px-8 pb-14 relative z-10 w-full">
           <div className="flex items-center gap-2 text-white/45 text-xs mb-4">
-            <Link to="/" className="hover:text-white transition-colors">الرئيسية</Link>
+            <Link to="/" className="hover:text-white transition-colors">{ui.category.home}</Link>
             <span>/</span>
-            <span className="text-white/70">الأخبار</span>
+            <span className="text-white/70">{ui.blog.badge}</span>
           </div>
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-5xl sm:text-6xl font-black text-white"
-          >
-            أبرز{" "}
-            <span className="text-ofoq-yellow">الأخبار</span>
+            >
+            {ui.blog.heroTitle}{" "}
+            <span className="text-ofoq-yellow">{ui.blog.heroHighlight}</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
@@ -63,7 +65,7 @@ export default function BlogPage() {
             transition={{ delay: 0.15 }}
             className="text-white/50 text-sm mt-2"
           >
-            المنشورات
+            {ui.blog.heroSub}
           </motion.p>
         </div>
       </section>
@@ -72,9 +74,9 @@ export default function BlogPage() {
       <section className="py-16 sm:py-20 bg-gray-50">
         <div className="max-w-5xl mx-auto px-5 sm:px-8">
           <div className="mb-10">
-            <p className="text-ofoq-green text-sm font-bold mb-1">من مدونتنا</p>
+            <p className="text-ofoq-green text-sm font-bold mb-1">{ui.blog.sectionEyebrow}</p>
             <h2 className="text-3xl font-black text-ofoq-navy">
-              آخر <span className="text-ofoq-green">الأخبار</span>
+              {ui.blog.sectionTitle} <span className="text-ofoq-green">{ui.blog.sectionHighlight}</span>
             </h2>
           </div>
 
@@ -96,8 +98,8 @@ export default function BlogPage() {
               <div className="inline-block mb-6 opacity-20">
                 <WireframeCube className="w-32 h-24 text-ofoq-navy" color="#2B273F" />
               </div>
-              <h3 className="text-xl font-bold text-ofoq-navy mb-2">لا توجد مقالات حتى الآن</h3>
-              <p className="text-gray-400 text-sm">تابعنا قريباً لأحدث المقالات والأخبار</p>
+              <h3 className="text-xl font-bold text-ofoq-navy mb-2">{ui.blog.empty}</h3>
+              <p className="text-gray-400 text-sm">{ui.blog.emptySub}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -130,7 +132,7 @@ export default function BlogPage() {
                   {/* المحتوى */}
                   <div className="p-6">
                     <p className="text-ofoq-green text-xs font-bold mb-2">
-                      {new Date(post.publishedAt ?? post.createdAt).toLocaleDateString("ar-SA", {
+                      {new Date(post.publishedAt ?? post.createdAt).toLocaleDateString(lang === "ar" ? "ar-SA" : lang === "ur" ? "ur-PK" : lang, {
                         year: "numeric",
                         month: "long",
                         day: "numeric",
@@ -151,7 +153,7 @@ export default function BlogPage() {
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                         <path d="m15 18-6-6 6-6" />
                       </svg>
-                      اقرء المزيد
+                       {ui.blog.read}
                     </Link>
                   </div>
                 </motion.article>

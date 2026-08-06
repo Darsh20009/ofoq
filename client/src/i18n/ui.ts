@@ -2,6 +2,7 @@ import type { Lang } from "./extraLangs";
 
 export type UiCopy = {
   header: { clientLogin: string; menu: string; language: string };
+  common: { sending: string; send: string };
   home: {
     badge: string; hero1: string; hero2: string; heroSub: string; request: string; explore: string;
     aboutBadge: string; aboutTitle1: string; aboutTitle2: string; aboutDesc: string; aboutCta: string;
@@ -12,6 +13,31 @@ export type UiCopy = {
   services: { title: string; badge: string; hero1: string; hero2: string; heroSub: string; view: string; more: string };
   category: { home: string; services: string; badge: string; available: string; service: string; grid: string; list: string; details: string; need: string; needDesc: string; request: string };
   detail: { home: string; services: string; badge: string; request: string; how: string; faq: string; window: string; suitable: string; requirements: string; related: string; details: string };
+  about: {
+    metaTitle: string; badge: string; heroTitle1: string; heroTitle2: string; heroSub: string;
+    storyTitle: string; storyVision: string; storyP1: string; storyP2: string; storyP3: string; storyP4: string;
+    valuesTitle: string; valuesSub: string; values: { title: string; desc: string }[];
+    teamTitle: string; ctaTitle: string;
+  };
+  contact: {
+    metaTitle: string; badge: string; heroTitle: string; heroSub: string; infoTitle: string;
+    phone: string; emailLabel: string; locationLabel: string; locationVal: string; hoursLabel: string; hoursVal: string;
+    consultTitle: string; consultDesc: string; available: string; successTitle: string; successDesc: string;
+    formTitle: string; nameLabel: string; namePlaceholder: string; companyLabel: string; companyPlaceholder: string;
+    emailFormLabel: string; phoneFormLabel: string; serviceLabel: string; serviceDefault: string; sectorDefault: string; messageLabel: string;
+    messagePlaceholder: string; emailError: string; required: string; services: string[]; sectors: string[];
+  };
+  blog: {
+    metaTitle: string; metaDescription: string; badge: string; heroTitle: string; heroHighlight: string; heroSub: string;
+    sectionEyebrow: string; sectionTitle: string; sectionHighlight: string; empty: string; emptySub: string; read: string;
+  };
+  countries: {
+    metaTitle: string; metaDescription: string; badge: string; heroTitle: string; heroHighlight: string; heroSub: string;
+    sectionEyebrow: string; sectionTitle: string; sectionHighlight: string; request: string;
+    processEyebrow: string; processTitle: string; processHighlight: string;
+    steps: { title: string; desc: string }[]; ctaEyebrow: string; ctaTitle: string; ctaHighlight: string; ctaButton: string;
+    items: { name: string; desc: string }[];
+  };
   auth: {
     clientTitle: string; clientSubtitle: string; login: string; email: string; password: string; forgot: string;
     noAccount: string; create: string; registerTitle: string; registerSubtitle: string; fullName: string;
@@ -145,6 +171,7 @@ export type UiCopy = {
 
 const en: UiCopy = {
   header: { clientLogin: "Client login", menu: "Menu", language: "Language" },
+  common: { sending: "Sending...", send: "Send message" },
   home: {
     badge: "OFOQ / SAUDI BUSINESS CONCIERGE", hero1: "We handle", hero2: "the details.", heroSub: "Your trusted partner for HR, government services, visas, and company formation in Saudi Arabia.", request: "Request service", explore: "Explore services",
     aboutBadge: "About OFOQ", aboutTitle1: "Your business partner", aboutTitle2: "in Saudi Arabia", aboutDesc: "We handle government procedures, HR management, and formation requirements — so you can focus entirely on growing your business.", aboutCta: "Learn more",
@@ -156,6 +183,68 @@ const en: UiCopy = {
   services: { title: "Services | OFOQ", badge: "THE OFOQ CATALOG", hero1: "Services designed", hero2: "for your business.", heroSub: "From entity formation to daily operations, we coordinate details through one team and a clear path.", view: "View services", more: "more" },
   category: { home: "Home", services: "Services", badge: "Service category", available: "services available", service: "services", grid: "Grid", list: "List", details: "Details", need: "Need these services?", needDesc: "Contact us and we'll help you identify the right service for your needs.", request: "Request service" },
   detail: { home: "Home", services: "Services", badge: "Service details", request: "Request service", how: "How we work", faq: "Frequently asked questions", window: "Service window", suitable: "Who is it for?", requirements: "Requirements", related: "Other services in this category", details: "Details" },
+  about: {
+    metaTitle: "About us | OFOQ Business Solutions", badge: "About us", heroTitle1: "Our journey toward", heroTitle2: "a wider horizon",
+    heroSub: "OFOQ Business Solutions is a Saudi company helping organizations build stronger operations, navigate government requirements, and grow with confidence.",
+    storyTitle: "Our story", storyVision: "Every company deserves a real technology partner.",
+    storyP1: "OFOQ began with a simple belief:", storyP2: "a partner should understand your challenges and work alongside your team.",
+    storyP3: "We have built lasting relationships with companies in Saudi Arabia and the Gulf, helping them turn ambitious goals into practical results.",
+    storyP4: "Today, our specialists combine local knowledge with a modern digital experience to make business clearer, faster, and more sustainable.",
+    valuesTitle: "Our core values", valuesSub: "The principles behind every decision and project we take on.",
+    values: [
+      { title: "Reliability", desc: "We build long-term relationships through transparency and dependable follow-through." },
+      { title: "Value", desc: "We turn ideas and innovation into measurable business outcomes and continuous growth." },
+      { title: "Service excellence", desc: "We deliver thoughtful, professional results with care for every detail." },
+      { title: "Integration", desc: "We connect sector knowledge and specialist expertise around each client's needs." },
+    ],
+    teamTitle: "Why OFOQ?", ctaTitle: "Start your journey with OFOQ",
+  },
+  contact: {
+    metaTitle: "Contact us | OFOQ Business Solutions", badge: "Contact us", heroTitle: "We are here to help",
+    heroSub: "Reach our team for a free consultation. We will respond within 24 hours.", infoTitle: "Contact information",
+    phone: "Phone", emailLabel: "Email", locationLabel: "Location", locationVal: "Saudi Arabia — Jeddah — King Abdullah Road",
+    hoursLabel: "Business hours", hoursVal: "Sunday – Thursday, 9 AM – 6 PM", consultTitle: "Free consultation",
+    consultDesc: "Book a free 30-minute session with an expert and discuss your business challenges.", available: "Available this week",
+    successTitle: "Your message was sent", successDesc: "Thank you for contacting us. Our team will reply within 24 hours.",
+    formTitle: "Send us a message", nameLabel: "Full name *", namePlaceholder: "Your full name", companyLabel: "Company",
+    companyPlaceholder: "Your company name", emailFormLabel: "Email address *", phoneFormLabel: "Phone number",
+    serviceLabel: "Service required", serviceDefault: "Choose a service...", sectorDefault: "Choose a sector...",
+    messageLabel: "Message *", messagePlaceholder: "Tell us about your project or what you need...", emailError: "Invalid email address",
+    required: "Required", services: ["Strategic consulting", "Digital transformation", "Data analytics", "Software development", "Digital marketing", "Cybersecurity", "Other"],
+    sectors: ["Retail", "Construction", "Professional services", "Technology", "Healthcare", "Education", "Other"],
+  },
+  blog: {
+    metaTitle: "Blog | OFOQ Business Solutions", metaDescription: "Insights and practical guidance from OFOQ Business Solutions.",
+    badge: "Blog", heroTitle: "Knowledge", heroHighlight: "center", heroSub: "Insights and strategies from our experts.",
+    sectionEyebrow: "From our blog", sectionTitle: "Latest", sectionHighlight: "updates", empty: "No articles yet",
+    emptySub: "Check back soon for new articles and business insights.", read: "Read more",
+  },
+  countries: {
+    metaTitle: "Recruitment countries | OFOQ Business Solutions", metaDescription: "Our international recruitment network supports companies in Saudi Arabia.",
+    badge: "Recruitment countries", heroTitle: "Talent from", heroHighlight: "around the world",
+    heroSub: "We work with a broad network of recruitment partners across leading talent markets.",
+    sectionEyebrow: "Our international network", sectionTitle: "Recruitment", sectionHighlight: "countries", request: "Request recruitment",
+    processEyebrow: "How it works", processTitle: "The recruitment", processHighlight: "journey",
+    steps: [
+      { title: "Define the need", desc: "Tell us the roles, skills, and workforce requirements." },
+      { title: "Search and select", desc: "We identify strong candidates through our international network." },
+      { title: "Visa processing", desc: "We coordinate visas, attestations, and required permits." },
+      { title: "Arrival and handover", desc: "We hand over employees ready to begin work." },
+    ],
+    ctaEyebrow: "Get started", ctaTitle: "Need specialized", ctaHighlight: "talent?", ctaButton: "Submit your request",
+    items: [
+      { name: "Pakistan", desc: "Specialist talent across technology, construction, and services." },
+      { name: "India", desc: "Skilled professionals in engineering, technology, and healthcare." },
+      { name: "Jordan", desc: "Professionals in accounting, law, and administration." },
+      { name: "Sri Lanka", desc: "Experienced workers in hospitality, domestic services, and industry." },
+      { name: "Egypt", desc: "Talent across media, marketing, engineering, and education." },
+      { name: "Philippines", desc: "Experienced workers in healthcare, services, and technology." },
+      { name: "Bangladesh", desc: "Specialists in construction, industry, and services." },
+      { name: "Uganda", desc: "Talent across agriculture, services, and construction." },
+      { name: "Nepal", desc: "Skilled workers in construction, security, and industry." },
+      { name: "Sudan", desc: "Professionals in healthcare, engineering, education, and administration." },
+    ],
+  },
   auth: { clientTitle: "Client portal", clientSubtitle: "Sign in to follow your requests", login: "Sign in", email: "Email address", password: "Password", forgot: "Forgot password?", noAccount: "Don't have an account?", create: "Create an account", registerTitle: "Create your account", registerSubtitle: "Join the OFOQ client portal", fullName: "Full name", phone: "Phone number", confirmPassword: "Confirm password", createAccount: "Create account", haveAccount: "Already have an account?", invalid: "Invalid email or password", forgotTitle: "Forgot your password?", forgotSubtitle: "Enter your email and we will send a recovery link", checkEmail: "Check your email", checkEmailDesc: "If this email is registered with us, you will receive a reset link within a few minutes.", spam: "Check your spam folder if you do not see it.", backLogin: "Back to sign in", sendReset: "Send recovery link", sending: "Sending...", resetTitle: "Set a new password", resetSubtitle: "Choose a strong password for your account", passwordChanged: "Password changed successfully", redirecting: "You will be redirected to sign in shortly.", goLogin: "Go to sign in now", newPassword: "New password", passwordStrength: "Strength", continueGoogle: "Continue with Google", continueApple: "Continue with Apple", or: "or", strengthVeryWeak: "Very weak", strengthWeak: "Weak", strengthAcceptable: "Acceptable", strengthStrong: "Strong", oauthCompleting: "Completing sign in...", oauthFailed: "Social sign-in could not be completed. Please try again.", oauthNotConfigured: "This sign-in method is not configured yet.", clientAccountRequired: "Use a client account to enter the client portal.", backHome: "Back to home", savePassword: "Save new password", saving: "Saving...", mismatch: "Passwords do not match", minPassword: "Password must be at least 8 characters", invalidReset: "The link is invalid or has expired" },
   request: { title: "New service request", subtitle: "Complete the form and our team will contact you within 24–48 hours", steps: ["Company information", "Contact details", "Service details", "Review"], company: "Company name", commercialReg: "Commercial registration (optional)", activity: "Business activity", contactEmail: "Contact email", contactPhone: "Phone number", service: "Requested service", package: "Package (optional)", country: "Recruitment country (if applicable)", notes: "Additional notes (optional)", chooseService: "Choose a service...", chooseCountry: "Choose a country...", next: "Next", previous: "Previous", review: "Review request", submit: "Submit request", submitted: "Submitted", success: "Your request was submitted successfully.", error: "Could not submit the request.", required: "Required" },
   packages: { title: "Packages | OFOQ", badge: "Packages", heroTitle: "Build your", heroHighlight: "success path", heroSub: "Choose the package that fits your business needs.", names: ["Silver package", "Gold package", "Platinum package"], taglines: ["For startups", "Most popular", "For larger organizations"], badges: ["", "Most popular", "Most comprehensive"], features: ["Ministry of Commerce", "Salama platform", "Social insurance", "Medical insurance services", "Zakat and tax services", "Absher and Muqeem platforms", "Consulting services", "Ministry of Media", "Balady platform", "Burden relief service", "Training and development"], subscribe: "Subscribe now", compare: "Compare packages", service: "Service", silver: "Silver", gold: "Gold", platinum: "Platinum", help: "Need help choosing?", helpTitle: "Our team can help", contact: "Contact us" },
@@ -328,10 +417,73 @@ const en: UiCopy = {
 const ar: UiCopy = {
   ...en,
   header: { clientLogin: "دخول العميل", menu: "القائمة", language: "اللغة" },
+  common: { sending: "جاري الإرسال...", send: "إرسال الرسالة" },
   home: { ...en.home, badge: "أفق / شريك الأعمال السعودي", hero1: "نرتّب التفاصيل،", hero2: "لتتفرغ للنمو.", heroSub: "شريكك الموثوق في الموارد البشرية، الخدمات الحكومية، التأشيرات وتأسيس الشركات في المملكة.", request: "اطلب خدمة", explore: "استكشف الخدمات", aboutBadge: "عن أفق", aboutTitle1: "شريك عملك في", aboutTitle2: "المملكة العربية السعودية", aboutDesc: "نحمل عنك الإجراءات الحكومية وإدارة الموارد البشرية ومتطلبات التأسيس — حتى تتفرغ تماماً لنمو أعمالك.", aboutCta: "اعرف المزيد", servicesBadge: "خدماتنا", servicesTitle1: "خدمات متكاملة", servicesTitle2: "وشاملة", servicesAll: "عرض جميع الخدمات", more: "خدمات أخرى", whyBadge: "لماذا أفق؟", whyTitle: "نبني معك خطوة بخطوة", ctaTitle1: "لنعزز نموكم", ctaTitle2: "المستدام", ctaDesc: "تواصل معنا اليوم وابدأ رحلة شراكة حقيقية.", contact: "تواصل معنا", stats: ["عميل تخدمهم أفق", "نسبة رضا العملاء", "خبير متخصص", "تصنيفات خدمية"], reasons: [{ title: "فريق متخصص", desc: "مختصون في كل مجال من مجالات خدماتنا في السوق السعودي." }, { title: "متابعة كاملة", desc: "نتابع ملفك حتى الإغلاق مع تحديثات دورية لك." }, { title: "تجربة رقمية", desc: "بوابة عميل متكاملة لمتابعة طلباتك أينما كنت." }, { title: "خبرة محلية", desc: "نفهم الأنظمة والجهات الحكومية السعودية عن قرب." }] },
   services: { title: "الخدمات | أفق", badge: "دليل خدمات أفق", hero1: "خدمات مصممة", hero2: "لعملك بالكامل.", heroSub: "من تأسيس الكيان إلى تشغيله يومياً، ننسّق التفاصيل عبر فريق واحد ومسار واضح.", view: "عرض الخدمات", more: "خدمات أخرى" },
   category: { home: "الرئيسية", services: "الخدمات", badge: "تصنيف الخدمة", available: "خدمة متاحة", service: "خدمة", grid: "شبكة", list: "قائمة", details: "التفاصيل", need: "هل تحتاج هذه الخدمات؟", needDesc: "تواصل معنا وسنساعدك في تحديد الخدمة المناسبة لاحتياجاتك.", request: "اطلب خدمة" },
   detail: { home: "الرئيسية", services: "الخدمات", badge: "تفاصيل الخدمة", request: "اطلب الخدمة", how: "كيف نعمل", faq: "الأسئلة الشائعة", window: "مدة التنفيذ", suitable: "لمن تناسب؟", requirements: "المتطلبات", related: "خدمات أخرى من نفس التصنيف", details: "التفاصيل" },
+  about: {
+    metaTitle: "من نحن | أفق لحلول الأعمال", badge: "من نحن", heroTitle1: "رحلتنا نحو", heroTitle2: "أفق أبعد",
+    heroSub: "أفق لحلول الأعمال شركة سعودية تساعد المؤسسات على بناء عمليات أقوى، وإنجاز المتطلبات الحكومية، والنمو بثقة.",
+    storyTitle: "قصتنا", storyVision: "كل شركة تستحق شريكاً تقنياً حقيقياً.",
+    storyP1: "بدأت أفق من إيمان بسيط:", storyP2: "أن يفهم الشريك تحدياتك ويعمل إلى جانب فريقك.",
+    storyP3: "بنينا علاقات طويلة الأمد مع شركات في السعودية والخليج، وساعدناها على تحويل أهدافها الطموحة إلى نتائج عملية.",
+    storyP4: "اليوم، يجمع خبراؤنا بين المعرفة المحلية والتجربة الرقمية الحديثة لجعل الأعمال أوضح وأسرع وأكثر استدامة.",
+    valuesTitle: "قيمنا الجوهرية", valuesSub: "المبادئ التي تقف وراء كل قرار ومشروع نتولاه.",
+    values: [
+      { title: "الموثوقية", desc: "نبني علاقات طويلة الأمد بالشفافية والمتابعة الموثوقة." },
+      { title: "القيمة", desc: "نحوّل الأفكار والابتكار إلى نتائج أعمال قابلة للقياس ونمو متواصل." },
+      { title: "تميّز الخدمة", desc: "نقدم نتائج احترافية بعناية واهتمام بكل التفاصيل." },
+      { title: "التكامل", desc: "نوحّد معرفة القطاعات وخبرة المتخصصين حول احتياجات كل عميل." },
+    ],
+    teamTitle: "لماذا أفق؟", ctaTitle: "ابدأ رحلتك مع أفق",
+  },
+  contact: {
+    metaTitle: "تواصل معنا | أفق لحلول الأعمال", badge: "تواصل معنا", heroTitle: "نحن هنا لمساعدتك",
+    heroSub: "تواصل مع فريقنا واحصل على استشارة مجانية. سنرد عليك خلال ٢٤ ساعة.", infoTitle: "معلومات التواصل",
+    phone: "الهاتف", emailLabel: "البريد الإلكتروني", locationLabel: "الموقع", locationVal: "السعودية — جدة — طريق الملك عبدالله",
+    hoursLabel: "ساعات العمل", hoursVal: "الأحد – الخميس، ٩ ص – ٦ م", consultTitle: "استشارة مجانية",
+    consultDesc: "احجز جلسة مجانية لمدة ٣٠ دقيقة مع أحد خبرائنا وناقش تحديات أعمالك.", available: "متاح هذا الأسبوع",
+    successTitle: "تم إرسال رسالتك", successDesc: "شكراً لتواصلك معنا. سيقوم فريقنا بالرد عليك خلال ٢٤ ساعة.",
+    formTitle: "أرسل لنا رسالة", nameLabel: "الاسم الكامل *", namePlaceholder: "اسمك الكريم", companyLabel: "الشركة",
+    companyPlaceholder: "اسم شركتك", emailFormLabel: "البريد الإلكتروني *", phoneFormLabel: "رقم الهاتف",
+    serviceLabel: "الخدمة المطلوبة", serviceDefault: "اختر الخدمة...", sectorDefault: "اختر القطاع...",
+    messageLabel: "الرسالة *", messagePlaceholder: "أخبرنا عن مشروعك أو ما تحتاجه...", emailError: "بريد غير صحيح",
+    required: "مطلوب", services: ["الاستشارات الاستراتيجية", "التحول الرقمي", "تحليل البيانات", "تطوير البرمجيات", "التسويق الرقمي", "الأمن السيبراني", "أخرى"],
+    sectors: ["التجزئة", "المقاولات", "الخدمات المهنية", "التقنية", "الصحة", "التعليم", "أخرى"],
+  },
+  blog: {
+    metaTitle: "المدونة | أفق لحلول الأعمال", metaDescription: "رؤى وإرشادات عملية من أفق لحلول الأعمال.",
+    badge: "المدونة", heroTitle: "مركز", heroHighlight: "المعرفة", heroSub: "رؤى واستراتيجيات من خبرائنا.",
+    sectionEyebrow: "من مدونتنا", sectionTitle: "أحدث", sectionHighlight: "التحديثات", empty: "لا توجد مقالات حتى الآن",
+    emptySub: "تابعنا قريباً لأحدث المقالات والرؤى العملية.", read: "اقرأ المزيد",
+  },
+  countries: {
+    metaTitle: "دول الاستقطاب | أفق لحلول الأعمال", metaDescription: "تدعم شبكة الاستقطاب الدولية لدينا الشركات في المملكة العربية السعودية.",
+    badge: "دول الاستقطاب", heroTitle: "كفاءات", heroHighlight: "من حول العالم",
+    heroSub: "نمتلك شبكة واسعة من الشراكات مع وكالات التوظيف في أبرز أسواق الكفاءات.",
+    sectionEyebrow: "شبكتنا الدولية", sectionTitle: "دول", sectionHighlight: "الاستقطاب", request: "اطلب استقطاب",
+    processEyebrow: "كيف تعمل؟", processTitle: "رحلة", processHighlight: "الاستقطاب",
+    steps: [
+      { title: "تحديد الاحتياج", desc: "حدد الوظائف والمهارات واحتياجات القوى العاملة." },
+      { title: "البحث والاختيار", desc: "نبحث في شبكتنا الدولية عن أفضل المرشحين." },
+      { title: "إجراءات التأشيرات", desc: "ننسق التأشيرات والتصديقات والتصاريح المطلوبة." },
+      { title: "الوصول والتسليم", desc: "نسلّمك الموظفين جاهزين لبدء العمل." },
+    ],
+    ctaEyebrow: "ابدأ الآن", ctaTitle: "هل تحتاج إلى", ctaHighlight: "عمالة متخصصة؟", ctaButton: "قدّم طلبك الآن",
+    items: [
+      { name: "باكستان", desc: "كفاءات متخصصة في قطاعات التقنية والبناء والخدمات." },
+      { name: "الهند", desc: "كوادر متميزة في مجالات الهندسة والتقنية والرعاية الصحية." },
+      { name: "الأردن", desc: "مهارات متخصصة في المحاسبة والقانون والإدارة." },
+      { name: "سريلانكا", desc: "عمالة ماهرة في قطاعات الضيافة والخدمات المنزلية والصناعة." },
+      { name: "مصر", desc: "كفاءات في الإعلام والتسويق والهندسة والتعليم." },
+      { name: "الفلبين", desc: "عمالة متميزة في الرعاية الصحية والخدمات والتقنية." },
+      { name: "بنجلاديش", desc: "عمالة متخصصة في البناء والصناعة والخدمات." },
+      { name: "أوغندا", desc: "كوادر في قطاعات الزراعة والخدمات والبناء." },
+      { name: "نيبال", desc: "عمالة ماهرة في قطاعات البناء والأمن والصناعة." },
+      { name: "السودان", desc: "كفاءات في الطب والهندسة والتعليم والإدارة." },
+    ],
+  },
   auth: { clientTitle: "بوابة العملاء", clientSubtitle: "سجّل دخولك لمتابعة طلباتك", login: "تسجيل الدخول", email: "البريد الإلكتروني", password: "كلمة المرور", forgot: "نسيت كلمة المرور؟", noAccount: "ليس لديك حساب؟", create: "إنشاء حساب جديد", registerTitle: "إنشاء حساب جديد", registerSubtitle: "انضم لبوابة عملاء أفق", fullName: "الاسم الكامل", phone: "رقم الهاتف", confirmPassword: "تأكيد كلمة المرور", createAccount: "إنشاء الحساب", haveAccount: "لديك حساب بالفعل؟", invalid: "البريد الإلكتروني أو كلمة المرور غير صحيحة", forgotTitle: "نسيت كلمة المرور؟", forgotSubtitle: "أدخل بريدك وسنرسل لك رابط الاسترداد", checkEmail: "تحقق من بريدك الإلكتروني", checkEmailDesc: "إذا كان البريد مسجلاً لدينا، ستصلك رسالة بها رابط إعادة التعيين خلال دقائق.", spam: "تحقق من مجلد Spam إذا لم تجد الرسالة", backLogin: "العودة لتسجيل الدخول", sendReset: "إرسال رابط الاسترداد", sending: "جاري الإرسال...", resetTitle: "تعيين كلمة مرور جديدة", resetSubtitle: "اختر كلمة مرور قوية لحسابك", passwordChanged: "تم تغيير كلمة المرور!", redirecting: "سيتم تحويلك لصفحة الدخول خلال ثوانٍ...", goLogin: "الذهاب لتسجيل الدخول الآن", newPassword: "كلمة المرور الجديدة", passwordStrength: "القوة", savePassword: "حفظ كلمة المرور الجديدة", saving: "جاري الحفظ...", mismatch: "كلمتا المرور غير متطابقتين", minPassword: "كلمة المرور يجب أن تكون 8 أحرف على الأقل", invalidReset: "الرابط غير صالح أو منتهي الصلاحية" },
   request: { title: "طلب خدمة جديد", subtitle: "أكمل النموذج وسيتواصل فريقنا معك خلال 24–48 ساعة", steps: ["معلومات الشركة", "بيانات التواصل", "تفاصيل الخدمة", "المراجعة"], company: "اسم الشركة", commercialReg: "رقم السجل التجاري (اختياري)", activity: "النشاط التجاري", contactEmail: "البريد الإلكتروني للتواصل", contactPhone: "رقم الهاتف", service: "نوع الخدمة المطلوبة", package: "الباقة (اختياري)", country: "دولة الاستقدام (إن انطبق)", notes: "ملاحظات إضافية (اختياري)", chooseService: "اختر الخدمة...", chooseCountry: "اختر الدولة...", next: "التالي", previous: "السابق", review: "مراجعة الطلب", submit: "إرسال الطلب", success: "تم تقديم طلبك بنجاح!", error: "خطأ في إرسال الطلب", required: "مطلوب" },
   packages: { ...en.packages, title: "الباقات | أفق", badge: "الباقات", heroTitle: "اصنع مسار", heroHighlight: "نجاحك", heroSub: "اختر الباقة التي تناسب احتياجات عملك", names: ["الباقة الفضية", "الباقة الذهبية", "الباقة البلاتينية"], taglines: ["للشركات الناشئة", "الأكثر طلباً", "للمؤسسات الكبرى"], badges: ["", "الأكثر طلباً", "الأشمل"], features: ["وزارة التجارة", "منصة سلامة", "التأمينات الاجتماعية", "خدمات التأمين الطبي", "خدمات الزكاة والضريبة", "منصة أبشر ومقيم", "خدمات الاستشارات", "وزارة الإعلام", "منصة بلدي", "خدمة تخفيف الأعباء", "التدريب والتطوير"], subscribe: "اشترك الآن", compare: "مقارنة الباقات", service: "الخدمة", silver: "فضية", gold: "ذهبية", platinum: "بلاتينية", help: "هل تحتاج إلى مساعدة في الاختيار؟", helpTitle: "فريقنا يساعدك", contact: "تواصل معنا" },
@@ -764,6 +916,72 @@ const overrides: Record<Exclude<Lang, "ar" | "en">, DeepPartial<UiCopy>> = {
   es: { header: { clientLogin: "Acceso de clientes", menu: "Menú", language: "Idioma" }, home: { ...en.home, hero1: "Nos ocupamos", hero2: "de los detalles.", heroSub: "Su socio de confianza para RR. HH., servicios públicos, visados y constitución de empresas en Arabia Saudí.", request: "Solicitar servicio", explore: "Explorar servicios" }, services: { ...en.services, title: "Servicios | OFOQ", hero1: "Servicios para", hero2: "su empresa." }, category: { ...en.category, home: "Inicio", services: "Servicios", request: "Solicitar servicio", details: "Detalles" }, detail: { ...en.detail, home: "Inicio", services: "Servicios", request: "Solicitar servicio", how: "Cómo trabajamos" }, auth: { ...en.auth, clientTitle: "Portal de clientes", clientSubtitle: "Inicie sesión para seguir sus solicitudes", login: "Iniciar sesión", create: "Crear una cuenta" }, request: { ...en.request, title: "Nueva solicitud de servicio", steps: ["Información de la empresa", "Datos de contacto", "Detalles del servicio", "Revisión"], next: "Siguiente", previous: "Anterior", submit: "Enviar solicitud" } },
 };
 
+const publicPageOverrides: Record<string, DeepPartial<UiCopy>> = {
+  ur: {
+    common: { sending: "بھیجا جا رہا ہے...", send: "پیغام بھیجیں" },
+    about: {
+      metaTitle: "ہمارے بارے میں | OFOQ بزنس سلوشنز", badge: "ہمارے بارے میں", heroTitle1: "ایک وسیع تر افق کی طرف", heroTitle2: "ہمارا سفر",
+      heroSub: "OFOQ ایک سعودی کمپنی ہے جو اداروں کو مضبوط آپریشنز، سرکاری تقاضوں اور پائیدار ترقی میں مدد دیتی ہے۔",
+      storyTitle: "ہماری کہانی", storyVision: "ہر کمپنی ایک حقیقی ٹیکنالوجی پارٹنر کی مستحق ہے۔",
+      storyP1: "OFOQ کا آغاز ایک سادہ یقین سے ہوا:", storyP2: "ایک پارٹنر کو آپ کے چیلنجز سمجھ کر آپ کی ٹیم کے ساتھ کام کرنا چاہیے۔",
+      storyP3: "ہم نے سعودی عرب اور خلیج کی کمپنیوں کے ساتھ دیرپا تعلقات قائم کیے اور ان کے بلند اہداف کو عملی نتائج میں بدلنے میں مدد کی۔",
+      storyP4: "آج ہمارے ماہرین مقامی علم کو جدید ڈیجیٹل تجربے کے ساتھ جوڑ کر کاروبار کو واضح، تیز اور زیادہ پائیدار بناتے ہیں۔",
+      valuesTitle: "ہماری بنیادی اقدار", valuesSub: "ہر فیصلے اور منصوبے کے پیچھے یہی اصول ہیں۔",
+      values: [{ title: "اعتماد", desc: "شفافیت اور قابل اعتماد فالو اپ کے ذریعے طویل مدتی تعلقات بناتے ہیں۔" }, { title: "قدر", desc: "خیالات اور جدت کو قابل پیمائش کاروباری نتائج میں بدلتے ہیں۔" }, { title: "خدمت کا معیار", desc: "ہر تفصیل کا خیال رکھتے ہوئے پیشہ ورانہ نتائج فراہم کرتے ہیں۔" }, { title: "انضمام", desc: "ہر کلائنٹ کی ضرورت کے لیے شعبہ جاتی علم اور ماہرین کی مہارت جوڑتے ہیں۔" }],
+      teamTitle: "OFOQ کیوں؟", ctaTitle: "OFOQ کے ساتھ اپنا سفر شروع کریں",
+    },
+    contact: {
+      metaTitle: "رابطہ کریں | OFOQ بزنس سلوشنز", badge: "رابطہ کریں", heroTitle: "ہم آپ کی مدد کے لیے موجود ہیں",
+      heroSub: "ہماری ٹیم سے رابطہ کریں اور مفت مشاورت حاصل کریں۔ ہم 24 گھنٹوں میں جواب دیں گے۔", infoTitle: "رابطے کی معلومات",
+      phone: "فون", emailLabel: "ای میل", locationLabel: "مقام", locationVal: "سعودی عرب — جدہ — شاہ عبداللہ روڈ", hoursLabel: "اوقات کار", hoursVal: "اتوار تا جمعرات، صبح 9 تا شام 6",
+      consultTitle: "مفت مشاورت", consultDesc: "اپنے کاروباری چیلنجز پر ماہر سے بات کرنے کے لیے 30 منٹ کا مفت سیشن بک کریں۔", available: "اس ہفتے دستیاب",
+      successTitle: "آپ کا پیغام بھیج دیا گیا", successDesc: "رابطہ کرنے کا شکریہ۔ ہماری ٹیم 24 گھنٹوں میں جواب دے گی۔", formTitle: "ہمیں پیغام بھیجیں",
+      nameLabel: "پورا نام *", namePlaceholder: "آپ کا نام", companyLabel: "کمپنی", companyPlaceholder: "آپ کی کمپنی کا نام", emailFormLabel: "ای میل *", phoneFormLabel: "فون نمبر",
+      serviceLabel: "مطلوبہ خدمت", serviceDefault: "خدمت منتخب کریں...", sectorDefault: "شعبہ منتخب کریں...", messageLabel: "پیغام *", messagePlaceholder: "اپنے منصوبے یا ضرورت کے بارے میں بتائیں...",
+      emailError: "درست ای میل درج کریں", required: "درکار", services: ["اسٹریٹجک مشاورت", "ڈیجیٹل تبدیلی", "ڈیٹا تجزیہ", "سافٹ ویئر ڈویلپمنٹ", "ڈیجیٹل مارکیٹنگ", "سائبر سیکیورٹی", "دیگر"],
+      sectors: ["ریٹیل", "تعمیرات", "پیشہ ورانہ خدمات", "ٹیکنالوجی", "صحت", "تعلیم", "دیگر"],
+    },
+    blog: { metaTitle: "بلاگ | OFOQ بزنس سلوشنز", metaDescription: "OFOQ بزنس سلوشنز کے ماہرین سے عملی رہنمائی اور بصیرت۔", badge: "بلاگ", heroTitle: "علم کا", heroHighlight: "مرکز", heroSub: "ہمارے ماہرین کی بصیرت اور حکمت عملی۔", sectionEyebrow: "ہمارے بلاگ سے", sectionTitle: "تازہ ترین", sectionHighlight: "تازہ کاریاں", empty: "ابھی کوئی مضمون نہیں", emptySub: "تازہ مضامین اور عملی بصیرت کے لیے دوبارہ آئیں۔", read: "مزید پڑھیں" },
+    countries: {
+      metaTitle: "استقطاب کے ممالک | OFOQ بزنس سلوشنز", metaDescription: "ہمارا بین الاقوامی نیٹ ورک سعودی عرب کی کمپنیوں کو باصلاحیت افراد تک رسائی دیتا ہے۔",
+      badge: "استقطاب کے ممالک", heroTitle: "دنیا بھر سے", heroHighlight: "باصلاحیت افراد", heroSub: "ہماری شراکت داری کا وسیع نیٹ ورک دنیا کی نمایاں ٹیلنٹ مارکیٹس تک رسائی فراہم کرتا ہے۔",
+      sectionEyebrow: "ہمارا بین الاقوامی نیٹ ورک", sectionTitle: "استقطاب کے", sectionHighlight: "ممالک", request: "استقطاب کی درخواست",
+      processEyebrow: "یہ کیسے کام کرتا ہے؟", processTitle: "استقطاب کا", processHighlight: "سفر",
+      steps: [{ title: "ضرورت کا تعین", desc: "ملازمت، مہارت اور افرادی قوت کی ضروریات بتائیں۔" }, { title: "تلاش اور انتخاب", desc: "ہم اپنے بین الاقوامی نیٹ ورک سے بہترین امیدوار تلاش کرتے ہیں۔" }, { title: "ویزا کارروائی", desc: "ویزا، تصدیق اور ضروری اجازت ناموں کا انتظام کرتے ہیں۔" }, { title: "آمد اور حوالگی", desc: "ملازمین کو کام شروع کرنے کے لیے تیار حالت میں آپ تک پہنچاتے ہیں۔" }],
+      ctaEyebrow: "آج ہی شروع کریں", ctaTitle: "کیا آپ کو", ctaHighlight: "ماہر افرادی قوت چاہیے؟", ctaButton: "ابھی درخواست دیں",
+      items: [{ name: "پاکستان", desc: "ٹیکنالوجی، تعمیرات اور خدمات کے شعبوں میں ماہر افراد۔" }, { name: "ہندوستان", desc: "انجینئرنگ، ٹیکنالوجی اور صحت کے شعبوں میں نمایاں افرادی قوت۔" }, { name: "اردن", desc: "اکاؤنٹنگ، قانون اور انتظامیہ میں خصوصی مہارت۔" }, { name: "سری لنکا", desc: "مہمان نوازی، گھریلو خدمات اور صنعت کے لیے ہنرمند افراد۔" }, { name: "مصر", desc: "میڈیا، مارکیٹنگ، انجینئرنگ اور تعلیم کے ماہرین۔" }, { name: "فلپائن", desc: "صحت، خدمات اور ٹیکنالوجی کے شعبوں میں نمایاں افرادی قوت۔" }, { name: "بنگلہ دیش", desc: "تعمیرات، صنعت اور خدمات کے لیے خصوصی افرادی قوت۔" }, { name: "یوگنڈا", desc: "زراعت، خدمات اور تعمیرات کے شعبوں میں افراد۔" }, { name: "نیپال", desc: "تعمیرات، سیکیورٹی اور صنعت کے لیے ہنرمند افراد۔" }, { name: "سوڈان", desc: "طب، انجینئرنگ، تعلیم اور انتظامیہ کے ماہرین۔" }],
+    },
+  },
+  id: {
+    common: { sending: "Mengirim...", send: "Kirim pesan" },
+    about: { metaTitle: "Tentang kami | OFOQ Business Solutions", badge: "Tentang kami", heroTitle1: "Perjalanan kami menuju", heroTitle2: "cakrawala yang lebih luas", heroSub: "OFOQ adalah perusahaan Saudi yang membantu organisasi membangun operasi yang lebih kuat, memenuhi persyaratan pemerintah, dan tumbuh dengan percaya diri.", storyTitle: "Kisah kami", storyVision: "Setiap perusahaan layak memiliki mitra teknologi yang nyata.", storyP1: "OFOQ dimulai dari keyakinan sederhana:", storyP2: "mitra harus memahami tantangan Anda dan bekerja bersama tim Anda.", storyP3: "Kami membangun hubungan jangka panjang dengan perusahaan di Arab Saudi dan Teluk, membantu mengubah tujuan ambisius menjadi hasil nyata.", storyP4: "Kini para spesialis kami memadukan pengetahuan lokal dengan pengalaman digital modern agar bisnis lebih jelas, cepat, dan berkelanjutan.", valuesTitle: "Nilai utama kami", valuesSub: "Prinsip yang mendasari setiap keputusan dan proyek kami.", values: [{ title: "Keandalan", desc: "Membangun hubungan jangka panjang melalui transparansi dan tindak lanjut yang dapat diandalkan." }, { title: "Nilai", desc: "Mengubah ide dan inovasi menjadi hasil bisnis terukur dan pertumbuhan berkelanjutan." }, { title: "Keunggulan layanan", desc: "Memberikan hasil profesional dengan perhatian pada setiap detail." }, { title: "Integrasi", desc: "Menghubungkan pengetahuan sektor dan keahlian spesialis untuk kebutuhan setiap klien." }], teamTitle: "Mengapa OFOQ?", ctaTitle: "Mulai perjalanan Anda bersama OFOQ" },
+    contact: { metaTitle: "Hubungi kami | OFOQ Business Solutions", badge: "Hubungi kami", heroTitle: "Kami siap membantu", heroSub: "Hubungi tim kami untuk konsultasi gratis. Kami akan membalas dalam 24 jam.", infoTitle: "Informasi kontak", phone: "Telepon", emailLabel: "Email", locationLabel: "Lokasi", locationVal: "Arab Saudi — Jeddah — Jalan King Abdullah", hoursLabel: "Jam kerja", hoursVal: "Minggu–Kamis, 09.00–18.00", consultTitle: "Konsultasi gratis", consultDesc: "Jadwalkan sesi gratis 30 menit dengan pakar kami untuk membahas tantangan bisnis Anda.", available: "Tersedia minggu ini", successTitle: "Pesan Anda terkirim", successDesc: "Terima kasih telah menghubungi kami. Tim kami akan membalas dalam 24 jam.", formTitle: "Kirim pesan kepada kami", nameLabel: "Nama lengkap *", namePlaceholder: "Nama Anda", companyLabel: "Perusahaan", companyPlaceholder: "Nama perusahaan Anda", emailFormLabel: "Email *", phoneFormLabel: "Nomor telepon", serviceLabel: "Layanan yang dibutuhkan", serviceDefault: "Pilih layanan...", sectorDefault: "Pilih sektor...", messageLabel: "Pesan *", messagePlaceholder: "Ceritakan proyek atau kebutuhan Anda...", emailError: "Masukkan email yang valid", required: "Wajib", services: ["Konsultasi strategis", "Transformasi digital", "Analisis data", "Pengembangan perangkat lunak", "Pemasaran digital", "Keamanan siber", "Lainnya"], sectors: ["Ritel", "Konstruksi", "Layanan profesional", "Teknologi", "Kesehatan", "Pendidikan", "Lainnya"] },
+    blog: { metaTitle: "Blog | OFOQ Business Solutions", metaDescription: "Wawasan dan panduan praktis dari OFOQ Business Solutions.", badge: "Blog", heroTitle: "Pusat", heroHighlight: "pengetahuan", heroSub: "Wawasan dan strategi dari para ahli kami.", sectionEyebrow: "Dari blog kami", sectionTitle: "Pembaruan", sectionHighlight: "terbaru", empty: "Belum ada artikel", emptySub: "Kunjungi lagi untuk artikel dan wawasan terbaru.", read: "Baca selengkapnya" },
+    countries: { metaTitle: "Negara sumber tenaga kerja | OFOQ", metaDescription: "Jaringan rekrutmen internasional kami mendukung perusahaan di Arab Saudi.", badge: "Negara sumber tenaga kerja", heroTitle: "Talenta", heroHighlight: "dari seluruh dunia", heroSub: "Jaringan kemitraan kami mencakup pasar talenta terkemuka di dunia.", sectionEyebrow: "Jaringan internasional kami", sectionTitle: "Negara", sectionHighlight: "sumber tenaga kerja", request: "Ajukan rekrutmen", processEyebrow: "Bagaimana cara kerja kami?", processTitle: "Perjalanan", processHighlight: "rekrutmen", steps: [{ title: "Tentukan kebutuhan", desc: "Tentukan posisi, keterampilan, dan kebutuhan tenaga kerja." }, { title: "Cari dan pilih", desc: "Kami mencari kandidat terbaik melalui jaringan internasional kami." }, { title: "Proses visa", desc: "Kami mengoordinasikan visa, legalisasi, dan izin yang diperlukan." }, { title: "Kedatangan", desc: "Kami menyerahkan tenaga kerja yang siap memulai pekerjaan." }], ctaEyebrow: "Mulai sekarang", ctaTitle: "Butuh tenaga kerja", ctaHighlight: "spesialis?", ctaButton: "Ajukan sekarang", items: [{ name: "Pakistan", desc: "Talenta khusus untuk teknologi, konstruksi, dan layanan." }, { name: "India", desc: "Tenaga ahli di bidang teknik, teknologi, dan kesehatan." }, { name: "Yordania", desc: "Keahlian khusus dalam akuntansi, hukum, dan administrasi." }, { name: "Sri Lanka", desc: "Tenaga terampil untuk perhotelan, layanan rumah tangga, dan industri." }, { name: "Mesir", desc: "Keahlian di bidang media, pemasaran, teknik, dan pendidikan." }, { name: "Filipina", desc: "Tenaga unggul untuk kesehatan, layanan, dan teknologi." }, { name: "Bangladesh", desc: "Tenaga khusus untuk konstruksi, industri, dan layanan." }, { name: "Uganda", desc: "Tenaga kerja untuk pertanian, layanan, dan konstruksi." }, { name: "Nepal", desc: "Tenaga terampil untuk konstruksi, keamanan, dan industri." }, { name: "Sudan", desc: "Keahlian di bidang medis, teknik, pendidikan, dan administrasi." }] },
+  },
+  hi: {
+    common: { sending: "भेजा जा रहा है...", send: "संदेश भेजें" },
+    about: { metaTitle: "हमारे बारे में | OFOQ Business Solutions", badge: "हमारे बारे में", heroTitle1: "एक विस्तृत क्षितिज की ओर", heroTitle2: "हमारी यात्रा", heroSub: "OFOQ एक सऊदी कंपनी है जो संस्थाओं को मजबूत संचालन, सरकारी आवश्यकताओं और आत्मविश्वास से बढ़ने में मदद करती है।", storyTitle: "हमारी कहानी", storyVision: "हर कंपनी एक वास्तविक तकनीकी साझेदार की हकदार है।", storyP1: "OFOQ की शुरुआत एक सरल विश्वास से हुई:", storyP2: "एक साझेदार को आपकी चुनौतियों को समझकर आपकी टीम के साथ काम करना चाहिए।", storyP3: "हमने सऊदी अरब और खाड़ी की कंपनियों के साथ दीर्घकालिक संबंध बनाए हैं और उनके महत्वाकांक्षी लक्ष्यों को व्यावहारिक परिणामों में बदला है।", storyP4: "आज हमारे विशेषज्ञ स्थानीय ज्ञान को आधुनिक डिजिटल अनुभव के साथ जोड़कर व्यवसाय को अधिक स्पष्ट, तेज़ और टिकाऊ बनाते हैं।", valuesTitle: "हमारे मूल मूल्य", valuesSub: "हर निर्णय और परियोजना के पीछे के सिद्धांत।", values: [{ title: "विश्वसनीयता", desc: "पारदर्शिता और भरोसेमंद फॉलो-अप से दीर्घकालिक संबंध बनाना।" }, { title: "मूल्य", desc: "विचारों और नवाचार को मापने योग्य व्यावसायिक परिणामों में बदलना।" }, { title: "सेवा उत्कृष्टता", desc: "हर विवरण पर ध्यान देकर पेशेवर परिणाम देना।" }, { title: "एकीकरण", desc: "हर ग्राहक की जरूरत के लिए क्षेत्रीय ज्ञान और विशेषज्ञ कौशल जोड़ना।" }], teamTitle: "OFOQ क्यों?", ctaTitle: "OFOQ के साथ अपनी यात्रा शुरू करें" },
+    contact: { metaTitle: "संपर्क करें | OFOQ Business Solutions", badge: "संपर्क करें", heroTitle: "हम आपकी सहायता के लिए तैयार हैं", heroSub: "मुफ्त परामर्श के लिए हमारी टीम से संपर्क करें। हम 24 घंटे में जवाब देंगे।", infoTitle: "संपर्क जानकारी", phone: "फ़ोन", emailLabel: "ईमेल", locationLabel: "स्थान", locationVal: "सऊदी अरब — जेद्दा — किंग अब्दुल्लाह रोड", hoursLabel: "कार्य समय", hoursVal: "रविवार–गुरुवार, सुबह 9–शाम 6", consultTitle: "मुफ्त परामर्श", consultDesc: "अपने व्यावसायिक मुद्दों पर विशेषज्ञ से चर्चा करने के लिए 30 मिनट का मुफ्त सत्र बुक करें।", available: "इस सप्ताह उपलब्ध", successTitle: "आपका संदेश भेज दिया गया", successDesc: "संपर्क करने के लिए धन्यवाद। हमारी टीम 24 घंटे में जवाब देगी।", formTitle: "हमें संदेश भेजें", nameLabel: "पूरा नाम *", namePlaceholder: "आपका नाम", companyLabel: "कंपनी", companyPlaceholder: "आपकी कंपनी का नाम", emailFormLabel: "ईमेल *", phoneFormLabel: "फ़ोन नंबर", serviceLabel: "आवश्यक सेवा", serviceDefault: "सेवा चुनें...", sectorDefault: "क्षेत्र चुनें...", messageLabel: "संदेश *", messagePlaceholder: "अपने प्रोजेक्ट या आवश्यकता के बारे में बताएं...", emailError: "मान्य ईमेल दर्ज करें", required: "आवश्यक", services: ["रणनीतिक परामर्श", "डिजिटल परिवर्तन", "डेटा विश्लेषण", "सॉफ्टवेयर विकास", "डिजिटल मार्केटिंग", "साइबर सुरक्षा", "अन्य"], sectors: ["रिटेल", "निर्माण", "पेशेवर सेवाएं", "तकनीक", "स्वास्थ्य", "शिक्षा", "अन्य"] },
+    blog: { metaTitle: "ब्लॉग | OFOQ Business Solutions", metaDescription: "OFOQ Business Solutions के विशेषज्ञों से व्यावहारिक जानकारी और मार्गदर्शन।", badge: "ब्लॉग", heroTitle: "ज्ञान", heroHighlight: "केंद्र", heroSub: "हमारे विशेषज्ञों की जानकारी और रणनीतियां।", sectionEyebrow: "हमारे ब्लॉग से", sectionTitle: "नवीनतम", sectionHighlight: "अपडेट", empty: "अभी कोई लेख नहीं", emptySub: "नवीनतम लेखों और उपयोगी जानकारी के लिए फिर आएं।", read: "और पढ़ें" },
+    countries: { metaTitle: "भर्ती के देश | OFOQ", metaDescription: "हमारा अंतरराष्ट्रीय भर्ती नेटवर्क सऊदी अरब की कंपनियों को सहयोग देता है।", badge: "भर्ती के देश", heroTitle: "दुनिया भर से", heroHighlight: "प्रतिभा", heroSub: "हमारा साझेदारी नेटवर्क दुनिया के प्रमुख प्रतिभा बाजारों तक पहुंचता है।", sectionEyebrow: "हमारा अंतरराष्ट्रीय नेटवर्क", sectionTitle: "भर्ती", sectionHighlight: "के देश", request: "भर्ती का अनुरोध", processEyebrow: "यह कैसे काम करता है?", processTitle: "भर्ती की", processHighlight: "यात्रा", steps: [{ title: "आवश्यकता तय करें", desc: "पद, कौशल और कार्यबल की जरूरत बताएं।" }, { title: "खोज और चयन", desc: "हम अपने अंतरराष्ट्रीय नेटवर्क से सर्वश्रेष्ठ उम्मीदवार खोजते हैं।" }, { title: "वीजा प्रक्रिया", desc: "हम वीजा, प्रमाणीकरण और आवश्यक परमिट का समन्वय करते हैं।" }, { title: "आगमन और सुपुर्दगी", desc: "हम कर्मचारियों को काम शुरू करने के लिए तैयार पहुंचाते हैं।" }], ctaEyebrow: "आज ही शुरू करें", ctaTitle: "क्या आपको", ctaHighlight: "विशेषज्ञ कार्यबल चाहिए?", ctaButton: "अभी अनुरोध करें", items: [{ name: "पाकिस्तान", desc: "तकनीक, निर्माण और सेवाओं में विशेषज्ञ प्रतिभा।" }, { name: "भारत", desc: "इंजीनियरिंग, तकनीक और स्वास्थ्य के क्षेत्र में कुशल लोग।" }, { name: "जॉर्डन", desc: "लेखा, कानून और प्रशासन में विशेषज्ञता।" }, { name: "श्रीलंका", desc: "आतिथ्य, घरेलू सेवाओं और उद्योग के लिए कुशल कर्मचारी।" }, { name: "मिस्र", desc: "मीडिया, मार्केटिंग, इंजीनियरिंग और शिक्षा की प्रतिभा।" }, { name: "फिलीपींस", desc: "स्वास्थ्य, सेवाओं और तकनीक में उत्कृष्ट कर्मचारी।" }, { name: "बांग्लादेश", desc: "निर्माण, उद्योग और सेवाओं के लिए विशेषज्ञ कर्मचारी।" }, { name: "युगांडा", desc: "कृषि, सेवाओं और निर्माण के क्षेत्र में प्रतिभा।" }, { name: "नेपाल", desc: "निर्माण, सुरक्षा और उद्योग के लिए कुशल कर्मचारी।" }, { name: "सूडान", desc: "चिकित्सा, इंजीनियरिंग, शिक्षा और प्रशासन की प्रतिभा।" }] },
+  },
+  de: {
+    common: { sending: "Wird gesendet...", send: "Nachricht senden" },
+    about: { metaTitle: "Über uns | OFOQ Business Solutions", badge: "Über uns", heroTitle1: "Unsere Reise zu", heroTitle2: "einem weiteren Horizont", heroSub: "OFOQ ist ein saudisches Unternehmen, das Organisationen beim Aufbau stärkerer Abläufe, bei Behördenanforderungen und beim Wachstum unterstützt.", storyTitle: "Unsere Geschichte", storyVision: "Jedes Unternehmen verdient einen echten Technologiepartner.", storyP1: "OFOQ begann mit einer einfachen Überzeugung:", storyP2: "Ein Partner sollte Ihre Herausforderungen verstehen und mit Ihrem Team zusammenarbeiten.", storyP3: "Wir haben langfristige Beziehungen zu Unternehmen in Saudi-Arabien und der Golfregion aufgebaut und helfen ihnen, ambitionierte Ziele in praktische Ergebnisse umzusetzen.", storyP4: "Heute verbinden unsere Spezialisten lokales Wissen mit moderner digitaler Erfahrung, damit Geschäfte klarer, schneller und nachhaltiger werden.", valuesTitle: "Unsere Grundwerte", valuesSub: "Die Prinzipien hinter jeder Entscheidung und jedem Projekt.", values: [{ title: "Zuverlässigkeit", desc: "Langfristige Beziehungen durch Transparenz und verlässliche Betreuung." }, { title: "Wert", desc: "Ideen und Innovation in messbare Geschäftsergebnisse verwandeln." }, { title: "Servicequalität", desc: "Professionelle Ergebnisse mit Sorgfalt für jedes Detail liefern." }, { title: "Integration", desc: "Branchenwissen und Spezialistenkompetenz für jeden Kunden verbinden." }], teamTitle: "Warum OFOQ?", ctaTitle: "Starten Sie Ihre Reise mit OFOQ" },
+    contact: { metaTitle: "Kontakt | OFOQ Business Solutions", badge: "Kontakt", heroTitle: "Wir sind für Sie da", heroSub: "Kontaktieren Sie unser Team für eine kostenlose Beratung. Wir antworten innerhalb von 24 Stunden.", infoTitle: "Kontaktinformationen", phone: "Telefon", emailLabel: "E-Mail", locationLabel: "Standort", locationVal: "Saudi-Arabien — Dschidda — King-Abdullah-Straße", hoursLabel: "Öffnungszeiten", hoursVal: "Sonntag–Donnerstag, 9–18 Uhr", consultTitle: "Kostenlose Beratung", consultDesc: "Buchen Sie eine kostenlose 30-minütige Sitzung mit einem unserer Experten.", available: "Diese Woche verfügbar", successTitle: "Ihre Nachricht wurde gesendet", successDesc: "Vielen Dank für Ihre Nachricht. Unser Team antwortet innerhalb von 24 Stunden.", formTitle: "Nachricht senden", nameLabel: "Vollständiger Name *", namePlaceholder: "Ihr Name", companyLabel: "Unternehmen", companyPlaceholder: "Name Ihres Unternehmens", emailFormLabel: "E-Mail *", phoneFormLabel: "Telefonnummer", serviceLabel: "Benötigte Leistung", serviceDefault: "Leistung auswählen...", sectorDefault: "Branche auswählen...", messageLabel: "Nachricht *", messagePlaceholder: "Erzählen Sie uns von Ihrem Projekt oder Bedarf...", emailError: "Gültige E-Mail eingeben", required: "Erforderlich", services: ["Strategische Beratung", "Digitale Transformation", "Datenanalyse", "Softwareentwicklung", "Digitales Marketing", "Cybersicherheit", "Sonstiges"], sectors: ["Einzelhandel", "Bauwesen", "Professionelle Dienstleistungen", "Technologie", "Gesundheit", "Bildung", "Sonstiges"] },
+    blog: { metaTitle: "Blog | OFOQ Business Solutions", metaDescription: "Praktische Einblicke und Leitfäden von OFOQ Business Solutions.", badge: "Blog", heroTitle: "Wissens", heroHighlight: "zentrum", heroSub: "Einblicke und Strategien von unseren Experten.", sectionEyebrow: "Aus unserem Blog", sectionTitle: "Neueste", sectionHighlight: "Updates", empty: "Noch keine Artikel", emptySub: "Schauen Sie bald wieder vorbei für neue Artikel und Einblicke.", read: "Mehr lesen" },
+    countries: { metaTitle: "Rekrutierungsländer | OFOQ", metaDescription: "Unser internationales Rekrutierungsnetzwerk unterstützt Unternehmen in Saudi-Arabien.", badge: "Rekrutierungsländer", heroTitle: "Talente", heroHighlight: "aus aller Welt", heroSub: "Unser Partnernetzwerk reicht in die führenden Talentmärkte der Welt.", sectionEyebrow: "Unser internationales Netzwerk", sectionTitle: "Rekrutierungs", sectionHighlight: "länder", request: "Rekrutierung anfragen", processEyebrow: "Wie funktioniert es?", processTitle: "Der Weg der", processHighlight: "Rekrutierung", steps: [{ title: "Bedarf bestimmen", desc: "Definieren Sie Positionen, Fähigkeiten und Personalbedarf." }, { title: "Suchen und auswählen", desc: "Wir finden die besten Kandidaten in unserem internationalen Netzwerk." }, { title: "Visaprozess", desc: "Wir koordinieren Visa, Beglaubigungen und erforderliche Genehmigungen." }, { title: "Ankunft und Übergabe", desc: "Wir übergeben einsatzbereite Mitarbeiter für den Arbeitsbeginn." }], ctaEyebrow: "Jetzt starten", ctaTitle: "Brauchen Sie", ctaHighlight: "spezialisierte Mitarbeiter?", ctaButton: "Jetzt anfragen", items: [{ name: "Pakistan", desc: "Spezialisierte Talente für Technologie, Bauwesen und Dienstleistungen." }, { name: "Indien", desc: "Fachkräfte in Ingenieurwesen, Technologie und Gesundheitswesen." }, { name: "Jordanien", desc: "Spezialisten für Buchhaltung, Recht und Verwaltung." }, { name: "Sri Lanka", desc: "Qualifizierte Mitarbeiter für Hotellerie, Haushalt und Industrie." }, { name: "Ägypten", desc: "Fachkräfte für Medien, Marketing, Ingenieurwesen und Bildung." }, { name: "Philippinen", desc: "Hervorragende Mitarbeiter für Gesundheit, Dienstleistungen und Technologie." }, { name: "Bangladesch", desc: "Spezialisierte Mitarbeiter für Bau, Industrie und Dienstleistungen." }, { name: "Uganda", desc: "Fachkräfte für Landwirtschaft, Dienstleistungen und Bauwesen." }, { name: "Nepal", desc: "Qualifizierte Mitarbeiter für Bau, Sicherheit und Industrie." }, { name: "Sudan", desc: "Fachkräfte für Medizin, Ingenieurwesen, Bildung und Verwaltung." }] },
+  },
+  es: {
+    common: { sending: "Enviando...", send: "Enviar mensaje" },
+    about: { metaTitle: "Sobre nosotros | OFOQ Business Solutions", badge: "Sobre nosotros", heroTitle1: "Nuestro camino hacia", heroTitle2: "un horizonte más amplio", heroSub: "OFOQ es una empresa saudí que ayuda a las organizaciones a crear operaciones sólidas, gestionar requisitos públicos y crecer con confianza.", storyTitle: "Nuestra historia", storyVision: "Toda empresa merece un verdadero socio tecnológico.", storyP1: "OFOQ nació de una convicción sencilla:", storyP2: "un socio debe entender sus retos y trabajar junto a su equipo.", storyP3: "Hemos creado relaciones duraderas con empresas de Arabia Saudí y el Golfo, ayudándolas a convertir objetivos ambiciosos en resultados prácticos.", storyP4: "Hoy, nuestros especialistas combinan el conocimiento local con una experiencia digital moderna para hacer que los negocios sean más claros, rápidos y sostenibles.", valuesTitle: "Nuestros valores", valuesSub: "Los principios detrás de cada decisión y proyecto que asumimos.", values: [{ title: "Fiabilidad", desc: "Creamos relaciones a largo plazo con transparencia y seguimiento constante." }, { title: "Valor", desc: "Convertimos ideas e innovación en resultados empresariales medibles." }, { title: "Excelencia del servicio", desc: "Ofrecemos resultados profesionales cuidando cada detalle." }, { title: "Integración", desc: "Unimos el conocimiento sectorial y la experiencia especializada para cada cliente." }], teamTitle: "¿Por qué OFOQ?", ctaTitle: "Empiece su camino con OFOQ" },
+    contact: { metaTitle: "Contáctanos | OFOQ Business Solutions", badge: "Contáctanos", heroTitle: "Estamos aquí para ayudarle", heroSub: "Contacte con nuestro equipo para una consulta gratuita. Responderemos en 24 horas.", infoTitle: "Información de contacto", phone: "Teléfono", emailLabel: "Correo electrónico", locationLabel: "Ubicación", locationVal: "Arabia Saudí — Yeda — Carretera King Abdullah", hoursLabel: "Horario", hoursVal: "Domingo–jueves, 9:00–18:00", consultTitle: "Consulta gratuita", consultDesc: "Reserve una sesión gratuita de 30 minutos con uno de nuestros expertos.", available: "Disponible esta semana", successTitle: "Su mensaje ha sido enviado", successDesc: "Gracias por contactarnos. Nuestro equipo responderá en 24 horas.", formTitle: "Envíenos un mensaje", nameLabel: "Nombre completo *", namePlaceholder: "Su nombre", companyLabel: "Empresa", companyPlaceholder: "Nombre de su empresa", emailFormLabel: "Correo electrónico *", phoneFormLabel: "Número de teléfono", serviceLabel: "Servicio necesario", serviceDefault: "Seleccione un servicio...", sectorDefault: "Seleccione un sector...", messageLabel: "Mensaje *", messagePlaceholder: "Cuéntenos sobre su proyecto o necesidad...", emailError: "Introduzca un correo válido", required: "Obligatorio", services: ["Consultoría estratégica", "Transformación digital", "Análisis de datos", "Desarrollo de software", "Marketing digital", "Ciberseguridad", "Otro"], sectors: ["Comercio minorista", "Construcción", "Servicios profesionales", "Tecnología", "Salud", "Educación", "Otro"] },
+    blog: { metaTitle: "Blog | OFOQ Business Solutions", metaDescription: "Ideas y guías prácticas de OFOQ Business Solutions.", badge: "Blog", heroTitle: "Centro de", heroHighlight: "conocimiento", heroSub: "Ideas y estrategias de nuestros expertos.", sectionEyebrow: "De nuestro blog", sectionTitle: "Últimas", sectionHighlight: "actualizaciones", empty: "Aún no hay artículos", emptySub: "Vuelva pronto para leer nuevos artículos e ideas prácticas.", read: "Leer más" },
+    countries: { metaTitle: "Países de contratación | OFOQ", metaDescription: "Nuestra red internacional de contratación ayuda a empresas en Arabia Saudí.", badge: "Países de contratación", heroTitle: "Talento", heroHighlight: "de todo el mundo", heroSub: "Nuestra red de socios llega a los principales mercados de talento del mundo.", sectionEyebrow: "Nuestra red internacional", sectionTitle: "Países de", sectionHighlight: "contratación", request: "Solicitar contratación", processEyebrow: "¿Cómo funciona?", processTitle: "El proceso de", processHighlight: "contratación", steps: [{ title: "Definir la necesidad", desc: "Indique puestos, habilidades y necesidades de personal." }, { title: "Buscar y seleccionar", desc: "Buscamos los mejores candidatos en nuestra red internacional." }, { title: "Trámites de visado", desc: "Coordinamos visados, legalizaciones y permisos necesarios." }, { title: "Llegada y entrega", desc: "Le entregamos empleados preparados para empezar a trabajar." }], ctaEyebrow: "Empiece ahora", ctaTitle: "¿Necesita personal", ctaHighlight: "especializado?", ctaButton: "Solicítelo ahora", items: [{ name: "Pakistán", desc: "Talento especializado en tecnología, construcción y servicios." }, { name: "India", desc: "Profesionales de ingeniería, tecnología y salud." }, { name: "Jordania", desc: "Especialistas en contabilidad, derecho y administración." }, { name: "Sri Lanka", desc: "Personal cualificado para hostelería, servicios domésticos e industria." }, { name: "Egipto", desc: "Profesionales de medios, marketing, ingeniería y educación." }, { name: "Filipinas", desc: "Personal destacado para salud, servicios y tecnología." }, { name: "Bangladés", desc: "Personal especializado para construcción, industria y servicios." }, { name: "Uganda", desc: "Profesionales de agricultura, servicios y construcción." }, { name: "Nepal", desc: "Personal cualificado para construcción, seguridad e industria." }, { name: "Sudán", desc: "Profesionales de medicina, ingeniería, educación y administración." }] },
+  },
+};
+
 const clientDetailOverrides: Record<string, Partial<UiCopy["client"]>> = {
   ar: {
     statusUpdated: "تم تحديث الحالة وإشعار العميل",
@@ -867,5 +1085,5 @@ export function getUiCopy(lang: Lang): UiCopy {
   if (lang === "ar") return merge(merge(ar, { client: clientDetailOverrides.ar }), { adminPages: adminContentOverrides.ar }) as UiCopy;
   if (lang === "en") return en;
   const patch = overrides[lang] || {};
-  return merge(merge(merge(en, patch), { client: clientDetailOverrides[lang] || {} }), { adminPages: adminContentOverrides[lang] || {} }) as UiCopy;
+  return merge(merge(merge(merge(en, patch), publicPageOverrides[lang] || {}), { client: clientDetailOverrides[lang] || {} }), { adminPages: adminContentOverrides[lang] || {} }) as UiCopy;
 }

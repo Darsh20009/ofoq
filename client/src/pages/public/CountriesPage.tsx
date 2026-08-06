@@ -2,31 +2,23 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import WireframeCube from "../../components/WireframeCube";
+import { useLang } from "../../i18n/LangContext";
 
 const fadeUp = {
   hidden:  { opacity: 0, y: 28 },
   visible: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.06, duration: 0.5 } }),
 };
 
-const COUNTRIES = [
-  { name: "باكستان",   flag: "🇵🇰", desc: "استقطاب كفاءات متخصصة في قطاعات التقنية والبناء والخدمات" },
-  { name: "الهند",     flag: "🇮🇳", desc: "كوادر بشرية متميزة في مجالات الهندسة والتقنية والطب" },
-  { name: "الأردن",    flag: "🇯🇴", desc: "مهارات متخصصة في المحاسبة والقانون والإدارة" },
-  { name: "سريلانكا", flag: "🇱🇰", desc: "عمالة ماهرة في قطاعات الضيافة والخدمات المنزلية والصناعة" },
-  { name: "مصر",       flag: "🇪🇬", desc: "كفاءات في الإعلام والتسويق والهندسة والتعليم" },
-  { name: "الفلبين",  flag: "🇵🇭", desc: "عمالة متميزة في الرعاية الصحية والخدمات والتقنية" },
-  { name: "بنجلاديش", flag: "🇧🇩", desc: "عمالة متخصصة في البناء والصناعة والخدمات" },
-  { name: "أوغندا",   flag: "🇺🇬", desc: "كوادر في قطاعات الزراعة والخدمات والبناء" },
-  { name: "نيبال",    flag: "🇳🇵", desc: "عمالة ماهرة في قطاعات البناء والأمن والصناعة" },
-  { name: "السودان",  flag: "🇸🇩", desc: "كفاءات في الطب والهندسة والتعليم والإدارة" },
-];
+const FLAGS = ["🇵🇰", "🇮🇳", "🇯🇴", "🇱🇰", "🇪🇬", "🇵🇭", "🇧🇩", "🇺🇬", "🇳🇵", "🇸🇩"];
 
 export default function CountriesPage() {
+  const { ui, dir } = useLang();
+  const countries = ui.countries.items.map((country, i) => ({ ...country, flag: FLAGS[i] }));
   return (
-    <div>
+    <div dir={dir}>
       <Helmet>
-        <title>دول الاستقطاب — أفق لحلول الأعمال</title>
-        <meta name="description" content="أفق لحلول الأعمال تستقطب الكفاءات من أبرز دول العمالة الماهرة حول العالم لدعم نمو شركتك في المملكة." />
+        <title>{ui.countries.metaTitle}</title>
+        <meta name="description" content={ui.countries.metaDescription} />
         <link rel="canonical" href="https://ofoqhc.com/countries" />
       </Helmet>
 
@@ -45,18 +37,18 @@ export default function CountriesPage() {
         </div>
         <div className="max-w-5xl mx-auto px-5 sm:px-8 pb-14 relative z-10 w-full">
           <div className="flex items-center gap-2 text-white/45 text-xs mb-4">
-            <Link to="/" className="hover:text-white transition-colors">الرئيسية</Link>
+            <Link to="/" className="hover:text-white transition-colors">{ui.category.home}</Link>
             <span>/</span>
-            <span className="text-white/70">دول الاستقطاب</span>
+            <span className="text-white/70">{ui.countries.badge}</span>
           </div>
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-5xl sm:text-6xl font-black text-white"
           >
-            نستقطب الكفاءات{" "}
+            {ui.countries.heroTitle}{" "}
             <br />
-            <span className="text-ofoq-yellow">من حول العالم</span>
+            <span className="text-ofoq-yellow">{ui.countries.heroHighlight}</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
@@ -64,7 +56,7 @@ export default function CountriesPage() {
             transition={{ delay: 0.15 }}
             className="text-white/55 text-base mt-3 max-w-lg"
           >
-            نمتلك شبكة واسعة من الشراكات مع وكالات التوظيف في أبرز دول الاستقطاب
+            {ui.countries.heroSub}
           </motion.p>
         </div>
       </section>
@@ -74,15 +66,15 @@ export default function CountriesPage() {
         <div className="max-w-5xl mx-auto px-5 sm:px-8">
 
           <div className="mb-10">
-            <p className="text-ofoq-green font-bold text-sm mb-2">شبكتنا الدولية</p>
+            <p className="text-ofoq-green font-bold text-sm mb-2">{ui.countries.sectionEyebrow}</p>
             <h2 className="text-3xl font-black text-ofoq-navy">
-              دول{" "}
-              <span className="text-ofoq-green">الاستقطاب</span>
+              {ui.countries.sectionTitle}{" "}
+              <span className="text-ofoq-green">{ui.countries.sectionHighlight}</span>
             </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {COUNTRIES.map((c, i) => (
+            {countries.map((c, i) => (
               <motion.div
                 key={i}
                 variants={fadeUp}
@@ -104,7 +96,7 @@ export default function CountriesPage() {
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="m15 18-6-6 6-6" />
                   </svg>
-                  اطلب استقطاب
+                  {ui.countries.request}
                 </Link>
               </motion.div>
             ))}
@@ -127,25 +119,20 @@ export default function CountriesPage() {
         </div>
         <div className="max-w-5xl mx-auto px-5 sm:px-8 relative z-10">
           <div className="text-center mb-12">
-            <p className="text-ofoq-green font-bold text-sm mb-2">كيف تعمل؟</p>
+            <p className="text-ofoq-green font-bold text-sm mb-2">{ui.countries.processEyebrow}</p>
             <h2 className="text-3xl font-black text-white">
-              خطوات{" "}
-              <span className="text-ofoq-yellow">الاستقطاب</span>
+              {ui.countries.processTitle}{" "}
+              <span className="text-ofoq-yellow">{ui.countries.processHighlight}</span>
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {[
-              { n: "١", t: "تحديد الاحتياج", d: "تحدد احتياجاتك من العمالة والتخصصات المطلوبة" },
-              { n: "٢", t: "البحث والاختيار",  d: "نبحث لك في شبكتنا الدولية عن أفضل المرشحين" },
-              { n: "٣", t: "استخراج التأشيرات", d: "نتولى جميع إجراءات التأشيرات والتصاريح" },
-              { n: "٤", t: "الاستقدام والتسليم", d: "نسلّم لك الموظفين جاهزين للعمل" },
-            ].map((step) => (
-              <div key={step.n} className="bg-white/8 border border-white/15 rounded-3xl p-6 text-center hover:bg-white/12 transition-colors">
+            {ui.countries.steps.map((step, i) => (
+              <div key={i} className="bg-white/8 border border-white/15 rounded-3xl p-6 text-center hover:bg-white/12 transition-colors">
                 <span className="w-12 h-12 rounded-full border-2 border-ofoq-green/40 flex items-center justify-center text-ofoq-green font-black text-lg mx-auto mb-4">
-                  {step.n}
+                  {i + 1}
                 </span>
-                <h4 className="font-black text-white text-sm mb-2">{step.t}</h4>
-                <p className="text-white/50 text-xs leading-relaxed">{step.d}</p>
+                <h4 className="font-black text-white text-sm mb-2">{step.title}</h4>
+                <p className="text-white/50 text-xs leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -155,10 +142,10 @@ export default function CountriesPage() {
       {/* ══ CTA ════════════════════════════════════════════════ */}
       <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-5 sm:px-8 text-center">
-          <p className="text-ofoq-green font-bold text-sm mb-2">ابدأ الآن</p>
+          <p className="text-ofoq-green font-bold text-sm mb-2">{ui.countries.ctaEyebrow}</p>
           <h2 className="text-3xl font-black text-ofoq-navy mb-6">
-            هل تحتاج إلى{" "}
-            <span className="text-ofoq-green">عمالة متخصصة؟</span>
+            {ui.countries.ctaTitle}{" "}
+            <span className="text-ofoq-green">{ui.countries.ctaHighlight}</span>
           </h2>
           <Link
             to="/client/register"
@@ -169,7 +156,7 @@ export default function CountriesPage() {
                 <path d="m15 18-6-6 6-6" />
               </svg>
             </span>
-            <span className="pl-2">قدّم طلبك الآن</span>
+            <span className="pl-2">{ui.countries.ctaButton}</span>
           </Link>
         </div>
       </section>

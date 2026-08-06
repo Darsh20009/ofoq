@@ -15,10 +15,8 @@ const fadeUp = {
 };
 
 export default function ContactPage() {
-  const { t, dir, lang } = useLang();
-  const sectors = lang === "ar"
-    ? ["التجزئة", "المقاولات", "الخدمات المهنية", "التقنية", "الصحة", "التعليم", "أخرى"]
-    : ["Retail", "Construction", "Professional services", "Technology", "Healthcare", "Education", "Other"];
+  const { ui, dir } = useLang();
+  const sectors = ui.contact.sectors;
   const [submitted, setSubmitted] = useState(false);
   const [searchParams] = useSearchParams();
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
@@ -37,8 +35,8 @@ export default function ContactPage() {
   return (
     <div dir={dir}>
       <Helmet>
-        <title>{t.contact.metaTitle}</title>
-        <meta name="description" content={t.contact.heroSub} />
+        <title>{ui.contact.metaTitle}</title>
+        <meta name="description" content={ui.contact.heroSub} />
         <link rel="canonical" href="https://ofoqhc.com/contact" />
       </Helmet>
 
@@ -57,16 +55,16 @@ export default function ContactPage() {
         </div>
         <div className="max-w-5xl mx-auto px-5 sm:px-8 pb-14 relative z-10 w-full">
           <div className="flex items-center gap-2 text-white/45 text-xs mb-4">
-            <Link to="/" className="hover:text-white transition-colors">{t.nav.home}</Link>
+            <Link to="/" className="hover:text-white transition-colors">{ui.category.home}</Link>
             <span>/</span>
-            <span className="text-white/70">{t.contact.badge}</span>
+            <span className="text-white/70">{ui.contact.badge}</span>
           </div>
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="max-w-3xl text-4xl font-black leading-tight sm:text-6xl">
-              {t.contact.heroTitle}
+              {ui.contact.heroTitle}
             </h1>
             <p className="text-white/50 text-sm mt-3">
-              {t.contact.heroSub}
+              {ui.contact.heroSub}
             </p>
           </motion.div>
         </div>
@@ -82,7 +80,7 @@ export default function ContactPage() {
               {/* الخريطة */}
               <div className="rounded-3xl overflow-hidden h-48 bg-ofoq-navy/10">
                 <iframe
-                  title={t.contact.infoTitle}
+                  title={ui.contact.infoTitle}
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3713.3!2d39.17!3d21.53!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjHCsDMxJzQ4LjAiTiAzOcKwMTAnMTIuMCJF!5e0!3m2!1sar!2ssa!4v1"
                   className="w-full h-full border-0"
                   loading="lazy"
@@ -97,7 +95,7 @@ export default function ContactPage() {
                     <Phone size={16} className="text-ofoq-green group-hover:text-white transition-colors" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400 mb-0.5">{t.contact.phone}</p>
+                    <p className="text-xs text-gray-400 mb-0.5">{ui.contact.phone}</p>
                     <p className="font-bold text-ofoq-navy text-sm" dir="ltr">+966 500 851 177</p>
                   </div>
                 </a>
@@ -106,7 +104,7 @@ export default function ContactPage() {
                     <Mail size={16} className="text-ofoq-green group-hover:text-white transition-colors" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400 mb-0.5">{t.contact.emailLabel}</p>
+                    <p className="text-xs text-gray-400 mb-0.5">{ui.contact.emailLabel}</p>
                     <p className="font-bold text-ofoq-navy text-sm">info@ofoqhc.com</p>
                   </div>
                 </a>
@@ -115,8 +113,8 @@ export default function ContactPage() {
                     <MapPin size={16} className="text-ofoq-green" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400 mb-0.5">{t.contact.locationLabel}</p>
-                    <p className="font-bold text-ofoq-navy text-sm">{t.contact.locationVal}</p>
+                    <p className="text-xs text-gray-400 mb-0.5">{ui.contact.locationLabel}</p>
+                    <p className="font-bold text-ofoq-navy text-sm">{ui.contact.locationVal}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -124,8 +122,8 @@ export default function ContactPage() {
                     <Clock size={16} className="text-ofoq-green" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400 mb-0.5">{t.contact.hoursLabel}</p>
-                    <p className="font-bold text-ofoq-navy text-sm">{t.contact.hoursVal}</p>
+                    <p className="text-xs text-gray-400 mb-0.5">{ui.contact.hoursLabel}</p>
+                    <p className="font-bold text-ofoq-navy text-sm">{ui.contact.hoursVal}</p>
                   </div>
                 </div>
               </div>
@@ -136,13 +134,13 @@ export default function ContactPage() {
                   <WireframeCube className="w-40 h-30 text-ofoq-green" color="#33B27C" />
                 </div>
                 <div className="relative z-10">
-                   <h4 className="font-black text-white mb-2">{t.contact.consultTitle}</h4>
+                    <h4 className="font-black text-white mb-2">{ui.contact.consultTitle}</h4>
                   <p className="text-white/55 text-sm leading-relaxed">
-                     {t.contact.consultDesc}
+                     {ui.contact.consultDesc}
                   </p>
                   <div className="mt-4 flex items-center gap-2 text-ofoq-yellow text-sm font-bold">
                     <span className="w-2 h-2 rounded-full bg-ofoq-green animate-pulse" />
-                     {t.contact.available}
+                     {ui.contact.available}
                   </div>
                 </div>
               </div>
@@ -161,8 +159,8 @@ export default function ContactPage() {
                       <path d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                   <h3 className="text-2xl font-black text-ofoq-navy mb-2">{t.contact.successTitle}</h3>
-                   <p className="text-gray-500 text-sm">{t.contact.successDesc}</p>
+                   <h3 className="text-2xl font-black text-ofoq-navy mb-2">{ui.contact.successTitle}</h3>
+                   <p className="text-gray-500 text-sm">{ui.contact.successDesc}</p>
                 </motion.div>
               ) : (
                 <motion.div
@@ -172,33 +170,33 @@ export default function ContactPage() {
                   viewport={{ once: true }}
                   className="bg-white rounded-3xl p-6 sm:p-8"
                 >
-                   <h3 className="font-black text-ofoq-navy text-xl mb-8">{t.contact.formTitle}</h3>
+                   <h3 className="font-black text-ofoq-navy text-xl mb-8">{ui.contact.formTitle}</h3>
                   <form onSubmit={handleSubmit((d) => mut.mutate(d))} className="space-y-0">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
                       {/* الاسم */}
                       <div className="mb-6">
-                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{t.contact.nameLabel}</label>
+                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{ui.contact.nameLabel}</label>
                         <input
                           {...register("name", { required: true })}
-                           placeholder={t.contact.namePlaceholder}
+                            placeholder={ui.contact.namePlaceholder}
                           className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm placeholder-gray-300 transition-colors"
                         />
-                         {errors.name && <p className="text-red-500 text-xs mt-1">{t.contact.required}</p>}
+                         {errors.name && <p className="text-red-500 text-xs mt-1">{ui.contact.required}</p>}
                       </div>
 
                       {/* الشركة */}
                       <div className="mb-6">
-                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{t.contact.companyLabel}</label>
+                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{ui.contact.companyLabel}</label>
                         <input
                           {...register("company")}
-                           placeholder={t.contact.companyPlaceholder}
+                            placeholder={ui.contact.companyPlaceholder}
                           className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm placeholder-gray-300 transition-colors"
                         />
                       </div>
 
                       {/* البريد */}
                       <div className="mb-6">
-                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{t.contact.emailFormLabel}</label>
+                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{ui.contact.emailFormLabel}</label>
                         <input
                           {...register("email", { required: true, pattern: /^\S+@\S+$/ })}
                           type="email"
@@ -206,12 +204,12 @@ export default function ContactPage() {
                           dir="ltr"
                           className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm placeholder-gray-300 transition-colors"
                         />
-                         {errors.email && <p className="text-red-500 text-xs mt-1">{t.contact.emailError}</p>}
+                         {errors.email && <p className="text-red-500 text-xs mt-1">{ui.contact.emailError}</p>}
                       </div>
 
                       {/* الجوال */}
                       <div className="mb-6">
-                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{t.contact.phoneFormLabel}</label>
+                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{ui.contact.phoneFormLabel}</label>
                         <input
                           {...register("phone")}
                           type="tel"
@@ -223,39 +221,39 @@ export default function ContactPage() {
 
                       {/* قطاع المؤسسة */}
                       <div className="mb-6">
-                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{t.contact.infoTitle}</label>
+                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{ui.contact.infoTitle}</label>
                         <select
                           {...register("sector")}
                           className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm transition-colors appearance-none cursor-pointer"
                         >
-                           <option value="">Select a sector</option>
+                           <option value="">{ui.contact.sectorDefault}</option>
                            {sectors.map((sector) => <option key={sector}>{sector}</option>)}
                         </select>
                       </div>
 
                       {/* أنا مهتم بـ */}
                       <div className="mb-6">
-                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{t.contact.serviceLabel}</label>
+                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{ui.contact.serviceLabel}</label>
                         <select
                           {...register("interest")}
                           className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm transition-colors appearance-none cursor-pointer"
                         >
-                           <option value="">{t.contact.serviceDefault}</option>
+                            <option value="">{ui.contact.serviceDefault}</option>
                           {searchParams.get("service") && (
                             <option value={searchParams.get("service")!}>{searchParams.get("service")}</option>
                           )}
-                           {t.contact.services.map((service) => <option key={service}>{service}</option>)}
+                            {ui.contact.services.map((service) => <option key={service}>{service}</option>)}
                         </select>
                       </div>
                     </div>
 
                     {/* الرسالة */}
                     <div className="mb-8">
-                       <label className="block text-ofoq-navy font-bold text-sm mb-2">{t.contact.messageLabel}</label>
+                        <label className="block text-ofoq-navy font-bold text-sm mb-2">{ui.contact.messageLabel}</label>
                       <textarea
                         {...register("message")}
                         rows={4}
-                         placeholder={t.contact.messagePlaceholder}
+                          placeholder={ui.contact.messagePlaceholder}
                         className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm placeholder-gray-300 transition-colors resize-none"
                       />
                     </div>
@@ -271,7 +269,7 @@ export default function ContactPage() {
                         </svg>
                       </span>
                       <span className="pl-2">
-                         {mut.isPending ? t.common.sending : t.common.send}
+                          {mut.isPending ? ui.common.sending : ui.common.send}
                       </span>
                     </button>
                   </form>
