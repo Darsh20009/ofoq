@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -13,6 +13,18 @@ import { useAuthStore } from "../../store/authStore";
 import { usersApi, webauthnApi, authApi } from "../../api/client";
 
 type TotpState = "idle" | "setting_up" | "verifying" | "enabled" | "disabling";
+
+function normalizeOtpInput(value: string): string {
+  return value
+    .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+    .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+    .replace(/\D/g, "")
+    .slice(0, 6);
+}
+
+function apiErrorMessage(error: any, fallback: string): string {
+  return error?.response?.data?.detail || error?.response?.data?.error || fallback;
+}
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuthStore();
@@ -44,6 +56,12 @@ export default function ProfilePage() {
   const [totpSecret, setTotpSecret] = useState("");
   const [totpCode, setTotpCode] = useState("");
 
+  useEffect(() => {
+    if (totpState === "idle" || totpState === "enabled") {
+      setTotpState(user?.twoFactorEnabled ? "enabled" : "idle");
+    }
+  }, [user?.twoFactorEnabled, totpState]);
+
   // ── Passkeys ───────────────────────────────────────────────
   const { data: passkeysData } = useQuery({
     queryKey: ["webauthn-credentials"],
@@ -59,20 +77,20 @@ export default function ProfilePage() {
       return usersApi.update(user!._id, fd as any);
     },
     onSuccess: (res) => { updateUser(res.data.data?.user || res.data.user || res.data); toast.success("تم تحديث الصورة"); },
-    onError: () => {},
+    onError: (error) => toast.error(apiErrorMessage(error, "تعذر تحديث الصورة")),
   });
 
   const updateMut = useMutation({
     mutationFn: (data: object) => usersApi.update(user!._id, data),
     onSuccess: (res) => { updateUser(res.data.data?.user || res.data.user || res.data); toast.success("تم تحديث الملف الشخصي"); },
-    onError: () => {},
+    onError: (error) => toast.error(apiErrorMessage(error, "تعذر تحديث الملف الشخصي")),
   });
 
   const pwdMut = useMutation({
     mutationFn: (data: { currentPassword: string; newPassword: string }) =>
       usersApi.changePassword(data),
     onSuccess: () => { resetPwd(); toast.success("تم تغيير كلمة المرور بنجاح"); },
-    onError: () => {},
+    onError: (error) => toast.error(apiErrorMessage(error, "تعذر تغيير كلمة المرور")),
   });
 
   const totpSetupMut = useMutation({
@@ -82,29 +100,38 @@ export default function ProfilePage() {
       setTotpSecret(res.data.secret);
       setTotpState("verifying");
     },
-    onError: () => {},
+    onError: (error) => {
+      setTotpState("idle");
+      toast.error(apiErrorMessage(error, "تعذر بدء إعداد المصادقة الثنائية"));
+    },
   });
 
   const totpVerifyMut = useMutation({
     mutationFn: (code: string) => authApi.totpVerify(code),
-    onSuccess: () => {
-      setTotpState("enabled");
+    onSuccess: (res) => {
+      const enabled = res.data?.twoFactorEnabled !== false;
+      setTotpState(enabled ? "enabled" : "idle");
       setTotpQr(""); setTotpCode("");
-      updateUser({ ...user!, twoFactorEnabled: true } as any);
+      updateUser({ twoFactorEnabled: enabled } as any);
       toast.success("تم تفعيل المصادقة الثنائية 🎉");
     },
-    onError: () => {},
+    onError: (error) => {
+      toast.error(apiErrorMessage(error, "رمز التحقق غير صحيح"));
+    },
   });
 
   const totpDisableMut = useMutation({
     mutationFn: (code: string) => authApi.totpDisable(code),
-    onSuccess: () => {
-      setTotpState("idle");
+    onSuccess: (res) => {
+      const enabled = Boolean(res.data?.twoFactorEnabled);
+      setTotpState(enabled ? "enabled" : "idle");
       setTotpCode("");
-      updateUser({ ...user!, twoFactorEnabled: false } as any);
+      updateUser({ twoFactorEnabled: enabled } as any);
       toast.success("تم تعطيل المصادقة الثنائية");
     },
-    onError: () => {},
+    onError: (error) => {
+      toast.error(apiErrorMessage(error, "تعذر تعطيل المصادقة الثنائية"));
+    },
   });
 
   const addPasskeyMut = useMutation({
@@ -294,7 +321,7 @@ export default function ProfilePage() {
               </div>
               <div>
                 <label className="label">أدخل الرمز من التطبيق للتحقق</label>
-                <input value={totpCode} onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                <input value={totpCode} onChange={(e) => setTotpCode(normalizeOtpInput(e.target.value))}
                   className="input-field text-center text-2xl font-mono tracking-widest" maxLength={6}
                   placeholder="000000" dir="ltr" />
               </div>
@@ -339,7 +366,7 @@ export default function ProfilePage() {
               </div>
               <div>
                 <label className="label">رمز التطبيق</label>
-                <input value={totpCode} onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                <input value={totpCode} onChange={(e) => setTotpCode(normalizeOtpInput(e.target.value))}
                   className="input-field text-center text-2xl font-mono tracking-widest" maxLength={6}
                   placeholder="000000" dir="ltr" />
               </div>

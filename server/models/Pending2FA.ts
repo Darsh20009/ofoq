@@ -6,6 +6,7 @@ export interface IPending2FA extends Document {
   methods: string[];
   expiresAt: Date;
   pushApproved: boolean;
+  emailCode?: string;
 }
 
 const Pending2FASchema = new Schema<IPending2FA>({
@@ -14,6 +15,7 @@ const Pending2FASchema = new Schema<IPending2FA>({
   methods: [String],
   expiresAt: { type: Date, required: true },
   pushApproved: { type: Boolean, default: false },
+  emailCode: { type: String, select: false },
 }, { timestamps: true });
 
 Pending2FASchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });

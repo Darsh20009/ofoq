@@ -15,6 +15,14 @@ import { useLang } from "../../i18n/LangContext";
 
 interface LoginForm { email: string; password: string; }
 
+function normalizeOtpInput(value: string): string {
+  return value
+    .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+    .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+    .replace(/\D/g, "")
+    .slice(0, 6);
+}
+
 export default function EmployeePortalLoginPage() {
   const [showPass, setShowPass]       = useState(false);
   const [loading, setLoading]         = useState(false);
@@ -63,7 +71,11 @@ export default function EmployeePortalLoginPage() {
     if (!twoFA || !otp.trim()) return;
     setLoading(true);
     try {
-      const res = await authApi.verify2FA({ tempToken: twoFA.tempToken, method: twoFA.method, code: otp });
+      const res = await authApi.verify2FA({
+        tempToken: twoFA.tempToken,
+        method: twoFA.method,
+        code: normalizeOtpInput(otp),
+      });
       const { user, token } = res.data;
       setAuth(user, token);
       toast.success(`مرحباً، ${user.name}!`);
@@ -165,7 +177,7 @@ export default function EmployeePortalLoginPage() {
             <input
               type="text"
               value={otp}
-              onChange={(e) => setOtp(e.target.value)}
+              onChange={(e) => setOtp(normalizeOtpInput(e.target.value))}
               placeholder={ui.employee.code}
               maxLength={6}
               className="w-full input text-center text-2xl tracking-widest"

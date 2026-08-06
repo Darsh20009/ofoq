@@ -19,6 +19,14 @@ import {
 
 export const authRouter = Router();
 
+function normalizeOtpCode(value: unknown): string {
+  return String(value ?? "")
+    .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+    .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+    .replace(/\D/g, "")
+    .slice(0, 8);
+}
+
 // ── Register ─────────────────────────────────────────────────────
 authRouter.post("/register", registerLimiter, validate(registerSchema), async (req, res) => {
   try {
@@ -103,12 +111,17 @@ authRouter.post("/login", loginLimiter, validate(loginSchema), async (req, res) 
     }
 
     // If 2FA enabled — return temp token
-    if (user.twoFactorEnabled && user.twoFactorMethods.length > 0) {
+    const twoFactorMethods = user.twoFactorMethods?.length
+      ? user.twoFactorMethods
+      : user.totpVerified && user.totpSecret
+        ? ["totp" as const]
+        : [];
+    if (user.twoFactorEnabled && twoFactorMethods.length > 0) {
       const tempToken = generateSecureToken();
       await Pending2FAModel.create({
         tempToken,
         userId: String(user._id),
-        methods: user.twoFactorMethods,
+        methods: twoFactorMethods,
         expiresAt: new Date(Date.now() + 10 * 60 * 1000),
         pushApproved: false,
       });
@@ -116,7 +129,7 @@ authRouter.post("/login", loginLimiter, validate(loginSchema), async (req, res) 
       res.json({
         requires2FA: true,
         tempToken,
-        methods: user.twoFactorMethods,
+        methods: twoFactorMethods,
         userId: user._id,
       });
       return;
@@ -157,7 +170,7 @@ authRouter.post("/login", loginLimiter, validate(loginSchema), async (req, res) 
 authRouter.post("/verify-2fa", async (req, res) => {
   try {
     const { tempToken, method, code } = req.body;
-    const pending = await Pending2FAModel.findOne({ tempToken });
+    const pending = await Pending2FAModel.findOne({ tempToken }).select("+emailCode");
     if (!pending || pending.expiresAt < new Date()) {
       res.status(400).json({ error: "رمز التحقق منتهي أو غير صالح" });
       return;
@@ -170,17 +183,18 @@ authRouter.post("/verify-2fa", async (req, res) => {
     }
 
     let verified = false;
+    const normalizedCode = normalizeOtpCode(code);
 
     if (method === "totp" && user.totpSecret) {
       verified = speakeasy.totp.verify({
         secret: user.totpSecret,
         encoding: "base32",
-        token: String(code),
+        token: normalizedCode,
         window: 3,
       });
     } else if (method === "email") {
       const stored = (pending as any).emailCode;
-      verified = stored && String(code) === String(stored);
+      verified = stored && normalizedCode === normalizeOtpCode(stored);
     } else if (method === "push") {
       verified = pending.pushApproved;
     }
@@ -197,7 +211,19 @@ authRouter.post("/verify-2fa", async (req, res) => {
 
     res.json({
       token,
-      user: { id: user._id, name: user.fullName, email: user.email, role: user.role },
+      user: {
+        id: user._id,
+        name: user.fullName,
+        email: user.email,
+        role: user.role,
+        lang: user.lang,
+        avatar: user.avatar,
+        emailVerified: user.emailVerified,
+        twoFactorEnabled: user.twoFactorEnabled,
+        permissions: user.permissions,
+        position: (user as any).position,
+        department: (user as any).department,
+      },
     });
   } catch (err: any) {
     res.status(500).json({ error: "خطأ في التحقق الثنائي" });
@@ -331,6 +357,11 @@ authRouter.post("/logout", requireAuth, async (req, res) => {
 authRouter.post("/totp/setup", requireAuth, async (req, res) => {
   try {
     const user = (req as any).user;
+    const existing = await UserModel.findById(user._id).select("+totpSecret");
+    if (existing?.totpVerified && existing.totpSecret) {
+      res.status(400).json({ error: "المصادقة الثنائية مفعّلة بالفعل" });
+      return;
+    }
     const secret = speakeasy.generateSecret({
       name: `OFOQ (${user.email})`,
       length: 32,
@@ -348,7 +379,7 @@ authRouter.post("/totp/setup", requireAuth, async (req, res) => {
 
 authRouter.post("/totp/verify-setup", requireAuth, async (req, res) => {
   try {
-    const { code } = req.body;
+    const code = normalizeOtpCode(req.body?.code);
     const user = await UserModel.findById((req as any).user._id).select("+totpSecret");
     if (!user?.totpSecret) {
       res.status(400).json({ error: "لم يتم إعداد TOTP بعد" });
@@ -357,7 +388,7 @@ authRouter.post("/totp/verify-setup", requireAuth, async (req, res) => {
     const valid = speakeasy.totp.verify({
       secret: user.totpSecret,
       encoding: "base32",
-      token: String(code),
+      token: code,
       window: 2,
     });
     if (!valid) {
@@ -369,7 +400,7 @@ authRouter.post("/totp/verify-setup", requireAuth, async (req, res) => {
       twoFactorEnabled: true,
       $addToSet: { twoFactorMethods: "totp" },
     });
-    res.json({ message: "تم تفعيل المصادقة الثنائية بنجاح" });
+    res.json({ message: "تم تفعيل المصادقة الثنائية بنجاح", twoFactorEnabled: true });
   } catch {
     res.status(500).json({ error: "خطأ في التحقق" });
   }
@@ -378,7 +409,7 @@ authRouter.post("/totp/verify-setup", requireAuth, async (req, res) => {
 // ── Disable TOTP ──────────────────────────────────────────────────
 authRouter.post("/totp/disable", requireAuth, async (req, res) => {
   try {
-    const { code } = req.body;
+    const code = normalizeOtpCode(req.body?.code);
     const user = await UserModel.findById((req as any).user._id).select("+totpSecret");
     if (!user?.totpVerified || !user.totpSecret) {
       res.status(400).json({ error: "المصادقة الثنائية غير مفعّلة" });
@@ -387,20 +418,24 @@ authRouter.post("/totp/disable", requireAuth, async (req, res) => {
     const valid = speakeasy.totp.verify({
       secret: user.totpSecret,
       encoding: "base32",
-      token: String(code),
+      token: code,
       window: 2,
     });
     if (!valid) {
       res.status(400).json({ error: "الرمز غير صحيح" });
       return;
     }
+    const remainingMethods = (user.twoFactorMethods || []).filter((method: string) => method !== "totp");
     await UserModel.findByIdAndUpdate(user._id, {
       totpVerified: false,
-      twoFactorEnabled: false,
+      twoFactorEnabled: remainingMethods.length > 0,
       totpSecret: null,
-      $pull: { twoFactorMethods: "totp" },
+      twoFactorMethods: remainingMethods,
     });
-    res.json({ message: "تم تعطيل المصادقة الثنائية" });
+    res.json({
+      message: "تم تعطيل المصادقة الثنائية",
+      twoFactorEnabled: remainingMethods.length > 0,
+    });
   } catch {
     res.status(500).json({ error: "خطأ في تعطيل المصادقة الثنائية" });
   }

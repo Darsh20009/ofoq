@@ -71,6 +71,12 @@ async function downloadWalletPass(setLoading: (v: boolean) => void) {
       } catch {
         toast.error("تعذّر توليد بطاقة Apple Wallet");
       }
+    } else {
+      toast.error(
+        err?.response?.data?.detail ||
+        err?.response?.data?.error ||
+        "تعذّر توليد بطاقة Apple Wallet"
+      );
     }
   } finally {
     setLoading(false);

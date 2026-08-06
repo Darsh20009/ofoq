@@ -11,6 +11,14 @@ import OfoqLogo from "../../components/OfoqLogo";
 import jsQR from "jsqr";
 import { useLang } from "../../i18n/LangContext";
 
+function normalizeOtpInput(value: string): string {
+  return value
+    .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+    .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+    .replace(/\D/g, "")
+    .slice(0, 6);
+}
+
 function GoogleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 48 48">
@@ -388,7 +396,7 @@ export default function LoginPage() {
                 </div>
                 <input
                   value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value)}
+                   onChange={(e) => setOtpCode(normalizeOtpInput(e.target.value))}
                   maxLength={6}
                   placeholder="000000"
                   className="w-full border border-gray-200 bg-gray-50 text-ofoq-navy text-center text-2xl tracking-[0.5em] placeholder-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-ofoq-red focus:ring-2 focus:ring-ofoq-red/20"
