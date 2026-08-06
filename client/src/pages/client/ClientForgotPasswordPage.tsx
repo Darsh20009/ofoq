@@ -48,8 +48,7 @@ export default function ClientForgotPasswordPage() {
                 </div>
                 <h2 className="text-ofoq-navy font-bold text-lg mb-2">{ui.auth.checkEmail}</h2>
                 <p className="text-gray-500 text-sm leading-relaxed mb-4">
-                  إذا كان البريد <span className="font-medium text-ofoq-navy" dir="ltr">{email}</span> مسجّلاً لدينا،
-                   {ui.auth.checkEmailDesc}
+                   {ui.auth.checkEmailDesc} <span className="font-medium text-ofoq-navy" dir="ltr">{email}</span>
                 </p>
                 <p className="text-gray-400 text-xs mb-6">{ui.auth.spam}</p>
                 <Link to="/client/login"
@@ -99,7 +98,7 @@ export default function ClientForgotPasswordPage() {
         </div>
 
         <p className="mt-6 text-center text-white/30 text-xs">
-          © 2025 أفق لحلول الأعمال — جميع الحقوق محفوظة
+          © {new Date().getFullYear()} OFOQ Business Solutions
         </p>
       </motion.div>
     </div>

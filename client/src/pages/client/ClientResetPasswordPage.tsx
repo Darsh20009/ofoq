@@ -29,7 +29,7 @@ export default function ClientResetPasswordPage() {
     : /[A-Z]/.test(password) && /[0-9]/.test(password) ? 4
     : 3;
 
-  const strengthLabel = ["", "ضعيفة جداً", "ضعيفة", "مقبولة", "قوية"];
+  const strengthLabel = ["", ui.auth.strengthVeryWeak, ui.auth.strengthWeak, ui.auth.strengthAcceptable, ui.auth.strengthStrong];
   const strengthColor  = ["", "bg-red-500", "bg-orange-400", "bg-yellow-400", "bg-green-500"];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -160,7 +160,7 @@ export default function ClientResetPasswordPage() {
         </div>
 
         <p className="mt-6 text-center text-white/30 text-xs">
-          © 2025 أفق لحلول الأعمال — جميع الحقوق محفوظة
+          © {new Date().getFullYear()} OFOQ Business Solutions
         </p>
       </motion.div>
     </div>

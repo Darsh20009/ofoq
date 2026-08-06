@@ -97,19 +97,19 @@ export default function ClientLoginPage() {
                   <a href="/api/auth/google"
                     className="flex items-center justify-center gap-3 w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-all text-sm font-medium text-gray-700 shadow-sm">
                     <GoogleIcon />
-                    Continue with Google
+                    {ui.auth.continueGoogle}
                   </a>
                 )}
                 {oauthStatus.apple && (
                   <a href="/api/auth/apple"
                     className="flex items-center justify-center gap-3 w-full py-2.5 px-4 rounded-xl border border-gray-900 bg-gray-900 hover:bg-black transition-all text-sm font-medium text-white shadow-sm">
                     <AppleIcon />
-                    Continue with Apple
+                    {ui.auth.continueApple}
                   </a>
                 )}
                 <div className="flex items-center gap-3 my-1">
                   <div className="flex-1 h-px bg-gray-200" />
-                  <span className="text-xs text-gray-400">or</span>
+                  <span className="text-xs text-gray-400">{ui.auth.or}</span>
                   <div className="flex-1 h-px bg-gray-200" />
                 </div>
               </div>
@@ -175,7 +175,7 @@ export default function ClientLoginPage() {
         </div>
 
         <p className="mt-6 text-center text-white/30 text-xs">
-          © 2025 أفق لحلول الأعمال — جميع الحقوق محفوظة
+          © {new Date().getFullYear()} OFOQ Business Solutions
         </p>
       </motion.div>
     </div>

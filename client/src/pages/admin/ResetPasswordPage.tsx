@@ -32,13 +32,7 @@ export default function ResetPasswordPage() {
     : /[A-Z]/.test(password) && /[0-9]/.test(password) ? 4
     : 3;
 
-  const strengthLabels: Record<string, string[]> = {
-    en: ["", "Very weak", "Weak", "Fair", "Strong"],
-    ar: ["", "ضعيفة جداً", "ضعيفة", "مقبولة", "قوية"],
-    ur: ["", "بہت کمزور", "کمزور", "مناسب", "مضبوط"],
-    id: ["", "Sangat lemah", "Lemah", "Cukup", "Kuat"],
-  };
-  const strengthLabel = strengthLabels[lang] || strengthLabels.en;
+  const strengthLabel = ["", copy.strengthVeryWeak, copy.strengthWeak, copy.strengthAcceptable, copy.strengthStrong];
   const strengthColor = ["", "bg-red-500", "bg-orange-400", "bg-yellow-400", "bg-green-500"];
 
   const handleSubmit = async (e: React.FormEvent) => {

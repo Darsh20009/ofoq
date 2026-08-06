@@ -110,7 +110,7 @@ export default function RequestDetailsPage() {
             [ui.request.contactEmail,  req.contactEmail],
             [ui.request.contactPhone,  req.contactPhone],
             [ui.request.package,       req.packageType || "—"],
-            ["Submitted",              new Date(req.createdAt).toLocaleDateString(lang)],
+            [ui.request.submitted,     new Date(req.createdAt).toLocaleDateString(lang)],
           ].map(([k, v]) => (
             <div key={String(k)} className="flex gap-3">
               <span className="text-gray-400 text-sm w-32 shrink-0">{k}</span>
