@@ -37,7 +37,7 @@ export type UiCopy = {
   adminPages: {
     adminPortal: {
       profileTitle: string; profileSubtitle: string; roleSuperAdmin: string; roleAdmin: string; roleManager: string; roleEmployee: string; roleClient: string;
-      personalInfo: string; nameEn: string; nameUr: string; phone: string; department: string; position: string; saving: string; saveChanges: string;
+      personalInfo: string; nameEn: string; nameUr: string; phone: string; department: string; position: string; saving: string; saveChanges: string; refresh: string;
       changePassword: string; currentPassword: string; newPassword: string; confirmPassword: string; passwordMismatch: string; updatePassword: string;
       totpTitle: string; totpEnabled: string; totpHint: string; totpSetup: string; totpSettingUp: string; totpGoogleAuth: string; totpEnterManually: string;
       totpCodeLabel: string; totpCancel: string; totpVerify: string; totpVerifying: string; totpConfirmed: string; totpActive: string; totpProtected: string;
@@ -54,6 +54,8 @@ export type UiCopy = {
       employeeDashboardGreetingMorning: string; employeeDashboardGreetingAfternoon: string; employeeDashboardGreetingEvening: string; employeeDashboardDate: string; activeProjects: string; completedProjects: string; overdueProjects: string; totalProjects: string; myProjects: string; viewAll: string; noActiveProjects: string; overdue: string; myCard: string; barcodePreview: string; myProfile: string; accountSettings: string; cardLabel: string;
       stageRequest: string; stageReview: string; stageQuotation: string; stageContract: string; stagePayment: string; stageExecution: string; stageClosed: string;
       employeeCardTitle: string; employeeCardSubtitle: string; companyBrand: string; employeeCode: string; loadingCard: string; loadError: string; retry: string; clickToBack: string; clickToBarcode: string; scanToVerify: string; generating: string; frontSide: string; showBarcode: string; downloadCard: string; regenerateBarcode: string; regenerateConfirm: string; barcodeRegenerated: string; walletSection: string; addToWallet: string; walletDownload: string; walletGenerated: string; walletError: string; platformNoteIos: string; platformNoteOther: string;
+      supportTitle: string; conversationCount: string; noConversations: string; chooseConversation: string; chooseConversationHint: string; noMessages: string; replyPlaceholder: string; sendReplyError: string; administration: string;
+      serviceRequestsTitle: string; loading: string; totalRequests: string; refresh: string; allStatuses: string; newStatus: string; reviewingStatus: string; approvedStatus: string; inProgressStatus: string; completedStatus: string; rejectedStatus: string; noRequests: string; noRequestsWithStatus: string; companyColumn: string; serviceColumn: string; statusColumn: string; dateColumn: string; view: string;
     };
     dashboard: {
       morning: string; afternoon: string; evening: string; subtitle: string; smartInsight: string;
@@ -151,6 +153,7 @@ const en: UiCopy = {
       position: "Job title",
       saving: "Saving...",
       saveChanges: "Save changes",
+      refresh: "Refresh",
       changePassword: "Change password",
       currentPassword: "Current password",
       newPassword: "New password",
@@ -381,6 +384,7 @@ const overrides: Record<Exclude<Lang, "ar" | "en">, DeepPartial<UiCopy>> = {
       position: "عہدہ",
       saving: "محفوظ کیا جا رہا ہے...",
       saveChanges: "تبدیلیاں محفوظ کریں",
+      refresh: "تازہ کریں",
       changePassword: "پاس ورڈ تبدیل کریں",
       currentPassword: "موجودہ پاس ورڈ",
       newPassword: "نیا پاس ورڈ",
@@ -583,6 +587,7 @@ const overrides: Record<Exclude<Lang, "ar" | "en">, DeepPartial<UiCopy>> = {
       position: "Jabatan",
       saving: "Menyimpan...",
       saveChanges: "Simpan perubahan",
+      refresh: "Segarkan",
       changePassword: "Ubah kata sandi",
       currentPassword: "Kata sandi saat ini",
       newPassword: "Kata sandi baru",
