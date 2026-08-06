@@ -5,10 +5,11 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { Eye, EyeOff, Lock, Mail, QrCode, X } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, QrCode, X, Fingerprint } from "lucide-react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { authApi } from "../../api/client";
+import { startAuthentication } from "@simplewebauthn/browser";
+import { authApi, webauthnApi } from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
 import OfoqLogo from "../../components/OfoqLogo";
 import { useLang } from "../../i18n/LangContext";
@@ -26,6 +27,7 @@ function normalizeOtpInput(value: string): string {
 export default function EmployeePortalLoginPage() {
   const [showPass, setShowPass]       = useState(false);
   const [loading, setLoading]         = useState(false);
+  const [passkeyLoading, setPasskeyLoading] = useState(false);
   const [error, setError]             = useState("");
   const [twoFA, setTwoFA]             = useState<{ tempToken: string; method: string } | null>(null);
   const [otp, setOtp]                 = useState("");
@@ -43,6 +45,26 @@ export default function EmployeePortalLoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>();
 
   const goHome = () => navigate("/", { replace: true });
+
+  /* ── Passkey login ───────────────── */
+  const handlePasskeyLogin = async () => {
+    setPasskeyLoading(true);
+    setError("");
+    try {
+      const email = (document.querySelector<HTMLInputElement>('input[name="email"]')?.value || "").trim();
+      const optRes = await webauthnApi.loginOptions(email || undefined);
+      const assertion = await startAuthentication({ optionsJSON: optRes.data });
+      const verifyRes = await webauthnApi.loginVerify(assertion);
+      const { user, token } = verifyRes.data;
+      setAuth(user, token);
+      toast.success(`مرحباً، ${user.name || user.fullName}!`);
+      goHome();
+    } catch (e: any) {
+      setError(e.response?.data?.error || "تعذر الدخول بمفتاح المرور. سجّل مفتاحاً أولاً من صفحة ملفي.");
+    } finally {
+      setPasskeyLoading(false);
+    }
+  };
 
   /* ── Login ─────────────────────── */
   const onSubmit = async (data: LoginForm) => {
@@ -260,6 +282,20 @@ export default function EmployeePortalLoginPage() {
             >
               {loading ? ui.employee.verifying : ui.employee.login}
             </button>
+
+            <button
+              type="button"
+              onClick={handlePasskeyLogin}
+              disabled={passkeyLoading}
+              className="w-full flex items-center justify-center gap-2 border border-[#1C2B6E]/15 bg-[#1C2B6E]/5 text-[#1C2B6E] rounded-xl py-3 text-sm hover:bg-[#1C2B6E]/10 transition-colors"
+            >
+              <Fingerprint size={17} className="text-[#33B27C]" />
+              {passkeyLoading ? ui.employee.verifying : "الدخول بالبصمة أو مفتاح المرور"}
+            </button>
+
+            <p className="text-center text-[11px] text-gray-400 -mt-2">
+              لتسجيل مفتاح جديد: ادخل أولاً ثم افتح «ملفي» واختر «إضافة مفتاح».
+            </p>
 
             <a
               href="https://www.ofoqhc.com/admin/login"
