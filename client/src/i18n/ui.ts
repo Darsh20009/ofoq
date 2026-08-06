@@ -100,7 +100,7 @@ export type UiCopy = {
     welcome: string; dashboardSub: string; total: string; active: string; completed: string; newRequests: string;
     newRequest: string; supportAction: string; latest: string; noRequests: string; noRequestsSub: string;
     submitNow: string; requestCount: string; loading: string; requestDetails: string; statusHistory: string;
-    messages: string; addNote: string; notePlaceholder: string; noteAdded: string; noteError: string;
+    messages: string; addNote: string; notePlaceholder: string; noteAdded: string; noteError: string; statusUpdated: string; statusUpdateError: string; requestNotFound: string; changeStatus: string; statusNotePlaceholder: string; customerNotes: string; notesTitle: string; noNotes: string; internalNote: string; add: string; history: string;
     supportSub: string; noMessages: string; noMessagesSub: string; supportPlaceholder: string; sendError: string;
     you: string; invalidRequest: string; backRequests: string; status: Record<string, string>;
     services: Record<string, string>;
@@ -294,7 +294,7 @@ const en: UiCopy = {
     invoices: { title: "Invoices", count: "invoices", new: "New invoice", collected: "Collected total", pending: "Pending", overdue: "Overdue invoices", search: "Search by invoice number or customer...", allStatuses: "All statuses", empty: "No invoices", number: "Invoice number", customer: "Customer", total: "Total", dueDate: "Due date", status: "Status", actions: "Actions", send: "Send", markPaid: "Mark payment", download: "Download PDF", deleteConfirm: "Delete this invoice?", draft: "Draft", sent: "Sent", viewed: "Viewed", paid: "Paid", overdueStatus: "Overdue", cancelled: "Cancelled" },
     contracts: { title: "Contracts", count: "contracts", new: "New contract", total: "Total contracts", drafts: "Drafts", signed: "Signed", totalValue: "Total value", search: "Search by contract number...", allStatuses: "All statuses", empty: "No contracts yet", number: "Contract number", contractTitle: "Title", customer: "Customer", value: "Value", endDate: "End date", status: "Status", actions: "Actions", edit: "Edit", send: "Send", certify: "Certify", download: "Download PDF", deleteConfirm: "Delete this contract?", editTitle: "Edit contract", titleLabel: "Contract title", chooseCustomer: "Choose customer...", currency: "Currency", startDate: "Start date", content: "Contract content", cancel: "Cancel", save: "Save changes", create: "Create contract", required: "Required", draft: "Draft", sent: "Sent", signedStatus: "Signed", expired: "Expired", cancelled: "Cancelled" },
   },
-  client: { portal: "Client portal", dashboard: "Dashboard", requests: "My requests", support: "Support", logout: "Sign out", client: "Client", welcome: "Welcome", dashboardSub: "Track your requests and contact our team from here.", total: "Total requests", active: "Active requests", completed: "Completed", newRequests: "New requests", newRequest: "New service request", supportAction: "Contact support", latest: "Latest requests", noRequests: "No requests yet", noRequestsSub: "Submit your first request and our team will contact you.", submitNow: "Submit a request now", requestCount: "requests", loading: "Loading...", requestDetails: "Request details", statusHistory: "Status history", messages: "Messages from the OFOQ team", addNote: "Add a note for the team", notePlaceholder: "Write your note here...", noteAdded: "Your note was added", noteError: "Could not send the note", supportSub: "Contact the OFOQ team directly — we reply during business hours.", noMessages: "No messages yet", noMessagesSub: "Send your first message and our team will reply soon.", supportPlaceholder: "Write your message... (Enter to send)", sendError: "Could not send the message", you: "You", invalidRequest: "The request was not found or you do not have access.", backRequests: "Back to requests", status: { new: "New", reviewing: "Under review", approved: "Approved", in_progress: "In progress", completed: "Completed", rejected: "Rejected" }, services: { company_formation: "Company formation", legal_services: "Legal services", trademark: "Trademark registration", government_services: "Government services", hr_management: "Human resources management", gov_platforms: "Government platforms management", investor_services: "Investor services", ipo_preparation: "IPO preparation" } },
+  client: { portal: "Client portal", dashboard: "Dashboard", requests: "My requests", support: "Support", logout: "Sign out", client: "Client", welcome: "Welcome", dashboardSub: "Track your requests and contact our team from here.", total: "Total requests", active: "Active requests", completed: "Completed", newRequests: "New requests", newRequest: "New service request", supportAction: "Contact support", latest: "Latest requests", noRequests: "No requests yet", noRequestsSub: "Submit your first request and our team will contact you.", submitNow: "Submit a request now", requestCount: "requests", loading: "Loading...", requestDetails: "Request details", statusHistory: "Status history", messages: "Messages from the OFOQ team", addNote: "Add a note for the team", notePlaceholder: "Write your note here...", noteAdded: "Your note was added", noteError: "Could not send the note", statusUpdated: "Status updated and client notified", statusUpdateError: "Could not update the status", requestNotFound: "Request not found", changeStatus: "Change status", statusNotePlaceholder: "Optional note for the client with the status change", customerNotes: "Client notes", notesTitle: "Notes", noNotes: "No notes yet", internalNote: "Internal note (not sent to the client)", add: "Add", history: "Status history", supportSub: "Contact the OFOQ team directly — we reply during business hours.", noMessages: "No messages yet", noMessagesSub: "Send your first message and our team will reply soon.", supportPlaceholder: "Write your message... (Enter to send)", sendError: "Could not send the message", you: "You", invalidRequest: "The request was not found or you do not have access.", backRequests: "Back to requests", status: { new: "New", reviewing: "Under review", approved: "Approved", in_progress: "In progress", completed: "Completed", rejected: "Rejected" }, services: { company_formation: "Company formation", legal_services: "Legal services", trademark: "Trademark registration", government_services: "Government services", hr_management: "Human resources management", gov_platforms: "Government platforms management", investor_services: "Investor services", ipo_preparation: "IPO preparation" } },
   employee: { portal: "Employee portal", login: "Sign in", email: "Email address", password: "Password", emailRequired: "Email is required", passwordRequired: "Password is required", invalid: "Unable to sign in. Check your details and try again.", twoFactor: "Two-factor verification", code: "Verification code", verify: "Confirm", verifying: "Verifying...", back: "Back", barcode: "Sign in with employee barcode", logout: "Sign out", employee: "Employee", dashboard: "Dashboard", card: "My card", profile: "My profile", employeePhoto: "Employee photo", passkey: "Sign in with passkey or biometrics", passkeyHint: "To register a passkey: sign in first, then open My profile and choose Add passkey.", adminLogin: "Control panel sign in", or: "or", barcodeTitle: "Sign in with barcode", cameraHint: "Tap to activate the camera", barcodeSubmit: "Sign in" },
   adminLogin: { title: "OFOQ Business Solutions", subtitle: "Sign in to the OFOQ control panel", email: "Email address", password: "Password", forgot: "Forgot password?", login: "Sign in", loggingIn: "Signing in...", emailRequired: "Email is required", passwordRequired: "Password is required", invalid: "Unable to sign in. Check your details and try again.", twoFactor: "Enter your two-factor code", code: "Verification code", verify: "Confirm", verifying: "Verifying...", back: "Back to sign in", employeeBarcode: "Sign in with employee barcode", employeeLogin: "Employee sign in" },
   footer: { newsletter: "Join our newsletter", newsletterSub: "Discover more about our advanced business services", email: "Your email address", join: "Join", about: "About us", services: "Services", packages: "Packages", contact: "Contact", story: "Our story", vision: "Vision & mission", why: "Why OFOQ?", formation: "Company formation", legal: "Legal services", hr: "Human resources", government: "Government platforms", investors: "Investor services", silver: "Silver package", gold: "Gold package", platinum: "Platinum package", compare: "Compare packages", form: "Contact form", rights: "All rights reserved.", privacy: "Privacy policy", terms: "Terms & conditions", madeBy: "Made by", location: "Jeddah — King Abdullah Road", description: "Your trusted business partner in Saudi Arabia — comprehensive services that simplify operations and support sustainable growth." },
@@ -737,15 +737,57 @@ const overrides: Record<Exclude<Lang, "ar" | "en">, DeepPartial<UiCopy>> = {
   es: { header: { clientLogin: "Acceso de clientes", menu: "Menú", language: "Idioma" }, home: { ...en.home, hero1: "Nos ocupamos", hero2: "de los detalles.", heroSub: "Su socio de confianza para RR. HH., servicios públicos, visados y constitución de empresas en Arabia Saudí.", request: "Solicitar servicio", explore: "Explorar servicios" }, services: { ...en.services, title: "Servicios | OFOQ", hero1: "Servicios para", hero2: "su empresa." }, category: { ...en.category, home: "Inicio", services: "Servicios", request: "Solicitar servicio", details: "Detalles" }, detail: { ...en.detail, home: "Inicio", services: "Servicios", request: "Solicitar servicio", how: "Cómo trabajamos" }, auth: { ...en.auth, clientTitle: "Portal de clientes", clientSubtitle: "Inicie sesión para seguir sus solicitudes", login: "Iniciar sesión", create: "Crear una cuenta" }, request: { ...en.request, title: "Nueva solicitud de servicio", steps: ["Información de la empresa", "Datos de contacto", "Detalles del servicio", "Revisión"], next: "Siguiente", previous: "Anterior", submit: "Enviar solicitud" } },
 };
 
+const clientDetailOverrides: Record<string, Partial<UiCopy["client"]>> = {
+  ar: {
+    statusUpdated: "تم تحديث الحالة وإشعار العميل",
+    statusUpdateError: "تعذر تحديث الحالة",
+    requestNotFound: "الطلب غير موجود",
+    changeStatus: "تغيير الحالة",
+    statusNotePlaceholder: "ملاحظة اختيارية للعميل مع تغيير الحالة",
+    customerNotes: "ملاحظات العميل",
+    notesTitle: "الملاحظات",
+    noNotes: "لا توجد ملاحظات بعد",
+    internalNote: "ملاحظة داخلية (لا تُرسل للعميل)",
+    add: "إضافة",
+    history: "سجل الحالات",
+  },
+  ur: {
+    statusUpdated: "حالت اپ ڈیٹ ہو گئی اور کلائنٹ کو اطلاع دے دی گئی",
+    statusUpdateError: "حالت اپ ڈیٹ نہیں ہو سکی",
+    requestNotFound: "درخواست نہیں ملی",
+    changeStatus: "حالت تبدیل کریں",
+    statusNotePlaceholder: "حالت کی تبدیلی کے ساتھ کلائنٹ کے لیے اختیاری نوٹ",
+    customerNotes: "کلائنٹ کے نوٹس",
+    notesTitle: "نوٹس",
+    noNotes: "ابھی کوئی نوٹ نہیں",
+    internalNote: "اندرونی نوٹ (کلائنٹ کو نہیں بھیجا جائے گا)",
+    add: "شامل کریں",
+    history: "حالت کی تاریخ",
+  },
+  id: {
+    statusUpdated: "Status diperbarui dan klien diberi tahu",
+    statusUpdateError: "Status tidak dapat diperbarui",
+    requestNotFound: "Permintaan tidak ditemukan",
+    changeStatus: "Ubah status",
+    statusNotePlaceholder: "Catatan opsional untuk klien saat status diubah",
+    customerNotes: "Catatan klien",
+    notesTitle: "Catatan",
+    noNotes: "Belum ada catatan",
+    internalNote: "Catatan internal (tidak dikirim ke klien)",
+    add: "Tambah",
+    history: "Riwayat status",
+  },
+};
+
 export function getUiCopy(lang: Lang): UiCopy {
-  if (lang === "ar") return ar;
-  if (lang === "en") return en;
-  const patch = overrides[lang] || {};
   const merge = (base: any, next: any): any => {
     if (!next || typeof next !== "object" || Array.isArray(next)) return next ?? base;
     const output = { ...base };
     for (const key of Object.keys(next)) output[key] = merge(base?.[key], next[key]);
     return output;
   };
-  return merge(en, patch) as UiCopy;
+  if (lang === "ar") return merge(ar, { client: clientDetailOverrides.ar }) as UiCopy;
+  if (lang === "en") return en;
+  const patch = overrides[lang] || {};
+  return merge(merge(en, patch), { client: clientDetailOverrides[lang] || {} }) as UiCopy;
 }
