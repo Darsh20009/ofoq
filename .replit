@@ -9,7 +9,7 @@ expertMode = true
 [userenv.shared]
 APP_NAME = "OFOQ Business Solutions"
 APP_NAME_AR = "أفق لحلول الأعمال"
-APP_URL = "https://ofoqhc.com"
+APP_URL = "https://www.ofoqhc.com"
 LANG_DEFAULT = "ar"
 NODE_ENV = "development"
 PORT = "5000"
