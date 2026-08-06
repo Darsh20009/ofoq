@@ -12,48 +12,100 @@ const OAUTH_BASE_URL = (
   "https://www.ofoqhc.com"
 ).replace(/\/$/, "");
 
+function safeClientRedirect(value: unknown): string {
+  const redirect = typeof value === "string" ? value : "";
+  return redirect.startsWith("/client/") && !redirect.startsWith("//")
+    ? redirect
+    : "/client/dashboard";
+}
+
+function buildOAuthState(audience: "admin" | "client", redirect?: string): string {
+  return audience === "client"
+    ? `client:${encodeURIComponent(safeClientRedirect(redirect))}`
+    : "admin";
+}
+
+function getOAuthContext(req: any): { audience: "admin" | "client"; redirect: string } {
+  const rawState = String(req.query?.state || req.body?.state || "");
+  if (!rawState.startsWith("client:")) {
+    return { audience: "admin", redirect: "/admin" };
+  }
+  return {
+    audience: "client",
+    redirect: safeClientRedirect(decodeURIComponent(rawState.slice("client:".length))),
+  };
+}
+
+function oauthFailureRedirect(req: any): string {
+  const context = getOAuthContext(req);
+  return context.audience === "client"
+    ? `${OAUTH_BASE_URL}/client/login?error=oauth_failed`
+    : `${OAUTH_BASE_URL}/admin/login?error=oauth_failed`;
+}
+
 function issueAndRedirect(req: any, res: any) {
   const user = req.user;
+  const context = getOAuthContext(req);
   if (!user) {
-    res.redirect(`${OAUTH_BASE_URL}/admin/login?error=oauth_failed`);
+    res.redirect(oauthFailureRedirect(req));
+    return;
+  }
+  if (context.audience === "client" && user.role !== "client") {
+    res.redirect(`${OAUTH_BASE_URL}/client/login?error=client_account_required`);
     return;
   }
   const token = signToken({ userId: String(user._id), role: user.role, email: user.email });
   logAction(String(user._id), "login_oauth", "User", String(user._id), req);
-  // Hand the token to the SPA via a short redirect — the frontend route
-  // /admin/oauth/callback reads it from the query string and stores it, then
-  // navigates to the dashboard.
-  res.redirect(`${OAUTH_BASE_URL}/admin/oauth/callback?token=${token}`);
+  const callbackPath = context.audience === "client"
+    ? `/client/oauth/callback?token=${encodeURIComponent(token)}&redirect=${encodeURIComponent(context.redirect)}`
+    : `/admin/oauth/callback?token=${encodeURIComponent(token)}`;
+  res.redirect(`${OAUTH_BASE_URL}${callbackPath}`);
 }
 
 // ── Google ─────────────────────────────────────────────────────────
 oauthRouter.get("/google", (req, res, next) => {
   if (!googleEnabled) {
-    res.status(503).json({ error: "تسجيل الدخول عبر Google غير مُفعّل حالياً" });
+    res.redirect(`${OAUTH_BASE_URL}/admin/login?error=oauth_not_configured`);
     return;
   }
-  passport.authenticate("google", { scope: ["profile", "email"], session: false })(req, res, next);
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    state: buildOAuthState("admin"),
+    session: false,
+  })(req, res, next);
 });
 
 oauthRouter.get(
   "/google/callback",
   (req, res, next) => {
     if (!googleEnabled) {
-      res.redirect(`${OAUTH_BASE_URL}/admin/login?error=oauth_not_configured`);
+      res.redirect(oauthFailureRedirect(req));
       return;
     }
-    passport.authenticate("google", { session: false, failureRedirect: `${OAUTH_BASE_URL}/admin/login?error=oauth_failed` })(req, res, next);
+    passport.authenticate("google", { session: false, failureRedirect: oauthFailureRedirect(req) })(req, res, next);
   },
   issueAndRedirect
 );
 
+oauthRouter.get("/client/google", (req, res, next) => {
+  if (!googleEnabled) {
+    res.redirect(`${OAUTH_BASE_URL}/client/login?error=oauth_not_configured`);
+    return;
+  }
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    state: buildOAuthState("client", typeof req.query.redirect === "string" ? req.query.redirect : undefined),
+    session: false,
+  })(req, res, next);
+});
+
 // ── Apple ──────────────────────────────────────────────────────────
 oauthRouter.get("/apple", (req, res, next) => {
   if (!appleEnabled) {
-    res.status(503).json({ error: "تسجيل الدخول عبر Apple غير مُفعّل حالياً" });
+    res.redirect(`${OAUTH_BASE_URL}/admin/login?error=oauth_not_configured`);
     return;
   }
-  passport.authenticate("apple", { session: false })(req, res, next);
+  passport.authenticate("apple", { state: buildOAuthState("admin"), session: false })(req, res, next);
 });
 
 // Apple posts the result back as x-www-form-urlencoded (form_post response mode)
@@ -61,13 +113,24 @@ oauthRouter.post(
   "/apple/callback",
   (req, res, next) => {
     if (!appleEnabled) {
-      res.redirect(`${OAUTH_BASE_URL}/admin/login?error=oauth_not_configured`);
+      res.redirect(oauthFailureRedirect(req));
       return;
     }
-    passport.authenticate("apple", { session: false, failureRedirect: `${OAUTH_BASE_URL}/admin/login?error=oauth_failed` })(req, res, next);
+    passport.authenticate("apple", { session: false, failureRedirect: oauthFailureRedirect(req) })(req, res, next);
   },
   issueAndRedirect
 );
+
+oauthRouter.get("/client/apple", (req, res, next) => {
+  if (!appleEnabled) {
+    res.redirect(`${OAUTH_BASE_URL}/client/login?error=oauth_not_configured`);
+    return;
+  }
+  passport.authenticate("apple", {
+    state: buildOAuthState("client", typeof req.query.redirect === "string" ? req.query.redirect : undefined),
+    session: false,
+  })(req, res, next);
+});
 
 oauthRouter.get("/status", (_req, res) => {
   res.json({ google: googleEnabled, apple: appleEnabled });

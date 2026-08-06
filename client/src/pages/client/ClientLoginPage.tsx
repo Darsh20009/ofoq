@@ -43,6 +43,17 @@ export default function ClientLoginPage() {
   const { ui, dir } = useLang();
 
   useEffect(() => {
+    const oauthError = params.get("error");
+    if (oauthError === "client_account_required") {
+      setErr(ui.auth.clientAccountRequired);
+    } else if (oauthError === "oauth_not_configured") {
+      setErr(ui.auth.oauthNotConfigured);
+    } else if (oauthError === "oauth_failed") {
+      setErr(ui.auth.oauthFailed);
+    }
+  }, [params, ui.auth.clientAccountRequired, ui.auth.oauthFailed, ui.auth.oauthNotConfigured]);
+
+  useEffect(() => {
     authApi.oauthStatus()
       .then((res) => setOauthStatus(res.data))
       .catch(() => {});
@@ -74,13 +85,13 @@ export default function ClientLoginPage() {
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}
-          <div className="bg-ofoq-navy p-8 text-center">
+              <Link to="/" className="block bg-ofoq-navy p-8 text-center hover:bg-[#1e1b38] transition-colors">
             <div className="flex justify-center mb-4">
               <OfoqLogo className="w-20 h-14" />
             </div>
             <h1 className="text-white text-xl font-bold">{ui.auth.clientTitle}</h1>
             <p className="text-white/50 text-sm mt-1">{ui.auth.clientSubtitle}</p>
-          </div>
+              </Link>
 
           {/* Form */}
           <div className="p-8">
@@ -94,14 +105,14 @@ export default function ClientLoginPage() {
             {hasOAuth && (
               <div className="mb-5 space-y-2.5">
                 {oauthStatus.google && (
-                  <a href="/api/auth/google"
+                  <a href={`/api/auth/client/google?redirect=${encodeURIComponent(redirect)}`}
                     className="flex items-center justify-center gap-3 w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-all text-sm font-medium text-gray-700 shadow-sm">
                     <GoogleIcon />
                     {ui.auth.continueGoogle}
                   </a>
                 )}
                 {oauthStatus.apple && (
-                  <a href="/api/auth/apple"
+                  <a href={`/api/auth/client/apple?redirect=${encodeURIComponent(redirect)}`}
                     className="flex items-center justify-center gap-3 w-full py-2.5 px-4 rounded-xl border border-gray-900 bg-gray-900 hover:bg-black transition-all text-sm font-medium text-white shadow-sm">
                     <AppleIcon />
                     {ui.auth.continueApple}

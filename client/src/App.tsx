@@ -15,6 +15,7 @@ import EmployeePortalLoginPage from "./pages/employee/EmployeePortalLoginPage";
 
 // Client Portal
 import ClientLoginPage from "./pages/client/ClientLoginPage";
+import ClientOAuthCallbackPage from "./pages/client/ClientOAuthCallbackPage";
 import ClientRegisterPage from "./pages/client/ClientRegisterPage";
 import ClientForgotPasswordPage from "./pages/client/ClientForgotPasswordPage";
 import ClientResetPasswordPage from "./pages/client/ClientResetPasswordPage";
@@ -283,6 +284,7 @@ export default function App() {
             </RequireClientGuest>
           }
         />
+        <Route path="/client/oauth/callback" element={<ClientOAuthCallbackPage />} />
         <Route
           path="/client/register"
           element={
