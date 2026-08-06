@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { authApi } from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
+import { useLang } from "../../i18n/LangContext";
 
 // Landing point for Google/Apple OAuth redirects. The server issues our own
 // JWT and hands it here via a query param; we exchange it for the user
@@ -12,6 +13,7 @@ export default function OAuthCallbackPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { setAuth } = useAuthStore();
+  const { ui, dir } = useLang();
 
   useEffect(() => {
     const token = params.get("token");
@@ -31,7 +33,7 @@ export default function OAuthCallbackPage() {
       .then((res) => {
         const user = res.data.user;
         setAuth(user, token);
-        toast.success(`مرحباً، ${user.name || user.fullName}!`);
+        toast.success(`${ui.adminLogin.welcome}، ${user.name || user.fullName}!`);
         // Route by role: clients → client portal, everyone else → admin
         if (user.role === "client") {
           navigate("/client/dashboard", { replace: true });
@@ -46,14 +48,14 @@ export default function OAuthCallbackPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-hero flex items-center justify-center" dir="rtl">
+    <div className="min-h-screen bg-hero flex items-center justify-center" dir={dir}>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="text-center"
       >
         <div className="w-12 h-12 border-4 border-white/20 border-t-ofoq-green rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-white/70 text-sm">جاري إتمام تسجيل الدخول...</p>
+        <p className="text-white/70 text-sm">{ui.adminLogin.oauthCompleting}</p>
       </motion.div>
     </div>
   );

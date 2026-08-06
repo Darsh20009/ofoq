@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { crmApi } from "../../../api/client";
 import type { Lead } from "../../../types";
+import { useLang } from "../../../i18n/LangContext";
 
 interface Props {
   open: boolean;
@@ -15,6 +16,9 @@ interface Props {
 }
 
 export default function LeadModal({ open, onClose, lead, onSaved }: Props) {
+  const { ui, dir } = useLang();
+  const copy = ui.adminPages.leads;
+  const customerCopy = ui.adminPages.customers;
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   useEffect(() => {
@@ -26,7 +30,7 @@ export default function LeadModal({ open, onClose, lead, onSaved }: Props) {
     mutationFn: (data: object) =>
       lead ? crmApi.leads.update(lead._id, data) : crmApi.leads.create(data),
     onSuccess: () => {
-      toast.success(lead ? "تم تحديث الفرصة" : "تم إضافة الفرصة");
+      toast.success(lead ? copy.updated : copy.created);
       onSaved();
     },
   });
@@ -45,10 +49,11 @@ export default function LeadModal({ open, onClose, lead, onSaved }: Props) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96 }}
             className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+            dir={dir}
           >
             <div className="flex items-center justify-between p-6 border-b">
               <h2 className="font-bold text-navy-700 text-lg">
-                {lead ? "تعديل الفرصة" : "إضافة فرصة جديدة"}
+                {lead ? copy.formEdit : copy.formNew}
               </h2>
               <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400">
                 <X size={18} />
@@ -58,86 +63,86 @@ export default function LeadModal({ open, onClose, lead, onSaved }: Props) {
             <form onSubmit={handleSubmit((d) => mut.mutate(d))} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <label className="label">الاسم *</label>
-                  <input {...register("name", { required: true })} className="input-field" placeholder="اسم العميل المحتمل" />
-                  {errors.name && <p className="text-red-500 text-xs mt-1">مطلوب</p>}
+                  <label className="label">{copy.name} *</label>
+                  <input {...register("name", { required: true })} className="input-field" placeholder={copy.namePlaceholder} />
+                  {errors.name && <p className="text-red-500 text-xs mt-1">{copy.required}</p>}
                 </div>
                 <div>
-                  <label className="label">البريد الإلكتروني *</label>
+                  <label className="label">{customerCopy.email} *</label>
                   <input {...register("email", { required: true })} type="email" className="input-field" placeholder="email@example.com" dir="ltr" />
                 </div>
                 <div>
-                  <label className="label">رقم الهاتف</label>
+                  <label className="label">{customerCopy.phone}</label>
                   <input {...register("phone")} className="input-field" placeholder="+966 5X XXX XXXX" dir="ltr" />
                 </div>
                 <div>
-                  <label className="label">الشركة</label>
-                  <input {...register("company")} className="input-field" placeholder="اسم الشركة" />
+                  <label className="label">{copy.company}</label>
+                  <input {...register("company")} className="input-field" placeholder={copy.company} />
                 </div>
                 <div>
-                  <label className="label">الخدمة المطلوبة</label>
-                  <input {...register("service")} className="input-field" placeholder="تطوير موقع، تسويق..." />
+                  <label className="label">{copy.service}</label>
+                  <input {...register("service")} className="input-field" placeholder={copy.servicePlaceholder} />
                 </div>
                 <div>
-                  <label className="label">المرحلة</label>
+                  <label className="label">{copy.stage}</label>
                   <select {...register("stage")} className="input-field">
-                    <option value="new">جديد</option>
-                    <option value="contacted">تم التواصل</option>
-                    <option value="qualified">مؤهّل</option>
-                    <option value="proposal">عرض سعر</option>
-                    <option value="negotiation">تفاوض</option>
-                    <option value="won">مُغلق (فوز)</option>
-                    <option value="lost">مُغلق (خسارة)</option>
+                    <option value="new">{copy.new}</option>
+                    <option value="contacted">{copy.contacted}</option>
+                    <option value="qualified">{copy.qualified}</option>
+                    <option value="proposal">{copy.proposal}</option>
+                    <option value="negotiation">{copy.negotiation}</option>
+                    <option value="won">{copy.won}</option>
+                    <option value="lost">{copy.lost}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="label">الأولوية</label>
+                  <label className="label">{copy.priority}</label>
                   <select {...register("priority")} className="input-field">
-                    <option value="low">منخفضة</option>
-                    <option value="medium">متوسطة</option>
-                    <option value="high">عالية</option>
-                    <option value="urgent">عاجلة</option>
+                    <option value="low">{copy.low}</option>
+                    <option value="medium">{copy.medium}</option>
+                    <option value="high">{copy.high}</option>
+                    <option value="urgent">{copy.urgent}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="label">الميزانية</label>
+                  <label className="label">{copy.budget}</label>
                   <input {...register("budget", { valueAsNumber: true })} type="number" className="input-field" placeholder="0" dir="ltr" />
                 </div>
                 <div>
-                  <label className="label">العملة</label>
+                  <label className="label">{customerCopy.currency}</label>
                   <select {...register("currency")} className="input-field">
-                    <option value="SAR">ريال سعودي (SAR)</option>
-                    <option value="USD">دولار (USD)</option>
-                    <option value="AED">درهم (AED)</option>
+                    <option value="SAR">{copy.currencySar}</option>
+                    <option value="USD">{copy.currencyUsd}</option>
+                    <option value="AED">{copy.currencyAed}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="label">المصدر</label>
+                  <label className="label">{copy.source}</label>
                   <select {...register("source")} className="input-field">
-                    <option value="website">الموقع الإلكتروني</option>
-                    <option value="referral">إحالة</option>
-                    <option value="social_media">وسائل التواصل</option>
-                    <option value="email">البريد الإلكتروني</option>
-                    <option value="phone">الهاتف</option>
-                    <option value="event">فعالية</option>
-                    <option value="other">أخرى</option>
+                    <option value="website">{copy.website}</option>
+                    <option value="referral">{copy.referral}</option>
+                    <option value="social_media">{copy.socialMedia}</option>
+                    <option value="email">{copy.emailSource}</option>
+                    <option value="phone">{copy.phoneSource}</option>
+                    <option value="event">{copy.event}</option>
+                    <option value="other">{copy.other}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="label">موعد المتابعة</label>
+                  <label className="label">{copy.followUp}</label>
                   <input {...register("followUpDate")} type="date" className="input-field" dir="ltr" />
                 </div>
                 <div className="col-span-2">
-                  <label className="label">ملاحظات</label>
-                  <textarea {...register("notes")} rows={3} className="input-field resize-none" placeholder="ملاحظات إضافية..." />
+                  <label className="label">{copy.notes}</label>
+                  <textarea {...register("notes")} rows={3} className="input-field resize-none" placeholder={copy.notesPlaceholder} />
                 </div>
               </div>
 
               <div className="flex gap-3 pt-2">
                 <button type="submit" disabled={mut.isPending} className="btn-primary flex-1 justify-center">
-                  {mut.isPending ? "جاري الحفظ..." : lead ? "تحديث" : "إضافة"}
+                  {mut.isPending ? copy.saving : lead ? copy.update : copy.add}
                 </button>
-                <button type="button" onClick={onClose} className="btn-ghost">إلغاء</button>
+                <button type="button" onClick={onClose} className="btn-ghost">{copy.cancel}</button>
               </div>
             </form>
           </motion.div>

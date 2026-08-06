@@ -118,7 +118,7 @@ export default function LoginPage() {
       toast.success(user.name);
       navigate(user.role === "employee" ? "/admin/employee/dashboard" : "/admin");
     } catch (e: any) {
-      setError(e.response?.data?.error || "رمز التحقق غير صحيح.");
+      setError(e.response?.data?.error || ui.adminLogin.twoFactorInvalid);
     } finally {
       setLoading(false);
     }
@@ -233,12 +233,12 @@ export default function LoginPage() {
           <p className="text-white/65 text-lg mt-4">{ui.home.heroSub}</p>
           <div className="mt-14 flex gap-4 justify-center">
             <div className="glass rounded-2xl px-6 py-4">
-              <b className="text-2xl block text-ofoq-yellow">٢٠٠+</b>
-              <span className="text-xs text-white/60">مشروع ناجح</span>
+              <b className="text-2xl block text-ofoq-yellow">200+</b>
+              <span className="text-xs text-white/60">{ui.adminLogin.successfulProjects}</span>
             </div>
             <div className="glass rounded-2xl px-6 py-4">
-              <b className="text-2xl block text-ofoq-red">٩٨٪</b>
-              <span className="text-xs text-white/60">رضا العملاء</span>
+              <b className="text-2xl block text-ofoq-red">98%</b>
+              <span className="text-xs text-white/60">{ui.adminLogin.customerSatisfaction}</span>
             </div>
           </div>
         </div>
@@ -351,7 +351,7 @@ export default function LoginPage() {
                   className="w-full flex items-center justify-center gap-2 bg-ofoq-navy/5 border border-gray-200 text-ofoq-navy rounded-xl py-3 text-sm hover:bg-ofoq-navy/10 transition-all"
                 >
                   <Fingerprint size={17} className="text-ofoq-green" />
-                  {passkeyLoading ? ui.adminLogin.verifying : "Sign in with passkey"}
+                  {passkeyLoading ? ui.adminLogin.verifying : ui.adminLogin.passkeyLogin}
                 </button>
 
                 {/* OAuth */}
@@ -359,7 +359,7 @@ export default function LoginPage() {
                   <>
                     <div className="flex items-center gap-3 py-1">
                       <div className="flex-1 h-px bg-gray-200" />
-                      <span className="text-gray-400 text-xs">or</span>
+                      <span className="text-gray-400 text-xs">{ui.adminLogin.or}</span>
                       <div className="flex-1 h-px bg-gray-200" />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
