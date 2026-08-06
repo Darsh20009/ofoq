@@ -3,19 +3,20 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Edit2, Trash2, Globe, FileText, Star, Image, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { format } from "date-fns";
-import { arSA } from "date-fns/locale";
 import { cmsApi } from "../../../api/client";
 import type { BlogPost } from "../../../types";
 import BlogModal from "./BlogModal";
-
-const tabs = [
-  { id: "blog", label: "المدونة", icon: FileText },
-  { id: "testimonials", label: "الشهادات", icon: Star },
-  { id: "pages", label: "الصفحات", icon: Globe },
-];
+import { useLang } from "../../../i18n/LangContext";
 
 export default function CmsPage() {
+  const { ui, lang, dir } = useLang();
+  const copy = ui.adminPages.cms;
+  const tabs = [
+    { id: "blog", label: copy.blog, icon: FileText },
+    { id: "testimonials", label: copy.testimonials, icon: Star },
+    { id: "pages", label: copy.pages, icon: Globe },
+  ];
+  const locale = lang === "ar" ? "ar-SA" : lang === "ur" ? "ur-PK" : lang;
   const [tab, setTab] = useState("blog");
   const qc = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
@@ -41,12 +42,12 @@ export default function CmsPage() {
 
   const deletePostMut = useMutation({
     mutationFn: (id: string) => cmsApi.blog.delete(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["blog-posts"] }); toast.success("تم الحذف"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["blog-posts"] }); toast.success(copy.deleted); },
   });
 
   const deleteTestimonialMut = useMutation({
     mutationFn: (id: string) => cmsApi.testimonials.delete(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["testimonials"] }); toast.success("تم الحذف"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["testimonials"] }); toast.success(copy.deleted); },
   });
 
   const posts: BlogPost[] = blogData?.data?.posts || [];
@@ -54,15 +55,15 @@ export default function CmsPage() {
   const pageList = pages?.data?.pages || [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={dir}>
       <div className="page-header">
         <div>
-          <h1 className="page-title">إدارة المحتوى</h1>
-          <p className="page-subtitle">تحكم كامل في محتوى الموقع</p>
+          <h1 className="page-title">{copy.title}</h1>
+          <p className="page-subtitle">{copy.subtitle}</p>
         </div>
         {tab === "blog" && (
           <button onClick={() => { setEditPost(null); setModalOpen(true); }} className="btn-primary">
-            <Plus size={16} /> مقالة جديدة
+            <Plus size={16} /> {copy.newArticle}
           </button>
         )}
       </div>
@@ -95,7 +96,7 @@ export default function CmsPage() {
           ) : posts.length === 0 ? (
             <div className="card py-16 text-center">
               <FileText size={40} className="mx-auto text-gray-200 mb-3" />
-              <p className="text-gray-400">لا توجد مقالات بعد</p>
+              <p className="text-gray-400">{copy.emptyPosts}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -112,15 +113,15 @@ export default function CmsPage() {
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-navy-700 truncate">{p.title.ar}</p>
+                     <p className="font-semibold text-navy-700 truncate">{lang === "en" ? p.title.en || p.title.ar : p.title.ar}</p>
                     <div className="flex items-center gap-3 mt-1">
                       <span className={p.isPublished ? "badge-green" : "badge-gray"}>
-                        {p.isPublished ? "منشور" : "مسودة"}
+                         {p.isPublished ? copy.published : copy.draft}
                       </span>
                       {p.category && <span className="text-xs text-gray-400">{p.category}</span>}
                       {p.publishedAt && (
                         <span className="text-xs text-gray-400">
-                          {format(new Date(p.publishedAt), "d MMM yyyy", { locale: arSA })}
+                           {new Date(p.publishedAt).toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" })}
                         </span>
                       )}
                     </div>
@@ -130,7 +131,7 @@ export default function CmsPage() {
                       className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-navy-700">
                       <Edit2 size={14} />
                     </button>
-                    <button onClick={() => { if (confirm("حذف المقالة؟")) deletePostMut.mutate(p._id); }}
+                     <button onClick={() => { if (confirm(copy.deletePostConfirm)) deletePostMut.mutate(p._id); }}
                       className="p-2 rounded-lg hover:bg-red-50 text-red-400">
                       <Trash2 size={14} />
                     </button>
@@ -150,7 +151,7 @@ export default function CmsPage() {
           ) : testimonialList.length === 0 ? (
             <div className="col-span-3 card py-16 text-center">
               <Star size={40} className="mx-auto text-gray-200 mb-3" />
-              <p className="text-gray-400">لا توجد شهادات</p>
+               <p className="text-gray-400">{copy.emptyTestimonials}</p>
             </div>
           ) : (
             testimonialList.map((t: { _id: string; author: { name: string; company: string }; content: { ar: string }; rating: number }) => (
@@ -166,7 +167,7 @@ export default function CmsPage() {
                     <p className="font-semibold text-sm text-navy-700">{t.author?.name}</p>
                     <p className="text-xs text-gray-400">{t.author?.company}</p>
                   </div>
-                  <button onClick={() => { if (confirm("حذف الشهادة؟")) deleteTestimonialMut.mutate(t._id); }}
+                   <button onClick={() => { if (confirm(copy.deleteTestimonialConfirm)) deleteTestimonialMut.mutate(t._id); }}
                     className="p-2 rounded-lg hover:bg-red-50 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Trash2 size={14} />
                   </button>
@@ -182,7 +183,12 @@ export default function CmsPage() {
         <div className="space-y-3">
           {pagesLoading ? (
             [...Array(4)].map((_, i) => <div key={i} className="skeleton h-14 rounded-xl" />)
-          ) : (
+           ) : pageList.length === 0 ? (
+             <div className="card py-16 text-center">
+               <Globe size={40} className="mx-auto text-gray-200 mb-3" />
+               <p className="text-gray-400">{copy.noPages}</p>
+             </div>
+           ) : (
             pageList.map((p: { _id: string; key: string; title: { ar: string }; isPublished: boolean; slug: string }) => (
               <div key={p._id} className="card p-4 flex items-center gap-4 group">
                 <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
@@ -193,7 +199,7 @@ export default function CmsPage() {
                   <p className="text-xs text-gray-400">/{p.slug || p.key}</p>
                 </div>
                 <span className={p.isPublished ? "badge-green" : "badge-gray"}>
-                  {p.isPublished ? "منشور" : "مخفي"}
+                   {p.isPublished ? copy.published : copy.hidden}
                 </span>
                 <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Edit2 size={14} />
