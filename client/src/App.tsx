@@ -10,7 +10,7 @@ import AdminLayout from "./layouts/AdminLayout";
 import EmployeeLayout from "./layouts/EmployeeLayout";
 import ClientLayout from "./layouts/ClientLayout";
 
-// Employee Portal
+  // Employee Portal
 import EmployeePortalLoginPage from "./pages/employee/EmployeePortalLoginPage";
 
 // Client Portal
@@ -87,6 +87,17 @@ function EmployeeAdminRedirect() {
   return null;
 }
 
+function EmployeeAdminPathRedirect() {
+  const location = useLocation();
+  const employeePath = location.pathname.replace(/^\/admin(?=\/|$)/, "") || "/";
+  return (
+    <Navigate
+      to={`${employeePath}${location.search}${location.hash}`}
+      replace
+    />
+  );
+}
+
 /* ── Client Portal Guards ─────────────────────────────────────────── */
 function RequireClientAuth({ children }: { children: JSX.Element }) {
   const { isAuthenticated, user } = useAuthStore();
@@ -156,19 +167,36 @@ export default function App() {
             path="/admin/login"
             element={<EmployeeAdminRedirect />}
           />
+          {/* Legacy page links inside shared admin pages use /admin/*.
+              Keep them working without leaving the employee subdomain. */}
+          <Route path="/admin/*" element={<EmployeeAdminPathRedirect />} />
 
-          {/* بوابة الموظف — تحتاج تسجيل دخول */}
+          {/* بوابة الموظف — نفس تجربة لوحة الإدارة بمسارات النطاق الفرعي */}
           <Route
             path="/"
             element={
               <RequireEmployeeAuth>
-                <EmployeeLayout />
+                <AdminLayout basePath="" />
               </RequireEmployeeAuth>
             }
           >
             <Route index element={<EmployeeDashboardPage />} />
-            <Route path="card" element={<EmployeeCardPage />} />
+            <Route path="dashboard" element={<EmployeeDashboardPage />} />
+            <Route path="crm/leads" element={<LeadsPage />} />
+            <Route path="crm/customers" element={<CustomersPage />} />
+            <Route path="projects" element={<ProjectsPage />} />
+            <Route path="invoices" element={<InvoicesPage />} />
+            <Route path="users" element={<UsersPage />} />
+            <Route path="cms" element={<CmsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
             <Route path="profile" element={<ProfilePage />} />
+            <Route path="contracts" element={<ContractsPage />} />
+            <Route path="employee/card" element={<EmployeeCardPage />} />
+            <Route path="employee/dashboard" element={<EmployeeDashboardPage />} />
+            <Route path="contact" element={<div className="card p-8 text-center text-gray-400">صفحة الاستشارات قيد الإنشاء</div>} />
+            <Route path="service-requests" element={<ServiceRequestsPage />} />
+            <Route path="service-requests/:id" element={<ServiceRequestDetailPage />} />
+            <Route path="support" element={<AdminSupportPage />} />
           </Route>
 
           {/* أي مسار غير معروف → الرئيسية */}

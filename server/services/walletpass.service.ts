@@ -67,8 +67,10 @@ export async function generateWalletPass(user: WalletPassUser): Promise<Buffer> 
   const certValue = process.env.APPLE_WALLET_CERT_B64 || process.env.APPLE_PASS_CERT;
   const keyValue  = process.env.APPLE_WALLET_KEY_B64  || process.env.APPLE_PASS_KEY;
   const wwdrValue = process.env.APPLE_WALLET_WWDR_B64 || process.env.APPLE_WWDR_CERT;
-  const passId    = process.env.APPLE_WALLET_PASS_ID;
-  const teamId    = process.env.APPLE_WALLET_TEAM_ID || process.env.APPLE_TEAM_ID;
+  // Pass identifiers are public metadata, so keep a safe fallback for
+  // deployments where Render has not received the non-secret env values yet.
+  const passId    = process.env.APPLE_WALLET_PASS_ID || "pass.com.qirox.employee";
+  const teamId    = process.env.APPLE_WALLET_TEAM_ID || process.env.APPLE_TEAM_ID || "V4K6RM59LS";
 
   if (!certValue || !keyValue || !wwdrValue) {
     throw new Error(

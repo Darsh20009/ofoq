@@ -112,7 +112,7 @@ export default function EmployeeDashboardPage() {
             <FolderKanban size={18} className="text-ofoq-green" />
             مشاريعي
           </h3>
-          <Link to="/admin/projects" className="text-xs text-ofoq-green hover:underline">عرض الكل</Link>
+           <Link to="/projects" className="text-xs text-ofoq-green hover:underline">عرض الكل</Link>
         </div>
         {myProjects.length === 0 ? (
           <p className="text-gray-400 text-sm text-center py-6">لا توجد مشاريع نشطة</p>
@@ -152,7 +152,7 @@ export default function EmployeeDashboardPage() {
 
       {/* Quick links */}
       <div className="grid grid-cols-2 gap-4">
-        <Link to="/admin/employee/card"
+        <Link to="/employee/card"
           className="card hover:shadow-ofoq-green/20 hover:shadow-lg transition-all group cursor-pointer flex items-center gap-3 py-4">
           <div className="w-10 h-10 rounded-xl bg-[#1C2B6E] flex items-center justify-center">
             <CreditCard size={18} className="text-[#33B27C]" />
@@ -162,7 +162,7 @@ export default function EmployeeDashboardPage() {
             <p className="text-xs text-gray-400">عرض الباركود</p>
           </div>
         </Link>
-        <Link to="/admin/profile"
+        <Link to="/profile"
           className="card hover:shadow-lg transition-all group cursor-pointer flex items-center gap-3 py-4">
           <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
             <Calendar size={18} className="text-gray-500" />

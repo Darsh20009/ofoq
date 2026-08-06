@@ -88,7 +88,7 @@ function NavLink({ item, collapsed, onNavigate }: {
   );
 }
 
-export default function AdminLayout() {
+export default function AdminLayout({ basePath = "/admin" }: { basePath?: string }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -97,27 +97,28 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const notifRef = useRef<HTMLDivElement>(null);
   const { t, dir } = useLang();
+  const pagePath = (path: string) => `${basePath}${path ? `/${path}` : ""}` || "/";
 
   const navItems: NavItem[] = [
-    { href: "/admin", label: t.admin.dashboard, icon: LayoutDashboard },
+    { href: pagePath(""), label: t.admin.dashboard, icon: LayoutDashboard },
     {
       label: t.admin.crm,
       icon: TrendingUp,
       children: [
-        { href: "/admin/crm/leads",     label: t.admin.leads },
-        { href: "/admin/crm/customers", label: t.admin.customers },
+        { href: pagePath("crm/leads"),     label: t.admin.leads },
+        { href: pagePath("crm/customers"), label: t.admin.customers },
       ],
     },
-    { href: "/admin/projects",      label: t.admin.projects,   icon: FolderKanban },
-    { href: "/admin/invoices",      label: t.admin.invoices,   icon: FileText },
-    { href: "/admin/contracts",     label: t.admin.contracts,  icon: FileSignature },
-    { href: "/admin/users",         label: t.admin.users,      icon: Users },
-    { href: "/admin/cms",           label: t.admin.cms,        icon: FileEdit },
-    { href: "/admin/settings",      label: t.admin.settings,   icon: Settings },
-    { href: "/admin/service-requests", label: "طلبات الخدمة",   icon: ClipboardList },
-    { href: "/admin/support",          label: "دعم العملاء",    icon: HeadphonesIcon },
-    { href: "/admin/contact",          label: "الاستشارات",     icon: MessageSquare },
-    { href: "/admin/employee/card",    label: t.admin.myCard,   icon: CreditCard },
+    { href: pagePath("projects"),      label: t.admin.projects,   icon: FolderKanban },
+    { href: pagePath("invoices"),      label: t.admin.invoices,   icon: FileText },
+    { href: pagePath("contracts"),     label: t.admin.contracts,  icon: FileSignature },
+    { href: pagePath("users"),         label: t.admin.users,      icon: Users },
+    { href: pagePath("cms"),           label: t.admin.cms,        icon: FileEdit },
+    { href: pagePath("settings"),      label: t.admin.settings,   icon: Settings },
+    { href: pagePath("service-requests"), label: "طلبات الخدمة",   icon: ClipboardList },
+    { href: pagePath("support"),          label: "دعم العملاء",    icon: HeadphonesIcon },
+    { href: pagePath("contact"),          label: "الاستشارات",     icon: MessageSquare },
+    { href: pagePath("employee/card"),    label: t.admin.myCard,   icon: CreditCard },
   ];
 
   // Load notifications — cached 60s, polling every 2 min (was a hot loop hitting wrong URL)
@@ -147,7 +148,7 @@ export default function AdminLayout() {
   const handleLogout = async () => {
     try { await authApi.logout(); } catch {}
     clearAuth();
-    navigate("/admin/login");
+    navigate(basePath ? "/admin/login" : "/login");
   };
 
   return (
@@ -315,7 +316,7 @@ export default function AdminLayout() {
                     className="absolute top-12 left-0 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
                   >
                     <Link
-                      to="/admin/profile"
+                      to={pagePath("profile")}
                       onClick={() => setUserMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-sm text-navy-700 transition-colors"
                     >
@@ -323,7 +324,7 @@ export default function AdminLayout() {
                       {t.admin.profile}
                     </Link>
                     <Link
-                      to="/admin/settings"
+                      to={pagePath("settings")}
                       onClick={() => setUserMenuOpen(false)}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-sm text-navy-700 transition-colors border-t"
                     >
