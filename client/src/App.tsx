@@ -56,6 +56,7 @@ import EmployeeDashboardPage from "./pages/admin/employee/EmployeeDashboardPage"
 import ServiceRequestsPage from "./pages/admin/service-requests/ServiceRequestsPage";
 import ServiceRequestDetailPage from "./pages/admin/service-requests/ServiceRequestDetailPage";
 import AdminSupportPage from "./pages/admin/support/AdminSupportPage";
+import EmployeeContactPage from "./pages/admin/EmployeeContactPage";
 
 // Page Transition Loader
 import PageLoader from "./components/PageLoader";
@@ -194,7 +195,7 @@ export default function App() {
             <Route path="contracts" element={<ContractsPage />} />
             <Route path="employee/card" element={<EmployeeCardPage />} />
             <Route path="employee/dashboard" element={<EmployeeDashboardPage />} />
-            <Route path="contact" element={<div className="card p-8 text-center text-gray-400">صفحة الاستشارات قيد الإنشاء</div>} />
+            <Route path="contact" element={<EmployeeContactPage />} />
             <Route path="service-requests" element={<ServiceRequestsPage />} />
             <Route path="service-requests/:id" element={<ServiceRequestDetailPage />} />
             <Route path="support" element={<AdminSupportPage />} />
@@ -269,7 +270,7 @@ export default function App() {
           <Route path="contracts" element={<ContractsPage />} />
           <Route path="employee/card" element={<EmployeeCardPage />} />
           <Route path="employee/dashboard" element={<EmployeeDashboardPage />} />
-          <Route path="contact" element={<div className="card p-8 text-center text-gray-400">صفحة الاستشارات قيد الإنشاء — Task #9</div>} />
+          <Route path="contact" element={<EmployeeContactPage />} />
           <Route path="service-requests" element={<ServiceRequestsPage />} />
           <Route path="service-requests/:id" element={<ServiceRequestDetailPage />} />
           <Route path="support" element={<AdminSupportPage />} />

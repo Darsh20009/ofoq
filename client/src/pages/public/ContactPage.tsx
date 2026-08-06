@@ -44,7 +44,7 @@ export default function ContactPage() {
 
       {/* ══ هيرو ══════════════════════════════════════════════ */}
       <section
-        className="relative min-h-[55vh] flex items-end overflow-hidden"
+        className="relative flex min-h-[42vh] items-end overflow-hidden sm:min-h-[55vh]"
         style={{
           backgroundImage:
             "linear-gradient(to top, rgba(43,39,63,0.92) 0%, rgba(43,39,63,0.50) 55%, rgba(0,0,0,0.15) 100%), url('/images/aramco-tower-sunset.jpg')",
@@ -62,7 +62,7 @@ export default function ContactPage() {
             <span className="text-white/70">{t.contact.badge}</span>
           </div>
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-5xl sm:text-6xl font-black text-white leading-tight">
+            <h1 className="max-w-3xl text-4xl font-black leading-tight sm:text-6xl">
               {t.contact.heroTitle}
             </h1>
             <p className="text-white/50 text-sm mt-3">
@@ -149,7 +149,7 @@ export default function ContactPage() {
             </div>
 
             {/* النموذج */}
-            <div className="lg:col-span-8">
+            <div className="min-w-0 lg:col-span-8">
               {submitted ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -263,7 +263,7 @@ export default function ContactPage() {
                     <button
                       type="submit"
                       disabled={isSubmitting || mut.isPending}
-                      className="inline-flex items-center gap-3 bg-ofoq-navy text-white font-bold text-sm px-5 py-3 rounded-full hover:bg-ofoq-navy-light transition-colors disabled:opacity-50"
+                      className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-ofoq-navy px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-ofoq-navy-light disabled:opacity-50 sm:w-auto"
                     >
                       <span className="w-9 h-9 rounded-full bg-ofoq-green flex items-center justify-center flex-shrink-0">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
