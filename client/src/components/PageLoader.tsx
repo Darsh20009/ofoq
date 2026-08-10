@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
 /**
@@ -7,10 +7,19 @@ import { motion } from "framer-motion";
  * اسم "أفق" يظهر تدريجياً بجانب اللوجو
  */
 export default function PageLoader({ onDone }: { onDone: () => void }) {
+  // Keep the timer independent from parent re-renders. App creates a new
+  // callback on each render, and restarting this effect can leave the loader
+  // covering the page indefinitely during authentication/data updates.
+  const onDoneRef = useRef(onDone);
+
   useEffect(() => {
-    const t = setTimeout(onDone, 1300);
-    return () => clearTimeout(t);
+    onDoneRef.current = onDone;
   }, [onDone]);
+
+  useEffect(() => {
+    const t = setTimeout(() => onDoneRef.current(), 900);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <motion.div

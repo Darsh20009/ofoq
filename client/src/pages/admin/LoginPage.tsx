@@ -279,6 +279,15 @@ export default function LoginPage() {
 
             {!twoFAStep ? (
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                {error && (
+                  <div
+                    role="alert"
+                    className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-relaxed text-red-700"
+                  >
+                    {error}
+                  </div>
+                )}
+
                 {/* البريد الإلكتروني */}
                 <div>
                   <label className="label">{ui.adminLogin.email}</label>
@@ -287,6 +296,7 @@ export default function LoginPage() {
                     <input
                       {...register("email", { required: ui.adminLogin.emailRequired })}
                       type="email"
+                      autoComplete="email"
                       placeholder="admin@ofoq.sa"
                       className="input-field pr-10"
                       dir="ltr"
@@ -305,6 +315,7 @@ export default function LoginPage() {
                     <input
                       {...register("password", { required: ui.adminLogin.passwordRequired })}
                       type={showPass ? "text" : "password"}
+                      autoComplete="current-password"
                       placeholder="••••••••"
                       className="input-field pr-10 pl-10"
                     />
