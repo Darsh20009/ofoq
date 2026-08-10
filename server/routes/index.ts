@@ -15,6 +15,7 @@ import { webauthnRouter } from "./webauthn.routes.js";
 import { employeeRouter } from "./employee.routes.js";
 import { clientRouter } from "./client.routes.js";
 import { isDBConnected } from "../db.js";
+import { requireAuth, requireRole } from "../auth.js";
 
 export function registerRoutes(app: Express): void {
   const API = "/api";
@@ -72,8 +73,8 @@ export function registerRoutes(app: Express): void {
     });
   });
 
-  // ── Test Email (admin only) ───────────────────────────────────
-  app.post(`${API}/admin/test-email`, async (req: any, res: any) => {
+  // ── Test Email (admin only — requires auth) ──────────────────
+  app.post(`${API}/admin/test-email`, requireAuth, requireRole("admin", "super_admin"), async (req: any, res: any) => {
     try {
       const { sendWelcomeEmail } = await import("../email.js");
       const to   = (req.body?.to as string)   || "info@ofoqhc.com";

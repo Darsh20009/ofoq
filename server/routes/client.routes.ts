@@ -28,7 +28,7 @@ function requireClient(req: any, res: any, next: any) {
 // ═══════════════════════════════════════════════════════════════════
 
 // POST /api/client/requests — create new request
-clientRouter.post("/requests", requireAuth, async (req: any, res) => {
+clientRouter.post("/requests", requireClient, async (req: any, res) => {
   try {
     const userId   = req.user._id;
     const userEmail = req.user.email;
@@ -89,7 +89,7 @@ clientRouter.post("/requests", requireAuth, async (req: any, res) => {
 });
 
 // GET /api/client/requests — list current client's requests
-clientRouter.get("/requests", requireAuth, async (req: any, res) => {
+clientRouter.get("/requests", requireClient, async (req: any, res) => {
   try {
     const userId = req.user._id;
     const requests = await ServiceRequestModel.find({ clientId: userId })
@@ -103,7 +103,7 @@ clientRouter.get("/requests", requireAuth, async (req: any, res) => {
 });
 
 // GET /api/client/requests/:id — single request details
-clientRouter.get("/requests/:id", requireAuth, async (req: any, res) => {
+clientRouter.get("/requests/:id", requireClient, async (req: any, res) => {
   try {
     const userId = req.user._id;
     const sr = await ServiceRequestModel.findOne({
@@ -123,7 +123,7 @@ clientRouter.get("/requests/:id", requireAuth, async (req: any, res) => {
 });
 
 // POST /api/client/requests/:id/notes — add client note
-clientRouter.post("/requests/:id/notes", requireAuth, async (req: any, res) => {
+clientRouter.post("/requests/:id/notes", requireClient, async (req: any, res) => {
   try {
     const userId = req.user._id;
     const { text } = req.body;
@@ -152,7 +152,7 @@ clientRouter.post("/requests/:id/notes", requireAuth, async (req: any, res) => {
 // ═══════════════════════════════════════════════════════════════════
 
 // GET /api/client/support — get messages for current client
-clientRouter.get("/support", requireAuth, async (req: any, res) => {
+clientRouter.get("/support", requireClient, async (req: any, res) => {
   try {
     const msgs = await SupportMessageModel.find({ clientId: req.user._id })
       .sort({ createdAt: 1 })
@@ -171,7 +171,7 @@ clientRouter.get("/support", requireAuth, async (req: any, res) => {
 });
 
 // POST /api/client/support — send message
-clientRouter.post("/support", requireAuth, async (req: any, res) => {
+clientRouter.post("/support", requireClient, async (req: any, res) => {
   try {
     const { text, requestId } = req.body;
     if (!text?.trim()) { res.status(400).json({ error: "النص مطلوب" }); return; }
@@ -191,7 +191,7 @@ clientRouter.post("/support", requireAuth, async (req: any, res) => {
 });
 
 // GET /api/client/support/unread-count
-clientRouter.get("/support/unread", requireAuth, async (req: any, res) => {
+clientRouter.get("/support/unread", requireClient, async (req: any, res) => {
   try {
     const count = await SupportMessageModel.countDocuments({
       clientId: req.user._id,

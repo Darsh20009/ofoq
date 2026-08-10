@@ -15,10 +15,11 @@ export default function SupportPage() {
   const endRef = useRef<HTMLDivElement>(null);
   const qc = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["client-support"],
     queryFn:  () => clientApi.getSupport().then((r) => r.data.messages),
     refetchInterval: 15_000,
+    retry: 2,
   });
 
   const messages = data || [];

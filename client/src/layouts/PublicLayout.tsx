@@ -54,20 +54,21 @@ const NAV_LINKS = [
   { href: "/contact",   labelAr: "تواصل معنا", labelEn: "Contact"  },
 ];
 
-/* ══ OFOQ Geometric Decoration (تستبدل حرف "T" في تسامي) ════════ */
+/* ══ OFOQ Geometric Decoration — شعار OFOQ المصغّر كزخرفة ════════ */
 function OfoqDecoration({ className = "" }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 120 120"
-      fill="none"
-      className={className}
-      aria-hidden="true"
-    >
-      <rect x="10" y="10" width="40" height="40" stroke="#33B27C" strokeWidth="2" strokeOpacity="0.5" />
-      <rect x="30" y="30" width="40" height="40" stroke="#E5FE04" strokeWidth="2" strokeOpacity="0.4" />
-      <rect x="50" y="50" width="40" height="40" stroke="#33B27C" strokeWidth="2" strokeOpacity="0.3" />
-      <line x1="50" y1="10" x2="70" y2="30" stroke="#E5FE04" strokeWidth="1" strokeOpacity="0.3" />
-      <line x1="10" y1="50" x2="30" y2="70" stroke="#33B27C" strokeWidth="1" strokeOpacity="0.3" />
+    <svg viewBox="0 0 80 90" fill="none" className={className} aria-hidden="true">
+      {/* الـ O الكبيرة — مستطيل عمودي بزوايا دائرية */}
+      <rect x="3"  y="3"  width="33" height="52" rx="7" stroke="#33B27C" strokeWidth="2.5" strokeOpacity="0.75" />
+      {/* الـ F — خطوط حمراء خفيفة */}
+      <line x1="42" y1="6"  x2="42" y2="50" stroke="#C13229" strokeWidth="2.5" strokeOpacity="0.55" strokeLinecap="square" />
+      <line x1="42" y1="6"  x2="66" y2="6"  stroke="#C13229" strokeWidth="2.5" strokeOpacity="0.55" strokeLinecap="square" />
+      <line x1="42" y1="26" x2="60" y2="26" stroke="#C13229" strokeWidth="2.5" strokeOpacity="0.55" strokeLinecap="square" />
+      {/* الـ o الصغيرة (أسفل) */}
+      <rect x="41" y="60" width="15" height="22" rx="4" stroke="#E5FE04" strokeWidth="2" strokeOpacity="0.60" />
+      {/* الـ Q الصغيرة مع كيرسور */}
+      <rect x="59" y="60" width="15" height="22" rx="4" stroke="#E5FE04" strokeWidth="2" strokeOpacity="0.60" />
+      <rect x="68" y="75" width="3.5" height="10" rx="1.5" fill="#C13229" fillOpacity="0.70" transform="rotate(-45 69.75 80)" />
     </svg>
   );
 }
@@ -184,19 +185,19 @@ export default function PublicLayout() {
               </div>
 
               {/* الموقع — تسامي style */}
-              <div className="px-8 py-8 border-b border-white/8">
-                <OfoqDecoration className="w-16 h-16 mb-4 opacity-60" />
-                <p className="text-[10px] font-bold uppercase tracking-[.25em] text-[#33B27C] mb-2">
-                  {isRtl ? "المملكة العربية السعودية" : "Saudi Arabia"}
-                </p>
-                <p className="text-white/50 text-sm leading-relaxed">
-                  {isRtl
-                    ? "المقر الرئيسي: الرياض، المملكة العربية السعودية"
-                    : "Head office: Riyadh, Saudi Arabia"}
-                </p>
-                <p className="text-white/35 text-xs mt-1">
-                  info@ofoqhc.com · +966 500 851 177
-                </p>
+              <div className="px-8 py-8 border-b border-white/8 flex items-start gap-5">
+                <OfoqDecoration className="w-14 h-16 flex-shrink-0 opacity-70 mt-1" />
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[.25em] text-[#33B27C] mb-1.5">
+                    {isRtl ? "المقر الرئيسي" : "Head Office"}
+                  </p>
+                  <p className="text-white/70 text-sm font-semibold leading-snug">
+                    {isRtl ? "الرياض، المملكة العربية السعودية" : "Riyadh, Saudi Arabia"}
+                  </p>
+                  <p className="text-white/35 text-xs mt-2 leading-relaxed">
+                    info@ofoqhc.com<br />+966 500 851 177
+                  </p>
+                </div>
               </div>
 
               {/* روابط التنقل */}

@@ -9,7 +9,7 @@ expertMode = true
 [userenv.shared]
 APP_NAME = "OFOQ Business Solutions"
 APP_NAME_AR = "أفق لحلول الأعمال"
-APP_URL = "https://www.ofoqhc.com"
+APP_URL = "https://ofoqhc.com"
 LANG_DEFAULT = "ar"
 NODE_ENV = "development"
 PORT = "5000"
@@ -20,6 +20,13 @@ APPLE_KEY_ID = "536AY95XA7"
 APPLE_TEAM_ID = "V4K6RM59LS"
 APPLE_WALLET_PASS_ID = "pass.com.qirox.employee"
 APPLE_WALLET_TEAM_ID = "V4K6RM59LS"
+CPANEL_SMTP_HOST = "server222.web-hosting.com"
+CPANEL_SMTP_PORT = "465"
+CPANEL_SMTP_USER = "info@qirox.online"
+CPANEL_USERNAME = "rfpeddku"
+EMAIL_SENDER_NAME = "أفق لحلول الأعمال"
+EMPLOYEE_URL = "https://employee.ofoqhc.com"
+GOOGLE_CLIENT_ID = "722115647290-f6dl35qs3611p4ohi24ljuku26ndnf9l.apps.googleusercontent.com"
 
 [workflows]
 runButton = "Project"
