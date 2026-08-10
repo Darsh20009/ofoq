@@ -48,6 +48,7 @@ import ProjectsPage from "./pages/admin/projects/ProjectsPage";
 import InvoicesPage from "./pages/admin/invoices/InvoicesPage";
 import UsersPage from "./pages/admin/users/UsersPage";
 import CmsPage from "./pages/admin/cms/CmsPage";
+import SiteContentPage from "./pages/admin/cms/SiteContentPage";
 import SettingsPage from "./pages/admin/settings/SettingsPage";
 import ProfilePage from "./pages/admin/ProfilePage";
 import ContractsPage from "./pages/admin/contracts/ContractsPage";
@@ -258,6 +259,7 @@ export default function App() {
           <Route path="invoices" element={<InvoicesPage />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="cms" element={<CmsPage />} />
+          <Route path="cms/site-content" element={<SiteContentPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="contracts" element={<ContractsPage />} />

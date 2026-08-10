@@ -96,7 +96,8 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
   const { user, clearAuth } = useAuthStore();
   const navigate = useNavigate();
   const notifRef = useRef<HTMLDivElement>(null);
-  const { t, dir, ui } = useLang();
+  const { t, dir, ui, lang } = useLang();
+  const isRtl = dir === "rtl";
   const pagePath = (path: string) => `${basePath}${path ? `/${path}` : ""}` || "/";
 
   const navItems: NavItem[] = [
@@ -113,7 +114,14 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
     { href: pagePath("invoices"),      label: t.admin.invoices,   icon: FileText },
     { href: pagePath("contracts"),     label: t.admin.contracts,  icon: FileSignature },
     { href: pagePath("users"),         label: t.admin.users,      icon: Users },
-    { href: pagePath("cms"),           label: t.admin.cms,        icon: FileEdit },
+    {
+      label: t.admin.cms,
+      icon: FileEdit,
+      children: [
+        { href: pagePath("cms"),              label: isRtl ? "المدونة والشهادات" : "Blog & Testimonials" },
+        { href: pagePath("cms/site-content"), label: isRtl ? "محرر المحتوى" : "Site Content Editor" },
+      ],
+    },
     { href: pagePath("settings"),      label: t.admin.settings,   icon: Settings },
     // Client copy lives in the shared UI translations; the legacy `t` pack
     // does not include a `client` section for the Arabic admin layout.

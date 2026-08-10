@@ -34,6 +34,16 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
     return (saved && VALID.includes(saved) ? saved : "ar") as Lang;
   });
 
+  // DB-stored content overrides (loaded once, shared across all languages)
+  const [siteContent, setSiteContent] = useState<Record<string, any>>({});
+
+  useEffect(() => {
+    fetch("/api/cms/site-content")
+      .then((r) => r.json())
+      .then((d) => { if (d?.data?.content) setSiteContent(d.data.content); })
+      .catch(() => {});
+  }, []);
+
   const dir: "rtl" | "ltr" = RTL.includes(lang) ? "rtl" : "ltr";
 
   useEffect(() => {
@@ -49,10 +59,16 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
   const t = useMemo(() => {
     if (lang === "ar") return translations.ar;
     if (lang === "en") return translations.en as typeof translations.ar;
-    // Other languages: English pack + partial overrides
     return deepMerge(translations.en as typeof translations.ar, extraLangs[lang]);
   }, [lang]);
-  const ui = useMemo(() => getUiCopy(lang), [lang]);
+
+  const ui = useMemo(() => {
+    const base = getUiCopy(lang);
+    const patch = siteContent[lang];
+    if (!patch || typeof patch !== "object") return base;
+    // Deep-merge DB content over the static default
+    return deepMerge(base as any, patch) as UiCopy;
+  }, [lang, siteContent]);
 
   const toggleLang = () => setLang((current) => {
     const index = LANGS.findIndex((item) => item.code === current);

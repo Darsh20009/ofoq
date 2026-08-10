@@ -427,3 +427,43 @@ cmsRouter.post("/media/upload-multiple", requireAuth, uploadMultiple as any, asy
     res.status(500).json({ error: "خطأ في رفع الملفات" });
   }
 });
+
+// ═══════════════════════════════════════════════════
+// SITE CONTENT — Multilingual editable page content
+// ═══════════════════════════════════════════════════
+
+cmsRouter.get("/site-content", async (req, res) => {
+  try {
+    const setting = await SystemSettingsModel.findOne({ key: "siteContent" }).lean();
+    const content = (setting as any)?.value || {};
+    res.json({ data: { content } });
+  } catch {
+    res.status(500).json({ error: "Failed to load site content" });
+  }
+});
+
+cmsRouter.put("/site-content", requireAuth, requireRole("super_admin", "admin"), async (req, res) => {
+  try {
+    const { lang, data } = req.body as { lang: string; data: Record<string, any> };
+    if (!lang || !data || typeof data !== "object") {
+      res.status(400).json({ error: "Missing lang or data" });
+      return;
+    }
+    let setting = await SystemSettingsModel.findOne({ key: "siteContent" });
+    if (!setting) {
+      setting = new SystemSettingsModel({
+        key: "siteContent", value: {}, group: "cms",
+        label: "Site Content (Multilingual)", updatedBy: (req as any).user._id,
+      });
+    }
+    const existing = { ...(setting.value as Record<string, any> || {}) };
+    existing[lang] = data;
+    setting.value = existing;
+    (setting as any).updatedBy = (req as any).user._id;
+    setting.markModified("value");
+    await setting.save();
+    res.json({ data: { content: existing } });
+  } catch {
+    res.status(500).json({ error: "Failed to save site content" });
+  }
+});
