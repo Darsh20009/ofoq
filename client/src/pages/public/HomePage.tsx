@@ -16,6 +16,7 @@ const stagger = { show: { transition: { staggerChildren: 0.15 } } };
 /* ══ الـ Splash screen — بالضبط كتسامي ════════════════════════ */
 function SplashIntro({ onDone }: { onDone: () => void }) {
   const [phase, setPhase] = useState<"in" | "hold" | "out">("in");
+  const { ui } = useLang();
 
   useEffect(() => {
     const t1 = setTimeout(() => setPhase("hold"), 200);
@@ -24,7 +25,7 @@ function SplashIntro({ onDone }: { onDone: () => void }) {
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, [onDone]);
 
-  const words = ["نرتّب", "التفاصيل،", "لتنتفرغ", "للنمو."];
+  const words = ui.home.splash ?? ["نرتّب", "التفاصيل،", "لتنتفرغ", "للنمو."];
 
   return (
     <motion.div

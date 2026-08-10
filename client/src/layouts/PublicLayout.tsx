@@ -44,15 +44,7 @@ const SOCIAL = [
   },
 ];
 
-const NAV_LINKS = [
-  { href: "/",          labelAr: "الرئيسية",   labelEn: "Home"     },
-  { href: "/about",     labelAr: "من نحن",      labelEn: "About"    },
-  { href: "/services",  labelAr: "خدماتنا",    labelEn: "Services" },
-  { href: "/packages",  labelAr: "الباقات",    labelEn: "Packages" },
-  { href: "/countries", labelAr: "الدول",       labelEn: "Countries"},
-  { href: "/blog",      labelAr: "المدونة",     labelEn: "Blog"     },
-  { href: "/contact",   labelAr: "تواصل معنا", labelEn: "Contact"  },
-];
+const NAV_HREFS = ["/", "/about", "/services", "/packages", "/countries", "/blog", "/contact"];
 
 /* ══ OFOQ Geometric Decoration — شعار OFOQ المصغّر كزخرفة ════════ */
 function OfoqDecoration({ className = "" }: { className?: string }) {
@@ -77,8 +69,9 @@ function OfoqDecoration({ className = "" }: { className?: string }) {
 export default function PublicLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { pathname } = useLocation();
-  const { lang, setLang, langs } = useLang();
+  const { lang, setLang, langs, ui } = useLang();
   const isRtl = lang === "ar" || lang === "ur";
+  const navLinks = NAV_HREFS.map((href, i) => ({ href, label: (ui.header.nav ?? [])[i] ?? href }));
 
   /* إغلاق الـ drawer عند تغيير الصفحة */
   useEffect(() => {
@@ -126,7 +119,7 @@ export default function PublicLayout() {
             to="/client/login"
             className="hidden sm:flex text-xs font-bold text-white/60 hover:text-white transition-colors"
           >
-            {isRtl ? "بوابة العميل" : "Client Portal"}
+            {ui.header.clientLogin}
           </Link>
 
           {/* زر المزيد */}
@@ -134,7 +127,7 @@ export default function PublicLayout() {
             onClick={() => setDrawerOpen(true)}
             className="flex items-center gap-2 text-white/70 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest"
           >
-            {isRtl ? "المزيد" : "More"}
+            {ui.header.menu}
             <span className="flex flex-col gap-[5px]">
               <span className="block w-5 h-[1.5px] bg-current" />
               <span className="block w-3 h-[1.5px] bg-current" />
@@ -206,7 +199,7 @@ export default function PublicLayout() {
                   {isRtl ? "الصفحات" : "Navigation"}
                 </p>
                 <ul className="space-y-1">
-                  {NAV_LINKS.map((link, i) => (
+                  {navLinks.map((link, i) => (
                     <motion.li
                       key={link.href}
                       initial={{ opacity: 0, x: isRtl ? -16 : 16 }}
@@ -222,7 +215,7 @@ export default function PublicLayout() {
                             : "text-white/70 hover:text-white"
                         }`}
                       >
-                        <span>{isRtl ? link.labelAr : link.labelEn}</span>
+                        <span>{link.label}</span>
                         <svg viewBox="0 0 16 16" fill="none" className={`w-4 h-4 text-white/20 ${isRtl ? "rotate-180" : ""}`}>
                           <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                         </svg>
@@ -241,7 +234,7 @@ export default function PublicLayout() {
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
                     </svg>
                   </span>
-                  {isRtl ? "بوابة العميل" : "Client Portal"}
+                  {ui.header.clientLogin}
                 </Link>
               </nav>
 

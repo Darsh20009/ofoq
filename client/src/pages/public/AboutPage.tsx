@@ -50,9 +50,9 @@ export default function AboutPage() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 pb-16 w-full">
           <div className="flex items-center gap-2 text-white/30 text-xs mb-8">
-            <Link to="/" className="hover:text-white transition-colors">{isRtl ? "الرئيسية" : "Home"}</Link>
+            <Link to="/" className="hover:text-white transition-colors">{ui.category.home}</Link>
             <span>/</span>
-            <span className="text-white/60">{isRtl ? "من نحن" : "About"}</span>
+            <span className="text-white/60">{ui.about.badge}</span>
           </div>
 
           <motion.p
@@ -91,7 +91,7 @@ export default function AboutPage() {
                 to="/contact"
                 className="inline-flex items-center gap-3 border border-white/20 text-white font-bold text-sm px-7 py-3.5 rounded-full hover:border-[#33B27C] hover:bg-[#33B27C] transition-all duration-300"
               >
-                {isRtl ? "تواصل معنا" : "Contact us"}
+                {ui.home.contact}
                 <svg viewBox="0 0 16 16" fill="none" className={`w-4 h-4 ${isRtl ? "rotate-180" : ""}`}>
                   <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -111,7 +111,7 @@ export default function AboutPage() {
               <div className="absolute bottom-6 left-6">
                 <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-1">OFOQ · 2019</p>
                 <p className="text-white font-black text-lg">
-                  {isRtl ? "نقود النمو ونحقق التنمية المستدامة" : "Driving growth & sustainable development"}
+                  {ui.about.storyGrowth}
                 </p>
               </div>
             </div>
@@ -120,13 +120,13 @@ export default function AboutPage() {
                 <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#33B27C] mb-3">
                   {ui.about.storyVision}
                 </p>
-                <p className="text-white/50 text-sm leading-6">{isRtl ? "اقتصاد مزدهر مرفوع بخدمات أعمال مبتكرة." : "A thriving economy elevated by innovative business services."}</p>
+                <p className="text-white/50 text-sm leading-6">{ui.about.visionText}</p>
               </div>
               <div className="bg-white/[0.04] border border-white/8 rounded-xl p-6">
                 <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#33B27C] mb-3">
-                  {isRtl ? "رسالتنا" : "Mission"}
+                  {ui.about.missionTitle}
                 </p>
-                <p className="text-white/50 text-sm leading-6">{isRtl ? "تمكين الشركات من النمو بخدمات رقمية موثوقة." : "Empowering businesses to grow with reliable digital services."}</p>
+                <p className="text-white/50 text-sm leading-6">{ui.about.missionText}</p>
               </div>
             </div>
           </div>
@@ -170,7 +170,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 py-20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-3">
-              {isRtl ? "معاً نصنع الأثر" : "Let's create impact together"}
+              {ui.about.ctaBadge}
             </p>
             <h2 className="text-3xl sm:text-4xl font-black">{ui.about.ctaTitle}</h2>
           </div>
@@ -178,7 +178,7 @@ export default function AboutPage() {
             to="/client/requests/new"
             className="flex-shrink-0 inline-flex items-center gap-3 bg-[#E5FE04] text-[#2B273F] font-black text-sm px-8 py-4 rounded-full hover:bg-white transition-all duration-300"
           >
-            {isRtl ? "اطلب خدمة" : "Request a service"}
+            {ui.about.requestService}
             <svg viewBox="0 0 16 16" fill="none" className={`w-4 h-4 ${isRtl ? "rotate-180" : ""}`}>
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>

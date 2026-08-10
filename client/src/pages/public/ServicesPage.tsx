@@ -7,14 +7,14 @@ import { useLang } from "../../i18n/LangContext";
 const ease = [0.22, 1, 0.36, 1] as const;
 
 export default function ServicesPage() {
-  const { lang } = useLang();
+  const { lang, ui } = useLang();
   const isRtl = lang === "ar" || lang === "ur";
 
   return (
     <div className="bg-[#2B273F] text-white min-h-screen" dir={isRtl ? "rtl" : "ltr"}>
       <Helmet>
-        <title>{isRtl ? "خدماتنا — أفق لحلول الأعمال" : "Our Services — OFOQ"}</title>
-        <meta name="description" content={isRtl ? "خدمات أفق المتكاملة في الموارد البشرية والخدمات الحكومية وتأسيس الشركات." : "OFOQ integrated services in HR, government services, and company formation."} />
+        <title>{ui.services.title}</title>
+        <meta name="description" content={ui.services.heroSub} />
       </Helmet>
 
       {/* ══ هيدر الصفحة ════════════════════════════════════════════ */}
@@ -38,9 +38,9 @@ export default function ServicesPage() {
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 pb-16 w-full">
           {/* breadcrumb */}
           <div className="flex items-center gap-2 text-white/30 text-xs mb-8">
-            <Link to="/" className="hover:text-white transition-colors">{isRtl ? "الرئيسية" : "Home"}</Link>
+            <Link to="/" className="hover:text-white transition-colors">{ui.category.home}</Link>
             <span>/</span>
-            <span className="text-white/60">{isRtl ? "الخدمات" : "Services"}</span>
+            <span className="text-white/60">{ui.category.services}</span>
           </div>
 
           <motion.p
@@ -49,7 +49,7 @@ export default function ServicesPage() {
             transition={{ duration: 0.6, ease }}
             className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-5"
           >
-            {isRtl ? "منطقة خبرتنا" : "Our area of expertise"}
+            {ui.services.areaBadge}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
@@ -57,11 +57,7 @@ export default function ServicesPage() {
             transition={{ duration: 0.8, delay: 0.1, ease }}
             className="text-5xl sm:text-7xl font-black leading-tight max-w-3xl"
           >
-            {isRtl ? (
-              <>اختر <span className="text-[#33B27C]">خدمتك</span></>
-            ) : (
-              <>Choose <span className="text-[#33B27C]">your service</span></>
-            )}
+            {ui.services.choose}{" "}<span className="text-[#33B27C]">{ui.services.yourService}</span>
           </motion.h1>
         </div>
       </section>
@@ -103,14 +99,14 @@ export default function ServicesPage() {
                       </li>
                     ))}
                     {cat.services.length > 3 && (
-                      <li className="text-[11px] text-white/20">+{cat.services.length - 3} {isRtl ? "أكثر" : "more"}</li>
+                      <li className="text-[11px] text-white/20">+{cat.services.length - 3} {ui.services.more}</li>
                     )}
                   </ul>
                 </div>
 
                 <div className="relative z-10 flex items-center justify-between mt-8 pt-6 border-t border-white/8">
                   <span className="text-xs font-bold text-white/30 group-hover:text-[#33B27C] transition-colors">
-                    {isRtl ? "اعرف أكثر" : "Learn more"}
+                    {ui.services.learnMore}
                   </span>
                   <span className="w-9 h-9 rounded-full border border-white/15 group-hover:border-[#33B27C] group-hover:bg-[#33B27C] flex items-center justify-center transition-all duration-300">
                     <svg viewBox="0 0 16 16" fill="none" className={`w-3.5 h-3.5 ${isRtl ? "rotate-180" : ""}`}>
@@ -129,17 +125,17 @@ export default function ServicesPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-10 py-20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-3">
-              {isRtl ? "لنصنع أثراً مستدام" : "Let's create sustainable impact"}
+              {ui.services.ctaBadge}
             </p>
             <h2 className="text-3xl sm:text-4xl font-black">
-              {isRtl ? "تواصل معنا اليوم" : "Contact us today"}
+              {ui.services.ctaTitle}
             </h2>
           </div>
           <Link
             to="/contact"
             className="flex-shrink-0 inline-flex items-center gap-3 border border-white/20 text-white font-bold text-sm px-8 py-4 rounded-full hover:border-[#33B27C] hover:bg-[#33B27C] transition-all duration-300"
           >
-            {isRtl ? "تواصل معنا" : "Contact us"}
+            {ui.home.contact}
             <svg viewBox="0 0 16 16" fill="none" className={`w-4 h-4 ${isRtl ? "rotate-180" : ""}`}>
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>

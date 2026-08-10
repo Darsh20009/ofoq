@@ -1,7 +1,7 @@
 import type { Lang } from "./extraLangs";
 
 export type UiCopy = {
-  header: { clientLogin: string; menu: string; language: string };
+  header: { clientLogin: string; menu: string; language: string; nav: string[] };
   common: { sending: string; send: string };
   home: {
     badge: string; hero1: string; hero2: string; heroSub: string; request: string; explore: string;
@@ -9,8 +9,9 @@ export type UiCopy = {
     servicesBadge: string; servicesTitle1: string; servicesTitle2: string; servicesAll: string; more: string;
     whyBadge: string; whyTitle: string; ctaTitle1: string; ctaTitle2: string; ctaDesc: string; contact: string;
     stats: string[]; reasons: { title: string; desc: string }[];
+    splash: string[];
   };
-  services: { title: string; badge: string; hero1: string; hero2: string; heroSub: string; view: string; more: string };
+  services: { title: string; badge: string; hero1: string; hero2: string; heroSub: string; view: string; more: string; areaBadge: string; choose: string; yourService: string; learnMore: string; ctaBadge: string; ctaTitle: string };
   category: { home: string; services: string; badge: string; available: string; service: string; grid: string; list: string; details: string; need: string; needDesc: string; request: string };
   detail: { home: string; services: string; badge: string; request: string; how: string; faq: string; window: string; suitable: string; requirements: string; related: string; details: string };
   about: {
@@ -18,6 +19,7 @@ export type UiCopy = {
     storyTitle: string; storyVision: string; storyP1: string; storyP2: string; storyP3: string; storyP4: string;
     valuesTitle: string; valuesSub: string; values: { title: string; desc: string }[];
     teamTitle: string; ctaTitle: string;
+    storyGrowth: string; visionText: string; missionTitle: string; missionText: string; ctaBadge: string; requestService: string;
   };
   contact: {
     metaTitle: string; badge: string; heroTitle: string; heroSub: string; infoTitle: string;
@@ -170,17 +172,18 @@ export type UiCopy = {
 };
 
 const en: UiCopy = {
-  header: { clientLogin: "Client login", menu: "Menu", language: "Language" },
+  header: { clientLogin: "Client login", menu: "Menu", language: "Language", nav: ["Home", "About", "Services", "Packages", "Countries", "Blog", "Contact"] },
   common: { sending: "Sending...", send: "Send message" },
   home: {
     badge: "OFOQ / SAUDI BUSINESS CONCIERGE", hero1: "We handle", hero2: "the details.", heroSub: "Your trusted partner for HR, government services, visas, and company formation in Saudi Arabia.", request: "Request service", explore: "Explore services",
     aboutBadge: "About OFOQ", aboutTitle1: "Your business partner", aboutTitle2: "in Saudi Arabia", aboutDesc: "We handle government procedures, HR management, and formation requirements — so you can focus entirely on growing your business.", aboutCta: "Learn more",
     servicesBadge: "Our services", servicesTitle1: "Comprehensive", servicesTitle2: "services", servicesAll: "View all services", more: "more services",
     whyBadge: "Why OFOQ?", whyTitle: "We build with you, step by step", ctaTitle1: "Let's boost your", ctaTitle2: "sustainable growth", ctaDesc: "Contact us today and start a real partnership journey.", contact: "Contact us",
+    splash: ["We handle", "the details,", "so you can", "grow."],
     stats: ["Clients served", "Client satisfaction", "Specialists", "Service categories"],
     reasons: [{ title: "Expert team", desc: "Specialists across every area of our services in the Saudi market." }, { title: "Full follow-up", desc: "We follow your file through to closure with regular updates." }, { title: "Digital experience", desc: "A full client portal to track your requests from anywhere." }, { title: "Local expertise", desc: "Deep knowledge of Saudi regulations and government bodies." }],
   },
-  services: { title: "Services | OFOQ", badge: "THE OFOQ CATALOG", hero1: "Services designed", hero2: "for your business.", heroSub: "From entity formation to daily operations, we coordinate details through one team and a clear path.", view: "View services", more: "more" },
+  services: { title: "Services | OFOQ", badge: "THE OFOQ CATALOG", hero1: "Services designed", hero2: "for your business.", heroSub: "From entity formation to daily operations, we coordinate details through one team and a clear path.", view: "View services", more: "more", areaBadge: "Our area of expertise", choose: "Choose", yourService: "your service", learnMore: "Learn more", ctaBadge: "Let's create sustainable impact", ctaTitle: "Contact us today" },
   category: { home: "Home", services: "Services", badge: "Service category", available: "services available", service: "services", grid: "Grid", list: "List", details: "Details", need: "Need these services?", needDesc: "Contact us and we'll help you identify the right service for your needs.", request: "Request service" },
   detail: { home: "Home", services: "Services", badge: "Service details", request: "Request service", how: "How we work", faq: "Frequently asked questions", window: "Service window", suitable: "Who is it for?", requirements: "Requirements", related: "Other services in this category", details: "Details" },
   about: {
@@ -198,6 +201,10 @@ const en: UiCopy = {
       { title: "Integration", desc: "We connect sector knowledge and specialist expertise around each client's needs." },
     ],
     teamTitle: "Why OFOQ?", ctaTitle: "Start your journey with OFOQ",
+    storyGrowth: "Driving growth & sustainable development",
+    visionText: "A thriving economy elevated by innovative business services.",
+    missionTitle: "Mission", missionText: "Empowering businesses to grow with reliable digital services.",
+    ctaBadge: "Let's create impact together", requestService: "Request a service",
   },
   contact: {
     metaTitle: "Contact us | OFOQ Business Solutions", badge: "Contact us", heroTitle: "We are here to help",
@@ -416,10 +423,10 @@ const en: UiCopy = {
 
 const ar: UiCopy = {
   ...en,
-  header: { clientLogin: "دخول العميل", menu: "القائمة", language: "اللغة" },
+  header: { clientLogin: "دخول العميل", menu: "القائمة", language: "اللغة", nav: ["الرئيسية", "من نحن", "خدماتنا", "الباقات", "الدول", "المدونة", "تواصل معنا"] },
   common: { sending: "جاري الإرسال...", send: "إرسال الرسالة" },
-  home: { ...en.home, badge: "أفق / شريك الأعمال السعودي", hero1: "نرتّب التفاصيل،", hero2: "لتتفرغ للنمو.", heroSub: "شريكك الموثوق في الموارد البشرية، الخدمات الحكومية، التأشيرات وتأسيس الشركات في المملكة.", request: "اطلب خدمة", explore: "استكشف الخدمات", aboutBadge: "عن أفق", aboutTitle1: "شريك عملك في", aboutTitle2: "المملكة العربية السعودية", aboutDesc: "نحمل عنك الإجراءات الحكومية وإدارة الموارد البشرية ومتطلبات التأسيس — حتى تتفرغ تماماً لنمو أعمالك.", aboutCta: "اعرف المزيد", servicesBadge: "خدماتنا", servicesTitle1: "خدمات متكاملة", servicesTitle2: "وشاملة", servicesAll: "عرض جميع الخدمات", more: "خدمات أخرى", whyBadge: "لماذا أفق؟", whyTitle: "نبني معك خطوة بخطوة", ctaTitle1: "لنعزز نموكم", ctaTitle2: "المستدام", ctaDesc: "تواصل معنا اليوم وابدأ رحلة شراكة حقيقية.", contact: "تواصل معنا", stats: ["عميل تخدمهم أفق", "نسبة رضا العملاء", "خبير متخصص", "تصنيفات خدمية"], reasons: [{ title: "فريق متخصص", desc: "مختصون في كل مجال من مجالات خدماتنا في السوق السعودي." }, { title: "متابعة كاملة", desc: "نتابع ملفك حتى الإغلاق مع تحديثات دورية لك." }, { title: "تجربة رقمية", desc: "بوابة عميل متكاملة لمتابعة طلباتك أينما كنت." }, { title: "خبرة محلية", desc: "نفهم الأنظمة والجهات الحكومية السعودية عن قرب." }] },
-  services: { title: "الخدمات | أفق", badge: "دليل خدمات أفق", hero1: "خدمات مصممة", hero2: "لعملك بالكامل.", heroSub: "من تأسيس الكيان إلى تشغيله يومياً، ننسّق التفاصيل عبر فريق واحد ومسار واضح.", view: "عرض الخدمات", more: "خدمات أخرى" },
+  home: { ...en.home, splash: ["نرتّب", "التفاصيل،", "لتنتفرغ", "للنمو."], badge: "أفق / شريك الأعمال السعودي", hero1: "نرتّب التفاصيل،", hero2: "لتتفرغ للنمو.", heroSub: "شريكك الموثوق في الموارد البشرية، الخدمات الحكومية، التأشيرات وتأسيس الشركات في المملكة.", request: "اطلب خدمة", explore: "استكشف الخدمات", aboutBadge: "عن أفق", aboutTitle1: "شريك عملك في", aboutTitle2: "المملكة العربية السعودية", aboutDesc: "نحمل عنك الإجراءات الحكومية وإدارة الموارد البشرية ومتطلبات التأسيس — حتى تتفرغ تماماً لنمو أعمالك.", aboutCta: "اعرف المزيد", servicesBadge: "خدماتنا", servicesTitle1: "خدمات متكاملة", servicesTitle2: "وشاملة", servicesAll: "عرض جميع الخدمات", more: "خدمات أخرى", whyBadge: "لماذا أفق؟", whyTitle: "نبني معك خطوة بخطوة", ctaTitle1: "لنعزز نموكم", ctaTitle2: "المستدام", ctaDesc: "تواصل معنا اليوم وابدأ رحلة شراكة حقيقية.", contact: "تواصل معنا", stats: ["عميل تخدمهم أفق", "نسبة رضا العملاء", "خبير متخصص", "تصنيفات خدمية"], reasons: [{ title: "فريق متخصص", desc: "مختصون في كل مجال من مجالات خدماتنا في السوق السعودي." }, { title: "متابعة كاملة", desc: "نتابع ملفك حتى الإغلاق مع تحديثات دورية لك." }, { title: "تجربة رقمية", desc: "بوابة عميل متكاملة لمتابعة طلباتك أينما كنت." }, { title: "خبرة محلية", desc: "نفهم الأنظمة والجهات الحكومية السعودية عن قرب." }] },
+  services: { title: "الخدمات | أفق", badge: "دليل خدمات أفق", hero1: "خدمات مصممة", hero2: "لعملك بالكامل.", heroSub: "من تأسيس الكيان إلى تشغيله يومياً، ننسّق التفاصيل عبر فريق واحد ومسار واضح.", view: "عرض الخدمات", more: "خدمات أخرى", areaBadge: "منطقة خبرتنا", choose: "اختر", yourService: "خدمتك", learnMore: "اعرف أكثر", ctaBadge: "لنصنع أثراً مستداماً", ctaTitle: "تواصل معنا اليوم" },
   category: { home: "الرئيسية", services: "الخدمات", badge: "تصنيف الخدمة", available: "خدمة متاحة", service: "خدمة", grid: "شبكة", list: "قائمة", details: "التفاصيل", need: "هل تحتاج هذه الخدمات؟", needDesc: "تواصل معنا وسنساعدك في تحديد الخدمة المناسبة لاحتياجاتك.", request: "اطلب خدمة" },
   detail: { home: "الرئيسية", services: "الخدمات", badge: "تفاصيل الخدمة", request: "اطلب الخدمة", how: "كيف نعمل", faq: "الأسئلة الشائعة", window: "مدة التنفيذ", suitable: "لمن تناسب؟", requirements: "المتطلبات", related: "خدمات أخرى من نفس التصنيف", details: "التفاصيل" },
   about: {
@@ -437,6 +444,10 @@ const ar: UiCopy = {
       { title: "التكامل", desc: "نوحّد معرفة القطاعات وخبرة المتخصصين حول احتياجات كل عميل." },
     ],
     teamTitle: "لماذا أفق؟", ctaTitle: "ابدأ رحلتك مع أفق",
+    storyGrowth: "نقود النمو ونحقق التنمية المستدامة",
+    visionText: "اقتصاد مزدهر مرفوع بخدمات أعمال مبتكرة.",
+    missionTitle: "رسالتنا", missionText: "تمكين الشركات من النمو بخدمات رقمية موثوقة.",
+    ctaBadge: "معاً نصنع الأثر", requestService: "اطلب خدمة",
   },
   contact: {
     metaTitle: "تواصل معنا | أفق لحلول الأعمال", badge: "تواصل معنا", heroTitle: "نحن هنا لمساعدتك",

@@ -59,7 +59,7 @@ export default function PackagesPage() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 pb-16 w-full">
           <div className="flex items-center gap-2 text-white/30 text-xs mb-8">
-            <Link to="/" className="hover:text-white transition-colors">{isRtl ? "الرئيسية" : "Home"}</Link>
+            <Link to="/" className="hover:text-white transition-colors">{ui.category.home}</Link>
             <span>/</span>
             <span className="text-white/60">{ui.packages.badge}</span>
           </div>
