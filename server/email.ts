@@ -601,6 +601,44 @@ export async function sendServiceRequestStageUpdate(opts: {
   return sendMail(opts.toEmail, "العميل", `تحديث طلبك — ${opts.newStatusAr} | أفق`, html);
 }
 
+/** Newsletter welcome email */
+export async function sendNewsletterWelcome(
+  to: string,
+  lang: string = "ar"
+): Promise<boolean> {
+  const cfg = getConfig();
+  const isAr = lang === "ar" || lang === "ur";
+
+  const subject = isAr
+    ? "مرحباً بك في مجتمع أفق 🎉"
+    : "Welcome to OFOQ Community 🎉";
+
+  const heading = isAr ? "تم اشتراكك بنجاح!" : "You're subscribed!";
+
+  const html = baseTemplate({
+    title: subject,
+    preheader: isAr
+      ? "شكراً لاشتراكك — ستصلك آخر أخبار أفق مباشرةً."
+      : "Thanks for subscribing — you'll get the latest from OFOQ directly.",
+    heading,
+    bodyHtml: isAr
+      ? `
+      ${p(`شكراً لاشتراكك في نشرة ${accent("أفق لحلول الأعمال")} البريدية.`)}
+      ${p("سنرسل لك آخر المقالات، التحديثات، والعروض الخاصة مباشرةً إلى بريدك الإلكتروني.")}
+      ${button("زيارة الموقع", cfg.siteUrl)}
+      ${p(`إذا لم تشترك بنفسك، يمكنك تجاهل هذا البريد.`, true)}
+    `
+      : `
+      ${p(`Thank you for subscribing to the ${accent("OFOQ Business Solutions")} newsletter.`)}
+      ${p("We'll send you the latest articles, updates, and special offers directly to your inbox.")}
+      ${button("Visit our website", cfg.siteUrl)}
+      ${p(`If you didn't subscribe, you can safely ignore this email.`, true)}
+    `,
+  });
+
+  return sendMail(to, isAr ? "المشترك" : "Subscriber", subject, html);
+}
+
 /** Notify client when admin replies on support */
 export async function sendSupportReplyNotify(opts: {
   toEmail: string;

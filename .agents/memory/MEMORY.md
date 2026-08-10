@@ -9,3 +9,5 @@
 - [OAuth deployment routing](oauth-deployment-routing.md) — OAuth callbacks must use the deployed API origin, separate from the marketing APP_URL
 - [Employee Apple Wallet passes](apple-wallet-employee.md) — validate server-side signing before debugging iOS Wallet download behavior
 - [Admin transition overlay](admin-transition-overlay.md) — page loader callbacks must not restart timers during auth/data re-renders
+- [i18n nav fix](i18n-nav-fix.md) — all 5 language overrides (ur/hi/id/de/es) must have header.nav[]; ur and id need full about/services/home keys (no ...en spread)
+- [Admin CMS site content](admin-cms-site-content.md) — SiteContentPage + /api/cms/site-content GET+PUT; LangContext deepMerges DB patch over getUiCopy()

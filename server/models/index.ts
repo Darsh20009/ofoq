@@ -19,3 +19,4 @@ export { Pending2FAModel } from "./Pending2FA.js";
 export { ContactRequestModel } from "./ContactRequest.js";
 export { ServiceRequestModel } from "./ServiceRequest.js";
 export { SupportMessageModel } from "./SupportMessage.js";
+export { NewsletterSubscriberModel } from "./NewsletterSubscriber.js";

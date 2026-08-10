@@ -68,6 +68,8 @@ function OfoqDecoration({ className = "" }: { className?: string }) {
 /* ══ المكوّن الرئيسي ═══════════════════════════════════════════ */
 export default function PublicLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterState, setNewsletterState] = useState<"idle" | "loading" | "success" | "already" | "error">("idle");
   const { pathname } = useLocation();
   const { lang, setLang, langs, ui } = useLang();
   const isRtl = lang === "ar" || lang === "ur";
@@ -78,6 +80,33 @@ export default function PublicLayout() {
     setDrawerOpen(false);
     window.scrollTo(0, 0);
   }, [pathname]);
+
+  /* إرسال الاشتراك البريدي */
+  async function handleNewsletterSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newsletterEmail) return;
+    setNewsletterState("loading");
+    try {
+      const res = await fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: newsletterEmail, lang }),
+      });
+      const json = await res.json();
+      if (res.status === 409 || json.alreadySubscribed) {
+        setNewsletterState("already");
+      } else if (!res.ok) {
+        setNewsletterState("error");
+      } else {
+        setNewsletterState("success");
+        setNewsletterEmail("");
+      }
+    } catch {
+      setNewsletterState("error");
+    }
+    // Reset after 5 seconds
+    setTimeout(() => setNewsletterState("idle"), 5000);
+  }
 
   /* منع تمرير الصفحة عند فتح الـ drawer */
   useEffect(() => {
@@ -284,22 +313,49 @@ export default function PublicLayout() {
                     : "Sign up to learn how we elevate business solutions"}
                 </h3>
               </div>
-              <form
-                className="flex items-stretch w-full lg:w-auto min-w-[320px]"
-                onSubmit={(e) => e.preventDefault()}
-              >
-                <input
-                  type="email"
-                  placeholder={isRtl ? "بريدك الإلكتروني" : "Your email address"}
-                  className="flex-1 bg-white/6 border border-white/12 text-white placeholder-white/30 text-sm px-5 py-3.5 rounded-r-full rounded-l-none outline-none focus:border-[#33B27C] transition-colors"
-                />
-                <button
-                  type="submit"
-                  className="bg-[#E5FE04] text-[#2B273F] font-black text-sm px-6 py-3.5 rounded-l-full rounded-r-none hover:bg-white transition-colors whitespace-nowrap"
-                >
-                  {isRtl ? "اشترك" : "JOIN"}
-                </button>
-              </form>
+              <div className="w-full lg:w-auto min-w-[320px]">
+                {newsletterState === "success" ? (
+                  <div className="flex items-center gap-3 bg-[#33B27C]/20 border border-[#33B27C]/40 rounded-full px-5 py-3.5 text-[#33B27C] font-bold text-sm">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-5 h-5 flex-shrink-0">
+                      <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {isRtl ? "تم الاشتراك! تحقق من بريدك." : "Subscribed! Check your inbox."}
+                  </div>
+                ) : newsletterState === "already" ? (
+                  <div className="flex items-center gap-3 bg-amber-400/15 border border-amber-400/30 rounded-full px-5 py-3.5 text-amber-300 font-bold text-sm">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-5 h-5 flex-shrink-0">
+                      <circle cx="12" cy="12" r="10" /><path d="M12 8v4m0 4h.01" strokeLinecap="round" />
+                    </svg>
+                    {isRtl ? "أنت مشترك بالفعل." : "You're already subscribed."}
+                  </div>
+                ) : (
+                  <form
+                    className="flex items-stretch"
+                    onSubmit={handleNewsletterSubmit}
+                    dir="ltr"
+                  >
+                    <input
+                      type="email"
+                      required
+                      value={newsletterEmail}
+                      onChange={(e) => setNewsletterEmail(e.target.value)}
+                      placeholder={isRtl ? "بريدك الإلكتروني" : "Your email address"}
+                      className="flex-1 bg-white/6 border border-white/12 text-white placeholder-white/30 text-sm px-5 py-3.5 rounded-l-full outline-none focus:border-[#33B27C] transition-colors min-w-0"
+                    />
+                    <button
+                      type="submit"
+                      disabled={newsletterState === "loading"}
+                      className="bg-[#E5FE04] text-[#2B273F] font-black text-sm px-6 py-3.5 rounded-r-full hover:bg-white transition-colors whitespace-nowrap disabled:opacity-60 flex-shrink-0"
+                    >
+                      {newsletterState === "loading"
+                        ? "..."
+                        : newsletterState === "error"
+                          ? (isRtl ? "خطأ!" : "Error!")
+                          : (isRtl ? "اشترك" : "JOIN")}
+                    </button>
+                  </form>
+                )}
+              </div>
             </div>
           </div>
         </div>

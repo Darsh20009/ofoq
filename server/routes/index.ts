@@ -14,6 +14,7 @@ import { oauthRouter } from "./oauth.routes.js";
 import { webauthnRouter } from "./webauthn.routes.js";
 import { employeeRouter } from "./employee.routes.js";
 import { clientRouter } from "./client.routes.js";
+import { newsletterRouter } from "./newsletter.routes.js";
 import { isDBConnected } from "../db.js";
 import { requireAuth, requireRole } from "../auth.js";
 
@@ -60,6 +61,9 @@ export function registerRoutes(app: Express): void {
 
   // ── Client Portal & Service Requests ─────────────────────────
   app.use(`${API}/client`, clientRouter);
+
+  // ── Newsletter ────────────────────────────────────────────────
+  app.use(`${API}/newsletter`, newsletterRouter);
 
   // ── Health Check ─────────────────────────────────────────────
   app.get(`${API}/health`, (_req, res) => {
