@@ -44,7 +44,7 @@ export function verifyToken(token: string): { userId: string; role: string; emai
 export function extractToken(req: Request): string | null {
   const auth = req.headers.authorization;
   if (auth?.startsWith("Bearer ")) return auth.slice(7);
-  if (req.query?.token) return String(req.query.token);
+  // NOTE: query-string tokens removed — exposed in URLs/logs/referrers (security risk)
   if ((req as any).session?.token) return (req as any).session.token;
   return null;
 }

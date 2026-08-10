@@ -7,7 +7,7 @@ import {
   hashPassword, verifyPassword, signToken,
   requireAuth, generateOtp, generateSecureToken, logAction
 } from "../auth.js";
-import { loginLimiter, otpLimiter, registerLimiter } from "../middleware/rateLimiter.js";
+import { loginLimiter, otpLimiter, registerLimiter, adminLoginLimiter, twoFALimiter, barcodeLoginLimiter } from "../middleware/rateLimiter.js";
 import { validate, registerSchema, loginSchema } from "../middleware/validate.js";
 import { fireNotify, fireNotifyAdmins } from "../notify.js";
 import { sendOtpEmail, sendPasswordResetEmail, sendEmailVerification, sendWelcomeEmail } from "../email.js";
@@ -167,7 +167,7 @@ authRouter.post("/login", loginLimiter, validate(loginSchema), async (req, res) 
 });
 
 // ── Verify 2FA ───────────────────────────────────────────────────
-authRouter.post("/verify-2fa", async (req, res) => {
+authRouter.post("/verify-2fa", twoFALimiter, async (req, res) => {
   try {
     const { tempToken, method, code } = req.body;
     const pending = await Pending2FAModel.findOne({ tempToken }).select("+emailCode");
@@ -442,7 +442,7 @@ authRouter.post("/totp/disable", requireAuth, async (req, res) => {
 });
 
 // ── Barcode / QR Code Login ───────────────────────────────────────
-authRouter.post("/barcode-login", async (req, res) => {
+authRouter.post("/barcode-login", barcodeLoginLimiter, async (req, res) => {
   try {
     const { code } = req.body;
     if (!code) { res.status(400).json({ error: "يرجى إدخال كود الموظف" }); return; }

@@ -66,7 +66,7 @@ export const usersApi = {
   list: (params?: object) => api.get("/users", { params }),
   get: (id: string) => api.get(`/users/${id}`),
   create: (data: object) => api.post("/users", data),
-  update: (id: string, data: object) => api.put(`/users/${id}`, data),
+  update: (id: string, data: object) => api.patch(`/users/${id}`, data),
   delete: (id: string) => api.delete(`/users/${id}`),
   changePassword: (data: { currentPassword: string; newPassword: string }) =>
     api.post("/users/change-password", data),
@@ -81,7 +81,7 @@ export const crmApi = {
     pipeline: () => api.get("/crm/leads/pipeline"),
     get: (id: string) => api.get(`/crm/leads/${id}`),
     create: (data: object) => api.post("/crm/leads", data),
-    update: (id: string, data: object) => api.put(`/crm/leads/${id}`, data),
+    update: (id: string, data: object) => api.patch(`/crm/leads/${id}`, data),
     delete: (id: string) => api.delete(`/crm/leads/${id}`),
     convert: (id: string) => api.post(`/crm/leads/${id}/convert`),
   },
@@ -89,7 +89,7 @@ export const crmApi = {
     list: (params?: object) => api.get("/crm/customers", { params }),
     get: (id: string) => api.get(`/crm/customers/${id}`),
     create: (data: object) => api.post("/crm/customers", data),
-    update: (id: string, data: object) => api.put(`/crm/customers/${id}`, data),
+    update: (id: string, data: object) => api.patch(`/crm/customers/${id}`, data),
     delete: (id: string) => api.delete(`/crm/customers/${id}`),
   },
 };
@@ -97,17 +97,17 @@ export const crmApi = {
 /* ── Projects ─────────────────────────────── */
 export const projectsApi = {
   list: (params?: object) => api.get("/projects", { params }),
-  stats: () => api.get("/projects/stats"),
+  stats: () => api.get("/projects/stats/overview"),
   get: (id: string) => api.get(`/projects/${id}`),
   create: (data: object) => api.post("/projects", data),
-  update: (id: string, data: object) => api.put(`/projects/${id}`, data),
+  update: (id: string, data: object) => api.patch(`/projects/${id}`, data),
   delete: (id: string) => api.delete(`/projects/${id}`),
   tasks: (projectId: string, params?: object) =>
     api.get(`/projects/${projectId}/tasks`, { params }),
   createTask: (projectId: string, data: object) =>
     api.post(`/projects/${projectId}/tasks`, data),
-  updateTask: (projectId: string, taskId: string, data: object) =>
-    api.put(`/projects/${projectId}/tasks/${taskId}`, data),
+  updateTask: (_projectId: string, taskId: string, data: object) =>
+    api.patch(`/projects/tasks/${taskId}`, data),
 };
 
 /* ── Invoices ─────────────────────────────── */
@@ -115,7 +115,7 @@ export const invoicesApi = {
   list: (params?: object) => api.get("/invoices", { params }),
   get: (id: string) => api.get(`/invoices/${id}`),
   create: (data: object) => api.post("/invoices", data),
-  update: (id: string, data: object) => api.put(`/invoices/${id}`, data),
+  update: (id: string, data: object) => api.patch(`/invoices/${id}`, data),
   delete: (id: string) => api.delete(`/invoices/${id}`),
   send: (id: string) => api.post(`/invoices/${id}/send`),
   markPaid: (id: string, data?: object) => api.post(`/invoices/${id}/mark-paid`, data),
@@ -192,6 +192,6 @@ export const servicesApi = {
   list: (params?: object) => api.get("/services", { params }),
   get: (id: string) => api.get(`/services/${id}`),
   create: (data: object) => api.post("/services", data),
-  update: (id: string, data: object) => api.put(`/services/${id}`, data),
+  update: (id: string, data: object) => api.patch(`/services/${id}`, data),
   delete: (id: string) => api.delete(`/services/${id}`),
 };

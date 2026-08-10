@@ -55,3 +55,30 @@ export const contactLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: "رسائل كثيرة جداً، حاول مجدداً لاحقاً" },
 });
+
+// Admin login limiter — stricter: 10 attempts per 15 min
+export const adminLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "تجاوزت حد محاولات دخول لوحة الإدارة، حاول مجدداً بعد 15 دقيقة" },
+});
+
+// 2FA verify limiter — 15 per 15 min per IP
+export const twoFALimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "تجاوزت حد التحقق الثنائي، حاول مجدداً بعد 15 دقيقة" },
+});
+
+// Barcode/QR login limiter — 20 per 15 min
+export const barcodeLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "تجاوزت حد محاولات دخول الباركود، حاول مجدداً بعد 15 دقيقة" },
+});

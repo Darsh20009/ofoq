@@ -51,6 +51,7 @@ contractsRouter.get("/", requireAuth, async (req, res) => {
 // ── Get Single Contract ───────────────────────────────────────────
 contractsRouter.get("/:id", requireAuth, async (req, res) => {
   try {
+    const me = (req as any).user;
     const contract = await ContractModel.findById(req.params.id)
       .populate("customerId", "name companyName email phone address country city taxNumber")
       .populate("projectId", "name projectNumber")
@@ -59,6 +60,14 @@ contractsRouter.get("/:id", requireAuth, async (req, res) => {
     if (!contract) {
       res.status(404).json({ error: "العقد غير موجود" });
       return;
+    }
+    // Clients can only access their own contracts
+    if (me.role === "client") {
+      const customer = await CustomerModel.findOne({ userId: me._id });
+      if (!customer || String((contract as any).customerId?._id ?? (contract as any).customerId) !== String(customer._id)) {
+        res.status(403).json({ error: "غير مصرح لك بعرض هذا العقد" });
+        return;
+      }
     }
     res.json({ contract });
   } catch {
