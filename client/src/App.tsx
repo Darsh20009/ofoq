@@ -173,28 +173,21 @@ export default function App() {
               Keep them working without leaving the employee subdomain. */}
           <Route path="/admin/*" element={<EmployeeAdminPathRedirect />} />
 
-          {/* بوابة الموظف — نفس تجربة لوحة الإدارة بمسارات النطاق الفرعي */}
+          {/* بوابة الموظف — EmployeeLayout المخصص (أبسط وأكثر استقراراً) */}
           <Route
             path="/"
             element={
               <RequireEmployeeAuth>
-                <AdminLayout basePath="" />
+                <EmployeeLayout />
               </RequireEmployeeAuth>
             }
           >
             <Route index element={<EmployeeDashboardPage />} />
             <Route path="dashboard" element={<EmployeeDashboardPage />} />
-            <Route path="crm/leads" element={<LeadsPage />} />
-            <Route path="crm/customers" element={<CustomersPage />} />
-            <Route path="projects" element={<ProjectsPage />} />
-            <Route path="invoices" element={<InvoicesPage />} />
-            <Route path="users" element={<UsersPage />} />
-            <Route path="cms" element={<CmsPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="contracts" element={<ContractsPage />} />
+            <Route path="card" element={<EmployeeCardPage />} />
             <Route path="employee/card" element={<EmployeeCardPage />} />
             <Route path="employee/dashboard" element={<EmployeeDashboardPage />} />
+            <Route path="profile" element={<ProfilePage />} />
             <Route path="contact" element={<EmployeeContactPage />} />
             <Route path="service-requests" element={<ServiceRequestsPage />} />
             <Route path="service-requests/:id" element={<ServiceRequestDetailPage />} />

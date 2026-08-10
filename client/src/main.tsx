@@ -6,6 +6,7 @@ import { Toaster } from "react-hot-toast";
 import { HelmetProvider } from "react-helmet-async";
 import App from "./App";
 import { LangProvider } from "./i18n/LangContext";
+import ErrorBoundary from "./components/ErrorBoundary";
 import "./styles/globals.css";
 
 const queryClient = new QueryClient({
@@ -122,9 +123,12 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <LangProvider>
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
-            <App />
+            <ErrorBoundary>
+              <App />
+            </ErrorBoundary>
             <Toaster
             position="top-center"
+
             toastOptions={{
               duration: 4000,
               style: {

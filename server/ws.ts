@@ -18,7 +18,7 @@ export function initWebSocket(server: Server): WebSocketServer {
 
     if (token) {
       try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || "ofoq-secret") as any;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "ofoq-dev-only-jwt-secret-CHANGE-BEFORE-PROD") as any;
         userId = decoded.userId || decoded.id;
         if (userId) {
           registerSocket(userId, ws);

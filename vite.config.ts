@@ -18,6 +18,12 @@ export default defineConfig({
     port: 5000,
     host: true,
     allowedHosts: true,
+    hmr: {
+      // Replit proxies all traffic on port 443 (WSS), so the browser-side
+      // HMR client must connect on 443 instead of the raw dev-server port.
+      clientPort: 443,
+      protocol: "wss",
+    },
     proxy: {
       "/api": {
         target: "http://127.0.0.1:3000",
