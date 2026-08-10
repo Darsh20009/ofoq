@@ -2,12 +2,13 @@ import type { Lang } from "./extraLangs";
 
 export type UiCopy = {
   header: { clientLogin: string; menu: string; language: string; nav: string[] };
-  common: { sending: string; send: string };
+  common: { sending: string; send: string; error: string };
   home: {
-    badge: string; hero1: string; hero2: string; heroSub: string; request: string; explore: string;
+    badge: string; hero1: string; hero2: string; hero3: string; metaTitle: string; heroSub: string; request: string; explore: string;
     aboutBadge: string; aboutTitle1: string; aboutTitle2: string; aboutDesc: string; aboutCta: string;
     servicesBadge: string; servicesTitle1: string; servicesTitle2: string; servicesAll: string; more: string;
     whyBadge: string; whyTitle: string; ctaTitle1: string; ctaTitle2: string; ctaDesc: string; contact: string;
+    clientsBadge: string; clientsTitle1: string; clientsTitle2: string; clientsDesc: string;
     stats: string[]; reasons: { title: string; desc: string }[];
     splash: string[];
   };
@@ -18,7 +19,7 @@ export type UiCopy = {
     metaTitle: string; badge: string; heroTitle1: string; heroTitle2: string; heroSub: string;
     storyTitle: string; storyVision: string; storyP1: string; storyP2: string; storyP3: string; storyP4: string;
     valuesTitle: string; valuesSub: string; values: { title: string; desc: string }[];
-    teamTitle: string; ctaTitle: string;
+    teamTitle: string; ctaTitle: string; visionLabel: string;
     storyGrowth: string; visionText: string; missionTitle: string; missionText: string; ctaBadge: string; requestService: string;
   };
   contact: {
@@ -173,12 +174,13 @@ export type UiCopy = {
 
 const en: UiCopy = {
   header: { clientLogin: "Client login", menu: "Menu", language: "Language", nav: ["Home", "About", "Services", "Packages", "Countries", "Blog", "Contact"] },
-  common: { sending: "Sending...", send: "Send message" },
+  common: { sending: "Sending...", send: "Send message", error: "Something went wrong. Please try again." },
   home: {
-    badge: "OFOQ / SAUDI BUSINESS CONCIERGE", hero1: "We handle", hero2: "the details.", heroSub: "Your trusted partner for HR, government services, visas, and company formation in Saudi Arabia.", request: "Request service", explore: "Explore services",
+    badge: "OFOQ / SAUDI BUSINESS CONCIERGE", hero1: "We handle", hero2: "the details.", hero3: "Business Services.", metaTitle: "OFOQ For Business Solutions — Saudi Business Partner", heroSub: "Your trusted partner for HR, government services, visas, and company formation in Saudi Arabia.", request: "Request service", explore: "Explore services",
     aboutBadge: "About OFOQ", aboutTitle1: "Your business partner", aboutTitle2: "in Saudi Arabia", aboutDesc: "We handle government procedures, HR management, and formation requirements — so you can focus entirely on growing your business.", aboutCta: "Learn more",
     servicesBadge: "Our services", servicesTitle1: "Comprehensive", servicesTitle2: "services", servicesAll: "View all services", more: "more services",
     whyBadge: "Why OFOQ?", whyTitle: "We build with you, step by step", ctaTitle1: "Let's boost your", ctaTitle2: "sustainable growth", ctaDesc: "Contact us today and start a real partnership journey.", contact: "Contact us",
+    clientsBadge: "Various industries", clientsTitle1: "Diverse", clientsTitle2: "clients", clientsDesc: "A comprehensive portfolio of services for clients across multiple sectors.",
     splash: ["We handle", "the details,", "so you can", "grow."],
     stats: ["Clients served", "Client satisfaction", "Specialists", "Service categories"],
     reasons: [{ title: "Expert team", desc: "Specialists across every area of our services in the Saudi market." }, { title: "Full follow-up", desc: "We follow your file through to closure with regular updates." }, { title: "Digital experience", desc: "A full client portal to track your requests from anywhere." }, { title: "Local expertise", desc: "Deep knowledge of Saudi regulations and government bodies." }],
@@ -200,7 +202,7 @@ const en: UiCopy = {
       { title: "Service excellence", desc: "We deliver thoughtful, professional results with care for every detail." },
       { title: "Integration", desc: "We connect sector knowledge and specialist expertise around each client's needs." },
     ],
-    teamTitle: "Why OFOQ?", ctaTitle: "Start your journey with OFOQ",
+    teamTitle: "Why OFOQ?", ctaTitle: "Start your journey with OFOQ", visionLabel: "Our Vision",
     storyGrowth: "Driving growth & sustainable development",
     visionText: "A thriving economy elevated by innovative business services.",
     missionTitle: "Mission", missionText: "Empowering businesses to grow with reliable digital services.",
@@ -424,8 +426,8 @@ const en: UiCopy = {
 const ar: UiCopy = {
   ...en,
   header: { clientLogin: "دخول العميل", menu: "القائمة", language: "اللغة", nav: ["الرئيسية", "من نحن", "خدماتنا", "الباقات", "الدول", "المدونة", "تواصل معنا"] },
-  common: { sending: "جاري الإرسال...", send: "إرسال الرسالة" },
-  home: { ...en.home, splash: ["نرتّب", "التفاصيل،", "لتنتفرغ", "للنمو."], badge: "أفق / شريك الأعمال السعودي", hero1: "نرتّب التفاصيل،", hero2: "لتتفرغ للنمو.", heroSub: "شريكك الموثوق في الموارد البشرية، الخدمات الحكومية، التأشيرات وتأسيس الشركات في المملكة.", request: "اطلب خدمة", explore: "استكشف الخدمات", aboutBadge: "عن أفق", aboutTitle1: "شريك عملك في", aboutTitle2: "المملكة العربية السعودية", aboutDesc: "نحمل عنك الإجراءات الحكومية وإدارة الموارد البشرية ومتطلبات التأسيس — حتى تتفرغ تماماً لنمو أعمالك.", aboutCta: "اعرف المزيد", servicesBadge: "خدماتنا", servicesTitle1: "خدمات متكاملة", servicesTitle2: "وشاملة", servicesAll: "عرض جميع الخدمات", more: "خدمات أخرى", whyBadge: "لماذا أفق؟", whyTitle: "نبني معك خطوة بخطوة", ctaTitle1: "لنعزز نموكم", ctaTitle2: "المستدام", ctaDesc: "تواصل معنا اليوم وابدأ رحلة شراكة حقيقية.", contact: "تواصل معنا", stats: ["عميل تخدمهم أفق", "نسبة رضا العملاء", "خبير متخصص", "تصنيفات خدمية"], reasons: [{ title: "فريق متخصص", desc: "مختصون في كل مجال من مجالات خدماتنا في السوق السعودي." }, { title: "متابعة كاملة", desc: "نتابع ملفك حتى الإغلاق مع تحديثات دورية لك." }, { title: "تجربة رقمية", desc: "بوابة عميل متكاملة لمتابعة طلباتك أينما كنت." }, { title: "خبرة محلية", desc: "نفهم الأنظمة والجهات الحكومية السعودية عن قرب." }] },
+  common: { sending: "جاري الإرسال...", send: "إرسال الرسالة", error: "حدث خطأ، حاول مجدداً" },
+  home: { ...en.home, splash: ["نرتّب", "التفاصيل،", "لتنتفرغ", "للنمو."], badge: "أفق / شريك الأعمال السعودي", hero1: "نرتّب التفاصيل،", hero2: "لتتفرغ للنمو.", hero3: "لتنتفرغ للنمو.", metaTitle: "أفق لحلول الأعمال — شريك الأعمال السعودي", heroSub: "شريكك الموثوق في الموارد البشرية، الخدمات الحكومية، التأشيرات وتأسيس الشركات في المملكة.", request: "اطلب خدمة", explore: "استكشف الخدمات", aboutBadge: "عن أفق", aboutTitle1: "شريك عملك في", aboutTitle2: "المملكة العربية السعودية", aboutDesc: "نحمل عنك الإجراءات الحكومية وإدارة الموارد البشرية ومتطلبات التأسيس — حتى تتفرغ تماماً لنمو أعمالك.", aboutCta: "اعرف المزيد", servicesBadge: "خدماتنا", servicesTitle1: "خدمات متكاملة", servicesTitle2: "وشاملة", servicesAll: "عرض جميع الخدمات", more: "خدمات أخرى", whyBadge: "لماذا أفق؟", whyTitle: "نبني معك خطوة بخطوة", ctaTitle1: "لنعزز نموكم", ctaTitle2: "المستدام", ctaDesc: "تواصل معنا اليوم وابدأ رحلة شراكة حقيقية.", contact: "تواصل معنا", clientsBadge: "قطاعات متنوعة", clientsTitle1: "عملاء", clientsTitle2: "متنوعون", clientsDesc: "محفظة متكاملة من الخدمات لعملاء متنوعين عبر قطاعات متعددة.", stats: ["عميل تخدمهم أفق", "نسبة رضا العملاء", "خبير متخصص", "تصنيفات خدمية"], reasons: [{ title: "فريق متخصص", desc: "مختصون في كل مجال من مجالات خدماتنا في السوق السعودي." }, { title: "متابعة كاملة", desc: "نتابع ملفك حتى الإغلاق مع تحديثات دورية لك." }, { title: "تجربة رقمية", desc: "بوابة عميل متكاملة لمتابعة طلباتك أينما كنت." }, { title: "خبرة محلية", desc: "نفهم الأنظمة والجهات الحكومية السعودية عن قرب." }] },
   services: { title: "الخدمات | أفق", badge: "دليل خدمات أفق", hero1: "خدمات مصممة", hero2: "لعملك بالكامل.", heroSub: "من تأسيس الكيان إلى تشغيله يومياً، ننسّق التفاصيل عبر فريق واحد ومسار واضح.", view: "عرض الخدمات", more: "خدمات أخرى", areaBadge: "منطقة خبرتنا", choose: "اختر", yourService: "خدمتك", learnMore: "اعرف أكثر", ctaBadge: "لنصنع أثراً مستداماً", ctaTitle: "تواصل معنا اليوم" },
   category: { home: "الرئيسية", services: "الخدمات", badge: "تصنيف الخدمة", available: "خدمة متاحة", service: "خدمة", grid: "شبكة", list: "قائمة", details: "التفاصيل", need: "هل تحتاج هذه الخدمات؟", needDesc: "تواصل معنا وسنساعدك في تحديد الخدمة المناسبة لاحتياجاتك.", request: "اطلب خدمة" },
   detail: { home: "الرئيسية", services: "الخدمات", badge: "تفاصيل الخدمة", request: "اطلب الخدمة", how: "كيف نعمل", faq: "الأسئلة الشائعة", window: "مدة التنفيذ", suitable: "لمن تناسب؟", requirements: "المتطلبات", related: "خدمات أخرى من نفس التصنيف", details: "التفاصيل" },
@@ -443,7 +445,7 @@ const ar: UiCopy = {
       { title: "تميّز الخدمة", desc: "نقدم نتائج احترافية بعناية واهتمام بكل التفاصيل." },
       { title: "التكامل", desc: "نوحّد معرفة القطاعات وخبرة المتخصصين حول احتياجات كل عميل." },
     ],
-    teamTitle: "لماذا أفق؟", ctaTitle: "ابدأ رحلتك مع أفق",
+    teamTitle: "لماذا أفق؟", ctaTitle: "ابدأ رحلتك مع أفق", visionLabel: "رؤيتنا",
     storyGrowth: "نقود النمو ونحقق التنمية المستدامة",
     visionText: "اقتصاد مزدهر مرفوع بخدمات أعمال مبتكرة.",
     missionTitle: "رسالتنا", missionText: "تمكين الشركات من النمو بخدمات رقمية موثوقة.",
@@ -524,6 +526,8 @@ const overrides: Record<Exclude<Lang, "ar" | "en">, DeepPartial<UiCopy>> = {
       badge: "OFOQ / سعودی کاروباری ساتھی",
       hero1: "ہم سنبھالتے ہیں",
       hero2: "آپ کی تفصیلات۔",
+      hero3: "کاروباری خدمات۔",
+      metaTitle: "OFOQ لحلول الأعمال — سعودی کاروباری ساتھی",
       heroSub: "سعودی عرب میں انسانی وسائل، سرکاری خدمات، ویزوں اور کمپنی بنانے کے لیے آپ کا قابل اعتماد ساتھی۔",
       request: "خدمت کی درخواست",
       explore: "خدمات دیکھیں",
@@ -543,6 +547,10 @@ const overrides: Record<Exclude<Lang, "ar" | "en">, DeepPartial<UiCopy>> = {
       ctaTitle2: "پائیدار ترقی کو بڑھائیں",
       ctaDesc: "آج ہی ہم سے رابطہ کریں اور حقیقی شراکتی سفر شروع کریں۔",
       contact: "ہم سے رابطہ کریں",
+      clientsBadge: "متنوع صنعتیں",
+      clientsTitle1: "متنوع",
+      clientsTitle2: "کلائنٹس",
+      clientsDesc: "متعدد شعبوں میں کلائنٹس کے لیے جامع خدمات کا پورٹ فولیو۔",
       stats: ["خدمات یافتہ کلائنٹس", "کلائنٹ اطمینان", "ماہرین", "خدماتی اقسام"],
       reasons: [
         { title: "ماہر ٹیم", desc: "سعودی مارکیٹ میں ہماری ہر سروس کے ہر شعبے کے ماہرین۔" },
@@ -552,7 +560,7 @@ const overrides: Record<Exclude<Lang, "ar" | "en">, DeepPartial<UiCopy>> = {
       ],
       splash: ["ہم ترتیب دیتے ہیں", "تفاصیل،", "تاکہ آپ", "ترقی کریں۔"],
     },
-    about: { ...en.about, storyGrowth: "ترقی اور پائیدار نمو", visionText: "جدید کاروباری خدمات سے بہتر معیشت۔", missionTitle: "مشن", missionText: "قابل اعتماد ڈیجیٹل خدمات کے ساتھ کاروباروں کو بڑھنے میں مدد۔", ctaBadge: "آئیے مل کر اثر پیدا کریں", requestService: "خدمت کی درخواست" },
+    about: { ...en.about, storyGrowth: "ترقی اور پائیدار نمو", visionLabel: "ہماری رویا", visionText: "جدید کاروباری خدمات سے بہتر معیشت۔", missionTitle: "مشن", missionText: "قابل اعتماد ڈیجیٹل خدمات کے ساتھ کاروباروں کو بڑھنے میں مدد۔", ctaBadge: "آئیے مل کر اثر پیدا کریں", requestService: "خدمت کی درخواست" },
     services: { title: "خدمات | OFOQ", badge: "OFOQ کی خدماتی فہرست", hero1: "خدمات جو", hero2: "آپ کے کاروبار کے لیے ہیں۔", heroSub: "تاسیس سے روزمرہ آپریشنز تک، ہم ایک ٹیم اور واضح راستے کے ساتھ تمام تفصیلات سنبھالتے ہیں۔", view: "خدمات دیکھیں", more: "مزید", areaBadge: "ہمارے ماہرانہ شعبے", choose: "منتخب کریں", yourService: "اپنی خدمت", learnMore: "مزید جانیں", ctaBadge: "آئیے مل کر اثر پیدا کریں", ctaTitle: "آج ہی رابطہ کریں" },
     category: { home: "ہوم", services: "خدمات", badge: "سروس کی قسم", available: "دستیاب خدمات", service: "خدمات", grid: "گرڈ", list: "فہرست", details: "تفصیلات", need: "کیا آپ کو ان خدمات کی ضرورت ہے؟", needDesc: "ہم سے رابطہ کریں اور ہم آپ کی ضرورت کے مطابق درست سروس منتخب کرنے میں مدد کریں گے۔", request: "خدمت کی درخواست" },
     detail: { home: "ہوم", services: "خدمات", badge: "سروس کی تفصیلات", request: "خدمت کی درخواست", how: "ہم کیسے کام کرتے ہیں", faq: "اکثر پوچھے گئے سوالات", window: "سروس مدت", suitable: "یہ کس کے لیے ہے؟", requirements: "ضروریات", related: "اس زمرے کی دیگر خدمات", details: "تفصیلات" },
@@ -729,6 +737,8 @@ const overrides: Record<Exclude<Lang, "ar" | "en">, DeepPartial<UiCopy>> = {
       badge: "OFOQ / Mitra bisnis Saudi",
       hero1: "Kami menangani",
       hero2: "detail bisnis Anda.",
+      hero3: "Layanan bisnis.",
+      metaTitle: "OFOQ For Business Solutions — Mitra bisnis Saudi",
       heroSub: "Mitra tepercaya untuk HR, layanan pemerintah, visa, dan pendirian perusahaan di Arab Saudi.",
       request: "Ajukan layanan",
       explore: "Jelajahi layanan",
@@ -748,6 +758,10 @@ const overrides: Record<Exclude<Lang, "ar" | "en">, DeepPartial<UiCopy>> = {
       ctaTitle2: "pertumbuhan berkelanjutan Anda",
       ctaDesc: "Hubungi kami hari ini dan mulai perjalanan kemitraan yang nyata.",
       contact: "Hubungi kami",
+      clientsBadge: "Berbagai industri",
+      clientsTitle1: "Klien",
+      clientsTitle2: "beragam",
+      clientsDesc: "Portofolio layanan komprehensif untuk klien di berbagai sektor.",
       stats: ["Klien terlayani", "Kepuasan klien", "Spesialis ahli", "Kategori layanan"],
       reasons: [
         { title: "Tim ahli", desc: "Spesialis di setiap area layanan kami di pasar Saudi." },
@@ -757,7 +771,7 @@ const overrides: Record<Exclude<Lang, "ar" | "en">, DeepPartial<UiCopy>> = {
       ],
       splash: ["Atur", "detailnya,", "agar Anda", "berkembang."],
     },
-    about: { ...en.about, storyGrowth: "Mendorong pertumbuhan & pembangunan berkelanjutan", visionText: "Perekonomian yang maju dengan layanan bisnis inovatif.", missionTitle: "Misi", missionText: "Memberdayakan bisnis untuk tumbuh dengan layanan digital yang andal.", ctaBadge: "Mari ciptakan dampak bersama", requestService: "Ajukan layanan" },
+    about: { ...en.about, storyGrowth: "Mendorong pertumbuhan & pembangunan berkelanjutan", visionLabel: "Visi kami", visionText: "Perekonomian yang maju dengan layanan bisnis inovatif.", missionTitle: "Misi", missionText: "Memberdayakan bisnis untuk tumbuh dengan layanan digital yang andal.", ctaBadge: "Mari ciptakan dampak bersama", requestService: "Ajukan layanan" },
     services: { title: "Layanan | OFOQ", badge: "Katalog layanan OFOQ", hero1: "Layanan yang", hero2: "dibuat untuk bisnis Anda.", heroSub: "Dari pembentukan entitas hingga operasi harian, kami mengoordinasikan detail melalui satu tim dan jalur yang jelas.", view: "Lihat layanan", more: "lainnya", areaBadge: "Bidang keahlian kami", choose: "Pilih", yourService: "layanan Anda", learnMore: "Pelajari lebih lanjut", ctaBadge: "Mari ciptakan dampak berkelanjutan", ctaTitle: "Hubungi kami hari ini" },
     category: { home: "Beranda", services: "Layanan", badge: "Kategori layanan", available: "layanan tersedia", service: "layanan", grid: "Tampilan kotak", list: "Daftar", details: "Detail", need: "Butuh layanan ini?", needDesc: "Hubungi kami dan kami akan membantu Anda menemukan layanan yang tepat untuk kebutuhan Anda.", request: "Ajukan layanan" },
     detail: { home: "Beranda", services: "Layanan", badge: "Detail layanan", request: "Ajukan layanan", how: "Cara kerja kami", faq: "Pertanyaan yang sering diajukan", window: "Waktu layanan", suitable: "Untuk siapa ini?", requirements: "Persyaratan", related: "Layanan lain dalam kategori ini", details: "Detail" },

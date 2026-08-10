@@ -119,7 +119,7 @@ export default function HomePage() {
   return (
     <>
       <Helmet>
-        <title>{isRtl ? "أفق لحلول الأعمال — شريك الأعمال السعودي" : "OFOQ For Business Solutions"}</title>
+        <title>{ui.home.metaTitle}</title>
         <meta name="description" content={ui.home.heroSub} />
         <link rel="canonical" href="https://ofoqhc.com/" />
       </Helmet>
@@ -174,7 +174,7 @@ export default function HomePage() {
                 <span className="block text-white/50 font-light">{ui.home.hero1}</span>
                 <span className="block text-white">{ui.home.hero2}</span>
                 <span className="block text-[#33B27C]">
-                  {isRtl ? "لتنتفرغ للنمو." : "Business Services."}
+                  {ui.home.hero3}
                 </span>
               </motion.h1>
 
@@ -279,7 +279,7 @@ export default function HomePage() {
             <div className="grid md:grid-cols-2 gap-px bg-white/8">
               {[
                 {
-                  label: isRtl ? "رؤيتنا" : "Our Vision",
+                  label: ui.about.visionLabel,
                   text: ui.about.visionText,
                 },
                 {
@@ -311,20 +311,14 @@ export default function HomePage() {
             <div className="flex flex-wrap items-end gap-6 mb-0">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-3">
-                  {isRtl ? "قطاعات متنوعة" : "Various industries"}
+                  {ui.home.clientsBadge}
                 </p>
                 <h2 className="text-3xl sm:text-4xl font-black text-gray-900">
-                  {isRtl ? (
-                    <>عملاء <span className="text-[#33B27C]">متنوعون</span></>
-                  ) : (
-                    <>Diverse <span className="text-[#33B27C]">clients</span></>
-                  )}
+                  {ui.home.clientsTitle1} <span className="text-[#33B27C]">{ui.home.clientsTitle2}</span>
                 </h2>
               </div>
               <p className="text-gray-400 text-sm max-w-sm pb-1">
-                {isRtl
-                  ? "محفظة متكاملة من الخدمات لعملاء متنوعين عبر قطاعات متعددة."
-                  : "A comprehensive portfolio of services for clients across multiple sectors."}
+                {ui.home.clientsDesc}
               </p>
             </div>
           </div>
@@ -504,7 +498,7 @@ export default function HomePage() {
                   to="/about"
                   className="inline-flex items-center gap-3 border border-white/40 text-white font-bold text-sm px-8 py-4 rounded-full hover:border-white hover:bg-white/10 transition-all duration-300"
                 >
-                  {ui.about.badge ?? (isRtl ? "من نحن" : "About us")}
+                  {ui.about.badge}
                 </Link>
               </motion.div>
             </motion.div>

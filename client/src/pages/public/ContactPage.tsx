@@ -55,9 +55,9 @@ export default function ContactPage() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 pb-16 w-full">
           <div className="flex items-center gap-2 text-white/30 text-xs mb-8">
-            <Link to="/" className="hover:text-white transition-colors">{isRtl ? "الرئيسية" : "Home"}</Link>
+            <Link to="/" className="hover:text-white transition-colors">{ui.category.home}</Link>
             <span>/</span>
-            <span className="text-white/60">{isRtl ? "تواصل" : "Contact"}</span>
+            <span className="text-white/60">{C.badge}</span>
           </div>
           <motion.p
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}
@@ -245,7 +245,7 @@ export default function ContactPage() {
                   )}
                 </button>
                 {status === "error" && (
-                  <p className="mt-3 text-red-400 text-xs text-center">{isRtl ? "حدث خطأ، حاول مجدداً" : "Something went wrong. Please try again."}</p>
+                  <p className="mt-3 text-red-400 text-xs text-center">{ui.common.error}</p>
                 )}
               </motion.div>
             </motion.form>
