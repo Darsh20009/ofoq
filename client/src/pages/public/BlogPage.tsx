@@ -38,12 +38,6 @@ export default function BlogPage() {
           backgroundPosition: "center",
         }}
       >
-        <div className="absolute left-4 bottom-4 opacity-18 pointer-events-none">
-          <WireframeCube className="w-56 h-40 text-ofoq-green" color="#33B27C" />
-        </div>
-        <div className="absolute right-8 top-12 opacity-12 pointer-events-none">
-          <WireframeCube className="w-36 h-26 text-ofoq-yellow" color="#E5FE04" />
-        </div>
         <div className="max-w-5xl mx-auto px-5 sm:px-8 pb-14 relative z-10 w-full">
           <div className="flex items-center gap-2 text-white/45 text-xs mb-4">
             <Link to="/" className="hover:text-white transition-colors">{ui.category.home}</Link>
