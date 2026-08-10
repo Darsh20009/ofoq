@@ -4,7 +4,6 @@ import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { cmsApi } from "../../api/client";
 import type { BlogPost } from "../../types";
-import WireframeCube from "../../components/WireframeCube";
 import { useLang } from "../../i18n/LangContext";
 
 const fadeUp = {
@@ -22,7 +21,7 @@ export default function BlogPage() {
   const posts: BlogPost[] = data?.data?.posts ?? [];
 
   return (
-    <div dir={dir}>
+    <div dir={dir} className="bg-[#2B273F] text-white min-h-screen">
       <Helmet>
         <title>{ui.blog.metaTitle}</title>
         <meta name="description" content={ui.blog.metaDescription} />
@@ -71,38 +70,40 @@ export default function BlogPage() {
       </section>
 
       {/* ══ آخر الأخبار ═══════════════════════════════════════ */}
-      <section className="py-16 sm:py-20 bg-gray-50">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8">
-          <div className="mb-10">
-            <p className="text-ofoq-green text-sm font-bold mb-1">{ui.blog.sectionEyebrow}</p>
-            <h2 className="text-3xl font-black text-ofoq-navy">
-              {ui.blog.sectionTitle} <span className="text-ofoq-green">{ui.blog.sectionHighlight}</span>
+      <section className="py-16 sm:py-20 border-t border-white/8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10">
+          <div className="mb-12">
+            <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-4">{ui.blog.sectionEyebrow}</p>
+            <h2 className="text-4xl font-black">
+              {ui.blog.sectionTitle} <span className="text-[#33B27C]">{ui.blog.sectionHighlight}</span>
             </h2>
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white rounded-3xl overflow-hidden">
-                  <div className="h-44 bg-ofoq-navy/5 animate-pulse" />
+                <div key={i} className="bg-white/[0.04] border border-white/8 rounded-2xl overflow-hidden">
+                  <div className="h-44 bg-white/5 animate-pulse" />
                   <div className="p-5 space-y-3">
-                    <div className="h-3 bg-gray-100 rounded animate-pulse w-1/3" />
-                    <div className="h-4 bg-gray-100 rounded animate-pulse" />
-                    <div className="h-3 bg-gray-100 rounded animate-pulse w-2/3" />
+                    <div className="h-3 bg-white/5 rounded animate-pulse w-1/3" />
+                    <div className="h-4 bg-white/5 rounded animate-pulse" />
+                    <div className="h-3 bg-white/5 rounded animate-pulse w-2/3" />
                   </div>
                 </div>
               ))}
             </div>
           ) : posts.length === 0 ? (
             <div className="text-center py-24">
-              <div className="inline-block mb-6 opacity-20">
-                <WireframeCube className="w-32 h-24 text-ofoq-navy" color="#2B273F" />
+              <div className="w-16 h-16 rounded-2xl border border-white/10 flex items-center justify-center mx-auto mb-6">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-7 h-7 text-white/30">
+                  <path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l6 6v10a2 2 0 0 1-2 2z" /><polyline points="14 2 14 8 20 8" />
+                </svg>
               </div>
-              <h3 className="text-xl font-bold text-ofoq-navy mb-2">{ui.blog.empty}</h3>
-              <p className="text-gray-400 text-sm">{ui.blog.emptySub}</p>
+              <h3 className="text-xl font-bold text-white mb-2">{ui.blog.empty}</h3>
+              <p className="text-white/40 text-sm">{ui.blog.emptySub}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {posts.map((post, i) => (
                 <motion.article
                   key={post._id}
@@ -111,49 +112,39 @@ export default function BlogPage() {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
-                  className="bg-white rounded-3xl overflow-hidden hover:shadow-xl transition-all group"
+                  className="bg-white/[0.03] border border-white/8 rounded-2xl overflow-hidden hover:border-[#33B27C]/40 transition-all group"
                 >
-                  {/* صورة الغلاف */}
-                  <div className="relative h-52 bg-gradient-to-br from-ofoq-navy to-ofoq-navy-light overflow-hidden">
+                  <div className="relative h-48 bg-[#1a1726] overflow-hidden">
                     {post.coverImage ? (
                       <img
                         src={`/uploads/${post.coverImage}`}
                         alt={post.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center opacity-20">
-                        <WireframeCube className="w-32 h-24 text-ofoq-green" color="#33B27C" />
+                      <div className="w-full h-full flex items-center justify-center">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="w-12 h-12 text-white/10">
+                          <path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10l6 6v10a2 2 0 0 1-2 2z" />
+                        </svg>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-ofoq-navy/60 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1a1726] to-transparent" />
                   </div>
-
-                  {/* المحتوى */}
                   <div className="p-6">
-                    <p className="text-ofoq-green text-xs font-bold mb-2">
-                      {new Date(post.publishedAt ?? post.createdAt).toLocaleDateString(lang === "ar" ? "ar-SA" : lang === "ur" ? "ur-PK" : lang, {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+                    <p className="text-[#33B27C] text-xs font-bold mb-3">
+                      {new Date(post.publishedAt ?? post.createdAt).toLocaleDateString(lang === "ar" ? "ar-SA" : lang, { year: "numeric", month: "long", day: "numeric" })}
                     </p>
-                    <h3 className="font-black text-ofoq-navy text-base leading-tight mb-3 line-clamp-2 group-hover:text-ofoq-green transition-colors">
+                    <h3 className="font-black text-white text-base leading-tight mb-3 line-clamp-2 group-hover:text-[#33B27C] transition-colors">
                       {post.title}
                     </h3>
                     {post.excerpt && (
-                      <p className="text-gray-400 text-sm leading-relaxed line-clamp-2 mb-4">
-                        {post.excerpt}
-                      </p>
+                      <p className="text-white/35 text-sm leading-relaxed line-clamp-2 mb-4">{post.excerpt}</p>
                     )}
-                    <Link
-                      to="/blog"
-                      className="flex items-center gap-1.5 text-sm font-bold text-ofoq-green hover:gap-3 transition-all"
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <path d="m15 18-6-6 6-6" />
+                    <Link to="/blog" className="flex items-center gap-2 text-xs font-bold text-white/40 hover:text-[#33B27C] transition-colors">
+                      {ui.blog.read}
+                      <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5">
+                        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                       {ui.blog.read}
                     </Link>
                   </div>
                 </motion.article>

@@ -1,7 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet-async";
-import WireframeCube from "../../components/WireframeCube";
 import { getCategory, getService, pick } from "../../data/servicesCatalog";
 import { useLang } from "../../i18n/LangContext";
 import { useState } from "react";
@@ -63,7 +62,7 @@ export default function ServiceDetailPage() {
   };
 
   return (
-    <div className="bg-white text-[#2B273F]">
+    <div className="bg-[#2B273F] text-white">
       <Helmet>
         <title>{pick(service.title, lang)} | OFOQ</title>
       </Helmet>
@@ -79,9 +78,6 @@ export default function ServiceDetailPage() {
           className="absolute inset-0 h-full w-full object-cover opacity-15"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#2B273F]/95 via-[#2B273F]/85 to-[#2B273F]" />
-
-        {/* Wireframe */}
-        <WireframeCube color="#33B27C" className="absolute -left-12 bottom-0 h-72 w-96 opacity-25" />
 
         <div className="relative mx-auto max-w-5xl">
           {/* Breadcrumb */}
@@ -158,7 +154,7 @@ export default function ServiceDetailPage() {
 
             {/* Steps */}
             <section>
-              <h2 className="mb-8 text-3xl font-black">{T.howWeWork}</h2>
+              <h2 className="mb-8 text-3xl font-black text-white">{T.howWeWork}</h2>
               <div className="space-y-3">
                 {service.steps.map((step, i) => (
                   <motion.div
@@ -167,12 +163,12 @@ export default function ServiceDetailPage() {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.08, duration: 0.55, ease }}
-                    className="flex items-start gap-4 rounded-2xl bg-[#f4f2ed] p-5 transition-colors hover:bg-[#33B27C]/10"
+                    className="flex items-start gap-4 rounded-2xl bg-white/[0.04] border border-white/8 p-5 transition-colors hover:border-[#33B27C]/30"
                   >
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#33B27C] font-black text-white">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#33B27C] font-black text-white text-sm">
                       {i + 1}
                     </span>
-                    <p className="pt-1 text-sm leading-7 font-bold">{pick(step, lang)}</p>
+                    <p className="pt-1 text-sm leading-7 font-bold text-white/70">{pick(step, lang)}</p>
                   </motion.div>
                 ))}
               </div>
@@ -180,15 +176,15 @@ export default function ServiceDetailPage() {
 
             {/* FAQ */}
             <section>
-              <h2 className="mb-8 text-3xl font-black">{T.faqTitle}</h2>
-              <div className="space-y-1">
+              <h2 className="mb-8 text-3xl font-black text-white">{T.faqTitle}</h2>
+              <div className="space-y-2">
                 {service.faq.map((item, i) => (
-                  <div key={i} className="overflow-hidden rounded-2xl border border-[#2B273F]/10">
+                  <div key={i} className="overflow-hidden rounded-2xl border border-white/8">
                     <button
                       onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                      className="flex w-full items-center justify-between gap-4 bg-white px-6 py-5 text-start font-black transition-colors hover:bg-[#f4f2ed]"
+                      className="flex w-full items-center justify-between gap-4 bg-white/[0.03] px-6 py-5 text-start font-black transition-colors hover:bg-white/[0.06]"
                     >
-                      <span className="text-sm">{pick(item.q, lang)}</span>
+                      <span className="text-sm text-white/80">{pick(item.q, lang)}</span>
                       <motion.span
                         animate={{ rotate: openFaq === i ? 45 : 0 }}
                         transition={{ duration: 0.2 }}
@@ -205,7 +201,7 @@ export default function ServiceDetailPage() {
                           exit={{ height: 0, opacity: 0 }}
                           transition={{ duration: 0.3, ease }}
                         >
-                          <p className="bg-[#f4f2ed] px-6 pb-5 pt-3 text-sm leading-7 text-[#2B273F]/65">
+                          <p className="bg-white/[0.02] px-6 pb-5 pt-3 text-sm leading-7 text-white/50">
                             {pick(item.a, lang)}
                           </p>
                         </motion.div>
@@ -218,20 +214,19 @@ export default function ServiceDetailPage() {
           </div>
 
           {/* ── Right: sidebar ────────────────────────── */}
-          <aside className="space-y-5">
+          <aside className="space-y-4">
             {/* Duration card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, ease }}
-              className="relative overflow-hidden rounded-[2rem] bg-[#2B273F] p-8 text-white"
+              className="relative overflow-hidden rounded-2xl bg-[#1a1726] border border-white/8 p-8"
             >
-              <WireframeCube color="#33B27C" className="absolute -bottom-8 -right-8 h-36 w-44 opacity-20" />
-              <p className="text-[11px] font-black uppercase tracking-[.2em] text-[#E5FE04]">
+              <p className="text-[11px] font-black uppercase tracking-[.2em] text-[#E5FE04] mb-5">
                 {T.windowTitle}
               </p>
-              <p className="mt-5 text-4xl font-black leading-tight">
+              <p className="text-3xl font-black leading-tight text-white">
                 {pick(service.duration, lang)}
               </p>
             </motion.div>
@@ -242,26 +237,24 @@ export default function ServiceDetailPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.1, ease }}
-              className="rounded-[2rem] border border-[#2B273F]/10 bg-white p-8"
+              className="rounded-2xl border border-white/8 bg-white/[0.04] p-7"
             >
-              <h3 className="mb-5 text-lg font-black">{T.suitableFor}</h3>
+              <h3 className="mb-5 text-base font-black text-white">{T.suitableFor}</h3>
               <ul className="space-y-3">
                 {service.beneficiaries.map((x, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm">
-                    <span className="mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#33B27C]/15">
-                      <span className="h-2 w-2 rounded-full bg-[#33B27C]" />
-                    </span>
+                  <li key={i} className="flex items-start gap-3 text-sm text-white/60">
+                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#33B27C] flex-shrink-0" />
                     {pick(x, lang)}
                   </li>
                 ))}
               </ul>
 
-              <h3 className="mb-5 mt-9 text-lg font-black">{T.requirements}</h3>
+              <h3 className="mb-5 mt-8 text-base font-black text-white">{T.requirements}</h3>
               <ul className="space-y-3">
                 {service.requirements.map((x, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm">
-                    <span className="mt-1 text-[#33B27C]">•</span>
-                    <span className="text-[#2B273F]/70">{pick(x, lang)}</span>
+                  <li key={i} className="flex items-start gap-3 text-sm text-white/50">
+                    <span className="mt-1 text-[#33B27C] flex-shrink-0">•</span>
+                    {pick(x, lang)}
                   </li>
                 ))}
               </ul>
@@ -270,7 +263,7 @@ export default function ServiceDetailPage() {
             {/* Request CTA */}
             <Link
               to={`/client/requests/new?service=${requestTypeByCategory[category.slug] || ""}`}
-              className="group flex items-center justify-between rounded-[2rem] bg-[#33B27C] p-6 text-white transition-all hover:bg-[#2B273F]"
+              className="group flex items-center justify-between rounded-2xl bg-[#33B27C] p-6 text-white transition-all hover:bg-[#2a9668]"
             >
               <span className="font-black">{T.requestService}</span>
               <span className="grid h-10 w-10 place-items-center rounded-full bg-white/20 transition-colors group-hover:bg-white/30">
@@ -282,8 +275,8 @@ export default function ServiceDetailPage() {
 
         {/* ── Related services ──────────────────────── */}
         {category.services.filter((s) => s.slug !== service.slug).length > 0 && (
-          <section className="mt-20">
-            <h2 className="mb-8 text-2xl font-black">{T.relatedServices}</h2>
+          <section className="mt-20 pt-12 border-t border-white/8">
+            <h2 className="mb-8 text-2xl font-black text-white">{T.relatedServices}</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {category.services
                 .filter((s) => s.slug !== service.slug)
@@ -298,10 +291,10 @@ export default function ServiceDetailPage() {
                   >
                     <Link
                       to={`/services/${category.slug}/${s.slug}`}
-                      className="group flex flex-col rounded-2xl border border-[#2B273F]/10 bg-white p-6 transition-all hover:border-[#33B27C] hover:shadow-lg"
+                      className="group flex flex-col rounded-2xl border border-white/8 bg-white/[0.03] p-6 transition-all hover:border-[#33B27C]/40"
                     >
-                      <h3 className="font-black">{pick(s.title, lang)}</h3>
-                      <p className="mt-2 text-xs leading-6 text-[#2B273F]/45">
+                      <h3 className="font-black text-white group-hover:text-[#33B27C] transition-colors">{pick(s.title, lang)}</h3>
+                      <p className="mt-2 text-xs leading-6 text-white/35">
                         {pick(s.desc, lang).split(".")[0]}.
                       </p>
                       <span className="mt-4 text-xs font-black text-[#33B27C]">

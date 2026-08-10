@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import WireframeCube from "../../components/WireframeCube";
 import { useLang } from "../../i18n/LangContext";
 
 const fadeUp = {
@@ -15,7 +14,7 @@ export default function CountriesPage() {
   const { ui, dir } = useLang();
   const countries = ui.countries.items.map((country, i) => ({ ...country, flag: FLAGS[i] }));
   return (
-    <div dir={dir}>
+    <div dir={dir} className="bg-[#2B273F] text-white min-h-screen">
       <Helmet>
         <title>{ui.countries.metaTitle}</title>
         <meta name="description" content={ui.countries.metaDescription} />
@@ -32,9 +31,7 @@ export default function CountriesPage() {
           backgroundPosition: "center",
         }}
       >
-        <div className="absolute left-4 bottom-4 opacity-15 pointer-events-none">
-          <WireframeCube className="w-64 h-44 text-ofoq-green" color="#33B27C" />
-        </div>
+        <div />
         <div className="max-w-5xl mx-auto px-5 sm:px-8 pb-14 relative z-10 w-full">
           <div className="flex items-center gap-2 text-white/45 text-xs mb-4">
             <Link to="/" className="hover:text-white transition-colors">{ui.category.home}</Link>
@@ -62,17 +59,15 @@ export default function CountriesPage() {
       </section>
 
       {/* ══ الدول ═══════════════════════════════════════════ */}
-      <section className="py-16 sm:py-20 bg-gray-50">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8">
-
-          <div className="mb-10">
-            <p className="text-ofoq-green font-bold text-sm mb-2">{ui.countries.sectionEyebrow}</p>
-            <h2 className="text-3xl font-black text-ofoq-navy">
+      <section className="py-16 sm:py-20 border-t border-white/8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10">
+          <div className="mb-12">
+            <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-4">{ui.countries.sectionEyebrow}</p>
+            <h2 className="text-4xl font-black">
               {ui.countries.sectionTitle}{" "}
-              <span className="text-ofoq-green">{ui.countries.sectionHighlight}</span>
+              <span className="text-[#33B27C]">{ui.countries.sectionHighlight}</span>
             </h2>
           </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {countries.map((c, i) => (
               <motion.div
@@ -82,21 +77,18 @@ export default function CountriesPage() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
-                className="bg-white rounded-3xl p-6 hover:shadow-lg transition-all group border border-gray-50 hover:border-ofoq-green/20"
+                className="bg-white/[0.03] border border-white/8 rounded-2xl p-7 hover:border-[#33B27C]/40 transition-all group"
               >
-                <div className="flex items-center gap-4 mb-4">
-                  <span className="text-4xl group-hover:scale-110 transition-transform">{c.flag}</span>
-                  <h3 className="font-black text-ofoq-navy text-lg">{c.name}</h3>
+                <div className="flex items-center gap-4 mb-5">
+                  <span className="text-3xl group-hover:scale-110 transition-transform">{c.flag}</span>
+                  <h3 className="font-black text-white text-lg">{c.name}</h3>
                 </div>
-                <p className="text-gray-500 text-sm leading-relaxed mb-4">{c.desc}</p>
-                <Link
-                  to="/client/register"
-                  className="flex items-center gap-1.5 text-xs font-bold text-ofoq-green hover:gap-2.5 transition-all"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="m15 18-6-6 6-6" />
-                  </svg>
+                <p className="text-white/40 text-sm leading-relaxed mb-5">{c.desc}</p>
+                <Link to="/client/register" className="flex items-center gap-2 text-xs font-bold text-[#33B27C] hover:text-white transition-colors">
                   {ui.countries.request}
+                  <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5">
+                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 </Link>
               </motion.div>
             ))}
@@ -105,34 +97,23 @@ export default function CountriesPage() {
       </section>
 
       {/* ══ قسم العملية ══════════════════════════════════════ */}
-      <section
-        className="relative overflow-hidden py-20"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(43,39,63,0.90), rgba(43,39,63,0.90)), url('/images/ofoq-brand-photo2.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="absolute left-4 bottom-4 opacity-15 pointer-events-none">
-          <WireframeCube className="w-64 h-44 text-ofoq-green" color="#33B27C" />
-        </div>
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 relative z-10">
-          <div className="text-center mb-12">
-            <p className="text-ofoq-green font-bold text-sm mb-2">{ui.countries.processEyebrow}</p>
-            <h2 className="text-3xl font-black text-white">
+      <section className="py-20 border-t border-white/8 bg-[#1a1726]">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10">
+          <div className="text-center mb-14">
+            <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-4">{ui.countries.processEyebrow}</p>
+            <h2 className="text-4xl font-black">
               {ui.countries.processTitle}{" "}
-              <span className="text-ofoq-yellow">{ui.countries.processHighlight}</span>
+              <span className="text-[#E5FE04]">{ui.countries.processHighlight}</span>
             </h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {ui.countries.steps.map((step, i) => (
-              <div key={i} className="bg-white/8 border border-white/15 rounded-3xl p-6 text-center hover:bg-white/12 transition-colors">
-                <span className="w-12 h-12 rounded-full border-2 border-ofoq-green/40 flex items-center justify-center text-ofoq-green font-black text-lg mx-auto mb-4">
+              <div key={i} className="bg-white/[0.04] border border-white/8 rounded-2xl p-7 text-center">
+                <span className="w-12 h-12 rounded-full border border-[#33B27C]/40 flex items-center justify-center text-[#33B27C] font-black text-lg mx-auto mb-5">
                   {i + 1}
                 </span>
-                <h4 className="font-black text-white text-sm mb-2">{step.title}</h4>
-                <p className="text-white/50 text-xs leading-relaxed">{step.desc}</p>
+                <h4 className="font-black text-white text-sm mb-3">{step.title}</h4>
+                <p className="text-white/40 text-xs leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -140,23 +121,23 @@ export default function CountriesPage() {
       </section>
 
       {/* ══ CTA ════════════════════════════════════════════════ */}
-      <section className="py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 text-center">
-          <p className="text-ofoq-green font-bold text-sm mb-2">{ui.countries.ctaEyebrow}</p>
-          <h2 className="text-3xl font-black text-ofoq-navy mb-6">
-            {ui.countries.ctaTitle}{" "}
-            <span className="text-ofoq-green">{ui.countries.ctaHighlight}</span>
-          </h2>
+      <section className="border-t border-white/8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 py-20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-3">{ui.countries.ctaEyebrow}</p>
+            <h2 className="text-3xl sm:text-4xl font-black">
+              {ui.countries.ctaTitle}{" "}
+              <span className="text-[#33B27C]">{ui.countries.ctaHighlight}</span>
+            </h2>
+          </div>
           <Link
             to="/client/register"
-            className="inline-flex items-center gap-3 bg-ofoq-navy text-white font-bold text-sm px-4 py-3 rounded-full hover:bg-ofoq-navy-light transition-all"
+            className="flex-shrink-0 inline-flex items-center gap-3 bg-[#E5FE04] text-[#2B273F] font-black text-sm px-8 py-4 rounded-full hover:bg-white transition-all duration-300"
           >
-            <span className="w-9 h-9 rounded-full bg-ofoq-green flex items-center justify-center flex-shrink-0">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-                <path d="m15 18-6-6 6-6" />
-              </svg>
-            </span>
-            <span className="pl-2">{ui.countries.ctaButton}</span>
+            {ui.countries.ctaButton}
+            <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </Link>
         </div>
       </section>

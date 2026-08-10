@@ -1,136 +1,151 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
-import WireframeCube from "../../components/WireframeCube";
 import { servicesCatalog, pick } from "../../data/servicesCatalog";
 import { useLang } from "../../i18n/LangContext";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-function ArrowIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 export default function ServicesPage() {
-  const { lang, ui } = useLang();
-
-  const T = {
-    pageTitle: ui.services.title, heroBadge: ui.services.badge, heroTitle1: ui.services.hero1,
-    heroTitle2: ui.services.hero2, heroSub: ui.services.heroSub, viewServices: ui.services.view,
-    moreLabel: ui.services.more,
-  };
+  const { lang } = useLang();
+  const isRtl = lang === "ar" || lang === "ur";
 
   return (
-    <div className="bg-white text-[#2B273F]">
-      <Helmet><title>{T.pageTitle}</title></Helmet>
+    <div className="bg-[#2B273F] text-white min-h-screen" dir={isRtl ? "rtl" : "ltr"}>
+      <Helmet>
+        <title>{isRtl ? "خدماتنا — أفق لحلول الأعمال" : "Our Services — OFOQ"}</title>
+        <meta name="description" content={isRtl ? "خدمات أفق المتكاملة في الموارد البشرية والخدمات الحكومية وتأسيس الشركات." : "OFOQ integrated services in HR, government services, and company formation."} />
+      </Helmet>
 
-      {/* ── Hero ──────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-[#2B273F] px-6 py-28 text-white sm:px-10 sm:py-36">
-        <WireframeCube color="#33B27C" className="absolute -left-10 bottom-0 h-80 w-[420px] opacity-30" />
-        <WireframeCube color="#E5FE04" className="absolute right-0 top-0 h-52 w-64 opacity-25" />
+      {/* ══ هيدر الصفحة ════════════════════════════════════════════ */}
+      <section className="relative min-h-[50vh] flex flex-col justify-end overflow-hidden pt-24">
+        <img
+          src="/images/riyadh-business-district.jpg"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover opacity-25"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#2B273F]/40 to-[#2B273F]" />
 
-        <div className="relative mx-auto max-w-7xl">
+        {/* زخرفة */}
+        <div className="absolute top-24 right-10 opacity-[0.07] pointer-events-none">
+          <svg viewBox="0 0 300 300" fill="none" className="w-72 h-72">
+            <rect x="30" y="30" width="120" height="120" stroke="#33B27C" strokeWidth="1.5" />
+            <rect x="80" y="80" width="120" height="120" stroke="#E5FE04" strokeWidth="1.5" />
+            <rect x="130" y="130" width="120" height="120" stroke="#33B27C" strokeWidth="1.5" />
+          </svg>
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 pb-16 w-full">
+          {/* breadcrumb */}
+          <div className="flex items-center gap-2 text-white/30 text-xs mb-8">
+            <Link to="/" className="hover:text-white transition-colors">{isRtl ? "الرئيسية" : "Home"}</Link>
+            <span>/</span>
+            <span className="text-white/60">{isRtl ? "الخدمات" : "Services"}</span>
+          </div>
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease }}
-            className="mb-5 flex items-center gap-3 text-[11px] font-black uppercase tracking-[.3em] text-[#E5FE04]"
+            className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-5"
           >
-            <span className="h-px w-10 bg-[#E5FE04]" />
-            {T.heroBadge}
+            {isRtl ? "منطقة خبرتنا" : "Our area of expertise"}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.1, ease }}
-            className="max-w-3xl text-5xl font-black sm:text-7xl"
+            transition={{ duration: 0.8, delay: 0.1, ease }}
+            className="text-5xl sm:text-7xl font-black leading-tight max-w-3xl"
           >
-            {T.heroTitle1}
-            <br />
-            <span className="text-[#33B27C]">{T.heroTitle2}</span>
+            {isRtl ? (
+              <>اختر <span className="text-[#33B27C]">خدمتك</span></>
+            ) : (
+              <>Choose <span className="text-[#33B27C]">your service</span></>
+            )}
           </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.2, ease }}
-            className="mt-7 max-w-xl text-lg leading-8 text-white/60"
-          >
-            {T.heroSub}
-          </motion.p>
         </div>
       </section>
 
-      {/* ── Categories grid ───────────────────────────── */}
-      <main className="mx-auto max-w-7xl px-6 py-16 sm:px-10 lg:py-24">
-        <div className="grid gap-5 md:grid-cols-2">
-          {servicesCatalog.map((category, i) => (
+      {/* ══ شبكة الخدمات ═══════════════════════════════════════════ */}
+      <section className="max-w-7xl mx-auto px-6 sm:px-10 py-20">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {servicesCatalog.map((cat, i) => (
             <motion.div
-              key={category.slug}
-              initial={{ opacity: 0, y: 25 }}
+              key={cat.slug}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "0px 0px -60px 0px" }}
-              transition={{ delay: i * 0.05, duration: 0.65, ease }}
+              transition={{ delay: i * 0.08, duration: 0.7, ease }}
             >
               <Link
-                to={`/services/${category.slug}`}
-                className="group flex overflow-hidden rounded-[2rem] border border-[#2B273F]/10 bg-white transition-all duration-500 hover:border-transparent hover:shadow-2xl"
+                to={`/services/${cat.slug}`}
+                className="group relative flex flex-col justify-between min-h-[380px] overflow-hidden rounded-2xl p-7 border border-white/8 hover:border-[#33B27C]/40 transition-all duration-500"
               >
-                {/* Content */}
-                <div className="flex flex-1 flex-col justify-between p-8">
-                  <div>
-                    <span className="mb-6 block text-sm font-black text-[#33B27C]">0{i + 1}</span>
-                    <h2 className="text-2xl font-black">{pick(category.title, lang)}</h2>
-                    <p className="mt-3 text-sm leading-7 text-[#2B273F]/55">
-                      {pick(category.intro, lang)}
-                    </p>
+                {/* صورة */}
+                <img
+                  src={cat.image}
+                  alt={pick(cat.title, lang)}
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale transition-all duration-700 group-hover:opacity-40 group-hover:grayscale-0 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#1a1726]/70 to-[#1a1726]/95 group-hover:to-[#2B273F]/80 transition-all duration-500" />
 
-                    {/* Sub-services list */}
-                    <ul className="mt-5 space-y-2">
-                      {category.services.slice(0, 5).map((s) => (
-                        <li
-                          key={s.slug}
-                          className="flex items-center gap-2.5 text-xs text-[#2B273F]/45"
-                        >
-                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#33B27C]" />
-                          {pick(s.title, lang)}
-                        </li>
-                      ))}
-                      {category.services.length > 5 && (
-                        <li className="text-[11px] text-[#2B273F]/30">
-                          +{category.services.length - 5} {T.moreLabel}
-                        </li>
-                      )}
-                    </ul>
-                  </div>
+                <div className="relative z-10">
+                  <p className="text-[#E5FE04] text-xs font-black tracking-widest mb-5">0{i + 1}</p>
+                  <h3 className="text-xl font-black text-white mb-3">{pick(cat.title, lang)}</h3>
+                  <p className="text-white/35 text-sm leading-7 line-clamp-2">{pick(cat.intro, lang)}</p>
 
-                  {/* CTA row */}
-                  <div className="mt-7 flex items-center gap-3 text-sm font-black text-[#33B27C]">
-                    <span className="grid h-9 w-9 place-items-center rounded-full bg-[#33B27C] text-white transition-transform duration-300 group-hover:scale-110">
-                      <ArrowIcon className="h-4 w-4" />
-                    </span>
-                    {T.viewServices}
-                  </div>
+                  <ul className="mt-5 space-y-2">
+                    {cat.services.slice(0, 3).map((s) => (
+                      <li key={s.slug} className="flex items-center gap-2.5 text-xs text-white/30 group-hover:text-white/50 transition-colors">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#33B27C] flex-shrink-0" />
+                        {pick(s.title, lang)}
+                      </li>
+                    ))}
+                    {cat.services.length > 3 && (
+                      <li className="text-[11px] text-white/20">+{cat.services.length - 3} {isRtl ? "أكثر" : "more"}</li>
+                    )}
+                  </ul>
                 </div>
 
-                {/* Image panel */}
-                <div className="hidden w-52 shrink-0 overflow-hidden sm:block">
-                  <img
-                    src={category.image}
-                    alt={pick(category.title, lang)}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-cover grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0"
-                  />
+                <div className="relative z-10 flex items-center justify-between mt-8 pt-6 border-t border-white/8">
+                  <span className="text-xs font-bold text-white/30 group-hover:text-[#33B27C] transition-colors">
+                    {isRtl ? "اعرف أكثر" : "Learn more"}
+                  </span>
+                  <span className="w-9 h-9 rounded-full border border-white/15 group-hover:border-[#33B27C] group-hover:bg-[#33B27C] flex items-center justify-center transition-all duration-300">
+                    <svg viewBox="0 0 16 16" fill="none" className={`w-3.5 h-3.5 ${isRtl ? "rotate-180" : ""}`}>
+                      <path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
                 </div>
               </Link>
             </motion.div>
           ))}
         </div>
-      </main>
+      </section>
+
+      {/* ══ CTA ════════════════════════════════════════════════════ */}
+      <section className="border-t border-white/8">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 py-20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-3">
+              {isRtl ? "لنصنع أثراً مستدام" : "Let's create sustainable impact"}
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-black">
+              {isRtl ? "تواصل معنا اليوم" : "Contact us today"}
+            </h2>
+          </div>
+          <Link
+            to="/contact"
+            className="flex-shrink-0 inline-flex items-center gap-3 border border-white/20 text-white font-bold text-sm px-8 py-4 rounded-full hover:border-[#33B27C] hover:bg-[#33B27C] transition-all duration-300"
+          >
+            {isRtl ? "تواصل معنا" : "Contact us"}
+            <svg viewBox="0 0 16 16" fill="none" className={`w-4 h-4 ${isRtl ? "rotate-180" : ""}`}>
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

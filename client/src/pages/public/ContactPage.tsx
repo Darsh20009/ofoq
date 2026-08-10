@@ -1,282 +1,255 @@
-import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Phone, Mail, MapPin, Clock } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { contactApi } from "../../api/client";
-import WireframeCube from "../../components/WireframeCube";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useLang } from "../../i18n/LangContext";
 
+const ease = [0.22, 1, 0.36, 1] as const;
 const fadeUp = {
-  hidden:  { opacity: 0, y: 28 },
-  visible: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5 } }),
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease } },
 };
+const stagger = { show: { transition: { staggerChildren: 0.1 } } };
 
 export default function ContactPage() {
-  const { ui, dir } = useLang();
-  const sectors = ui.contact.sectors;
-  const [submitted, setSubmitted] = useState(false);
-  const [searchParams] = useSearchParams();
-  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
-    defaultValues: { interest: searchParams.get("service") || "" },
-  });
-  useEffect(() => {
-    const svc = searchParams.get("service");
-    if (svc) setValue("interest", svc);
-  }, [searchParams, setValue]);
+  const { ui, lang } = useLang();
+  const isRtl = lang === "ar" || lang === "ur";
+  const C = ui.contact;
 
-  const mut = useMutation({
-    mutationFn: (data: object) => contactApi.submit(data),
-    onSuccess: () => setSubmitted(true),
-  });
+  const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", service: "", message: "" });
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      setStatus(res.ok ? "sent" : "error");
+    } catch {
+      setStatus("error");
+    }
+  };
 
   return (
-    <div dir={dir}>
+    <div className="bg-[#2B273F] text-white min-h-screen" dir={isRtl ? "rtl" : "ltr"}>
       <Helmet>
-        <title>{ui.contact.metaTitle}</title>
-        <meta name="description" content={ui.contact.heroSub} />
+        <title>{C.metaTitle}</title>
+        <meta name="description" content={C.heroSub} />
         <link rel="canonical" href="https://ofoqhc.com/contact" />
       </Helmet>
 
-      {/* ══ هيرو ══════════════════════════════════════════════ */}
-      <section
-        className="relative flex min-h-[42vh] items-end overflow-hidden sm:min-h-[55vh]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to top, rgba(43,39,63,0.92) 0%, rgba(43,39,63,0.50) 55%, rgba(0,0,0,0.15) 100%), url('/images/aramco-tower-sunset.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="absolute left-4 bottom-4 opacity-18 pointer-events-none">
-          <WireframeCube className="w-64 h-44 text-ofoq-green" color="#33B27C" />
+      {/* ══ Hero ══════════════════════════════════════════════════ */}
+      <section className="relative min-h-[45vh] flex flex-col justify-end overflow-hidden pt-20">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1a1726] to-[#2B273F]" />
+        <div className="absolute top-0 right-0 w-full h-full overflow-hidden opacity-[0.04] pointer-events-none">
+          <svg viewBox="0 0 800 400" fill="none" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
+            <rect x="500" y="20" width="200" height="200" stroke="#33B27C" strokeWidth="1" />
+            <rect x="560" y="80" width="200" height="200" stroke="#E5FE04" strokeWidth="1" />
+            <rect x="620" y="140" width="200" height="200" stroke="#33B27C" strokeWidth="1" />
+          </svg>
         </div>
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 pb-14 relative z-10 w-full">
-          <div className="flex items-center gap-2 text-white/45 text-xs mb-4">
-            <Link to="/" className="hover:text-white transition-colors">{ui.category.home}</Link>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 pb-16 w-full">
+          <div className="flex items-center gap-2 text-white/30 text-xs mb-8">
+            <Link to="/" className="hover:text-white transition-colors">{isRtl ? "الرئيسية" : "Home"}</Link>
             <span>/</span>
-            <span className="text-white/70">{ui.contact.badge}</span>
+            <span className="text-white/60">{isRtl ? "تواصل" : "Contact"}</span>
           </div>
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="max-w-3xl text-4xl font-black leading-tight sm:text-6xl">
-              {ui.contact.heroTitle}
-            </h1>
-            <p className="text-white/50 text-sm mt-3">
-              {ui.contact.heroSub}
-            </p>
-          </motion.div>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}
+            className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-5"
+          >
+            {C.badge}
+          </motion.p>
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1, ease }}
+            className="text-5xl sm:text-7xl font-black leading-tight max-w-2xl"
+          >
+            {C.heroTitle}
+          </motion.h1>
         </div>
       </section>
 
-      {/* ══ المحتوى الرئيسي ═══════════════════════════════════ */}
-      <section className="py-16 sm:py-20 bg-gray-50">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      {/* ══ المحتوى ════════════════════════════════════════════════ */}
+      <section className="max-w-7xl mx-auto px-6 sm:px-10 py-20">
+        <div className="grid lg:grid-cols-2 gap-16">
 
-            {/* معلومات التواصل */}
-            <div className="lg:col-span-4 space-y-4">
-              {/* الخريطة */}
-              <div className="rounded-3xl overflow-hidden h-48 bg-ofoq-navy/10">
-                <iframe
-                  title={ui.contact.infoTitle}
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3713.3!2d39.17!3d21.53!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjHCsDMxJzQ4LjAiTiAzOcKwMTAnMTIuMCJF!5e0!3m2!1sar!2ssa!4v1"
-                  className="w-full h-full border-0"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-              </div>
+          {/* معلومات التواصل */}
+          <motion.div
+            initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
+          >
+            <motion.p variants={fadeUp} className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-6">
+              {C.infoTitle}
+            </motion.p>
+            <motion.p variants={fadeUp} className="text-white/50 text-base leading-8 mb-10 max-w-md">
+              {C.heroSub}
+            </motion.p>
 
-              {/* بيانات الاتصال */}
-              <div className="bg-white rounded-3xl p-6 space-y-5">
-                <a href="tel:+966500851177" className="flex items-center gap-4 group">
-                  <div className="w-10 h-10 rounded-full bg-ofoq-green/10 flex items-center justify-center group-hover:bg-ofoq-green transition-colors flex-shrink-0">
-                    <Phone size={16} className="text-ofoq-green group-hover:text-white transition-colors" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 mb-0.5">{ui.contact.phone}</p>
-                    <p className="font-bold text-ofoq-navy text-sm" dir="ltr">+966 500 851 177</p>
-                  </div>
-                </a>
-                <a href="mailto:info@ofoqhc.com" className="flex items-center gap-4 group">
-                  <div className="w-10 h-10 rounded-full bg-ofoq-green/10 flex items-center justify-center group-hover:bg-ofoq-green transition-colors flex-shrink-0">
-                    <Mail size={16} className="text-ofoq-green group-hover:text-white transition-colors" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 mb-0.5">{ui.contact.emailLabel}</p>
-                    <p className="font-bold text-ofoq-navy text-sm">info@ofoqhc.com</p>
-                  </div>
-                </a>
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-ofoq-green/10 flex items-center justify-center flex-shrink-0">
-                    <MapPin size={16} className="text-ofoq-green" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 mb-0.5">{ui.contact.locationLabel}</p>
-                    <p className="font-bold text-ofoq-navy text-sm">{ui.contact.locationVal}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-ofoq-green/10 flex items-center justify-center flex-shrink-0">
-                    <Clock size={16} className="text-ofoq-green" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 mb-0.5">{ui.contact.hoursLabel}</p>
-                    <p className="font-bold text-ofoq-navy text-sm">{ui.contact.hoursVal}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* بطاقة الاستشارة */}
-              <div className="relative bg-ofoq-navy rounded-3xl p-6 overflow-hidden">
-                <div className="absolute left-0 bottom-0 opacity-15 pointer-events-none">
-                  <WireframeCube className="w-40 h-30 text-ofoq-green" color="#33B27C" />
-                </div>
-                <div className="relative z-10">
-                    <h4 className="font-black text-white mb-2">{ui.contact.consultTitle}</h4>
-                  <p className="text-white/55 text-sm leading-relaxed">
-                     {ui.contact.consultDesc}
-                  </p>
-                  <div className="mt-4 flex items-center gap-2 text-ofoq-yellow text-sm font-bold">
-                    <span className="w-2 h-2 rounded-full bg-ofoq-green animate-pulse" />
-                     {ui.contact.available}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* النموذج */}
-            <div className="min-w-0 lg:col-span-8">
-              {submitted ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="bg-white rounded-3xl p-12 text-center"
-                >
-                  <div className="w-20 h-20 rounded-full bg-ofoq-green/10 flex items-center justify-center mx-auto mb-6">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#33B27C" strokeWidth="2">
-                      <path d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                   <h3 className="text-2xl font-black text-ofoq-navy mb-2">{ui.contact.successTitle}</h3>
-                   <p className="text-gray-500 text-sm">{ui.contact.successDesc}</p>
-                </motion.div>
-              ) : (
-                <motion.div
+            <div className="space-y-6">
+              {[
+                { label: C.phone, value: "+966 500 851 177", href: "tel:+966500851177", icon: (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2z" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )},
+                { label: C.emailLabel, value: "info@ofoqhc.com", href: "mailto:info@ofoqhc.com", icon: (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" strokeLinecap="round" strokeLinejoin="round"/>
+                    <polyline points="22,6 12,13 2,6" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )},
+                { label: C.locationLabel, value: C.locationVal, href: "#", icon: (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="12" cy="10" r="3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )},
+                { label: C.hoursLabel, value: C.hoursVal, href: "#", icon: (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
+                    <circle cx="12" cy="12" r="10" strokeLinecap="round" strokeLinejoin="round"/>
+                    <polyline points="12,6 12,12 16,14" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )},
+              ].map(({ label, value, href, icon }) => (
+                <motion.a
+                  key={label}
+                  href={href}
                   variants={fadeUp}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  className="bg-white rounded-3xl p-6 sm:p-8"
+                  className="flex items-start gap-4 group"
                 >
-                   <h3 className="font-black text-ofoq-navy text-xl mb-8">{ui.contact.formTitle}</h3>
-                  <form onSubmit={handleSubmit((d) => mut.mutate(d))} className="space-y-0">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
-                      {/* الاسم */}
-                      <div className="mb-6">
-                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{ui.contact.nameLabel}</label>
-                        <input
-                          {...register("name", { required: true })}
-                            placeholder={ui.contact.namePlaceholder}
-                          className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm placeholder-gray-300 transition-colors"
-                        />
-                         {errors.name && <p className="text-red-500 text-xs mt-1">{ui.contact.required}</p>}
-                      </div>
-
-                      {/* الشركة */}
-                      <div className="mb-6">
-                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{ui.contact.companyLabel}</label>
-                        <input
-                          {...register("company")}
-                            placeholder={ui.contact.companyPlaceholder}
-                          className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm placeholder-gray-300 transition-colors"
-                        />
-                      </div>
-
-                      {/* البريد */}
-                      <div className="mb-6">
-                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{ui.contact.emailFormLabel}</label>
-                        <input
-                          {...register("email", { required: true, pattern: /^\S+@\S+$/ })}
-                          type="email"
-                          placeholder="email@example.com"
-                          dir="ltr"
-                          className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm placeholder-gray-300 transition-colors"
-                        />
-                         {errors.email && <p className="text-red-500 text-xs mt-1">{ui.contact.emailError}</p>}
-                      </div>
-
-                      {/* الجوال */}
-                      <div className="mb-6">
-                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{ui.contact.phoneFormLabel}</label>
-                        <input
-                          {...register("phone")}
-                          type="tel"
-                          placeholder="+966 5X XXX XXXX"
-                          dir="ltr"
-                          className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm placeholder-gray-300 transition-colors"
-                        />
-                      </div>
-
-                      {/* قطاع المؤسسة */}
-                      <div className="mb-6">
-                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{ui.contact.infoTitle}</label>
-                        <select
-                          {...register("sector")}
-                          className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm transition-colors appearance-none cursor-pointer"
-                        >
-                           <option value="">{ui.contact.sectorDefault}</option>
-                           {sectors.map((sector) => <option key={sector}>{sector}</option>)}
-                        </select>
-                      </div>
-
-                      {/* أنا مهتم بـ */}
-                      <div className="mb-6">
-                         <label className="block text-ofoq-navy font-bold text-sm mb-2">{ui.contact.serviceLabel}</label>
-                        <select
-                          {...register("interest")}
-                          className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm transition-colors appearance-none cursor-pointer"
-                        >
-                            <option value="">{ui.contact.serviceDefault}</option>
-                          {searchParams.get("service") && (
-                            <option value={searchParams.get("service")!}>{searchParams.get("service")}</option>
-                          )}
-                            {ui.contact.services.map((service) => <option key={service}>{service}</option>)}
-                        </select>
-                      </div>
-                    </div>
-
-                    {/* الرسالة */}
-                    <div className="mb-8">
-                        <label className="block text-ofoq-navy font-bold text-sm mb-2">{ui.contact.messageLabel}</label>
-                      <textarea
-                        {...register("message")}
-                        rows={4}
-                          placeholder={ui.contact.messagePlaceholder}
-                        className="w-full bg-transparent border-b-2 border-gray-200 focus:border-ofoq-green outline-none py-2 text-ofoq-navy text-sm placeholder-gray-300 transition-colors resize-none"
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isSubmitting || mut.isPending}
-                      className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-ofoq-navy px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-ofoq-navy-light disabled:opacity-50 sm:w-auto"
-                    >
-                      <span className="w-9 h-9 rounded-full bg-ofoq-green flex items-center justify-center flex-shrink-0">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
-                          <path d="m15 18-6-6 6-6" />
-                        </svg>
-                      </span>
-                      <span className="pl-2">
-                          {mut.isPending ? ui.common.sending : ui.common.send}
-                      </span>
-                    </button>
-                  </form>
-                </motion.div>
-              )}
+                  <span className="w-10 h-10 rounded-full border border-white/12 flex items-center justify-center text-white/40 group-hover:border-[#33B27C] group-hover:text-[#33B27C] transition-all flex-shrink-0">
+                    {icon}
+                  </span>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[.2em] text-white/30 mb-1">{label}</p>
+                    <p className="text-white/70 text-sm group-hover:text-white transition-colors">{value}</p>
+                  </div>
+                </motion.a>
+              ))}
             </div>
-          </div>
+
+            {/* استشارة مجانية */}
+            <motion.div
+              variants={fadeUp}
+              className="mt-10 bg-white/[0.04] border border-white/8 rounded-2xl p-7"
+            >
+              <p className="text-[10px] font-bold uppercase tracking-[.25em] text-[#33B27C] mb-3">{C.consultTitle}</p>
+              <p className="text-white/50 text-sm leading-7 mb-4">{C.consultDesc}</p>
+              <p className="text-xs font-bold text-[#E5FE04]">{C.available}</p>
+            </motion.div>
+          </motion.div>
+
+          {/* النموذج */}
+          {status === "sent" ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center justify-center text-center bg-white/[0.03] border border-white/8 rounded-2xl p-14"
+            >
+              <div className="w-16 h-16 rounded-full bg-[#33B27C]/20 border border-[#33B27C]/40 flex items-center justify-center mb-6">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#33B27C" strokeWidth="2" className="w-8 h-8">
+                  <path d="m20 6-11 11-5-5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-black mb-3">{C.successTitle}</h3>
+              <p className="text-white/50 text-sm">{C.successDesc}</p>
+            </motion.div>
+          ) : (
+            <motion.form
+              initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
+              onSubmit={handleSubmit}
+              className="space-y-4"
+            >
+              <motion.p variants={fadeUp} className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-6">
+                {C.formTitle}
+              </motion.p>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                {[
+                  { id: "name", label: C.nameLabel, placeholder: C.namePlaceholder, type: "text" },
+                  { id: "company", label: C.companyLabel, placeholder: C.companyPlaceholder, type: "text" },
+                ].map(({ id, label, placeholder, type }) => (
+                  <motion.div key={id} variants={fadeUp}>
+                    <label className="block text-[10px] font-bold uppercase tracking-[.2em] text-white/40 mb-2">{label}</label>
+                    <input
+                      type={type}
+                      placeholder={placeholder}
+                      value={form[id as keyof typeof form]}
+                      onChange={(e) => setForm({ ...form, [id]: e.target.value })}
+                      required
+                      className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
+                    />
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                {[
+                  { id: "email", label: C.emailFormLabel, placeholder: "example@company.com", type: "email" },
+                  { id: "phone", label: C.phoneFormLabel, placeholder: "+966 5X XXX XXXX", type: "tel" },
+                ].map(({ id, label, placeholder, type }) => (
+                  <motion.div key={id} variants={fadeUp}>
+                    <label className="block text-[10px] font-bold uppercase tracking-[.2em] text-white/40 mb-2">{label}</label>
+                    <input
+                      type={type}
+                      placeholder={placeholder}
+                      value={form[id as keyof typeof form]}
+                      onChange={(e) => setForm({ ...form, [id]: e.target.value })}
+                      required
+                      className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
+                    />
+                  </motion.div>
+                ))}
+              </div>
+
+              <motion.div variants={fadeUp}>
+                <label className="block text-[10px] font-bold uppercase tracking-[.2em] text-white/40 mb-2">{C.serviceLabel}</label>
+                <select
+                  value={form.service}
+                  onChange={(e) => setForm({ ...form, service: e.target.value })}
+                  className="w-full bg-white/[0.04] border border-white/10 text-white text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
+                >
+                  <option value="" className="bg-[#2B273F]">{C.serviceDefault}</option>
+                  {C.services.map((s) => (
+                    <option key={s} value={s} className="bg-[#2B273F]">{s}</option>
+                  ))}
+                </select>
+              </motion.div>
+
+              <motion.div variants={fadeUp}>
+                <label className="block text-[10px] font-bold uppercase tracking-[.2em] text-white/40 mb-2">{C.messageLabel}</label>
+                <textarea
+                  rows={5}
+                  placeholder={C.messagePlaceholder}
+                  value={form.message}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors resize-none"
+                />
+              </motion.div>
+
+              <motion.div variants={fadeUp}>
+                <button
+                  type="submit"
+                  disabled={status === "sending"}
+                  className="w-full flex items-center justify-center gap-3 bg-[#33B27C] text-white font-black text-sm py-4 rounded-full hover:bg-[#2a9668] transition-colors disabled:opacity-60"
+                >
+                  {status === "sending" ? ui.common.sending : ui.common.send}
+                  {status !== "sending" && (
+                    <svg viewBox="0 0 16 16" fill="none" className={`w-4 h-4 ${isRtl ? "rotate-180" : ""}`}>
+                      <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </button>
+                {status === "error" && (
+                  <p className="mt-3 text-red-400 text-xs text-center">{isRtl ? "حدث خطأ، حاول مجدداً" : "Something went wrong. Please try again."}</p>
+                )}
+              </motion.div>
+            </motion.form>
+          )}
         </div>
       </section>
     </div>
