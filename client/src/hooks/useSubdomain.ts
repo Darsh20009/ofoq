@@ -7,11 +7,17 @@ export function useSubdomain() {
   const hostname =
     typeof window !== "undefined" ? window.location.hostname : "";
 
+  let devOverride = false;
+  try {
+    devOverride = typeof localStorage !== "undefined" && localStorage.getItem("__emp__") === "1";
+  } catch {
+    // localStorage unavailable (private browsing, sandboxed iframe, etc.)
+  }
+
   const isEmployee =
     hostname === "employee.ofoqhc.com" ||
     hostname.startsWith("employee.") ||
-    (typeof localStorage !== "undefined" &&
-      localStorage.getItem("__emp__") === "1");
+    devOverride;
 
   return { isEmployee };
 }

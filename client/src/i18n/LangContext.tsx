@@ -30,8 +30,13 @@ const VALID = LANGS.map((l) => l.code) as readonly string[];
 
 export function LangProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLang] = useState<Lang>(() => {
-    const saved = localStorage.getItem("ofoq_lang");
-    return (saved && VALID.includes(saved) ? saved : "ar") as Lang;
+    try {
+      const saved = localStorage.getItem("ofoq_lang");
+      return (saved && VALID.includes(saved) ? saved : "ar") as Lang;
+    } catch {
+      // localStorage unavailable (private browsing, sandboxed iframe, etc.)
+      return "ar";
+    }
   });
 
   // DB-stored content overrides (loaded once, shared across all languages)
