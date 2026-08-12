@@ -4,11 +4,9 @@ import { useForm } from "react-hook-form";
 import { Eye, EyeOff, Lock, Mail, ShieldCheck, Fingerprint, QrCode, X } from "lucide-react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { startAuthentication } from "@simplewebauthn/browser";
 import { authApi, webauthnApi } from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
 import OfoqLogo from "../../components/OfoqLogo";
-import jsQR from "jsqr";
 import { useLang } from "../../i18n/LangContext";
 
 function normalizeOtpInput(value: string): string {
@@ -76,6 +74,7 @@ export default function LoginPage() {
     setPasskeyLoading(true);
     try {
       const optRes = await webauthnApi.loginOptions(emailValue || undefined);
+      const { startAuthentication } = await import("@simplewebauthn/browser");
       const asseResp = await startAuthentication({ optionsJSON: optRes.data });
       const verifyRes = await webauthnApi.loginVerify(asseResp);
       const { user, token } = verifyRes.data;
@@ -189,6 +188,7 @@ export default function LoginPage() {
             if (codes.length) result = codes[0].rawValue;
           } else {
             const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const { default: jsQR } = await import("jsqr");
             const qr = jsQR(imgData.data, imgData.width, imgData.height, {
               inversionAttempts: "dontInvert",
             });
