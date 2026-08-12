@@ -35,6 +35,7 @@ import BlogPage from "./pages/public/BlogPage";
 import ContactPage from "./pages/public/ContactPage";
 import PackagesPage from "./pages/public/PackagesPage";
 import CountriesPage from "./pages/public/CountriesPage";
+import TermsPage from "./pages/public/TermsPage";
 
 // Admin Pages
 import LoginPage from "./pages/admin/LoginPage";
@@ -228,6 +229,7 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/terms" element={<TermsPage />} />
         </Route>
 
         {/* ── تسجيل دخول الأدمن ───────────────────── */}

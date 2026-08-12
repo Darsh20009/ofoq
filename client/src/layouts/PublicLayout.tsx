@@ -459,7 +459,7 @@ export default function PublicLayout() {
             <p>© {new Date().getFullYear()} OFOQ For Business Solutions. {isRtl ? "جميع الحقوق محفوظة." : "All rights reserved."}</p>
             <div className="flex gap-5">
               <a href="#" className="hover:text-white transition-colors">{isRtl ? "سياسة الخصوصية" : "Privacy"}</a>
-              <a href="#" className="hover:text-white transition-colors">{isRtl ? "الشروط والأحكام" : "Terms"}</a>
+              <Link to="/terms" className="hover:text-white transition-colors">{isRtl ? "الشروط والأحكام" : "Terms"}</Link>
             </div>
           </div>
         </div>
