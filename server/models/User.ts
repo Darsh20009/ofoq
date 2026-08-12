@@ -49,6 +49,7 @@ export interface IUser extends Document {
   // Timestamps
   lastLogin?: Date;
   lastActivity?: Date;
+  sessionRevokedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -97,6 +98,7 @@ const UserSchema = new Schema<IUser>({
   employeeCode: { type: String, sparse: true, unique: true },
   lastLogin: Date,
   lastActivity: Date,
+  sessionRevokedAt: Date,
 }, {
   timestamps: true,
   toJSON: {

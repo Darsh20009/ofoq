@@ -353,6 +353,18 @@ authRouter.post("/logout", requireAuth, async (req, res) => {
   res.json({ message: "تم تسجيل الخروج بنجاح" });
 });
 
+// ── Revoke all sessions (logout from every device) ───────────────
+authRouter.post("/revoke-all-sessions", requireAuth, async (req, res) => {
+  try {
+    const userId = (req as any).user._id;
+    await UserModel.findByIdAndUpdate(userId, { sessionRevokedAt: new Date() });
+    await logAction(String(userId), "revoke_all_sessions", "User", String(userId), req);
+    res.json({ message: "تم إلغاء جميع الجلسات بنجاح" });
+  } catch {
+    res.status(500).json({ error: "فشل إلغاء الجلسات" });
+  }
+});
+
 // ── TOTP Setup ────────────────────────────────────────────────────
 authRouter.post("/totp/setup", requireAuth, async (req, res) => {
   try {

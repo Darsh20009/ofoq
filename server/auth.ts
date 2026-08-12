@@ -32,7 +32,7 @@ export function signToken(payload: { userId: string; role: string; email: string
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES } as any);
 }
 
-export function verifyToken(token: string): { userId: string; role: string; email: string } | null {
+export function verifyToken(token: string): { userId: string; role: string; email: string; iat?: number } | null {
   try {
     return jwt.verify(token, JWT_SECRET) as any;
   } catch {
@@ -77,6 +77,14 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     if (user.status !== "active") {
       res.status(403).json({ error: "الحساب غير مفعّل أو موقوف" });
       return;
+    }
+    // Reject tokens issued before the last session revocation
+    if (user.sessionRevokedAt && decoded.iat) {
+      const revokedMs = new Date(user.sessionRevokedAt).getTime();
+      if (decoded.iat * 1000 < revokedMs) {
+        res.status(401).json({ error: "تم إلغاء الجلسة. يرجى تسجيل الدخول مجدداً." });
+        return;
+      }
     }
     (req as any).user = user;
     next();

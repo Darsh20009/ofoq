@@ -48,6 +48,7 @@ export const authApi = {
   totpVerify: (code: string) => api.post("/auth/totp/verify-setup", { code }),
   totpDisable: (code: string) => api.post("/auth/totp/disable", { code }),
   barcodeLogin: (code: string) => api.post("/auth/barcode-login", { code }),
+  revokeAllSessions: () => api.post("/auth/revoke-all-sessions"),
 };
 
 /* ── WebAuthn / Passkeys ──────────────────────── */

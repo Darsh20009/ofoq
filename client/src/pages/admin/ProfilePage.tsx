@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
   User, Lock, Shield, Camera, Fingerprint, Trash2, Plus,
-  CheckCircle, QrCode, AlertCircle, CreditCard, Eye, EyeOff,
+  CheckCircle, QrCode, AlertCircle, CreditCard, Eye, EyeOff, LogOut,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
@@ -27,7 +27,7 @@ function apiErrorMessage(error: any, fallback: string): string {
 }
 
 export default function ProfilePage() {
-  const { user, updateUser } = useAuthStore();
+  const { user, updateUser, clearAuth } = useAuthStore();
   const { ui, lang } = useLang();
   const copy = ui.adminPages.adminPortal;
   const queryClient = useQueryClient();
@@ -151,6 +151,16 @@ export default function ProfilePage() {
   const deletePasskeyMut = useMutation({
     mutationFn: (id: string) => webauthnApi.deleteCredential(id),
     onSuccess: () => { toast.success(copy.passkeyDeleted); queryClient.invalidateQueries({ queryKey: ["webauthn-credentials"] }); },
+  });
+
+  const revokeAllMut = useMutation({
+    mutationFn: () => authApi.revokeAllSessions(),
+    onSuccess: () => {
+      toast.success("تم تسجيل الخروج من جميع الأجهزة");
+      // clear local session too
+      clearAuth();
+    },
+    onError: () => toast.error("فشل إلغاء الجلسات، حاول مرة أخرى"),
   });
 
   const togglePwd = (key: string) => setShowPwd((p) => ({ ...p, [key]: !p[key] }));
@@ -420,6 +430,37 @@ export default function ProfilePage() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* ── Revoke All Sessions ──────────────────────────────── */}
+      <div className="card border border-red-100">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center flex-shrink-0">
+            <LogOut size={20} className="text-red-500" />
+          </div>
+          <div className="flex-1">
+            <p className="font-bold text-gray-800">تسجيل الخروج من جميع الأجهزة</p>
+            <p className="text-sm text-gray-500 mt-1 leading-relaxed">
+              يُلغي جميع الجلسات النشطة على كل الأجهزة والمتصفحات فوراً. ستحتاج إلى تسجيل الدخول مجدداً على كل جهاز.
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              if (window.confirm("هل أنت متأكد؟ سيتم تسجيل خروجك من جميع الأجهزة.")) {
+                revokeAllMut.mutate();
+              }
+            }}
+            disabled={revokeAllMut.isPending}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-red-600 border border-red-200 hover:bg-red-50 transition-all disabled:opacity-60 flex-shrink-0"
+          >
+            {revokeAllMut.isPending ? (
+              <span className="w-4 h-4 border-2 border-red-400/30 border-t-red-500 rounded-full animate-spin" />
+            ) : (
+              <LogOut size={15} />
+            )}
+            إلغاء الكل
+          </button>
+        </div>
       </div>
 
       {/* ── Employee Card link ───────────────────────────────── */}
