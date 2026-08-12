@@ -8,7 +8,6 @@ import { useForm } from "react-hook-form";
 import { Eye, EyeOff, Lock, Mail, QrCode, X, Fingerprint } from "lucide-react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { startAuthentication } from "@simplewebauthn/browser";
 import { authApi, webauthnApi } from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
 import OfoqLogo from "../../components/OfoqLogo";
@@ -53,6 +52,7 @@ export default function EmployeePortalLoginPage() {
     try {
       const email = (document.querySelector<HTMLInputElement>('input[name="email"]')?.value || "").trim();
       const optRes = await webauthnApi.loginOptions(email || undefined);
+      const { startAuthentication } = await import("@simplewebauthn/browser");
       const assertion = await startAuthentication({ optionsJSON: optRes.data });
       const verifyRes = await webauthnApi.loginVerify(assertion);
       const { user, token } = verifyRes.data;

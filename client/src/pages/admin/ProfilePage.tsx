@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
-import { startRegistration } from "@simplewebauthn/browser";
 import { useAuthStore } from "../../store/authStore";
 import { usersApi, webauthnApi, authApi } from "../../api/client";
 import { useLang } from "../../i18n/LangContext";
@@ -140,6 +139,7 @@ export default function ProfilePage() {
   const addPasskeyMut = useMutation({
     mutationFn: async () => {
       const optRes = await webauthnApi.registerOptions();
+      const { startRegistration } = await import("@simplewebauthn/browser");
       const attResp = await startRegistration({ optionsJSON: optRes.data });
       const deviceName = navigator.userAgent.split(") ")[0].split(" (").join(" · ").slice(0, 60);
       return webauthnApi.registerVerify(attResp, deviceName);
