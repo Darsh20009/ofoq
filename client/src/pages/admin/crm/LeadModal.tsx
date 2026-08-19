@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { X } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -7,6 +7,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { crmApi } from "../../../api/client";
 import type { Lead } from "../../../types";
 import { useLang } from "../../../i18n/LangContext";
+import PhoneInput from "../../../components/forms/PhoneInput";
+
+// Map text status → numeric stage (schema requires number 1-6)
+const STATUS_TO_STAGE: Record<string, number> = {
+  new: 1, contacted: 2, qualified: 3,
+  proposal: 4, negotiation: 5, won: 6, lost: 6,
+};
 
 interface Props {
   open: boolean;
@@ -19,19 +26,47 @@ export default function LeadModal({ open, onClose, lead, onSaved }: Props) {
   const { ui, dir } = useLang();
   const copy = ui.adminPages.leads;
   const customerCopy = ui.adminPages.customers;
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
 
   useEffect(() => {
-    if (lead) reset(lead);
-    else reset({ currency: "SAR", priority: "medium", stage: "new", source: "website" });
+    if (lead) {
+      reset({
+        ...lead,
+        status: (lead as any).status || "new",
+        estimatedValue: (lead as any).estimatedValue ?? (lead as any).budget ?? "",
+        service: Array.isArray((lead as any).interestedServices)
+          ? (lead as any).interestedServices.join(", ")
+          : ((lead as any).service || ""),
+      });
+    } else {
+      reset({ currency: "SAR", priority: "medium", status: "new", source: "website" });
+    }
   }, [lead, reset]);
 
   const mut = useMutation({
-    mutationFn: (data: object) =>
-      lead ? crmApi.leads.update(lead._id, data) : crmApi.leads.create(data),
+    mutationFn: (data: any) => {
+      // Convert status text → numeric stage
+      const stage = STATUS_TO_STAGE[data.status] ?? 1;
+      // Map service string → interestedServices array
+      const interestedServices = data.service
+        ? data.service.split(",").map((s: string) => s.trim()).filter(Boolean)
+        : [];
+      const payload = {
+        ...data,
+        stage,
+        interestedServices,
+        estimatedValue: data.estimatedValue ? Number(data.estimatedValue) : undefined,
+      };
+      delete payload.service;
+      delete payload.budget;
+      return lead ? crmApi.leads.update(lead._id, payload) : crmApi.leads.create(payload);
+    },
     onSuccess: () => {
       toast.success(lead ? copy.updated : copy.created);
       onSaved();
+    },
+    onError: (e: any) => {
+      toast.error(e?.response?.data?.error || "حدث خطأ أثناء الحفظ");
     },
   });
 
@@ -68,12 +103,22 @@ export default function LeadModal({ open, onClose, lead, onSaved }: Props) {
                   {errors.name && <p className="text-red-500 text-xs mt-1">{copy.required}</p>}
                 </div>
                 <div>
-                  <label className="label">{customerCopy.email} *</label>
-                  <input {...register("email", { required: true })} type="email" className="input-field" placeholder="email@example.com" dir="ltr" />
+                  <label className="label">{customerCopy.email}</label>
+                  <input {...register("email")} type="email" className="input-field" placeholder="email@example.com" dir="ltr" />
                 </div>
                 <div>
                   <label className="label">{customerCopy.phone}</label>
-                  <input {...register("phone")} className="input-field" placeholder="+966 5X XXX XXXX" dir="ltr" />
+                  <Controller
+                    name="phone"
+                    control={control}
+                    render={({ field }) => (
+                      <PhoneInput
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                      />
+                    )}
+                  />
                 </div>
                 <div>
                   <label className="label">{copy.company}</label>
@@ -81,11 +126,16 @@ export default function LeadModal({ open, onClose, lead, onSaved }: Props) {
                 </div>
                 <div>
                   <label className="label">{copy.service}</label>
-                  <input {...register("service")} className="input-field" placeholder={copy.servicePlaceholder} />
+                  <input
+                    {...register("service")}
+                    className="input-field"
+                    placeholder="تأشيرات، موارد بشرية، ..."
+                  />
+                  <p className="text-xs text-gray-400 mt-0.5">افصل بفاصلة لأكثر من خدمة</p>
                 </div>
                 <div>
                   <label className="label">{copy.stage}</label>
-                  <select {...register("stage")} className="input-field">
+                  <select {...register("status")} className="input-field">
                     <option value="new">{copy.new}</option>
                     <option value="contacted">{copy.contacted}</option>
                     <option value="qualified">{copy.qualified}</option>
@@ -106,7 +156,7 @@ export default function LeadModal({ open, onClose, lead, onSaved }: Props) {
                 </div>
                 <div>
                   <label className="label">{copy.budget}</label>
-                  <input {...register("budget", { valueAsNumber: true })} type="number" className="input-field" placeholder="0" dir="ltr" />
+                  <input {...register("estimatedValue")} type="number" className="input-field" placeholder="0" dir="ltr" />
                 </div>
                 <div>
                   <label className="label">{customerCopy.currency}</label>
@@ -121,16 +171,17 @@ export default function LeadModal({ open, onClose, lead, onSaved }: Props) {
                   <select {...register("source")} className="input-field">
                     <option value="website">{copy.website}</option>
                     <option value="referral">{copy.referral}</option>
-                    <option value="social_media">{copy.socialMedia}</option>
+                    <option value="social">{copy.socialMedia}</option>
                     <option value="email">{copy.emailSource}</option>
-                    <option value="phone">{copy.phoneSource}</option>
+                    <option value="cold_call">{copy.phoneSource}</option>
                     <option value="event">{copy.event}</option>
+                    <option value="partner">شريك</option>
                     <option value="other">{copy.other}</option>
                   </select>
                 </div>
                 <div>
                   <label className="label">{copy.followUp}</label>
-                  <input {...register("followUpDate")} type="date" className="input-field" dir="ltr" />
+                  <input {...register("nextFollowUp")} type="date" className="input-field" dir="ltr" />
                 </div>
                 <div className="col-span-2">
                   <label className="label">{copy.notes}</label>

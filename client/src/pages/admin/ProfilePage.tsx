@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/authStore";
 import { usersApi, webauthnApi, authApi } from "../../api/client";
 import { useLang } from "../../i18n/LangContext";
+import PhoneInput from "../../components/forms/PhoneInput";
 
 type TotpState = "idle" | "setting_up" | "verifying" | "enabled" | "disabling";
 
@@ -33,7 +34,7 @@ export default function ProfilePage() {
   const queryClient = useQueryClient();
 
   // ── Profile form ────────────────────────────────────────────
-  const { register, handleSubmit } = useForm({
+  const { register, handleSubmit, control } = useForm({
     defaultValues: {
       fullName: user?.name,
       fullNameAr: (user as any)?.fullNameAr,
@@ -216,7 +217,17 @@ export default function ProfilePage() {
             </div>
             <div>
               <label className="label">{copy.phone}</label>
-              <input {...register("phone")} className="input-field" dir="ltr" placeholder="+966..." />
+              <Controller
+                name="phone"
+                control={control}
+                render={({ field }) => (
+                  <PhoneInput
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              />
             </div>
             <div>
               <label className="label">{copy.department}</label>

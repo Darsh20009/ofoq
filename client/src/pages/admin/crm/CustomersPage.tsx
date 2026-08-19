@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Search, Trash2, Edit2, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { crmApi } from "../../../api/client";
 import type { Customer } from "../../../types";
 import { useLang } from "../../../i18n/LangContext";
+import PhoneInput from "../../../components/forms/PhoneInput";
 
 const TIER_COLORS: Record<string, string> = {
   bronze: "badge-gray",
@@ -34,7 +35,9 @@ export default function CustomersPage() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["customers"] }); toast.success(copy.deleteConfirm.replace("؟", "")); },
   });
 
-  const customers: Customer[] = data?.data?.customers || [];
+  // crmApi already returns the Axios response body.
+  // The API shape is { customers, total, page, pages }.
+  const customers: Customer[] = data?.customers || [];
 
   return (
     <div className="space-y-6">
@@ -80,7 +83,7 @@ export default function CustomersPage() {
                   </div>
                   <div>
                     <p className="font-semibold text-navy-700">{c.name}</p>
-                    <p className="text-xs text-gray-400">{c.company || c.email}</p>
+                    <p className="text-xs text-gray-400">{c.companyName || c.company || c.email}</p>
                   </div>
                 </div>
                  <span className={TIER_COLORS[c.tier] || "badge-gray"}>{copy[c.tier as "bronze" | "silver" | "gold" | "platinum"] || c.tier}</span>
@@ -120,16 +123,25 @@ function CustomerModal({ open, onClose, customer, onSaved }: {
 }) {
   const { ui } = useLang();
   const copy = ui.adminPages.customers;
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset, control } = useForm();
   useEffect(() => {
-    if (customer) reset(customer);
-    else reset({ currency: "SAR", tier: "bronze", status: "active" });
+    if (customer) {
+      reset({
+        ...customer,
+        companyName: customer.companyName || customer.company || "",
+      });
+    } else {
+      reset({ currency: "SAR", tier: "standard", status: "active" });
+    }
   }, [customer, reset]);
 
   const mut = useMutation({
     mutationFn: (data: object) =>
       customer ? crmApi.customers.update(customer._id, data) : crmApi.customers.create(data),
     onSuccess: () => { toast.success(customer ? copy.update : copy.save); onSaved(); },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.error || "حدث خطأ أثناء حفظ العميل");
+    },
   });
 
   return (
@@ -157,11 +169,21 @@ function CustomerModal({ open, onClose, customer, onSaved }: {
                 </div>
                 <div>
                    <label className="label">{copy.phone}</label>
-                  <input {...register("phone")} className="input-field" dir="ltr" />
+                   <Controller
+                     name="phone"
+                     control={control}
+                     render={({ field }) => (
+                       <PhoneInput
+                         value={field.value || ""}
+                         onChange={field.onChange}
+                         onBlur={field.onBlur}
+                       />
+                     )}
+                   />
                 </div>
                 <div>
-                   <label className="label">{copy.company}</label>
-                  <input {...register("company")} className="input-field" />
+                    <label className="label">{copy.company}</label>
+                  <input {...register("companyName")} className="input-field" />
                 </div>
                 <div>
                    <label className="label">{copy.industry}</label>
@@ -170,7 +192,7 @@ function CustomerModal({ open, onClose, customer, onSaved }: {
                 <div>
                    <label className="label">{copy.tier}</label>
                   <select {...register("tier")} className="input-field">
-                     <option value="bronze">{copy.bronze}</option>
+                      <option value="standard">{copy.bronze || "قياسي"}</option>
                      <option value="silver">{copy.silver}</option>
                      <option value="gold">{copy.gold}</option>
                      <option value="platinum">{copy.platinum}</option>
@@ -210,4 +232,3 @@ function CustomerModal({ open, onClose, customer, onSaved }: {
   );
 }
 
-import { useEffect } from "react";

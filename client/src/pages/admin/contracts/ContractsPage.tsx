@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { Plus, Search, FileSignature, Send, CheckSquare, Trash2, Download, X, FileText } from "lucide-react";
+import { Plus, Search, FileSignature, Send, CheckSquare, Trash2, Download, X, FileText, Eye, Stamp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
@@ -29,12 +29,26 @@ interface ContractForm {
   currency: string;
   startDate: string;
   endDate: string;
+}
+
+interface ContractSection {
+  title: string;
   content: string;
 }
 
+interface ApprovalField {
+  type: "signature" | "stamp";
+  label: string;
+  party: "company" | "client" | "witness";
+  required: boolean;
+}
+
+const CONTRACT_DRAFT_KEY = "ofoq_contract_editor_draft";
+
 export default function ContractsPage() {
-  const { ui, lang } = useLang();
+  const { ui, lang, dir } = useLang();
   const copy = ui.adminPages.contracts;
+  const isArabic = lang === "ar";
   const statusConfig = {
     draft: { label: copy.draft, color: "badge-gray" }, sent: { label: copy.sent, color: "badge-blue" },
     signed: { label: copy.signedStatus, color: "badge-green" }, expired: { label: copy.expired, color: "badge-red" },
@@ -45,10 +59,15 @@ export default function ContractsPage() {
   const [status, setStatus] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<any>(null);
+  const [viewing, setViewing] = useState<any>(null);
+  const [sections, setSections] = useState<ContractSection[]>([]);
+  const [approvalFields, setApprovalFields] = useState<ApprovalField[]>([]);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ContractForm>({
+  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<ContractForm>({
     defaultValues: { currency: "SAR" },
   });
+  const watchedForm = watch();
+  const [draftSaved, setDraftSaved] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["contracts", search, status],
@@ -62,20 +81,38 @@ export default function ContractsPage() {
 
   const createMut = useMutation({
     mutationFn: (data: object) => contractsApi.create(data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success(copy.create); closeModal(); },
-    onError: () => {},
+    onSuccess: () => {
+      localStorage.removeItem(CONTRACT_DRAFT_KEY);
+      setDraftSaved(false);
+      qc.invalidateQueries({ queryKey: ["contracts"] });
+      toast.success(copy.create);
+      closeModal();
+    },
+    onError: (error: any) => {
+      saveDraftLocally();
+      toast.error(`${error?.response?.data?.error || (isArabic ? "تعذر إنشاء العقد" : "Couldn't create contract")} — ${isArabic ? "تم حفظ نسخة مسودة لاسترجاعها" : "A draft backup was saved for recovery"}`);
+    },
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, data }: { id: string; data: object }) => contractsApi.update(id, data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success(copy.save); closeModal(); },
-    onError: () => {},
+    onSuccess: () => {
+      localStorage.removeItem(CONTRACT_DRAFT_KEY);
+      setDraftSaved(false);
+      qc.invalidateQueries({ queryKey: ["contracts"] });
+      toast.success(copy.save);
+      closeModal();
+    },
+    onError: (error: any) => {
+      saveDraftLocally();
+      toast.error(`${error?.response?.data?.error || (isArabic ? "تعذر حفظ العقد" : "Couldn't save contract")} — ${isArabic ? "تم حفظ نسخة مسودة لاسترجاعها" : "A draft backup was saved for recovery"}`);
+    },
   });
 
   const sendMut = useMutation({
     mutationFn: (id: string) => contractsApi.send(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["contracts"] }); toast.success(copy.send); },
-    onError: () => {},
+    onError: (error: any) => toast.error(error?.response?.data?.error || (isArabic ? "تعذر إرسال العقد" : "Couldn't send contract")),
   });
 
   const signMut = useMutation({
@@ -103,33 +140,163 @@ export default function ContractsPage() {
 
   function openCreate() {
     setEditing(null);
-    reset({ currency: "SAR" });
+    const saved = readDraftLocally();
+    if (saved && !saved.editingId) {
+      reset(saved.form);
+      setSections(saved.sections);
+      setApprovalFields(saved.approvalFields);
+      setDraftSaved(true);
+      toast.success(isArabic ? "تم استرجاع المسودة المحفوظة" : "Saved draft restored");
+    } else {
+      reset({ currency: "SAR" });
+      setSections([{ title: isArabic ? "نطاق الخدمات" : "Scope of services", content: "" }]);
+      setApprovalFields([
+        { type: "signature", label: isArabic ? "توقيع الطرف الأول (أفق)" : "First party signature (OFOQ)", party: "company", required: true },
+        { type: "signature", label: isArabic ? "توقيع الطرف الثاني (العميل)" : "Second party signature (client)", party: "client", required: true },
+      ]);
+      setDraftSaved(false);
+    }
     setShowModal(true);
   }
 
   function openEdit(c: any) {
     setEditing(c);
-    reset({
-      title: c.title,
-      customerId: c.customerId?._id || c.customerId,
-      value: c.value,
-      currency: c.currency || "SAR",
-      startDate: c.startDate ? c.startDate.slice(0, 10) : "",
-      endDate: c.endDate ? c.endDate.slice(0, 10) : "",
-      content: c.content || "",
-    });
+    const saved = readDraftLocally();
+    if (saved?.editingId === c._id) {
+      reset(saved.form);
+      setSections(saved.sections);
+      setApprovalFields(saved.approvalFields);
+      setDraftSaved(true);
+      toast.success(isArabic ? "تم استرجاع آخر نسخة محفوظة من العقد" : "Last saved contract draft restored");
+    } else {
+      reset({
+        title: c.title,
+        customerId: c.customerId?._id || c.customerId,
+        value: c.value,
+        currency: c.currency || "SAR",
+        startDate: c.startDate ? c.startDate.slice(0, 10) : "",
+        endDate: c.endDate ? c.endDate.slice(0, 10) : "",
+      });
+      setSections(
+        Array.isArray(c.sections) && c.sections.length
+          ? c.sections.map((section: any) => ({ title: section.title || "", content: section.content || "" }))
+          : [{ title: isArabic ? "بنود العقد" : "Contract terms", content: c.content || c.termsAr || c.terms || "" }]
+      );
+      setApprovalFields(
+        Array.isArray(c.approvalFields) && c.approvalFields.length
+          ? c.approvalFields.map((field: any) => ({
+            type: field.type === "stamp" ? "stamp" : "signature",
+            label: field.label || "",
+            party: ["company", "client", "witness"].includes(field.party) ? field.party : "company",
+            required: Boolean(field.required),
+          }))
+          : [
+            { type: "signature", label: isArabic ? "توقيع الطرف الأول (أفق)" : "First party signature (OFOQ)", party: "company", required: true },
+            { type: "signature", label: isArabic ? "توقيع الطرف الثاني (العميل)" : "Second party signature (client)", party: "client", required: true },
+          ]
+      );
+      setDraftSaved(false);
+    }
     setShowModal(true);
   }
 
-  function closeModal() { setShowModal(false); setEditing(null); reset(); }
+  function closeModal() {
+    setShowModal(false);
+    setEditing(null);
+    setSections([]);
+    setApprovalFields([]);
+    setDraftSaved(false);
+    reset();
+  }
+
+  function saveDraftLocally() {
+    if (typeof window === "undefined") return;
+    const snapshot = {
+      editingId: editing?._id || null,
+      form: watchedForm,
+      sections,
+      approvalFields,
+      savedAt: new Date().toISOString(),
+    };
+    localStorage.setItem(CONTRACT_DRAFT_KEY, JSON.stringify(snapshot));
+    setDraftSaved(true);
+  }
+
+  function readDraftLocally(): {
+    editingId: string | null;
+    form: ContractForm;
+    sections: ContractSection[];
+    approvalFields: ApprovalField[];
+  } | null {
+    try {
+      const raw = localStorage.getItem(CONTRACT_DRAFT_KEY);
+      if (!raw) return null;
+      const saved = JSON.parse(raw);
+      if (!saved?.form || !Array.isArray(saved.sections) || !Array.isArray(saved.approvalFields)) return null;
+      return saved;
+    } catch {
+      return null;
+    }
+  }
+
+  useEffect(() => {
+    if (!showModal) return;
+    const timer = window.setTimeout(() => saveDraftLocally(), 500);
+    return () => window.clearTimeout(timer);
+  }, [
+    showModal,
+    editing?._id,
+    watchedForm.title,
+    watchedForm.customerId,
+    watchedForm.value,
+    watchedForm.currency,
+    watchedForm.startDate,
+    watchedForm.endDate,
+    sections,
+    approvalFields,
+  ]);
 
   function onSubmit(data: ContractForm) {
-    if (editing) updateMut.mutate({ id: editing._id, data });
-    else createMut.mutate(data);
+    const cleanSections = sections
+      .map((section) => ({ title: section.title.trim(), content: section.content.trim() }))
+      .filter((section) => section.title && section.content);
+    if (data.startDate && data.endDate && new Date(data.endDate) < new Date(data.startDate)) {
+      toast.error(isArabic ? "يجب أن يكون تاريخ الانتهاء بعد تاريخ البدء" : "The end date must be after the start date");
+      return;
+    }
+    const cleanApprovals = approvalFields
+      .map((field) => ({ ...field, label: field.label.trim() }))
+      .filter((field) => field.label);
+    const payload = {
+      ...data,
+      status: "draft",
+      value: Number(data.value) || 0,
+      sections: cleanSections,
+      approvalFields: cleanApprovals,
+      // Keeps existing documents and external consumers compatible.
+      content: cleanSections.map((section) => `${section.title}\n${section.content}`).join("\n\n"),
+    };
+    if (editing) updateMut.mutate({ id: editing._id, data: payload });
+    else createMut.mutate(payload);
+  }
+
+  function onInvalid() {
+    saveDraftLocally();
+    toast.error(isArabic
+      ? "أدخل عنوان العقد واختر العميل. تم حفظ بقية البيانات كمسودة."
+      : "Enter a contract title and select a customer. The remaining data was saved as a draft.");
+  }
+
+  function updateSection(index: number, key: keyof ContractSection, value: string) {
+    setSections((current) => current.map((section, i) => i === index ? { ...section, [key]: value } : section));
+  }
+
+  function updateApproval(index: number, patch: Partial<ApprovalField>) {
+    setApprovalFields((current) => current.map((field, i) => i === index ? { ...field, ...patch } : field));
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={dir}>
       <div className="page-header">
         <div>
            <h1 className="page-title">{copy.title}</h1>
@@ -215,6 +382,10 @@ export default function ContractsPage() {
                       <td><span className={s.color}>{s.label}</span></td>
                       <td>
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                           <button onClick={() => setViewing(c)}
+                              className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600" title={isArabic ? "معاينة العقد" : "Preview contract"}>
+                             <Eye size={14} />
+                           </button>
                           {/* Edit */}
                           <button onClick={() => openEdit(c)}
                              className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-navy-600" title={copy.edit}>
@@ -267,7 +438,7 @@ export default function ContractsPage() {
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between p-6 border-b">
                 <h3 className="text-lg font-bold text-navy-700">
@@ -277,8 +448,15 @@ export default function ContractsPage() {
                   <X size={18} />
                 </button>
               </div>
+               {draftSaved && (
+                 <div className="mx-6 mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                   {isArabic
+                     ? "تم حفظ نسخة مسودة احتياطية تلقائياً. ستبقى حتى ينجح الحفظ."
+                     : "A backup draft was saved automatically and will remain until saving succeeds."}
+                 </div>
+               )}
 
-              <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+               <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="p-6 space-y-4">
                 {/* Title */}
                 <div>
                    <label className="label">{copy.titleLabel} <span className="text-red-500">*</span></label>
@@ -327,11 +505,79 @@ export default function ContractsPage() {
                   </div>
                 </div>
 
-                {/* Content */}
-                <div>
-                   <label className="label">{copy.content}</label>
-                  <textarea {...register("content")} rows={5}
-                     className="input-field resize-none" placeholder={copy.content} />
+                {/* Contract sections */}
+                <div className="rounded-xl border border-gray-200 p-4 space-y-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <h4 className="font-bold text-navy-700">{isArabic ? "أقسام ومحتوى العقد" : "Contract sections and content"}</h4>
+                      <p className="text-xs text-gray-400 mt-1">{isArabic ? "أضف بنوداً مستقلة لتظهر مرتبة في المعاينة وملف PDF." : "Add separate clauses, ordered in the preview and PDF."}</p>
+                    </div>
+                    <button type="button" onClick={() => setSections((current) => [...current, { title: "", content: "" }])}
+                      className="btn-secondary text-sm whitespace-nowrap">
+                      <Plus size={15} /> {isArabic ? "إضافة قسم" : "Add section"}
+                    </button>
+                  </div>
+                  {sections.map((section, index) => (
+                    <div key={index} className="rounded-xl border border-gray-100 bg-gray-50 p-3 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-ofoq-navy text-xs font-bold text-white">{index + 1}</span>
+                        <input value={section.title} onChange={(event) => updateSection(index, "title", event.target.value)}
+                          className="input-field flex-1 bg-white" placeholder={isArabic ? "عنوان القسم، مثال: نطاق الخدمات" : "Section title, e.g. Scope of services"} />
+                        {sections.length > 1 && (
+                          <button type="button" onClick={() => setSections((current) => current.filter((_, i) => i !== index))}
+                            className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500" title={isArabic ? "حذف القسم" : "Delete section"}>
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+                      <textarea value={section.content} onChange={(event) => updateSection(index, "content", event.target.value)} rows={4}
+                        className="input-field resize-y bg-white" placeholder={isArabic ? "اكتب محتوى هذا القسم..." : "Write this section's content..."} />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Signatures and stamps */}
+                <div className="rounded-xl border border-gray-200 p-4 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <h4 className="font-bold text-navy-700">{isArabic ? "أماكن التوقيع والختم" : "Signature and stamp areas"}</h4>
+                      <p className="text-xs text-gray-400 mt-1">{isArabic ? "يمكن إضافة أكثر من توقيع أو ختم وفق أطراف العقد." : "Add as many signature or stamp areas as the contract needs."}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button type="button" onClick={() => setApprovalFields((current) => [...current, { type: "signature", label: isArabic ? "توقيع إضافي" : "Additional signature", party: "witness", required: false }])}
+                        className="btn-secondary text-sm"><FileSignature size={15} /> {isArabic ? "توقيع" : "Signature"}</button>
+                      <button type="button" onClick={() => setApprovalFields((current) => [...current, { type: "stamp", label: isArabic ? "ختم جهة" : "Organization stamp", party: "company", required: false }])}
+                        className="btn-secondary text-sm"><Stamp size={15} /> {isArabic ? "ختم" : "Stamp"}</button>
+                    </div>
+                  </div>
+                  {approvalFields.length === 0 ? (
+                    <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-700">{isArabic ? "لا توجد أماكن اعتماد مضافة." : "No approval areas have been added."}</p>
+                  ) : approvalFields.map((field, index) => (
+                    <div key={index} className="grid grid-cols-1 gap-2 rounded-xl border border-gray-100 bg-gray-50 p-3 sm:grid-cols-[auto_1fr_9rem_auto] sm:items-center">
+                      <span className={`inline-flex w-fit items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold ${field.type === "stamp" ? "bg-purple-50 text-purple-700" : "bg-blue-50 text-blue-700"}`}>
+                        {field.type === "stamp" ? <Stamp size={13} /> : <FileSignature size={13} />}
+                        {field.type === "stamp" ? (isArabic ? "ختم" : "Stamp") : (isArabic ? "توقيع" : "Signature")}
+                      </span>
+                      <input value={field.label} onChange={(event) => updateApproval(index, { label: event.target.value })}
+                        className="input-field bg-white" placeholder={isArabic ? "وصف مكان الاعتماد" : "Approval area label"} />
+                      <select value={field.party} onChange={(event) => updateApproval(index, { party: event.target.value as ApprovalField["party"] })}
+                        className="input-field bg-white">
+                        <option value="company">{isArabic ? "أفق / الشركة" : "OFOQ / Company"}</option>
+                        <option value="client">{isArabic ? "العميل" : "Client"}</option>
+                        <option value="witness">{isArabic ? "شاهد / طرف إضافي" : "Witness / other party"}</option>
+                      </select>
+                      <div className="flex items-center justify-between gap-2">
+                        <label className="flex items-center gap-1 text-xs text-gray-500">
+                          <input type="checkbox" checked={field.required} onChange={(event) => updateApproval(index, { required: event.target.checked })} />
+                          {isArabic ? "مطلوب" : "Required"}
+                        </label>
+                        <button type="button" onClick={() => setApprovalFields((current) => current.filter((_, i) => i !== index))}
+                          className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500" title={isArabic ? "حذف" : "Delete"}>
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="flex gap-3 pt-2">
@@ -347,6 +593,83 @@ export default function ContractsPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <ContractPreview
+        contract={viewing}
+        onClose={() => setViewing(null)}
+        isArabic={isArabic}
+        onDownload={downloadContractPdf}
+      />
     </div>
+  );
+}
+
+function ContractPreview({ contract, onClose, isArabic, onDownload }: {
+  contract: any;
+  onClose: () => void;
+  isArabic: boolean;
+  onDownload: (id: string, number: string) => void;
+}) {
+  if (!contract) return null;
+  const sections = Array.isArray(contract.sections) && contract.sections.length
+    ? [...contract.sections].sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+    : [{ title: isArabic ? "بنود العقد" : "Contract terms", content: contract.content || contract.termsAr || contract.terms || "—" }];
+  const approvals = Array.isArray(contract.approvalFields) && contract.approvalFields.length
+    ? contract.approvalFields
+    : [
+      { type: "signature", label: isArabic ? "توقيع الطرف الأول" : "First party signature" },
+      { type: "signature", label: isArabic ? "توقيع الطرف الثاني" : "Second party signature" },
+    ];
+
+  return (
+    <AnimatePresence>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+        <motion.div initial={{ scale: 0.98, y: 12 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.98, y: 12 }}
+          onClick={(event) => event.stopPropagation()}
+          className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white p-5">
+            <div>
+              <p className="text-xs font-semibold text-ofoq-green">{contract.contractNumber}</p>
+              <h2 className="text-lg font-bold text-navy-700">{contract.title}</h2>
+            </div>
+            <div className="flex gap-2">
+              <button type="button" onClick={() => onDownload(contract._id, contract.contractNumber)} className="btn-secondary text-sm">
+                <Download size={15} /> PDF
+              </button>
+              <button type="button" onClick={onClose} className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"><X size={18} /></button>
+            </div>
+          </div>
+          <div className="space-y-6 p-6">
+            <div className="grid gap-3 rounded-xl bg-gray-50 p-4 text-sm sm:grid-cols-3">
+              <div><p className="text-gray-400">{isArabic ? "العميل" : "Customer"}</p><p className="mt-1 font-semibold text-navy-700">{contract.customerId?.companyName || contract.customerId?.name || "—"}</p></div>
+              <div><p className="text-gray-400">{isArabic ? "تاريخ البدء" : "Start date"}</p><p className="mt-1 font-semibold text-navy-700">{contract.startDate ? new Date(contract.startDate).toLocaleDateString() : "—"}</p></div>
+              <div><p className="text-gray-400">{isArabic ? "تاريخ النهاية" : "End date"}</p><p className="mt-1 font-semibold text-navy-700">{contract.endDate ? new Date(contract.endDate).toLocaleDateString() : "—"}</p></div>
+            </div>
+            <div className="space-y-5">
+              {sections.map((section: any, index: number) => (
+                <section key={index}>
+                  <h3 className="border-b-2 border-ofoq-green pb-2 font-bold text-navy-700">{index + 1}. {section.title}</h3>
+                  <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-gray-700">{section.content}</p>
+                </section>
+              ))}
+            </div>
+            <div>
+              <h3 className="mb-3 font-bold text-navy-700">{isArabic ? "التوقيعات والأختام" : "Signatures and stamps"}</h3>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {approvals.map((field: any, index: number) => (
+                  <div key={index} className="min-h-28 rounded-xl border border-dashed border-gray-300 p-4 text-center">
+                    {field.type === "stamp"
+                      ? <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full border border-dashed border-gray-400 text-xs text-gray-400">{isArabic ? "ختم" : "Stamp"}</div>
+                      : <div className="h-14" />}
+                    <p className="border-t border-gray-400 pt-2 text-sm text-gray-600">{field.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 }

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { useLang } from "../../i18n/LangContext";
+import PhoneInput from "../../components/forms/PhoneInput";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const fadeUp = {
@@ -188,22 +189,27 @@ export default function ContactPage() {
               </div>
 
               <div className="grid sm:grid-cols-2 gap-4">
-                {[
-                  { id: "email", label: C.emailFormLabel, placeholder: "example@company.com", type: "email" },
-                  { id: "phone", label: C.phoneFormLabel, placeholder: "+966 5X XXX XXXX", type: "tel" },
-                ].map(({ id, label, placeholder, type }) => (
-                  <motion.div key={id} variants={fadeUp}>
-                    <label className="block text-[10px] font-bold uppercase tracking-[.2em] text-white/40 mb-2">{label}</label>
-                    <input
-                      type={type}
-                      placeholder={placeholder}
-                      value={form[id as keyof typeof form]}
-                      onChange={(e) => setForm({ ...form, [id]: e.target.value })}
-                      required
-                      className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
-                    />
-                  </motion.div>
-                ))}
+                <motion.div variants={fadeUp}>
+                  <label className="block text-[10px] font-bold uppercase tracking-[.2em] text-white/40 mb-2">{C.emailFormLabel}</label>
+                  <input
+                    type="email"
+                    placeholder="example@company.com"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    required
+                    className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
+                  />
+                </motion.div>
+                <motion.div variants={fadeUp}>
+                  <label className="block text-[10px] font-bold uppercase tracking-[.2em] text-white/40 mb-2">{C.phoneFormLabel}</label>
+                  <PhoneInput
+                    value={form.phone}
+                    onChange={(phone) => setForm({ ...form, phone })}
+                    required
+                    className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
+                    selectClassName="bg-white/[0.04] border border-white/10 text-white text-xs px-2 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
+                  />
+                </motion.div>
               </div>
 
               <motion.div variants={fadeUp}>

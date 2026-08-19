@@ -17,6 +17,17 @@ export interface IContract extends Document {
   terms?: string;
   termsAr?: string;
   content?: string;
+  sections: {
+    title: string;
+    content: string;
+    order: number;
+  }[];
+  approvalFields: {
+    type: "signature" | "stamp";
+    label: string;
+    party: "company" | "client" | "witness";
+    required: boolean;
+  }[];
   pdfUrl?: string;
   signatureUrl?: string;
   createdBy: mongoose.Types.ObjectId;
@@ -49,6 +60,17 @@ const ContractSchema = new Schema<IContract>({
   terms: String,
   termsAr: String,
   content: String,
+  sections: [{
+    title: { type: String, required: true, trim: true },
+    content: { type: String, required: true },
+    order: { type: Number, default: 0 },
+  }],
+  approvalFields: [{
+    type: { type: String, enum: ["signature", "stamp"], required: true },
+    label: { type: String, required: true, trim: true },
+    party: { type: String, enum: ["company", "client", "witness"], default: "company" },
+    required: { type: Boolean, default: false },
+  }],
   pdfUrl: String,
   signatureUrl: String,
   createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },

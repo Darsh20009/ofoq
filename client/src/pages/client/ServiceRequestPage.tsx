@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, CheckCircle2, Building2, Briefcase, FileText, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { clientApi } from "../../api/clientApi";
 import { useLang } from "../../i18n/LangContext";
+import PhoneInput from "../../components/forms/PhoneInput";
 
 const SERVICES = [
   { value: "company_formation",   label: "تأسيس الشركات",            icon: "🏢" },
@@ -50,7 +51,7 @@ export default function ServiceRequestPage() {
   const requestedService = params.get("service") || "";
   const initialService = SERVICES.some((s) => s.value === requestedService) ? requestedService : "";
   const { ui, dir } = useLang();
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<Form>({
+  const { register, handleSubmit, watch, setValue, control, formState: { errors } } = useForm<Form>({
     defaultValues: { serviceType: initialService },
   });
   const all = watch();
@@ -141,9 +142,21 @@ export default function ServiceRequestPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">{ui.request.contactPhone} <span className="text-red-500">*</span></label>
-                <input type="tel" dir="ltr" {...register("contactPhone", { required: ui.request.required })}
-                  placeholder="+966 5x xxx xxxx"
-                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 ${errors.contactPhone ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`} />
+                <Controller
+                  name="contactPhone"
+                  control={control}
+                  rules={{ required: ui.request.required }}
+                  render={({ field }) => (
+                    <PhoneInput
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      required
+                      className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 ${errors.contactPhone ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`}
+                      selectClassName={`px-2 py-3 rounded-xl border text-xs focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 ${errors.contactPhone ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`}
+                    />
+                  )}
+                />
                 {errors.contactPhone && <p className="mt-1 text-xs text-red-500">{errors.contactPhone.message}</p>}
               </div>
             </motion.div>

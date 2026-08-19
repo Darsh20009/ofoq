@@ -199,3 +199,18 @@ invoicesRouter.post("/:id/mark-paid", requireAuth, requireRole("super_admin", "a
     res.status(500).json({ error: "خطأ في تحديث حالة الدفع" });
   }
 });
+
+// ── Delete Invoice ─────────────────────────────────────────────────
+invoicesRouter.delete("/:id", requireAuth, requireRole("super_admin", "admin"), async (req, res) => {
+  try {
+    const invoice = await InvoiceModel.findByIdAndDelete(req.params.id);
+    if (!invoice) {
+      res.status(404).json({ error: "الفاتورة غير موجودة" });
+      return;
+    }
+    await logAction(String((req as any).user._id), "delete_invoice", "Invoice", req.params.id, req);
+    res.json({ message: "تم حذف الفاتورة" });
+  } catch {
+    res.status(500).json({ error: "خطأ في حذف الفاتورة" });
+  }
+});

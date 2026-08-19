@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { Mail, MapPin, Phone, Send, CheckCircle2, Clock3, MessageSquare } from "lucide-react";
 import { contactApi } from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
 import { useLang } from "../../i18n/LangContext";
+import PhoneInput from "../../components/forms/PhoneInput";
 
 type ContactForm = {
   name: string;
@@ -20,7 +21,7 @@ export default function EmployeeContactPage() {
   const { user } = useAuthStore();
   const { t, dir, lang } = useLang();
   const [submitted, setSubmitted] = useState(false);
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ContactForm>({
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<ContactForm>({
     defaultValues: {
       name: user?.name || "",
       email: user?.email || "",
@@ -138,7 +139,17 @@ export default function EmployeeContactPage() {
                   </label>
                   <label className="block">
                     <span className="mb-1.5 block text-sm font-semibold text-navy-700">{t.contact.phoneFormLabel}</span>
-                    <input {...register("phone")} type="tel" dir="ltr" className="input-field w-full" placeholder="+966 5X XXX XXXX" />
+                    <Controller
+                      name="phone"
+                      control={control}
+                      render={({ field }) => (
+                        <PhoneInput
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                        />
+                      )}
+                    />
                   </label>
                   <label className="block">
                     <span className="mb-1.5 block text-sm font-semibold text-navy-700">{t.contact.companyLabel}</span>

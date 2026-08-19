@@ -2,13 +2,14 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Search, Trash2, Edit2, Shield, UserCheck, UserX } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { X } from "lucide-react";
 import { usersApi } from "../../../api/client";
 import type { User } from "../../../types";
 import { useAuthStore } from "../../../store/authStore";
 import { useLang } from "../../../i18n/LangContext";
+import PhoneInput from "../../../components/forms/PhoneInput";
 
 export default function UsersPage() {
   const qc = useQueryClient();
@@ -141,7 +142,7 @@ export default function UsersPage() {
 function UserModal({ open, onClose, user, onSaved }: {
   open: boolean; onClose: () => void; user: User | null; onSaved: () => void;
 }) {
-  const { register, handleSubmit, reset, watch } = useForm();
+  const { register, handleSubmit, reset, watch, control } = useForm();
   const isEdit = !!user;
   const { ui } = useLang();
   const copy = ui.adminPages.adminPortal;
@@ -212,7 +213,17 @@ function UserModal({ open, onClose, user, onSaved }: {
               </div>
               <div>
                 <label className="label">{copy.phone}</label>
-                <input {...register("phone")} className="input-field" dir="ltr" />
+                 <Controller
+                   name="phone"
+                   control={control}
+                   render={({ field }) => (
+                     <PhoneInput
+                       value={field.value || ""}
+                       onChange={field.onChange}
+                       onBlur={field.onBlur}
+                     />
+                   )}
+                 />
               </div>
               <div className="flex gap-3 pt-2">
                 <button type="submit" disabled={mut.isPending} className="btn-primary flex-1 justify-center">

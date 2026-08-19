@@ -46,8 +46,12 @@ export default function LeadsPage() {
     },
   });
 
-  const leads: Lead[] = data?.data?.leads || [];
-  const pagination = data?.data?.pagination;
+  // crmApi already resolves Axios' response body in the query function.
+  // The API returns { leads, total, page, pages }, not a nested data payload.
+  const leads: Lead[] = data?.leads || [];
+  const pagination = data
+    ? { total: data.total || 0, page: data.page || 1, pages: data.pages || 1 }
+    : null;
 
   return (
     <div className="space-y-6">
@@ -143,7 +147,9 @@ export default function LeadsPage() {
                         </span>
                       </td>
                       <td className="font-medium">
-                         {lead.budget ? `${lead.budget.toLocaleString(lang)} ${lead.currency}` : "—"}
+                         {(lead.estimatedValue ?? lead.budget)
+                           ? `${Number(lead.estimatedValue ?? lead.budget).toLocaleString(lang)} ${lead.currency}`
+                           : "—"}
                       </td>
                       <td className="text-gray-500 text-xs">{lead.source}</td>
                       <td>

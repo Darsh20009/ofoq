@@ -63,11 +63,13 @@ export interface Lead {
 export interface Customer {
   _id: string;
   name: string;
-  email: string;
+  email?: string;
   phone?: string;
+  /** Legacy alias retained while existing records are migrated. */
   company?: string;
-  tier: "bronze" | "silver" | "gold" | "platinum";
-  status: "active" | "inactive" | "churned";
+  companyName?: string;
+  tier: "standard" | "silver" | "gold" | "platinum";
+  status: "active" | "inactive" | "vip" | "at_risk";
   totalRevenue: number;
   currency: string;
   country?: string;
@@ -117,14 +119,16 @@ export interface Invoice {
   _id: string;
   invoiceNumber: string;
   customer?: Customer;
+  customerId?: Customer | string;
   project?: Project;
-  status: "draft" | "sent" | "viewed" | "paid" | "overdue" | "cancelled";
-  issueDate: string;
-  dueDate: string;
+  projectId?: Project | string;
+  status: "draft" | "sent" | "viewed" | "partial" | "paid" | "overdue" | "cancelled";
+  issueDate?: string;
+  dueDate?: string;
   items: InvoiceItem[];
   subtotal: number;
-  vatRate: number;
-  vatAmount: number;
+  vatRate?: number;
+  vatAmount?: number;
   total: number;
   currency: string;
   paidAt?: string;

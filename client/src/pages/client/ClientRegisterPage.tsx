@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import axios from "axios";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { motion } from "framer-motion";
@@ -8,6 +8,7 @@ import { useAuthStore } from "../../store/authStore";
 import OfoqLogo from "../../components/OfoqLogo";
 import { useLang } from "../../i18n/LangContext";
 import { authApi } from "../../api/client";
+import PhoneInput from "../../components/forms/PhoneInput";
 
 function GoogleIcon() {
   return (
@@ -37,7 +38,7 @@ interface Form {
 }
 
 export default function ClientRegisterPage() {
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<Form>();
+  const { register, handleSubmit, watch, control, formState: { errors } } = useForm<Form>();
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -146,10 +147,21 @@ export default function ClientRegisterPage() {
               {/* Phone */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">{ui.auth.phone}</label>
-                <input type="tel" dir="ltr"
-                  {...register("phone", { required: ui.request.required })}
-                  placeholder="+966 5x xxx xxxx"
-                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 transition-all ${errors.phone ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`} />
+                <Controller
+                  name="phone"
+                  control={control}
+                  rules={{ required: ui.request.required }}
+                  render={({ field }) => (
+                    <PhoneInput
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      required
+                      className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 transition-all ${errors.phone ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`}
+                      selectClassName={`px-2 py-3 rounded-xl border text-xs focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 ${errors.phone ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`}
+                    />
+                  )}
+                />
                 {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone.message}</p>}
               </div>
 

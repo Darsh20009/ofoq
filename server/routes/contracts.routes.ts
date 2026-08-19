@@ -7,6 +7,37 @@ import { sendContractEmail } from "../email.js";
 
 export const contractsRouter = Router();
 
+function normalizeContractBody(body: any) {
+  const normalized = { ...body };
+
+  if (Array.isArray(body.sections)) {
+    normalized.sections = body.sections
+      .map((section: any, order: number) => ({
+        title: String(section?.title || "").trim(),
+        content: String(section?.content || "").trim(),
+        order,
+      }))
+      .filter((section: any) => section.title && section.content);
+  }
+
+  if (Array.isArray(body.approvalFields)) {
+    normalized.approvalFields = body.approvalFields
+      .map((field: any) => ({
+        type: field?.type === "stamp" ? "stamp" : "signature",
+        label: String(field?.label || "").trim(),
+        party: ["company", "client", "witness"].includes(field?.party) ? field.party : "company",
+        required: Boolean(field?.required),
+      }))
+      .filter((field: any) => field.label);
+  }
+
+  if (normalized.startDate && normalized.endDate && new Date(normalized.endDate) < new Date(normalized.startDate)) {
+    throw new Error("يجب أن يكون تاريخ انتهاء العقد بعد تاريخ البدء");
+  }
+
+  return normalized;
+}
+
 async function generateContractNumber(): Promise<string> {
   const year = new Date().getFullYear();
   const count = await ContractModel.countDocuments();
@@ -80,7 +111,7 @@ contractsRouter.post("/", requireAuth, requireRole("super_admin", "admin", "mana
   try {
     const contractNumber = await generateContractNumber();
     const contract = await ContractModel.create({
-      ...req.body,
+      ...normalizeContractBody(req.body),
       contractNumber,
       createdBy: (req as any).user._id,
     });
@@ -88,14 +119,14 @@ contractsRouter.post("/", requireAuth, requireRole("super_admin", "admin", "mana
     res.status(201).json({ contract });
   } catch (err: any) {
     console.error("[Contracts] Create error:", err.message);
-    res.status(500).json({ error: "خطأ في إنشاء العقد" });
+    res.status(400).json({ error: err.message || "خطأ في إنشاء العقد" });
   }
 });
 
 // ── Update Contract ────────────────────────────────────────────────
 contractsRouter.patch("/:id", requireAuth, requireRole("super_admin", "admin", "manager", "employee"), async (req, res) => {
   try {
-    const contract = await ContractModel.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    const contract = await ContractModel.findByIdAndUpdate(req.params.id, normalizeContractBody(req.body), { new: true })
       .populate("customerId", "name companyName email").lean();
     if (!contract) {
       res.status(404).json({ error: "العقد غير موجود" });
@@ -103,8 +134,8 @@ contractsRouter.patch("/:id", requireAuth, requireRole("super_admin", "admin", "
     }
     await logAction(String((req as any).user._id), "update_contract", "Contract", req.params.id, req);
     res.json({ contract });
-  } catch {
-    res.status(500).json({ error: "خطأ في تحديث العقد" });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message || "خطأ في تحديث العقد" });
   }
 });
 

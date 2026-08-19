@@ -221,9 +221,16 @@ function docShell(title: string, bodyHtml: string): string {
   .party h4 { font-size: 11px; color: #33B27C; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
   .party p { font-size: 13px; line-height: 1.9; color: #2B273F; }
   .contract-body { margin-top: 20px; font-size: 13px; line-height: 2.1; color: #3a3750; white-space: pre-wrap; }
+   .contract-section { margin-top: 20px; page-break-inside: avoid; }
+   .contract-section h3 { color: #2B273F; font-size: 14px; padding-bottom: 7px; margin-bottom: 9px; border-bottom: 2px solid #33B27C; }
+   .contract-section .section-content { white-space: pre-wrap; font-size: 13px; line-height: 2.1; color: #3a3750; }
   .sig-grid { display: flex; justify-content: space-between; margin-top: 50px; gap: 30px; }
   .sig-box { flex: 1; text-align: center; }
   .sig-line { border-top: 1.5px solid #2B273F; margin-top: 50px; padding-top: 8px; font-size: 12px; color: #6d6a7e; }
+   .approval-grid { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 48px; }
+   .approval-field { flex: 1 1 40%; min-width: 200px; text-align: center; min-height: 112px; border: 1px dashed #b8b5c6; border-radius: 10px; padding: 13px; }
+   .approval-space { height: 48px; }
+   .stamp-space { height: 64px; width: 64px; border: 1.5px dashed #a19dae; border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; color: #9691a8; font-size: 10px; }
 </style>
 </head>
 <body>
@@ -249,6 +256,15 @@ function ltr(text: string): string {
 function formatDate(d?: Date | string): string {
   if (!d) return "-";
   return new Date(d).toLocaleDateString("ar-SA-u-nu-latn", { year: "numeric", month: "long", day: "numeric" });
+}
+
+function escapeHtml(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 const INVOICE_STATUS_LABELS: Record<string, string> = {
@@ -376,6 +392,25 @@ const CONTRACT_TYPE_LABELS: Record<string, string> = {
 
 export function buildContractHtml(contract: any, customer: any, company: CompanyProfile): string {
   const defaultContent = `يقر الطرفان بالموافقة على تنفيذ الأعمال والخدمات الموضحة في هذا العقد وفق النطاق والجدول الزمني والمقابل المالي المتفق عليه أدناه، ويلتزم كل طرف بتنفيذ التزاماته بحسن نية ووفقاً للأنظمة المعمول بها في المملكة العربية السعودية.`;
+  const sections = Array.isArray(contract.sections) && contract.sections.length
+    ? [...contract.sections].sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+    : [{ title: "بنود العقد", content: contract.content || contract.termsAr || contract.terms || defaultContent }];
+  const sectionsHtml = sections.map((section: any, index: number) => `
+    <section class="contract-section">
+      <h3>${index + 1}. ${escapeHtml(section.title)}</h3>
+      <div class="section-content">${escapeHtml(section.content)}</div>
+    </section>`).join("");
+  const defaultApprovalFields = [
+    { type: "signature", label: `توقيع الطرف الأول — ${company.nameAr}` },
+    { type: "signature", label: `توقيع الطرف الثاني — ${customer?.name || ""}` },
+  ];
+  const approvalFields = Array.isArray(contract.approvalFields) && contract.approvalFields.length
+    ? contract.approvalFields
+    : defaultApprovalFields;
+  const approvalsHtml = approvalFields.map((field: any) => field.type === "stamp"
+    ? `<div class="approval-field"><div class="stamp-space">ختم</div><div>${escapeHtml(field.label)}</div></div>`
+    : `<div class="approval-field"><div class="approval-space"></div><div class="sig-line">${escapeHtml(field.label)}</div></div>`
+  ).join("");
 
   const body = `
   <div class="page">
@@ -431,16 +466,9 @@ export function buildContractHtml(contract: any, customer: any, company: Company
       </div>
     </div>
 
-    <div class="contract-body">${(contract.content || contract.termsAr || contract.terms || defaultContent)}</div>
+    ${sectionsHtml}
 
-    <div class="sig-grid">
-      <div class="sig-box">
-        <div class="sig-line">توقيع الطرف الأول — ${company.nameAr}</div>
-      </div>
-      <div class="sig-box">
-        <div class="sig-line">توقيع الطرف الثاني — ${customer?.name || ""}</div>
-      </div>
-    </div>
+    <div class="approval-grid">${approvalsHtml}</div>
 
     <div class="footer">
       <p><span class="brand-name">${company.nameAr}</span> · ${ltr(company.phone)} · ${ltr(company.email)} · ${ltr(company.website)}</p>
