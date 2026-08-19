@@ -21,12 +21,15 @@ export const globalLimiter = rateLimit({
 });
 
 // Login limiter — 30 attempts per 15 min (was 10 — too strict)
+// Skip in development: behind Replit's dev proxy all clients share one IP,
+// so the counter accumulates across test attempts and blocks legitimate logins.
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 30,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "محاولات دخول كثيرة، حاول مجدداً بعد 15 دقيقة" },
+  skip: () => process.env.NODE_ENV !== "production",
 });
 
 // OTP limiter — 20 per hour (was 5 — blocked normal use)
