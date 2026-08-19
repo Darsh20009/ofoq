@@ -302,9 +302,8 @@ async function seed() {
   console.log("🔑 بيانات الدخول للوحة التحكم:");
   console.log("   الرابط:  /admin/login");
   console.log("   البريد:  admin@ofoqhc.com");
-  console.log("   المرور:  OFOQ@2026#");
+  console.log("   المرور:  كلمة المرور المحفوظة في ADMIN_INITIAL_PASSWORD");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.log("⚠️  غيّر كلمة المرور فور الدخول!\n");
 
   await mongoose.disconnect();
   process.exit(0);
