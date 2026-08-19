@@ -297,7 +297,7 @@ export default function LoginPage() {
                       {...register("email", { required: ui.adminLogin.emailRequired })}
                       type="email"
                       autoComplete="email"
-                      placeholder="admin@ofoq.sa"
+                      placeholder="admin@ofoqhc.com"
                       className="input-field pr-10"
                       dir="ltr"
                     />
