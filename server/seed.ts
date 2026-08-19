@@ -22,11 +22,20 @@ async function seed() {
   console.log("✅ اتصال بـ MongoDB ناجح\n");
 
   // ── 1. Super Admin ──────────────────────────────────────────────
+  const configuredAdminPassword = process.env.ADMIN_INITIAL_PASSWORD?.trim();
   const existingAdmin = await UserModel.findOne({ role: "super_admin" });
   if (existingAdmin) {
     console.log(`⏭️  المدير الرئيسي موجود مسبقاً: ${existingAdmin.email}`);
+    if (configuredAdminPassword) {
+      existingAdmin.password = await hashPassword(configuredAdminPassword);
+      await existingAdmin.save();
+      console.log("✅ تم تحديث كلمة مرور المدير من Secret آمن");
+    }
   } else {
-    const password = await hashPassword("OFOQ@2026#");
+    if (!configuredAdminPassword) {
+      throw new Error("ADMIN_INITIAL_PASSWORD is required when creating the first administrator");
+    }
+    const password = await hashPassword(configuredAdminPassword);
     const admin = await UserModel.create({
       fullName: "مدير النظام",
       email: "admin@ofoqhc.com",
@@ -38,8 +47,7 @@ async function seed() {
     });
     console.log("✅ تم إنشاء المدير الرئيسي:");
     console.log(`   📧 البريد: ${admin.email}`);
-    console.log(`   🔑 كلمة المرور: OFOQ@2026#`);
-    console.log(`   ⚠️  غيّر كلمة المرور فور الدخول!\n`);
+    console.log("   🔐 كلمة المرور مأخوذة من Secret آمن");
   }
 
   // ── 2. System Settings ─────────────────────────────────────────
