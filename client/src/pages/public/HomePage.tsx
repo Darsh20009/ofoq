@@ -146,6 +146,19 @@ export default function HomePage() {
             transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
             className="pointer-events-none absolute -bottom-1/4 right-[-6%] h-[110%] w-[48%] rotate-[-20deg] bg-[radial-gradient(ellipse_at_center,rgba(229,254,4,.18),rgba(51,178,124,.16)_32%,transparent_69%)] blur-2xl"
           />
+          {/* The creative mark belongs to the hero itself; it is not fixed to the viewport. */}
+          <motion.div
+            aria-hidden="true"
+            initial={{ opacity: 0, scale: 0.94 }}
+            animate={{ opacity: 0.13, scale: 1 }}
+            transition={{ duration: 1.1, delay: 0.2, ease }}
+            className={`pointer-events-none absolute bottom-[-8%] z-[1] ${
+              isRtl ? "left-[-13%] sm:left-[-4%]" : "right-[-13%] sm:right-[-4%]"
+            }`}
+          >
+            <div className="absolute -inset-[28%] rounded-full bg-[#33B27C]/20 blur-3xl" />
+            <OfoqLogo className="relative h-[300px] w-[430px] sm:h-[390px] sm:w-[560px]" />
+          </motion.div>
 
           <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center px-6 py-20 sm:px-10 sm:py-24">
             <motion.div
@@ -263,8 +276,8 @@ export default function HomePage() {
               className="mt-8 overflow-hidden rounded-sm"
             >
               <img
-                src="/images/riyadh-kingdom-vertical.png"
-                alt="أبراج الرياض"
+                src="/images/riyadh-business-district.jpg"
+                alt="منطقة الأعمال في الرياض"
                 className="h-[390px] w-full object-cover object-center sm:h-[560px]"
               />
             </motion.figure>
