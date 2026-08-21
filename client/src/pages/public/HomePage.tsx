@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet-async";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { servicesCatalog, pick } from "../../data/servicesCatalog";
 import { useLang } from "../../i18n/LangContext";
 import OfoqLogo from "../../components/OfoqLogo";
@@ -21,52 +21,98 @@ const GRID_STYLE: React.CSSProperties = {
   backgroundSize: "80px 80px",
 };
 
-/* ══ Splash screen — tasama style ══════════════════════════════ */
+/* ══ Splash screen — fast brand intro, completed in three seconds ══ */
 function SplashIntro({ onDone }: { onDone: () => void }) {
-  const [phase, setPhase] = useState<"in" | "hold" | "out">("in");
-  const { ui } = useLang();
+  const [typedCount, setTypedCount] = useState(0);
+  const [strikeVisible, setStrikeVisible] = useState(false);
+  const [showDomain, setShowDomain] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
+  const { lang, dir } = useLang();
+
+  const messages: Record<string, string> = {
+    ar: "خدمات ترتقي بالشركات",
+    en: "Services that elevate businesses",
+    ur: "کاروبار کو ترقی دینے والی خدمات",
+    hi: "व्यवसायों को आगे बढ़ाने वाली सेवाएँ",
+    id: "Layanan yang mengangkat bisnis",
+    de: "Services, die Unternehmen voranbringen",
+    es: "Servicios que impulsan empresas",
+  };
+  const message = messages[lang] ?? messages.en;
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase("hold"), 200);
-    const t2 = setTimeout(() => setPhase("out"), 2600);
-    const t3 = setTimeout(onDone, 3300);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
-  }, [onDone]);
+    let index = 0;
+    const typingInterval = window.setInterval(() => {
+      index += 1;
+      setTypedCount(index);
+      if (index >= message.length) window.clearInterval(typingInterval);
+    }, Math.max(22, Math.floor(1000 / message.length)));
 
-  const words = ui.home.splash ?? ["نرتّب", "التفاصيل،", "لتنتفرغ", "للنمو."];
+    const strikeTimer = window.setTimeout(() => setStrikeVisible(true), 1250);
+    const removeStrikeTimer = window.setTimeout(() => setStrikeVisible(false), 1640);
+    const domainTimer = window.setTimeout(() => setShowDomain(true), 1740);
+    const leaveTimer = window.setTimeout(() => setIsLeaving(true), 2540);
+    const doneTimer = window.setTimeout(onDone, 3000);
+
+    return () => {
+      window.clearInterval(typingInterval);
+      window.clearTimeout(strikeTimer);
+      window.clearTimeout(removeStrikeTimer);
+      window.clearTimeout(domainTimer);
+      window.clearTimeout(leaveTimer);
+      window.clearTimeout(doneTimer);
+    };
+  }, [message, onDone]);
 
   return (
     <motion.div
       initial={{ opacity: 1 }}
-      animate={{ opacity: phase === "out" ? 0 : 1 }}
-      transition={{ duration: 0.7, ease: "easeInOut" }}
-      className="fixed inset-0 z-[200] bg-[#2B273F] flex flex-col items-center justify-center overflow-hidden"
+      animate={{ opacity: isLeaving ? 0 : 1 }}
+      transition={{ duration: 0.45, ease: "easeInOut" }}
+      dir={dir}
+      className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden bg-[#2B273F]"
     >
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: phase === "in" ? 0 : 0.35 }}
-        transition={{ delay: 0.5, duration: 0.8 }}
-        className="absolute bottom-10 text-white text-xs tracking-[.4em] uppercase font-light"
-      >
-        ofoqhc.com
-      </motion.p>
-
-      <div className="flex flex-col items-center gap-1 sm:gap-2 relative z-10">
-        {words.map((word, i) => (
-          <motion.span
-            key={i}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: phase !== "in" ? 1 : 0, y: phase !== "in" ? 0 : 30 }}
-            transition={{ delay: i * 0.18, duration: 0.6, ease }}
-            className={`block font-black leading-none text-center ${
-              i === 1 || i === 2
-                ? "text-4xl sm:text-6xl lg:text-7xl text-[#E5FE04]"
-                : "text-4xl sm:text-6xl lg:text-7xl text-white"
-            }`}
-          >
-            {word}
-          </motion.span>
-        ))}
+      <div className="relative z-10 flex w-[min(92vw,900px)] flex-col items-center text-center">
+        <AnimatePresence mode="wait">
+          {!showDomain ? (
+            <motion.div
+              key="message"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35, ease }}
+              className="relative inline-block max-w-full overflow-hidden px-1"
+            >
+              <p className="min-h-[1.2em] text-sm font-black leading-tight tracking-[-.02em] text-white sm:text-base lg:text-xl">
+                {message.slice(0, typedCount)}
+                <span className="ml-1 inline-block h-[.8em] w-[.05em] translate-y-[.08em] animate-pulse bg-[#E5FE04]" />
+              </p>
+              {strikeVisible && (
+                <motion.span
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  exit={{ scaleX: 0 }}
+                  transition={{ duration: 0.24, ease }}
+                  className="absolute inset-x-1 top-[18%] h-[.68em] origin-right bg-[#C13229]"
+                  aria-hidden="true"
+                />
+              )}
+            </motion.div>
+          ) : (
+            <motion.span
+            key="domain"
+              initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 0.8, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35, ease }}
+            className="text-xs font-light uppercase tracking-[.35em] text-[#E5FE04] sm:text-sm"
+            >
+            <a href="https://www.ofoqhc.com" target="_blank" rel="noreferrer">
+              www.ofoqhc.com
+            </a>
+            </motion.span>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
@@ -92,14 +138,11 @@ const CLIENTS = [
 export default function HomePage() {
   const { lang, dir, ui } = useLang();
   const isRtl = dir === "rtl";
-  // The hero is the primary landing experience, so it should be visible
-  // immediately instead of being held behind the legacy splash screen.
-  const [splashDone, setSplashDone] = useState(true);
+  const [splashDone, setSplashDone] = useState(false);
 
-  const handleSplashDone = () => {
-    sessionStorage.setItem("ofoq_splash_done", "1");
+  const handleSplashDone = useCallback(() => {
     setSplashDone(true);
-  };
+  }, []);
 
   const featuredServices = servicesCatalog.slice(0, 3);
   const aboutDetail = lang === "ar"
@@ -138,14 +181,8 @@ export default function HomePage() {
             directional light, and a white header provided by the layout.
         ════════════════════════════════════════════════════════ */}
         <section className="relative isolate flex min-h-dvh overflow-hidden bg-[#2B273F] pt-16 sm:pt-[72px]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_48%,rgba(51,178,124,.22),transparent_30%),linear-gradient(118deg,#2B273F_0%,#2B273F_56%,#2B273F_100%)]" />
+          <div className="absolute inset-0 bg-[#2B273F]" />
 
-          <motion.div
-            aria-hidden="true"
-            animate={{ opacity: [0.15, 0.38, 0.15], x: ["0%", "-5%", "0%"], y: ["0%", "-4%", "0%"] }}
-            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-            className="pointer-events-none absolute -bottom-1/4 right-[-6%] h-[110%] w-[48%] rotate-[-20deg] bg-[radial-gradient(ellipse_at_center,rgba(229,254,4,.18),rgba(51,178,124,.16)_32%,transparent_69%)] blur-2xl"
-          />
           {/* The creative mark belongs to the hero itself; it is not fixed to the viewport. */}
           <motion.div
             aria-hidden="true"
@@ -156,7 +193,6 @@ export default function HomePage() {
               isRtl ? "left-[-13%] sm:left-[-4%]" : "right-[-13%] sm:right-[-4%]"
             }`}
           >
-            <div className="absolute -inset-[28%] rounded-full bg-[#33B27C]/20 blur-3xl" />
             <OfoqLogo className="relative h-[300px] w-[430px] sm:h-[390px] sm:w-[560px]" />
           </motion.div>
 
