@@ -1,0 +1,19 @@
+kind = "design"
+previewPath = "/__ofoq-hero/"
+title = "OFOQ Hero Design Preview"
+description = "Isolated preview of the OFOQ homepage hero redesign."
+version = "1.0.0"
+id = "artifacts/ofoq-hero-preview"
+router = "path"
+
+[[services]]
+name = "Component Preview Server"
+paths = [ "/__ofoq-hero/" ]
+localPort = 22244
+
+[services.development]
+run = "npm run dev"
+
+[services.env]
+PORT = "22244"
+BASE_PATH = "/__ofoq-hero/"

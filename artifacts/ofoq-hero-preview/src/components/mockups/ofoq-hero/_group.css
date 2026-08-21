@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
+
+.ofoq-hero-preview {
+  font-family: "Cairo", sans-serif;
+}
+
+.ofoq-hero-preview * {
+  box-sizing: border-box;
+}
+
+@keyframes ofoq-hero-glow {
+  0%, 100% { opacity: .36; transform: translate3d(0, 0, 0) rotate(-18deg) scale(1); }
+  50% { opacity: .82; transform: translate3d(-4%, -6%, 0) rotate(-14deg) scale(1.1); }
+}
+
+@keyframes ofoq-hero-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.ofoq-hero-glow {
+  animation: ofoq-hero-glow 8s ease-in-out infinite;
+}
+
+.ofoq-hero-float {
+  animation: ofoq-hero-float 7s ease-in-out infinite;
+}
