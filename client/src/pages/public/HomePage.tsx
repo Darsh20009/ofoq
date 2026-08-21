@@ -49,8 +49,10 @@ function SplashIntro({ onDone }: { onDone: () => void }) {
     }, Math.max(22, Math.floor(1000 / message.length)));
 
     const strikeTimer = window.setTimeout(() => setStrikeVisible(true), 1250);
-    const removeStrikeTimer = window.setTimeout(() => setStrikeVisible(false), 1640);
-    const domainTimer = window.setTimeout(() => setShowDomain(true), 1740);
+    // Swap the content while the red panel is fully covering it, then reveal
+    // the link through the panel's synchronized retracting motion.
+    const domainTimer = window.setTimeout(() => setShowDomain(true), 1540);
+    const removeStrikeTimer = window.setTimeout(() => setStrikeVisible(false), 1840);
     const leaveTimer = window.setTimeout(() => setIsLeaving(true), 2540);
     const doneTimer = window.setTimeout(onDone, 3000);
 
@@ -73,45 +75,49 @@ function SplashIntro({ onDone }: { onDone: () => void }) {
       className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden bg-[#2B273F]"
     >
       <div className="relative z-10 flex w-[min(92vw,900px)] flex-col items-center text-center">
-        <AnimatePresence mode="wait">
-          {!showDomain ? (
-            <motion.div
-              key="message"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.35, ease }}
-              className="relative inline-block max-w-full overflow-hidden px-1"
-            >
-              <p className="min-h-[1.2em] text-sm font-black leading-tight tracking-[-.02em] text-white sm:text-base lg:text-xl">
+        <div className="relative inline-grid max-w-full overflow-hidden px-1">
+          <AnimatePresence mode="wait" initial={false}>
+            {showDomain ? (
+              <motion.a
+                key="domain"
+                href="https://www.ofoqhc.com"
+                target="_blank"
+                rel="noreferrer"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 0.82, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.24, ease }}
+                className="col-start-1 row-start-1 self-center text-xs font-light uppercase tracking-[.35em] text-[#E5FE04] sm:text-sm"
+              >
+                www.ofoqhc.com
+              </motion.a>
+            ) : (
+              <motion.p
+                key="message"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.35, ease }}
+                className="col-start-1 row-start-1 min-h-[1.2em] self-center text-sm font-black leading-tight tracking-[-.02em] text-white sm:text-base lg:text-xl"
+              >
                 {message.slice(0, typedCount)}
                 <span className="ml-1 inline-block h-[.8em] w-[.05em] translate-y-[.08em] animate-pulse bg-[#E5FE04]" />
-              </p>
-              {strikeVisible && (
-                <motion.span
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.3, ease }}
-                  className="absolute inset-0 z-20 origin-right bg-[#C13229]"
-                  aria-hidden="true"
-                />
-              )}
-            </motion.div>
-          ) : (
-            <motion.span
-            key="domain"
-              initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 0.8, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.35, ease }}
-            className="text-xs font-light uppercase tracking-[.35em] text-[#E5FE04] sm:text-sm"
-            >
-            <a href="https://www.ofoqhc.com" target="_blank" rel="noreferrer">
-              www.ofoqhc.com
-            </a>
-            </motion.span>
-          )}
-        </AnimatePresence>
+              </motion.p>
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {strikeVisible && (
+              <motion.span
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                exit={{ scaleX: 0 }}
+                transition={{ duration: 0.3, ease }}
+                className="pointer-events-none absolute inset-0 z-20 origin-right bg-[#C13229]"
+                aria-hidden="true"
+              />
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </motion.div>
   );
