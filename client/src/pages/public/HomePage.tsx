@@ -117,21 +117,11 @@ function SplashIntro({ onDone }: { onDone: () => void }) {
   );
 }
 
-/* ══ Clients grid — exactly like tasama ════════════════════════ */
-const CLIENTS = [
-  { name: "Aramco",         sector: "Energy" },
-  { name: "SABIC",          sector: "Chemicals" },
-  { name: "STC",            sector: "Telecom" },
-  { name: "Mobily",         sector: "Telecom" },
-  { name: "BinLadin Group", sector: "Construction" },
-  { name: "Kingdom Holding",sector: "Holding" },
-  { name: "Riyad Bank",     sector: "Finance" },
-  { name: "Wataniya",       sector: "Insurance" },
-  { name: "Al-Faisaliah",   sector: "Real Estate" },
-  { name: "Dur Hospitality",sector: "Hospitality" },
-  { name: "Manafea",        sector: "Services" },
-  { name: "Namaa",          sector: "Investment" },
-];
+/* ══ Client logos — supplied brand marks, prepared without backgrounds ══ */
+const CLIENT_LOGOS = Array.from({ length: 10 }, (_, index) => ({
+  src: `/images/client-logos/client-${String(index + 1).padStart(2, "0")}.png`,
+  alt: `شعار عميل أفق ${index + 1}`,
+}));
 
 /* ══ Main component ═════════════════════════════════════════════ */
 export default function HomePage() {
@@ -322,7 +312,7 @@ export default function HomePage() {
         {/* ════════════════════════════════════════════════════════
             VISION / MISSION — image-led vision and blue mission field
         ════════════════════════════════════════════════════════ */}
-        <section className="overflow-hidden bg-[#1608A8] text-white">
+        <section className="overflow-hidden bg-[#2B273F] text-white">
           <div className="relative h-[330px] overflow-hidden sm:h-[480px] lg:h-[560px]">
             <img
               src="/images/riyadh-business-district.jpg"
@@ -347,6 +337,13 @@ export default function HomePage() {
           </div>
 
           <div className="relative min-h-[370px] overflow-hidden px-6 py-12 sm:min-h-[460px] sm:px-10 sm:py-16 lg:px-16">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute bottom-[-8%] left-1/2 z-0 -translate-x-1/2 opacity-[0.08]"
+            >
+              <OfoqLogo className="h-[390px] w-[550px] sm:h-[520px] sm:w-[730px]" />
+            </div>
+
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -382,46 +379,60 @@ export default function HomePage() {
         </section>
 
         {/* ════════════════════════════════════════════════════════
-            CLIENTS — WHITE, logo GRID exactly like tasama
+            CLIENTS — paired continuous logo columns
         ════════════════════════════════════════════════════════ */}
-        <section className="bg-white border-t border-gray-100">
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 pt-20 pb-0">
-            <div className="flex flex-wrap items-end gap-6 mb-0">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-3">
-                  {ui.home.clientsBadge}
-                </p>
-                <h2 className="text-3xl sm:text-4xl font-black text-gray-900">
-                  {ui.home.clientsTitle1} <span className="text-[#33B27C]">{ui.home.clientsTitle2}</span>
-                </h2>
-              </div>
-              <p className="text-gray-400 text-sm max-w-sm pb-1">
-                {ui.home.clientsDesc}
-              </p>
-            </div>
+        <section className="overflow-hidden bg-white">
+          <div className="mx-auto max-w-4xl px-6 pt-20 text-center sm:px-10 sm:pt-28">
+            <p className="mb-2 text-sm font-black text-[#2B273F] sm:text-lg">
+              {ui.home.clientsBadge}
+            </p>
+            <h2 className="text-4xl font-black tracking-[-.045em] text-[#2B273F] sm:text-6xl">
+              {ui.home.clientsTitle1}{" "}
+              <span className="text-[#C5B278]">{ui.home.clientsTitle2}</span>
+            </h2>
+            <p className="mx-auto mt-6 max-w-xl text-base leading-7 text-[#2B273F]/70 sm:text-lg">
+              {ui.home.clientsDesc}
+            </p>
           </div>
 
-          {/* Clients grid — bordered cells exactly like tasama */}
-          <div className="mt-12 border-t border-gray-200">
-            <div className="max-w-7xl mx-auto">
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-                {CLIENTS.map((c, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.04, duration: 0.5 }}
-                    className="border-b border-r border-gray-200 py-10 px-6 flex flex-col items-center justify-center gap-2 hover:bg-[#f8f7ff] transition-colors group cursor-default"
-                  >
-                    <span className="text-gray-800 font-black text-sm sm:text-base tracking-wide group-hover:text-[#2B273F] transition-colors">
-                      {c.name}
-                    </span>
-                    <span className="text-gray-400 text-[10px] uppercase tracking-[.2em]">{c.sector}</span>
-                  </motion.div>
+          <div className="relative mx-auto mt-12 h-[470px] max-w-3xl overflow-hidden px-8 sm:mt-16 sm:h-[610px] sm:px-14">
+            <div className="grid h-full grid-cols-2 gap-x-12 sm:gap-x-28">
+              <motion.div
+                aria-label="شعارات عملاء أفق"
+                animate={{ y: isRtl ? ["0%", "-50%"] : ["-50%", "0%"] }}
+                transition={{ duration: 27, ease: "linear", repeat: Infinity }}
+                className="flex flex-col"
+              >
+                {[0, 1].map((repeat) => (
+                  <div key={repeat} className="flex flex-col gap-12 pb-12 sm:gap-16 sm:pb-16">
+                    {CLIENT_LOGOS.filter((_, index) => index % 2 === 0).map((logo) => (
+                      <div key={`${repeat}-${logo.src}`} className="flex h-16 items-center justify-center sm:h-20">
+                        <img src={logo.src} alt={logo.alt} className="max-h-full max-w-full object-contain" />
+                      </div>
+                    ))}
+                  </div>
                 ))}
-              </div>
+              </motion.div>
+
+              <motion.div
+                aria-label="شعارات عملاء أفق"
+                animate={{ y: isRtl ? ["-50%", "0%"] : ["0%", "-50%"] }}
+                transition={{ duration: 27, ease: "linear", repeat: Infinity }}
+                className="flex flex-col"
+              >
+                {[0, 1].map((repeat) => (
+                  <div key={repeat} className="flex flex-col gap-12 pb-12 sm:gap-16 sm:pb-16">
+                    {CLIENT_LOGOS.filter((_, index) => index % 2 === 1).map((logo) => (
+                      <div key={`${repeat}-${logo.src}`} className="flex h-16 items-center justify-center sm:h-20">
+                        <img src={logo.src} alt={logo.alt} className="max-h-full max-w-full object-contain" />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </motion.div>
             </div>
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white to-transparent sm:h-24" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent sm:h-24" />
           </div>
         </section>
 
