@@ -65,6 +65,17 @@ function OfoqDecoration({ className = "" }: { className?: string }) {
   );
 }
 
+function OfoqLogoFrame() {
+  return (
+    <svg viewBox="0 0 92 62" fill="none" className="absolute -inset-x-3 -inset-y-2 h-[calc(100%+16px)] w-[calc(100%+24px)]" aria-hidden="true">
+      <path d="M7 31 21 7h46l18 12v28l-18 8H21L7 31Z" stroke="#D7C86C" strokeWidth="1.15" />
+      <path d="M7 31h32l16-24M39 31l28 24M39 31l28-12" stroke="#D7C86C" strokeWidth=".9" opacity=".75" />
+      <circle cx="7" cy="31" r="2" fill="#C13229" />
+      <circle cx="85" cy="47" r="2" fill="#C13229" />
+    </svg>
+  );
+}
+
 /* ══ المكوّن الرئيسي ═══════════════════════════════════════════ */
 export default function PublicLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -126,7 +137,10 @@ export default function PublicLayout() {
       >
         {/* الشعار */}
         <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
-          <OfoqLogo className="w-10 h-7 sm:w-12 sm:h-9" dark={isHomePage} />
+          <span className="relative flex h-9 w-12 items-center justify-center sm:h-10 sm:w-14">
+            {isHomePage && <OfoqLogoFrame />}
+            <OfoqLogo className="relative z-10 h-7 w-10 sm:h-9 sm:w-12" dark={isHomePage} />
+          </span>
           <div className="leading-none hidden sm:block">
             <p className={`font-black text-sm ${isHomePage ? "text-[#0B0A35]" : "text-white"}`}>أفق</p>
             <p className={`text-[9px] tracking-wide ${isHomePage ? "text-[#8B825B]" : "text-white/40"}`}>OFOQ BUSINESS SERVICES</p>

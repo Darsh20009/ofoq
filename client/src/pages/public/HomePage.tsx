@@ -134,20 +134,26 @@ export default function HomePage() {
             HERO — OFOQ reference: deep blue field, warm wireframe,
             directional light, and a white header provided by the layout.
         ════════════════════════════════════════════════════════ */}
-        <section className="relative isolate flex min-h-dvh overflow-hidden bg-[#08065F] pt-16 sm:pt-[72px]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_50%,rgba(44,53,188,.5),transparent_32%),linear-gradient(112deg,#07055A_0%,#0B0871_52%,#050447_100%)]" />
+        <section className="relative isolate flex min-h-dvh overflow-hidden bg-[#090637] pt-16 sm:pt-[72px]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_47%,rgba(48,61,190,.62),transparent_29%),radial-gradient(circle_at_32%_110%,rgba(103,39,132,.42),transparent_47%),linear-gradient(118deg,#080636_0%,#17104D_48%,#0B0751_100%)]" />
           <div className="absolute inset-0 pointer-events-none opacity-50" style={GRID_STYLE} />
 
           <motion.div
             aria-hidden="true"
-            animate={{ opacity: [0.35, 0.72, 0.35], x: ["0%", "-5%", "0%"], y: ["0%", "-4%", "0%"] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="pointer-events-none absolute -bottom-1/4 right-[-6%] h-[110%] w-[48%] rotate-[-20deg] bg-[radial-gradient(ellipse_at_center,rgba(184,191,255,.72),rgba(100,107,255,.23)_32%,transparent_69%)] blur-2xl"
+            animate={{ opacity: [0.25, 0.7, 0.25], x: ["0%", "-5%", "0%"], y: ["0%", "-4%", "0%"] }}
+            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+            className="pointer-events-none absolute -bottom-1/4 right-[-6%] h-[110%] w-[48%] rotate-[-20deg] bg-[radial-gradient(ellipse_at_center,rgba(164,175,255,.7),rgba(94,81,221,.28)_32%,transparent_69%)] blur-2xl"
+          />
+          <motion.div
+            aria-hidden="true"
+            animate={{ opacity: [0.12, 0.45, 0.12], x: ["0%", "4%", "0%"] }}
+            transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+            className="pointer-events-none absolute -top-1/2 left-[-14%] h-[90%] w-[48%] rounded-full bg-[#6F3C8F] blur-[150px]"
           />
 
           <svg
             viewBox="0 0 820 680"
-            className={`pointer-events-none absolute -bottom-28 h-[680px] w-[820px] opacity-85 ${
+            className={`pointer-events-none fixed bottom-[-7rem] z-0 h-[680px] w-[820px] opacity-85 ${
               isRtl ? "-left-44" : "-right-44 -scale-x-100"
             }`}
             fill="none"
@@ -175,9 +181,9 @@ export default function HomePage() {
                 className="text-[clamp(3.1rem,7vw,6.8rem)] font-medium leading-[1.12] tracking-[-.045em]"
               >
                 <span className="block text-white">{ui.home.hero1}</span>
-                <span className="block text-white">
-                  {ui.home.hero2}{" "}
-                  <span className="font-black text-[#D7B34B]">{ui.home.hero3}</span>
+                <span className="block font-black text-[#D7B34B]">
+                  {ui.home.hero2}
+                  {ui.home.hero3 ? ` ${ui.home.hero3}` : ""}
                 </span>
               </motion.h1>
 
