@@ -10,3 +10,4 @@
 - [Admin transition overlay](admin-transition-overlay.md) — page loader callbacks must not restart timers during auth/data re-renders
 - [i18n nav fix](i18n-nav-fix.md) — all 5 language overrides (ur/hi/id/de/es) must have header.nav[]; ur and id need full about/services/home keys (no ...en spread)
 - [Admin CMS site content](admin-cms-site-content.md) — SiteContentPage + /api/cms/site-content GET+PUT; LangContext deepMerges DB patch over getUiCopy()
+- [OFOQ visual palette](ofoq-visual-palette.md) — primary UI palette is deep violet, green, and lime across future public-facing work.

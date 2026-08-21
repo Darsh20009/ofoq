@@ -118,6 +118,14 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads"), {
   maxAge: 0,
   setHeaders: (res) => res.setHeader("Cache-Control", "no-cache"),
 }));
+// The approved About-section portrait is kept as the original uploaded asset.
+app.get("/images/about-person.png", (_req, res) => {
+  res.sendFile(path.join(
+    process.cwd(),
+    "attached_assets",
+    "Screenshot_1448-03-08_at_7.46.23_PM_1787330808736.png",
+  ));
+});
 // public (icons, images, manifest): long-lived cache — 30 days
 const publicDir = path.join(process.cwd(), "public");
 const PUBLIC_CACHE = { maxAge: "30d", immutable: false } as const;

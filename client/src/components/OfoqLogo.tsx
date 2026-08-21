@@ -13,7 +13,7 @@ interface Props {
  */
 export default function OfoqLogo({ className = "w-28 h-20", dark = false }: Props) {
   const mark = dark ? "#2B273F" : "#FFFFFF";
-  const red = "#C13229";
+  const red = "#33B27C";
 
   return (
     <svg

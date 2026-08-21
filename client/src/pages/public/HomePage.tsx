@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet-async";
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { servicesCatalog, pick } from "../../data/servicesCatalog";
 import { useLang } from "../../i18n/LangContext";
+import OfoqLogo from "../../components/OfoqLogo";
 
 /* ══ Animation presets ══════════════════════════════════════════ */
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -41,9 +42,6 @@ function SplashIntro({ onDone }: { onDone: () => void }) {
       transition={{ duration: 0.7, ease: "easeInOut" }}
       className="fixed inset-0 z-[200] bg-[#2B273F] flex flex-col items-center justify-center overflow-hidden"
     >
-      {/* Grid overlay */}
-      <div className="absolute inset-0 pointer-events-none" style={GRID_STYLE} />
-
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: phase === "in" ? 0 : 0.35 }}
@@ -62,7 +60,7 @@ function SplashIntro({ onDone }: { onDone: () => void }) {
             transition={{ delay: i * 0.18, duration: 0.6, ease }}
             className={`block font-black leading-none text-center ${
               i === 1 || i === 2
-                ? "text-4xl sm:text-6xl lg:text-7xl text-[#33B27C]"
+                ? "text-4xl sm:text-6xl lg:text-7xl text-[#E5FE04]"
                 : "text-4xl sm:text-6xl lg:text-7xl text-white"
             }`}
           >
@@ -72,17 +70,6 @@ function SplashIntro({ onDone }: { onDone: () => void }) {
       </div>
     </motion.div>
   );
-}
-
-/* ══ Animated counter ═══════════════════════════════════════════ */
-function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "0px 0px -80px 0px" });
-  const val = useMotionValue(0);
-  const spring = useSpring(val, { duration: 1800, bounce: 0 });
-  const display = useTransform(spring, (v) => Math.round(v) + suffix);
-  useEffect(() => { if (inView) val.set(to); }, [inView, to, val]);
-  return <motion.span ref={ref}>{display}</motion.span>;
 }
 
 /* ══ Clients grid — exactly like tasama ════════════════════════ */
@@ -115,6 +102,22 @@ export default function HomePage() {
   };
 
   const featuredServices = servicesCatalog.slice(0, 3);
+  const aboutDetail = lang === "ar"
+    ? "نقدّم حلول أعمال متكاملة تدعم الكفاءة التشغيلية، وتُسهّل رحلة المنشآت من التأسيس إلى النمو بثقة."
+    : "We deliver integrated business solutions that strengthen operational efficiency and support companies from formation to confident growth.";
+  const aboutQuote = lang === "ar"
+    ? "خدمات أعمال تعزّز النمو وتدعم التنمية المستدامة بما يتماشى مع رؤية السعودية"
+    : "Business services that advance sustainable growth in line with Saudi Vision.";
+
+  useEffect(() => {
+    const scrollToHash = () => {
+      const target = document.getElementById(window.location.hash.slice(1));
+      if (target) requestAnimationFrame(() => target.scrollIntoView({ block: "start" }));
+    };
+    scrollToHash();
+    window.addEventListener("hashchange", scrollToHash);
+    return () => window.removeEventListener("hashchange", scrollToHash);
+  }, []);
 
   return (
     <>
@@ -134,36 +137,15 @@ export default function HomePage() {
             HERO — OFOQ reference: deep blue field, warm wireframe,
             directional light, and a white header provided by the layout.
         ════════════════════════════════════════════════════════ */}
-        <section className="relative isolate flex min-h-dvh overflow-hidden bg-[#090637] pt-16 sm:pt-[72px]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_47%,rgba(48,61,190,.62),transparent_29%),radial-gradient(circle_at_32%_110%,rgba(103,39,132,.42),transparent_47%),linear-gradient(118deg,#080636_0%,#17104D_48%,#0B0751_100%)]" />
-          <div className="absolute inset-0 pointer-events-none opacity-50" style={GRID_STYLE} />
+        <section className="relative isolate flex min-h-dvh overflow-hidden bg-[#2B273F] pt-16 sm:pt-[72px]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_48%,rgba(51,178,124,.22),transparent_30%),linear-gradient(118deg,#2B273F_0%,#2B273F_56%,#2B273F_100%)]" />
 
           <motion.div
             aria-hidden="true"
-            animate={{ opacity: [0.25, 0.7, 0.25], x: ["0%", "-5%", "0%"], y: ["0%", "-4%", "0%"] }}
+            animate={{ opacity: [0.15, 0.38, 0.15], x: ["0%", "-5%", "0%"], y: ["0%", "-4%", "0%"] }}
             transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-            className="pointer-events-none absolute -bottom-1/4 right-[-6%] h-[110%] w-[48%] rotate-[-20deg] bg-[radial-gradient(ellipse_at_center,rgba(164,175,255,.7),rgba(94,81,221,.28)_32%,transparent_69%)] blur-2xl"
+            className="pointer-events-none absolute -bottom-1/4 right-[-6%] h-[110%] w-[48%] rotate-[-20deg] bg-[radial-gradient(ellipse_at_center,rgba(229,254,4,.18),rgba(51,178,124,.16)_32%,transparent_69%)] blur-2xl"
           />
-          <motion.div
-            aria-hidden="true"
-            animate={{ opacity: [0.12, 0.45, 0.12], x: ["0%", "4%", "0%"] }}
-            transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
-            className="pointer-events-none absolute -top-1/2 left-[-14%] h-[90%] w-[48%] rounded-full bg-[#6F3C8F] blur-[150px]"
-          />
-
-          <svg
-            viewBox="0 0 820 680"
-            className={`pointer-events-none fixed bottom-[-7rem] z-0 h-[680px] w-[820px] opacity-85 ${
-              isRtl ? "-left-44" : "-right-44 -scale-x-100"
-            }`}
-            fill="none"
-            aria-hidden="true"
-          >
-            <path d="M-118 258C63 114 233 98 438 118L574 202V461L308 520L-118 418V258Z" stroke="#D7C86C" strokeWidth="1.5" />
-            <path d="M-118 258L308 347L574 202M308 347V520M-118 418L308 347" stroke="#D7C86C" strokeWidth="1.5" />
-            <path d="M-69 235C99 161 245 145 462 163M-69 294C106 229 276 219 533 242" stroke="#D7C86C" strokeWidth="1.15" opacity=".85" />
-            <path d="M-48 430C140 447 313 480 574 461" stroke="#D7C86C" strokeWidth="1.15" opacity=".66" />
-          </svg>
 
           <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center px-6 py-20 sm:px-10 sm:py-24">
             <motion.div
@@ -172,7 +154,7 @@ export default function HomePage() {
               variants={stagger}
               className={`w-full max-w-2xl ${isRtl ? "mr-auto text-right sm:mr-0 sm:pr-[7%]" : "ml-auto text-left sm:ml-0 sm:pl-[7%]"}`}
             >
-              <motion.p variants={fadeUp} className="mb-6 text-[10px] font-bold uppercase tracking-[.28em] text-[#D7C86C]">
+              <motion.p variants={fadeUp} className="mb-6 text-[10px] font-bold uppercase tracking-[.28em] text-[#E5FE04]">
                 {ui.home.badge}
               </motion.p>
 
@@ -181,7 +163,7 @@ export default function HomePage() {
                 className="text-[clamp(3.1rem,7vw,6.8rem)] font-medium leading-[1.12] tracking-[-.045em]"
               >
                 <span className="block text-white">{ui.home.hero1}</span>
-                <span className="block font-black text-[#D7B34B]">
+                <span className="block font-black text-[#E5FE04]">
                   {ui.home.hero2}
                   {ui.home.hero3 ? ` ${ui.home.hero3}` : ""}
                 </span>
@@ -194,9 +176,9 @@ export default function HomePage() {
               <motion.div variants={fadeUp} className="mt-9 flex flex-wrap items-center gap-5">
                 <Link
                   to="/services"
-                  className="group inline-flex items-center gap-3 rounded-full bg-white py-2.5 pl-6 pr-3 text-sm font-extrabold text-[#11102F] shadow-[0_12px_30px_rgba(0,0,0,.2)] transition-all duration-300 hover:-translate-y-0.5"
+                  className="group inline-flex items-center gap-3 rounded-full bg-white py-2.5 pl-6 pr-3 text-sm font-extrabold text-[#2B273F] shadow-[0_12px_30px_rgba(0,0,0,.2)] transition-all duration-300 hover:-translate-y-0.5"
                 >
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#B6E186] text-xl font-normal text-white transition-transform duration-300 group-hover:translate-x-0.5">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#33B27C] text-xl font-normal text-white transition-transform duration-300 group-hover:translate-x-0.5">
                     {isRtl ? "←" : "→"}
                   </span>
                   {ui.home.explore}
@@ -217,66 +199,75 @@ export default function HomePage() {
         </section>
 
         {/* ════════════════════════════════════════════════════════
-            ABOUT — WHITE section (tasama inner white style)
+            ABOUT — editorial story, portrait, then city image
         ════════════════════════════════════════════════════════ */}
-        <section className="bg-white text-gray-900">
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 py-24 sm:py-32">
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-              {/* Text */}
-              <motion.div
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-                variants={stagger}
-              >
-                <motion.p variants={fadeUp} className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-6">
-                  {ui.home.aboutBadge}
-                </motion.p>
-                <motion.h2 variants={fadeUp} className="text-4xl sm:text-5xl font-black leading-tight mb-6 text-gray-900">
-                  {ui.home.aboutTitle1}{" "}
-                  <span className="text-[#2B273F]">{ui.home.aboutTitle2}</span>
-                </motion.h2>
-                <motion.p variants={fadeUp} className="text-gray-500 text-base leading-8 max-w-lg mb-8">
-                  {ui.home.aboutDesc}
-                </motion.p>
-                <motion.div variants={fadeUp}>
-                  <Link
-                    to="/about"
-                    className="group inline-flex items-center gap-3 font-black text-sm text-[#2B273F]"
-                  >
-                    <span className="w-10 h-10 rounded-full bg-[#33B27C] flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover:scale-110">
-                      <svg viewBox="0 0 16 16" fill="none" className={`w-4 h-4 ${isRtl ? "rotate-180" : ""}`}>
-                        <path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </span>
-                    {ui.home.aboutCta}
-                  </Link>
-                </motion.div>
+        <section id="about" className="bg-white text-[#2B273F]">
+          <div className="mx-auto max-w-4xl px-6 py-24 sm:px-10 sm:py-32">
+            <motion.div
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+              variants={stagger}
+              className={isRtl ? "text-right" : "text-left"}
+            >
+              <motion.div variants={fadeUp} className="mb-7">
+                <OfoqLogo className="h-8 w-11" dark />
               </motion.div>
+              <motion.p variants={fadeUp} className="mb-4 text-xs font-black tracking-[.16em] text-[#33B27C]">
+                {ui.home.aboutBadge}
+              </motion.p>
+              <motion.h2 variants={fadeUp} className="max-w-3xl text-4xl font-black leading-[1.2] tracking-[-.03em] sm:text-6xl">
+                {ui.home.aboutTitle1}{" "}
+                <span className="text-[#33B27C]">{ui.home.aboutTitle2}</span>
+              </motion.h2>
+              <motion.p variants={fadeUp} className="mt-8 max-w-3xl text-base leading-8 text-[#2B273F]/75 sm:text-lg sm:leading-9">
+                {ui.home.aboutDesc}
+              </motion.p>
+              <motion.p variants={fadeUp} className="mt-5 max-w-3xl text-base leading-8 text-[#2B273F]/75 sm:text-lg sm:leading-9">
+                {aboutDetail}
+              </motion.p>
+              <motion.div variants={fadeUp} className="mt-9">
+                <Link to="/about" className="group inline-flex items-center gap-3 text-sm font-black text-[#2B273F]">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#33B27C] transition-transform duration-300 group-hover:scale-110">
+                    <svg viewBox="0 0 16 16" fill="none" className={`h-4 w-4 ${isRtl ? "rotate-180" : ""}`}>
+                      <path d="M3 8h10M9 4l4 4-4 4" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                  {ui.home.aboutCta}
+                </Link>
+              </motion.div>
+            </motion.div>
 
-              {/* Stats grid — white section tasama style */}
-              <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.9, ease }}
-                className="grid grid-cols-2 gap-px bg-gray-200"
-              >
-                {[
-                  { n: 200, suffix: "+", label: ui.home.stats[0] },
-                  { n: 98,  suffix: "%", label: ui.home.stats[1] },
-                  { n: 50,  suffix: "+", label: ui.home.stats[2] },
-                  { n: 7,   suffix: "",  label: ui.home.stats[3] },
-                ].map(({ n, suffix, label }, i) => (
-                  <div key={i} className="bg-white p-8 sm:p-10">
-                    <p className="text-4xl sm:text-5xl font-black text-[#2B273F]">
-                      <Counter to={n} suffix={suffix} />
-                    </p>
-                    <p className="text-gray-400 text-sm mt-2">{label}</p>
-                  </div>
-                ))}
-              </motion.div>
-            </div>
+            <motion.div
+              id="about-story"
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+              transition={{ duration: 0.8, ease }}
+              className={`mt-20 flex items-center gap-4 ${isRtl ? "justify-end text-right" : "justify-start text-left"}`}
+            >
+              <div className="relative h-16 w-16 shrink-0 rounded-full border-[3px] border-[#33B27C] bg-white p-1 shadow-sm">
+                <img src="/images/about-person.png" alt="" className="h-full w-full rounded-full object-cover object-top" />
+                <span className="absolute -bottom-1 -left-2 flex h-7 w-7 items-center justify-center rounded-full bg-[#E5FE04] text-lg font-black leading-none text-[#2B273F]">“</span>
+              </div>
+              <p className="max-w-xl text-lg font-bold leading-8 text-[#2B273F] sm:text-xl">
+                {aboutQuote}
+              </p>
+            </motion.div>
+
+            <motion.figure
+              initial={{ opacity: 0, y: 34 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+              transition={{ duration: 0.9, ease }}
+              className="mt-8 overflow-hidden rounded-sm"
+            >
+              <img
+                src="/images/riyadh-kingdom-vertical.png"
+                alt="أبراج الرياض"
+                className="h-[390px] w-full object-cover object-center sm:h-[560px]"
+              />
+            </motion.figure>
           </div>
         </section>
 
