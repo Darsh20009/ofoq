@@ -73,6 +73,7 @@ export default function PublicLayout() {
   const { pathname } = useLocation();
   const { lang, setLang, langs, ui } = useLang();
   const isRtl = lang === "ar" || lang === "ur";
+  const isHomePage = pathname === "/";
   const navLinks = NAV_HREFS.map((href, i) => ({ href, label: (ui.header.nav ?? [])[i] ?? href }));
 
   /* إغلاق الـ drawer عند تغيير الصفحة */
@@ -117,14 +118,18 @@ export default function PublicLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-[#2B273F]" dir={isRtl ? "rtl" : "ltr"}>
 
-      {/* ══ الهيدر الثابت المنسجم مع تسامي ══════════════════════ */}
-      <header className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 sm:px-10 h-16 sm:h-[72px]">
+      {/* ══ الهيدر الثابت — أبيض فوق هيرو الصفحة الرئيسية ═════════ */}
+      <header
+        className={`fixed top-0 inset-x-0 z-50 flex h-16 items-center justify-between px-6 transition-colors sm:h-[72px] sm:px-10 ${
+          isHomePage ? "bg-white text-[#0B0A35] shadow-[0_1px_0_rgba(11,10,53,.08)]" : "text-white"
+        }`}
+      >
         {/* الشعار */}
         <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
-          <OfoqLogo className="w-10 h-7 sm:w-12 sm:h-9" />
+          <OfoqLogo className="w-10 h-7 sm:w-12 sm:h-9" dark={isHomePage} />
           <div className="leading-none hidden sm:block">
-            <p className="font-black text-sm text-white">أفق</p>
-            <p className="text-[9px] text-white/40 tracking-wide">OFOQ</p>
+            <p className={`font-black text-sm ${isHomePage ? "text-[#0B0A35]" : "text-white"}`}>أفق</p>
+            <p className={`text-[9px] tracking-wide ${isHomePage ? "text-[#8B825B]" : "text-white/40"}`}>OFOQ BUSINESS SERVICES</p>
           </div>
         </Link>
 
@@ -134,10 +139,12 @@ export default function PublicLayout() {
           <select
             value={lang}
             onChange={(e) => setLang(e.target.value as typeof lang)}
-            className="bg-transparent text-white/60 text-xs font-bold outline-none cursor-pointer hover:text-white transition-colors"
+            className={`bg-transparent text-xs font-bold outline-none cursor-pointer transition-colors ${
+              isHomePage ? "text-[#0B0A35]/75 hover:text-[#0B0A35]" : "text-white/60 hover:text-white"
+            }`}
           >
             {langs.map((l) => (
-              <option key={l.code} value={l.code} className="bg-[#2B273F] text-white">
+              <option key={l.code} value={l.code} className={isHomePage ? "bg-white text-[#0B0A35]" : "bg-[#2B273F] text-white"}>
                 {l.label}
               </option>
             ))}
@@ -146,7 +153,9 @@ export default function PublicLayout() {
           {/* زر بوابة العميل */}
           <Link
             to="/client/login"
-            className="hidden sm:flex text-xs font-bold text-white/60 hover:text-white transition-colors"
+            className={`hidden sm:flex text-xs font-bold transition-colors ${
+              isHomePage ? "text-[#0B0A35]/75 hover:text-[#0B0A35]" : "text-white/60 hover:text-white"
+            }`}
           >
             {ui.header.clientLogin}
           </Link>
@@ -154,7 +163,9 @@ export default function PublicLayout() {
           {/* زر المزيد */}
           <button
             onClick={() => setDrawerOpen(true)}
-            className="flex items-center gap-2 text-white/70 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest"
+            className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-colors ${
+              isHomePage ? "text-[#0B0A35]/80 hover:text-[#0B0A35]" : "text-white/70 hover:text-white"
+            }`}
           >
             {ui.header.menu}
             <span className="flex flex-col gap-[5px]">

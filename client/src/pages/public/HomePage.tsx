@@ -105,9 +105,9 @@ const CLIENTS = [
 export default function HomePage() {
   const { lang, dir, ui } = useLang();
   const isRtl = dir === "rtl";
-  const [splashDone, setSplashDone] = useState(() =>
-    sessionStorage.getItem("ofoq_splash_done") === "1"
-  );
+  // The hero is the primary landing experience, so it should be visible
+  // immediately instead of being held behind the legacy splash screen.
+  const [splashDone, setSplashDone] = useState(true);
 
   const handleSplashDone = () => {
     sessionStorage.setItem("ofoq_splash_done", "1");
@@ -131,78 +131,81 @@ export default function HomePage() {
       <div dir={dir}>
 
         {/* ════════════════════════════════════════════════════════
-            HERO — dark, full viewport, grid overlay, tasama exact
+            HERO — OFOQ reference: deep blue field, warm wireframe,
+            directional light, and a white header provided by the layout.
         ════════════════════════════════════════════════════════ */}
-        <section className="relative min-h-dvh flex flex-col justify-end overflow-hidden bg-[#2B273F]">
-          {/* Grid overlay like tasama */}
-          <div className="absolute inset-0 pointer-events-none" style={GRID_STYLE} />
+        <section className="relative isolate flex min-h-dvh overflow-hidden bg-[#08065F] pt-16 sm:pt-[72px]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_50%,rgba(44,53,188,.5),transparent_32%),linear-gradient(112deg,#07055A_0%,#0B0871_52%,#050447_100%)]" />
+          <div className="absolute inset-0 pointer-events-none opacity-50" style={GRID_STYLE} />
 
-          <img
-            src="/images/riyadh-business-district.jpg"
-            alt=""
-            decoding="async"
-            className="absolute inset-0 h-full w-full object-cover opacity-20"
+          <motion.div
+            aria-hidden="true"
+            animate={{ opacity: [0.35, 0.72, 0.35], x: ["0%", "-5%", "0%"], y: ["0%", "-4%", "0%"] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="pointer-events-none absolute -bottom-1/4 right-[-6%] h-[110%] w-[48%] rotate-[-20deg] bg-[radial-gradient(ellipse_at_center,rgba(184,191,255,.72),rgba(100,107,255,.23)_32%,transparent_69%)] blur-2xl"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#2B273F]/40 via-[#2B273F]/60 to-[#2B273F]" />
 
-          {/* Geometric decoration — tasama style */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <svg viewBox="0 0 600 600" className="absolute -right-20 -top-20 w-[600px] h-[600px] opacity-[0.08]" aria-hidden="true">
-              <rect x="60" y="60" width="220" height="220" stroke="#33B27C" strokeWidth="1.5" fill="none" />
-              <rect x="120" y="120" width="220" height="220" stroke="#E5FE04" strokeWidth="1.5" fill="none" />
-              <rect x="180" y="180" width="220" height="220" stroke="#33B27C" strokeWidth="1.5" fill="none" />
-              <line x1="60" y1="280" x2="280" y2="60" stroke="#E5FE04" strokeWidth="1" opacity="0.4" />
-            </svg>
-            <svg viewBox="0 0 300 300" className="absolute -left-10 bottom-20 w-[300px] h-[300px] opacity-[0.07]" aria-hidden="true">
-              <rect x="30" y="30" width="120" height="120" stroke="#E5FE04" strokeWidth="1" fill="none" />
-              <rect x="70" y="70" width="120" height="120" stroke="#33B27C" strokeWidth="1" fill="none" />
-            </svg>
-          </div>
+          <svg
+            viewBox="0 0 820 680"
+            className={`pointer-events-none absolute -bottom-28 h-[680px] w-[820px] opacity-85 ${
+              isRtl ? "-left-44" : "-right-44 -scale-x-100"
+            }`}
+            fill="none"
+            aria-hidden="true"
+          >
+            <path d="M-118 258C63 114 233 98 438 118L574 202V461L308 520L-118 418V258Z" stroke="#D7C86C" strokeWidth="1.5" />
+            <path d="M-118 258L308 347L574 202M308 347V520M-118 418L308 347" stroke="#D7C86C" strokeWidth="1.5" />
+            <path d="M-69 235C99 161 245 145 462 163M-69 294C106 229 276 219 533 242" stroke="#D7C86C" strokeWidth="1.15" opacity=".85" />
+            <path d="M-48 430C140 447 313 480 574 461" stroke="#D7C86C" strokeWidth="1.15" opacity=".66" />
+          </svg>
 
-          <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 pb-20 sm:pb-28 pt-36 w-full">
+          <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center px-6 py-20 sm:px-10 sm:py-24">
             <motion.div
               initial="hidden"
               animate={splashDone ? "show" : "hidden"}
               variants={stagger}
-              className="max-w-5xl"
+              className={`w-full max-w-2xl ${isRtl ? "mr-auto text-right sm:mr-0 sm:pr-[7%]" : "ml-auto text-left sm:ml-0 sm:pl-[7%]"}`}
             >
-              {/* Hero headline — 3 lines exactly like tasama */}
+              <motion.p variants={fadeUp} className="mb-6 text-[10px] font-bold uppercase tracking-[.28em] text-[#D7C86C]">
+                {ui.home.badge}
+              </motion.p>
+
               <motion.h1
                 variants={fadeUp}
-                className="text-[clamp(2.8rem,8vw,7.5rem)] font-black leading-[1.0] tracking-tight"
+                className="text-[clamp(3.1rem,7vw,6.8rem)] font-medium leading-[1.12] tracking-[-.045em]"
               >
-                <span className="block text-white/50 font-light">{ui.home.hero1}</span>
-                <span className="block text-white">{ui.home.hero2}</span>
-                <span className="block text-[#33B27C]">
-                  {ui.home.hero3}
+                <span className="block text-white">{ui.home.hero1}</span>
+                <span className="block text-white">
+                  {ui.home.hero2}{" "}
+                  <span className="font-black text-[#D7B34B]">{ui.home.hero3}</span>
                 </span>
               </motion.h1>
 
-              <motion.p variants={fadeUp} className="mt-8 text-white/50 text-lg max-w-md leading-8">
+              <motion.p variants={fadeUp} className="mt-8 max-w-xl text-base leading-9 text-white/80 sm:text-lg">
                 {ui.home.heroSub}
               </motion.p>
 
-              <motion.div variants={fadeUp} className="mt-10 flex flex-wrap gap-4">
-                <Link
-                  to="/request"
-                  className="group inline-flex items-center gap-3 bg-[#33B27C] text-white font-bold text-sm px-8 py-4 rounded-full hover:bg-[#2a9a6a] transition-all duration-300"
-                >
-                  {ui.home.request}
-                  <svg viewBox="0 0 16 16" fill="none" className={`w-4 h-4 ${isRtl ? "rotate-180" : ""}`}>
-                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </Link>
+              <motion.div variants={fadeUp} className="mt-9 flex flex-wrap items-center gap-5">
                 <Link
                   to="/services"
-                  className="inline-flex items-center gap-3 border border-white/25 text-white font-bold text-sm px-8 py-4 rounded-full hover:border-white/60 hover:bg-white/5 transition-all duration-300"
+                  className="group inline-flex items-center gap-3 rounded-full bg-white py-2.5 pl-6 pr-3 text-sm font-extrabold text-[#11102F] shadow-[0_12px_30px_rgba(0,0,0,.2)] transition-all duration-300 hover:-translate-y-0.5"
                 >
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#B6E186] text-xl font-normal text-white transition-transform duration-300 group-hover:translate-x-0.5">
+                    {isRtl ? "←" : "→"}
+                  </span>
                   {ui.home.explore}
+                </Link>
+                <Link
+                  to="/request"
+                  className="text-sm font-bold text-white/75 underline decoration-white/35 underline-offset-8 transition-colors hover:text-white"
+                >
+                  {ui.home.request}
                 </Link>
               </motion.div>
             </motion.div>
 
-            <p className={`absolute bottom-8 ${isRtl ? "left-8 sm:left-12" : "right-8 sm:right-12"} text-[10px] tracking-[.35em] text-white/25 uppercase`}>
-              Riyadh · Jeddah · KSA
+            <p className={`absolute bottom-8 ${isRtl ? "right-6 sm:right-10" : "left-6 sm:left-10"} text-[9px] tracking-[.38em] text-white/28 uppercase`}>
+              OFOQHC.COM
             </p>
           </div>
         </section>
