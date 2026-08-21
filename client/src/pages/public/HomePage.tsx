@@ -443,67 +443,117 @@ export default function HomePage() {
         </section>
 
         {/* ════════════════════════════════════════════════════════
-            SERVICES — dark, big image cards (tasama style)
+            SERVICES — OFOQ editorial cards
         ════════════════════════════════════════════════════════ */}
-        <section className="bg-[#2B273F] text-white">
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 py-24 sm:py-32">
-            <div className="flex flex-wrap items-end justify-between gap-6 mb-14">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-4">
-                  {ui.services.areaBadge}
-                </p>
-                <h2 className="text-4xl sm:text-5xl font-black">
-                  {ui.services.choose}{" "}
-                  <span className="text-[#33B27C]">{ui.services.yourService}</span>
-                </h2>
+        <section className="relative overflow-hidden bg-[#2B273F] text-white">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/10" />
+          <div className="relative mx-auto max-w-6xl px-6 py-24 sm:px-10 sm:py-32">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+              transition={{ duration: 0.8, ease }}
+              className="mx-auto flex max-w-xl flex-col items-center text-center"
+            >
+              <p className="text-xs font-black tracking-[.18em] text-[#33B27C] sm:text-sm">
+                {ui.services.areaBadge}
+              </p>
+              <div className="relative mt-7 h-20 w-48 overflow-hidden rounded-full border border-white/15 sm:h-24 sm:w-60">
+                <img
+                  src={featuredServices[0].image}
+                  alt=""
+                  className="h-full w-full object-cover opacity-70"
+                />
+                <div className="absolute inset-0 bg-[#2B273F]/35" />
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#2B273F] shadow-lg">
+                    <svg viewBox="0 0 16 16" className="h-4 w-4 translate-x-px" fill="currentColor" aria-hidden="true">
+                      <path d="m5 3 7 5-7 5V3Z" />
+                    </svg>
+                  </span>
+                </span>
               </div>
+              <h2 className="mt-8 text-4xl font-black leading-[1.12] tracking-[-.045em] sm:text-6xl">
+                {ui.services.choose}
+                <span className="mt-1 block text-[#E5FE04]">{ui.services.yourService}</span>
+              </h2>
               <Link
                 to="/services"
-                className="text-sm font-bold text-white/50 hover:text-white transition-colors border-b border-white/20 hover:border-white pb-0.5"
+                className="group mt-8 inline-flex items-center gap-3 rounded-full bg-white py-2 ps-2 pe-5 text-sm font-black text-[#2B273F] transition-transform duration-300 hover:-translate-y-1"
               >
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#33B27C] text-white transition-transform duration-300 group-hover:-translate-x-1">
+                  <svg viewBox="0 0 16 16" fill="none" className={`h-4 w-4 ${isRtl ? "rotate-180" : ""}`} aria-hidden="true">
+                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
                 {ui.home.servicesAll}
               </Link>
-            </div>
+            </motion.div>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {featuredServices.map((cat, i) => (
+            <div className="mx-auto mt-20 grid max-w-4xl gap-5 md:grid-cols-2 md:items-end">
+              {featuredServices.slice(0, 2).map((cat, i) => (
                 <motion.div
                   key={cat.slug}
-                  initial={{ opacity: 0, y: 40 }}
+                  initial={{ opacity: 0, y: 42 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "0px 0px -60px 0px" }}
-                  transition={{ delay: i * 0.1, duration: 0.8, ease }}
+                  transition={{ delay: i * 0.12, duration: 0.8, ease }}
+                  className={i === 0 ? "md:translate-y-12" : ""}
                 >
                   <Link
                     to={`/services/${cat.slug}`}
-                    className="group relative flex flex-col justify-between min-h-[420px] overflow-hidden rounded-2xl p-8 transition-all duration-500"
+                    className={`group relative flex min-h-[410px] flex-col justify-between overflow-hidden rounded-md p-7 sm:min-h-[470px] sm:p-9 ${
+                      i === 0
+                        ? "bg-[#171522] text-white"
+                        : "bg-[#F9F8F3] text-[#2B273F]"
+                    }`}
                   >
-                    <img
-                      src={cat.image}
-                      alt={pick(cat.title, lang)}
-                      loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover opacity-30 grayscale transition-all duration-700 group-hover:opacity-50 group-hover:grayscale-0 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#1a1726]/60 via-[#1a1726]/70 to-[#1a1726]/90 group-hover:to-[#33B27C]/30 transition-all duration-500" />
-                    <div className="absolute inset-0 border border-white/8 rounded-2xl group-hover:border-[#33B27C]/40 transition-colors duration-500" />
+                    {i === 0 ? (
+                      <>
+                        <img
+                          src={cat.image}
+                          alt={pick(cat.title, lang)}
+                          loading="lazy"
+                          className="absolute inset-0 h-full w-full object-cover opacity-35 grayscale transition duration-700 group-hover:scale-105 group-hover:grayscale-0"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-b from-[#171522]/45 via-[#171522]/68 to-[#171522]/95" />
+                      </>
+                    ) : (
+                      <>
+                        <div aria-hidden="true" className="absolute -bottom-12 -right-16 h-64 w-64 rounded-full border border-[#33B27C]/35" />
+                        <div aria-hidden="true" className="absolute bottom-8 right-8 h-28 w-40 border border-[#33B27C]/35 sm:h-36 sm:w-52" />
+                        <OfoqLogo dark className="absolute -bottom-10 -left-16 h-56 w-80 opacity-[0.045]" />
+                      </>
+                    )}
 
                     <div className="relative z-10">
-                      <p className="text-[#E5FE04] text-xs font-black tracking-widest mb-4">0{i + 1}</p>
-                      <h3 className="text-2xl font-black text-white leading-tight mb-3">
+                      <span className={`inline-flex rounded-full border px-4 py-1.5 text-[11px] font-black ${
+                        i === 0
+                          ? "border-white/20 bg-white/10 text-[#E5FE04]"
+                          : "border-[#2B273F]/15 bg-white text-[#33B27C]"
+                      }`}>
+                        {ui.home.clientsBadge}
+                      </span>
+                      <p className={`mt-7 text-xs font-black tracking-[.2em] ${i === 0 ? "text-[#E5FE04]" : "text-[#33B27C]"}`}>
+                        0{i + 1}
+                      </p>
+                      <h3 className="mt-3 text-3xl font-black leading-tight sm:text-4xl">
                         {pick(cat.title, lang)}
                       </h3>
-                      <p className="text-white/40 text-sm leading-7 line-clamp-3">
+                      <p className={`mt-4 max-w-sm text-sm leading-7 sm:text-base ${i === 0 ? "text-white/75" : "text-[#2B273F]/70"}`}>
                         {pick(cat.intro, lang)}
                       </p>
                     </div>
 
-                    <div className="relative z-10 flex items-center justify-between mt-8">
-                      <span className="text-xs font-bold text-white/40 group-hover:text-white transition-colors">
+                    <div className="relative z-10 flex items-center justify-between">
+                      <span className={`text-sm font-black ${i === 0 ? "text-white" : "text-[#2B273F]"}`}>
                         {ui.services.learnMore}
                       </span>
-                      <span className="w-10 h-10 rounded-full border border-white/20 group-hover:border-[#33B27C] group-hover:bg-[#33B27C] flex items-center justify-center transition-all duration-300">
-                        <svg viewBox="0 0 16 16" fill="none" className={`w-4 h-4 ${isRtl ? "rotate-180" : ""}`}>
-                          <path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      <span className={`flex h-10 w-10 items-center justify-center rounded-full transition-transform duration-300 group-hover:-translate-x-1 ${
+                        i === 0 ? "bg-white text-[#2B273F]" : "border border-[#2B273F]/15 bg-white text-[#2B273F]"
+                      }`}>
+                        <svg viewBox="0 0 16 16" fill="none" className={`h-4 w-4 ${isRtl ? "rotate-180" : ""}`} aria-hidden="true">
+                          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </span>
                     </div>
