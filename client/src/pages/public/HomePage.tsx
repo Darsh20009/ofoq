@@ -91,9 +91,8 @@ function SplashIntro({ onDone }: { onDone: () => void }) {
                 <motion.span
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
-                  exit={{ scaleX: 0 }}
-                  transition={{ duration: 0.24, ease }}
-                  className="absolute inset-x-1 top-[18%] h-[.68em] origin-right bg-[#C13229]"
+                  transition={{ duration: 0.3, ease }}
+                  className="absolute inset-0 z-20 origin-right bg-[#C13229]"
                   aria-hidden="true"
                 />
               )}
@@ -314,41 +313,71 @@ export default function HomePage() {
               <img
                 src="/images/riyadh-business-district.jpg"
                 alt="منطقة الأعمال في الرياض"
-                className="h-[390px] w-full object-cover object-center sm:h-[560px]"
+                className="block h-auto w-full object-contain"
               />
             </motion.figure>
           </div>
         </section>
 
         {/* ════════════════════════════════════════════════════════
-            VISION / MISSION — dark section (tasama two-column)
+            VISION / MISSION — image-led vision and blue mission field
         ════════════════════════════════════════════════════════ */}
-        <section className="bg-[#2B273F]" style={GRID_STYLE}>
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 py-24">
-            <div className="grid md:grid-cols-2 gap-px bg-white/8">
-              {[
-                {
-                  label: ui.about.visionLabel,
-                  text: ui.about.visionText,
-                },
-                {
-                  label: ui.about.missionTitle,
-                  text: ui.about.missionText,
-                },
-              ].map(({ label, text }, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.15, duration: 0.8, ease }}
-                  className="bg-[#2B273F] p-10 sm:p-14"
-                >
-                  <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-4">{label}</p>
-                  <p className="text-white/60 text-base sm:text-lg leading-8">{text}</p>
-                </motion.div>
-              ))}
-            </div>
+        <section className="overflow-hidden bg-[#1608A8] text-white">
+          <div className="relative h-[330px] overflow-hidden sm:h-[480px] lg:h-[560px]">
+            <img
+              src="/images/riyadh-business-district.jpg"
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-[#17142A]/65" />
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+              transition={{ duration: 0.75, ease }}
+              className={`absolute bottom-8 z-10 max-w-xl px-6 sm:bottom-12 sm:px-10 lg:px-16 ${
+                isRtl ? "right-0 text-right" : "left-0 text-left"
+              }`}
+            >
+              <p className="mb-3 text-lg font-black sm:text-2xl">{ui.about.visionLabel}</p>
+              <p className="text-base font-medium leading-7 text-white/90 sm:text-xl sm:leading-9">
+                {ui.about.visionText}
+              </p>
+            </motion.div>
+          </div>
+
+          <div className="relative min-h-[370px] overflow-hidden px-6 py-12 sm:min-h-[460px] sm:px-10 sm:py-16 lg:px-16">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+              transition={{ duration: 0.75, ease }}
+              className={`relative z-10 max-w-4xl ${isRtl ? "ml-auto text-right" : "mr-auto text-left"}`}
+            >
+              <p className="mb-3 text-xl font-black sm:text-3xl">{ui.about.missionTitle}</p>
+              <p className="text-base font-medium leading-7 text-white/90 sm:text-xl sm:leading-9">
+                {ui.about.missionText}
+              </p>
+            </motion.div>
+
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 900 440"
+              className={`pointer-events-none absolute -bottom-32 h-[390px] w-[760px] text-[#E5FE04]/75 sm:-bottom-24 sm:h-[500px] sm:w-[980px] ${
+                isRtl ? "-left-36" : "-right-36"
+              }`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M0 395 355 310 545 410 170 438 0 350Z" />
+              <path d="M170 438V235l375-93v268" />
+              <path d="m170 235 355 100 375-90" />
+              <path d="M545 142v268" />
+              <path d="M510 430C595 255 700 112 900 18" />
+              <path d="M645 438c78-152 160-241 310-310" />
+              <path d="M720 440c70-99 127-152 230-187" />
+            </svg>
           </div>
         </section>
 
