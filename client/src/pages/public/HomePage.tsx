@@ -173,6 +173,7 @@ export default function HomePage() {
   const { lang, dir, ui } = useLang();
   const isRtl = dir === "rtl";
   const [splashDone, setSplashDone] = useState(false);
+  const [servicePreviewIndex, setServicePreviewIndex] = useState(0);
   const servicesRailRef = useRef<HTMLDivElement>(null);
   const [servicesRailProgress, setServicesRailProgress] = useState(0);
 
@@ -186,6 +187,7 @@ export default function HomePage() {
   const aboutQuote = lang === "ar"
     ? "خدمات أعمال تعزّز النمو وتدعم التنمية المستدامة بما يتماشى مع رؤية السعودية"
     : "Business services that advance sustainable growth in line with Saudi Vision.";
+  const activeServicePreview = servicesCatalog[servicePreviewIndex];
 
   const updateServicesRailProgress = () => {
     const rail = servicesRailRef.current;
@@ -210,6 +212,13 @@ export default function HomePage() {
     scrollToHash();
     window.addEventListener("hashchange", scrollToHash);
     return () => window.removeEventListener("hashchange", scrollToHash);
+  }, []);
+
+  useEffect(() => {
+    const previewTimer = window.setInterval(() => {
+      setServicePreviewIndex((index) => (index + 1) % servicesCatalog.length);
+    }, 3600);
+    return () => window.clearInterval(previewTimer);
   }, []);
 
   return (
@@ -514,32 +523,33 @@ export default function HomePage() {
                 {ui.services.areaBadge}
               </p>
               <div className="relative mt-7 h-24 w-full max-w-md overflow-hidden rounded-full border border-white/15 bg-[#171522] p-1 sm:h-28">
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={activeServicePreview.slug}
+                    src={activeServicePreview.image}
+                    alt={pick(activeServicePreview.title, lang)}
+                    initial={{ opacity: 0, scale: 1.12, x: isRtl ? -20 : 20 }}
+                    animate={{ opacity: 0.78, scale: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.96, x: isRtl ? 20 : -20 }}
+                    transition={{ duration: 0.65, ease }}
+                    className="h-full w-full rounded-full object-cover"
+                  />
+                </AnimatePresence>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#2B273F]/60 via-transparent to-[#2B273F]/60" />
                 <motion.div
-                  animate={{ x: isRtl ? ["-50%", "0%"] : ["0%", "-50%"] }}
-                  transition={{ duration: 24, ease: "linear", repeat: Infinity }}
-                  className="flex h-full w-max gap-2"
-                >
-                  {[0, 1].map((repeat) => (
-                    <div key={repeat} className="flex h-full gap-2 pe-2">
-                      {servicesCatalog.map((service) => (
-                        <img
-                          key={`${repeat}-${service.slug}`}
-                          src={service.image}
-                          alt=""
-                          className="h-full w-28 shrink-0 rounded-full object-cover opacity-75 sm:w-36"
-                        />
-                      ))}
-                    </div>
-                  ))}
-                </motion.div>
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#2B273F]/70 via-transparent to-[#2B273F]/70" />
-                <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#2B273F] shadow-lg">
-                    <svg viewBox="0 0 16 16" className="h-4 w-4 translate-x-px" fill="currentColor" aria-hidden="true">
-                      <path d="m5 3 7 5-7 5V3Z" />
-                    </svg>
-                  </span>
-                </span>
+                  key={`service-wipe-${servicePreviewIndex}`}
+                  initial={{ x: isRtl ? "120%" : "-120%" }}
+                  animate={{ x: isRtl ? "-120%" : "120%" }}
+                  transition={{ duration: 0.8, ease: "easeInOut", delay: 0.08 }}
+                  className="pointer-events-none absolute inset-y-0 w-24 -skew-x-12 bg-[#E5FE04]/85 mix-blend-screen"
+                />
+                <motion.div
+                  key={`service-line-${servicePreviewIndex}`}
+                  initial={{ scaleX: 0, opacity: 0 }}
+                  animate={{ scaleX: [0, 1, 1], opacity: [0, 1, 0] }}
+                  transition={{ duration: 0.95, times: [0, 0.2, 1], ease: "easeOut" }}
+                  className={`pointer-events-none absolute inset-y-0 w-px bg-white/90 ${isRtl ? "right-1/2 origin-right" : "left-1/2 origin-left"}`}
+                />
               </div>
               <h2 className="mt-8 text-4xl font-black leading-[1.12] tracking-[-.045em] sm:text-6xl">
                 {ui.services.choose}
