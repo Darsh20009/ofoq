@@ -129,6 +129,45 @@ const CLIENT_LOGOS = Array.from({ length: 10 }, (_, index) => ({
   alt: `شعار عميل أفق ${index + 1}`,
 }));
 
+const SERVICE_CARD_THEMES = [
+  {
+    dark: true,
+    card: "bg-[#171522] text-white",
+    overlay: "bg-gradient-to-b from-[#171522]/30 via-[#171522]/58 to-[#171522]/95",
+    badge: "border-white/20 bg-white/10 text-[#E5FE04]",
+    number: "text-[#E5FE04]",
+    copy: "text-white/75",
+    action: "bg-white text-[#2B273F]",
+  },
+  {
+    dark: false,
+    card: "bg-[#F9F8F3] text-[#2B273F]",
+    overlay: "bg-gradient-to-b from-white/82 via-[#F9F8F3]/84 to-[#F9F8F3]/98",
+    badge: "border-[#2B273F]/15 bg-white text-[#33B27C]",
+    number: "text-[#33B27C]",
+    copy: "text-[#2B273F]/70",
+    action: "border border-[#2B273F]/15 bg-white text-[#2B273F]",
+  },
+  {
+    dark: true,
+    card: "bg-[#247C5A] text-white",
+    overlay: "bg-gradient-to-b from-[#247C5A]/25 via-[#247C5A]/62 to-[#1E6148]/96",
+    badge: "border-white/25 bg-white/10 text-[#E5FE04]",
+    number: "text-[#E5FE04]",
+    copy: "text-white/80",
+    action: "bg-[#E5FE04] text-[#2B273F]",
+  },
+  {
+    dark: false,
+    card: "bg-[#E5FE04] text-[#2B273F]",
+    overlay: "bg-gradient-to-b from-[#E5FE04]/55 via-[#E5FE04]/78 to-[#E5FE04]/96",
+    badge: "border-[#2B273F]/15 bg-white/70 text-[#2B273F]",
+    number: "text-[#2B273F]",
+    copy: "text-[#2B273F]/75",
+    action: "bg-[#2B273F] text-white",
+  },
+] as const;
+
 /* ══ Main component ═════════════════════════════════════════════ */
 export default function HomePage() {
   const { lang, dir, ui } = useLang();
@@ -139,7 +178,6 @@ export default function HomePage() {
     setSplashDone(true);
   }, []);
 
-  const featuredServices = servicesCatalog.slice(0, 3);
   const aboutDetail = lang === "ar"
     ? "نقدّم حلول أعمال متكاملة تدعم الكفاءة التشغيلية، وتُسهّل رحلة المنشآت من التأسيس إلى النمو بثقة."
     : "We deliver integrated business solutions that strengthen operational efficiency and support companies from formation to confident growth.";
@@ -458,14 +496,27 @@ export default function HomePage() {
               <p className="text-xs font-black tracking-[.18em] text-[#33B27C] sm:text-sm">
                 {ui.services.areaBadge}
               </p>
-              <div className="relative mt-7 h-20 w-48 overflow-hidden rounded-full border border-white/15 sm:h-24 sm:w-60">
-                <img
-                  src={featuredServices[0].image}
-                  alt=""
-                  className="h-full w-full object-cover opacity-70"
-                />
-                <div className="absolute inset-0 bg-[#2B273F]/35" />
-                <span className="absolute inset-0 flex items-center justify-center">
+              <div className="relative mt-7 h-24 w-full max-w-md overflow-hidden rounded-full border border-white/15 bg-[#171522] p-1 sm:h-28">
+                <motion.div
+                  animate={{ x: isRtl ? ["-50%", "0%"] : ["0%", "-50%"] }}
+                  transition={{ duration: 24, ease: "linear", repeat: Infinity }}
+                  className="flex h-full w-max gap-2"
+                >
+                  {[0, 1].map((repeat) => (
+                    <div key={repeat} className="flex h-full gap-2 pe-2">
+                      {servicesCatalog.map((service) => (
+                        <img
+                          key={`${repeat}-${service.slug}`}
+                          src={service.image}
+                          alt=""
+                          className="h-full w-28 shrink-0 rounded-full object-cover opacity-75 sm:w-36"
+                        />
+                      ))}
+                    </div>
+                  ))}
+                </motion.div>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#2B273F]/70 via-transparent to-[#2B273F]/70" />
+                <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#2B273F] shadow-lg">
                     <svg viewBox="0 0 16 16" className="h-4 w-4 translate-x-px" fill="currentColor" aria-hidden="true">
                       <path d="m5 3 7 5-7 5V3Z" />
@@ -490,68 +541,55 @@ export default function HomePage() {
               </Link>
             </motion.div>
 
-            <div className="mx-auto mt-20 grid max-w-4xl gap-5 md:grid-cols-2 md:items-end">
-              {featuredServices.slice(0, 2).map((cat, i) => (
+            <div className="mt-20 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+              {servicesCatalog.map((cat, i) => {
+                const theme = SERVICE_CARD_THEMES[i % SERVICE_CARD_THEMES.length];
+                return (
                 <motion.div
                   key={cat.slug}
                   initial={{ opacity: 0, y: 42 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "0px 0px -60px 0px" }}
-                  transition={{ delay: i * 0.12, duration: 0.8, ease }}
-                  className={i === 0 ? "md:translate-y-12" : ""}
+                  transition={{ delay: (i % 4) * 0.1, duration: 0.8, ease }}
+                  className={i % 4 === 0 ? "xl:translate-y-10" : i % 4 === 2 ? "xl:translate-y-5" : ""}
                 >
                   <Link
                     to={`/services/${cat.slug}`}
-                    className={`group relative flex min-h-[410px] flex-col justify-between overflow-hidden rounded-md p-7 sm:min-h-[470px] sm:p-9 ${
-                      i === 0
-                        ? "bg-[#171522] text-white"
-                        : "bg-[#F9F8F3] text-[#2B273F]"
-                    }`}
+                    className={`group relative flex min-h-[410px] flex-col justify-between overflow-hidden rounded-md p-7 transition-transform duration-500 hover:-translate-y-2 sm:min-h-[465px] ${theme.card}`}
                   >
-                    {i === 0 ? (
-                      <>
-                        <img
-                          src={cat.image}
-                          alt={pick(cat.title, lang)}
-                          loading="lazy"
-                          className="absolute inset-0 h-full w-full object-cover opacity-35 grayscale transition duration-700 group-hover:scale-105 group-hover:grayscale-0"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-b from-[#171522]/45 via-[#171522]/68 to-[#171522]/95" />
-                      </>
-                    ) : (
-                      <>
-                        <div aria-hidden="true" className="absolute -bottom-12 -right-16 h-64 w-64 rounded-full border border-[#33B27C]/35" />
-                        <div aria-hidden="true" className="absolute bottom-8 right-8 h-28 w-40 border border-[#33B27C]/35 sm:h-36 sm:w-52" />
-                        <OfoqLogo dark className="absolute -bottom-10 -left-16 h-56 w-80 opacity-[0.045]" />
-                      </>
+                    <img
+                      src={cat.image}
+                      alt={pick(cat.title, lang)}
+                      loading="lazy"
+                      className={`absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105 ${
+                        theme.dark ? "opacity-35 grayscale group-hover:grayscale-0" : "opacity-25"
+                      }`}
+                    />
+                    <div className={`absolute inset-0 ${theme.overlay}`} />
+                    {!theme.dark && (
+                      <OfoqLogo dark className="pointer-events-none absolute -bottom-10 -left-14 h-44 w-64 opacity-[0.05]" />
                     )}
 
                     <div className="relative z-10">
-                      <span className={`inline-flex rounded-full border px-4 py-1.5 text-[11px] font-black ${
-                        i === 0
-                          ? "border-white/20 bg-white/10 text-[#E5FE04]"
-                          : "border-[#2B273F]/15 bg-white text-[#33B27C]"
-                      }`}>
-                        {ui.home.clientsBadge}
+                      <span className={`inline-flex rounded-full border px-4 py-1.5 text-[11px] font-black ${theme.badge}`}>
+                        {ui.services.areaBadge}
                       </span>
-                      <p className={`mt-7 text-xs font-black tracking-[.2em] ${i === 0 ? "text-[#E5FE04]" : "text-[#33B27C]"}`}>
+                      <p className={`mt-7 text-xs font-black tracking-[.2em] ${theme.number}`}>
                         0{i + 1}
                       </p>
-                      <h3 className="mt-3 text-3xl font-black leading-tight sm:text-4xl">
+                      <h3 className="mt-3 text-2xl font-black leading-tight sm:text-3xl">
                         {pick(cat.title, lang)}
                       </h3>
-                      <p className={`mt-4 max-w-sm text-sm leading-7 sm:text-base ${i === 0 ? "text-white/75" : "text-[#2B273F]/70"}`}>
+                      <p className={`mt-4 text-sm leading-7 ${theme.copy}`}>
                         {pick(cat.intro, lang)}
                       </p>
                     </div>
 
                     <div className="relative z-10 flex items-center justify-between">
-                      <span className={`text-sm font-black ${i === 0 ? "text-white" : "text-[#2B273F]"}`}>
+                      <span className="text-sm font-black">
                         {ui.services.learnMore}
                       </span>
-                      <span className={`flex h-10 w-10 items-center justify-center rounded-full transition-transform duration-300 group-hover:-translate-x-1 ${
-                        i === 0 ? "bg-white text-[#2B273F]" : "border border-[#2B273F]/15 bg-white text-[#2B273F]"
-                      }`}>
+                      <span className={`flex h-10 w-10 items-center justify-center rounded-full transition-transform duration-300 group-hover:-translate-x-1 ${theme.action}`}>
                         <svg viewBox="0 0 16 16" fill="none" className={`h-4 w-4 ${isRtl ? "rotate-180" : ""}`} aria-hidden="true">
                           <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
@@ -559,7 +597,8 @@ export default function HomePage() {
                     </div>
                   </Link>
                 </motion.div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
