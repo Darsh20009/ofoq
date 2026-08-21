@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet-async";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { servicesCatalog, pick } from "../../data/servicesCatalog";
 import { useLang } from "../../i18n/LangContext";
 import OfoqLogo from "../../components/OfoqLogo";
@@ -173,6 +173,8 @@ export default function HomePage() {
   const { lang, dir, ui } = useLang();
   const isRtl = dir === "rtl";
   const [splashDone, setSplashDone] = useState(false);
+  const servicesRailRef = useRef<HTMLDivElement>(null);
+  const [servicesRailProgress, setServicesRailProgress] = useState(0);
 
   const handleSplashDone = useCallback(() => {
     setSplashDone(true);
@@ -184,6 +186,21 @@ export default function HomePage() {
   const aboutQuote = lang === "ar"
     ? "خدمات أعمال تعزّز النمو وتدعم التنمية المستدامة بما يتماشى مع رؤية السعودية"
     : "Business services that advance sustainable growth in line with Saudi Vision.";
+
+  const updateServicesRailProgress = () => {
+    const rail = servicesRailRef.current;
+    if (!rail) return;
+    const maxScroll = rail.scrollWidth - rail.clientWidth;
+    setServicesRailProgress(maxScroll > 0 ? Math.min(1, Math.abs(rail.scrollLeft) / maxScroll) : 0);
+  };
+
+  const scrollServicesRail = (direction: "next" | "previous") => {
+    const rail = servicesRailRef.current;
+    if (!rail) return;
+    const distance = rail.clientWidth * 0.84;
+    const advance = direction === "next" ? distance : -distance;
+    rail.scrollBy({ left: isRtl ? -advance : advance, behavior: "smooth" });
+  };
 
   useEffect(() => {
     const scrollToHash = () => {
@@ -541,7 +558,42 @@ export default function HomePage() {
               </Link>
             </motion.div>
 
-            <div className="mt-20 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="mx-auto mt-16 flex max-w-6xl items-center justify-between gap-6">
+              <div className="flex items-center gap-3 text-xs font-black tracking-[.18em] text-white/55">
+                <span className="text-[#E5FE04]">01</span>
+                <span className="h-px w-12 bg-white/20 sm:w-20" />
+                <span>{String(servicesCatalog.length).padStart(2, "0")}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => scrollServicesRail("previous")}
+                  aria-label={lang === "ar" ? "الخدمة السابقة" : "Previous service"}
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white transition-colors hover:border-[#E5FE04] hover:bg-[#E5FE04] hover:text-[#2B273F]"
+                >
+                  <svg viewBox="0 0 16 16" fill="none" className={`h-4 w-4 ${isRtl ? "" : "rotate-180"}`} aria-hidden="true">
+                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollServicesRail("next")}
+                  aria-label={lang === "ar" ? "الخدمة التالية" : "Next service"}
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#2B273F] transition-transform hover:scale-105"
+                >
+                  <svg viewBox="0 0 16 16" fill="none" className={`h-4 w-4 ${isRtl ? "rotate-180" : ""}`} aria-hidden="true">
+                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div
+              ref={servicesRailRef}
+              onScroll={updateServicesRailProgress}
+              className="mt-6 -mx-6 overflow-x-auto overscroll-x-contain scroll-smooth px-6 pb-5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-10 sm:px-10"
+            >
+              <div className="flex w-max snap-x snap-mandatory gap-5">
               {servicesCatalog.map((cat, i) => {
                 const theme = SERVICE_CARD_THEMES[i % SERVICE_CARD_THEMES.length];
                 return (
@@ -551,7 +603,7 @@ export default function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "0px 0px -60px 0px" }}
                   transition={{ delay: (i % 4) * 0.1, duration: 0.8, ease }}
-                  className={i % 4 === 0 ? "xl:translate-y-10" : i % 4 === 2 ? "xl:translate-y-5" : ""}
+                  className="w-[82vw] max-w-[330px] shrink-0 snap-start sm:w-[310px]"
                 >
                   <Link
                     to={`/services/${cat.slug}`}
@@ -599,6 +651,14 @@ export default function HomePage() {
                 </motion.div>
                 );
               })}
+              </div>
+            </div>
+            <div className="mx-auto mt-1 h-px max-w-6xl overflow-hidden bg-white/20">
+              <motion.div
+                animate={{ width: `${12 + servicesRailProgress * 88}%` }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className={`h-full bg-[#E5FE04] ${isRtl ? "mr-auto" : ""}`}
+              />
             </div>
           </div>
         </section>
