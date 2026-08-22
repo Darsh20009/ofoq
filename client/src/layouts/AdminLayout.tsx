@@ -106,6 +106,17 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
   const isRtl = dir === "rtl";
   const pagePath = (path: string) => `${basePath}${path ? `/${path}` : ""}` || "/";
 
+  const { data: sidebarCountsData } = useQuery({
+    queryKey: ["sidebar-counts", user?._id, user?.role],
+    queryFn: () => usersApi.sidebarCounts().then((r) => r.data),
+    enabled: !!user,
+    refetchInterval: 30_000,
+    staleTime: 15_000,
+    refetchOnWindowFocus: true,
+    retry: false,
+  });
+  const sidebarCounts = sidebarCountsData || { notifications: 0, requests: 0, users: 0 };
+
   const navItems: NavItem[] = [
     { href: pagePath(""), label: t.admin.dashboard, icon: LayoutDashboard },
     {
@@ -138,17 +149,6 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
     { href: pagePath("contact"),          label: t.contact.consultTitle, icon: MessageSquare },
     { href: pagePath("employee/card"),    label: t.admin.myCard,   icon: CreditCard },
   ];
-
-  const { data: sidebarCountsData } = useQuery({
-    queryKey: ["sidebar-counts", user?._id, user?.role],
-    queryFn: () => usersApi.sidebarCounts().then((r) => r.data),
-    enabled: !!user,
-    refetchInterval: 30_000,
-    staleTime: 15_000,
-    refetchOnWindowFocus: true,
-    retry: false,
-  });
-  const sidebarCounts = sidebarCountsData || { notifications: 0, requests: 0, users: 0 };
 
   // Load notifications — cached 60s, polling every 2 min (was a hot loop hitting wrong URL)
   const { data: notifData } = useQuery({
