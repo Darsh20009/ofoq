@@ -193,7 +193,7 @@ export default function SiteContentPage() {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch {
-      alert(isRtl ? "خطأ في الحفظ" : "Save failed");
+      alert(lang === "ar" ? "خطأ في الحفظ" : "Save failed");
     }
     setSaving(false);
   };
@@ -208,7 +208,7 @@ export default function SiteContentPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-gray-900">
-            {isRtl ? "محرر محتوى الموقع" : "Site Content Editor"}
+            {lang === "ar" ? "محرر محتوى الموقع" : "Site Content Editor"}
           </h1>
           <p className="text-gray-500 text-sm mt-1">
             {isRtl
@@ -225,7 +225,7 @@ export default function SiteContentPage() {
               : "bg-[#33B27C] text-white hover:bg-[#2a9a6a]"
           } disabled:opacity-60`}
         >
-          {saving ? (isRtl ? "جاري الحفظ..." : "Saving...") : saved ? (isRtl ? "✓ تم الحفظ" : "✓ Saved") : (isRtl ? "حفظ التغييرات" : "Save changes")}
+          {saving ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : saved ? (lang === "ar" ? "✓ تم الحفظ" : "✓ Saved") : (lang === "ar" ? "حفظ التغييرات" : "Save changes")}
         </button>
       </div>
 
@@ -233,7 +233,7 @@ export default function SiteContentPage() {
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="border-b border-gray-200 px-4 pt-4">
           <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">
-            {isRtl ? "اختر اللغة" : "Select language"}
+            {lang === "ar" ? "اختر اللغة" : "Select language"}
           </p>
           <div className="flex flex-wrap gap-2 pb-0">
             {LANGS.map(l => (
@@ -265,7 +265,7 @@ export default function SiteContentPage() {
                     : "text-gray-600 hover:bg-gray-50"
                 }`}
               >
-                {isRtl ? s.labelAr : s.label}
+                {lang === "ar" ? s.labelAr : s.label}
               </button>
             ))}
           </aside>
@@ -278,7 +278,7 @@ export default function SiteContentPage() {
                   <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
                   <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
                 </svg>
-                {isRtl ? "جاري التحميل..." : "Loading..."}
+                {lang === "ar" ? "جاري التحميل..." : "Loading..."}
               </div>
             ) : (
               <div className="space-y-4">
@@ -296,7 +296,7 @@ export default function SiteContentPage() {
                         {field.label}
                         {defaultVal && (
                           <span className="ms-2 font-normal text-gray-400 truncate max-w-[200px] inline-block align-bottom">
-                            ({isRtl ? "افتراضي" : "default"}: {defaultVal.slice(0, 40)}{defaultVal.length > 40 ? "…" : ""})
+                            ({lang === "ar" ? "افتراضي" : "default"}: {defaultVal.slice(0, 40)}{defaultVal.length > 40 ? "…" : ""})
                           </span>
                         )}
                       </label>
@@ -330,7 +330,7 @@ export default function SiteContentPage() {
 
       {/* Info box */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700">
-        <p className="font-bold mb-1">{isRtl ? "كيف يعمل؟" : "How it works"}</p>
+        <p className="font-bold mb-1">{lang === "ar" ? "كيف يعمل؟" : "How it works"}</p>
         <p className="text-blue-600">
           {isRtl
             ? "كل تغيير تحفظه يتطبق على الموقع فوراً لجميع زوار هذه اللغة. لا حاجة لإعادة نشر أو بناء الكود."

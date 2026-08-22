@@ -40,7 +40,7 @@ export default function EmployeeDashboardPage() {
     request: copy.stageRequest, review: copy.stageReview, quotation: copy.stageQuotation,
     contract: copy.stageContract, payment: copy.stagePayment, execution: copy.stageExecution, closed: copy.stageClosed,
   };
-  const dateLocale = lang === "ar" || lang === "ur" ? arSA : undefined;
+  const dateLocale = lang === "ar" ? arSA : undefined;
 
   return (
     <div className="space-y-6" dir={dir}>
@@ -65,7 +65,7 @@ export default function EmployeeDashboardPage() {
           </div>
           <div className="ms-auto">
             <p className="text-white/50 text-xs">
-              {format(now, lang === "ar" || lang === "ur" ? "EEEE، d MMMM yyyy" : "EEEE, d MMMM yyyy", { locale: dateLocale })}
+              {format(now, lang === "ar" ? "EEEE، d MMMM yyyy" : "EEEE, MMMM d, yyyy", { locale: dateLocale })}
             </p>
           </div>
         </div>

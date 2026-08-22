@@ -128,24 +128,24 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
       ],
     },
     { href: pagePath("projects"),      label: t.admin.projects,   icon: FolderKanban },
-    { href: pagePath("quotations"),    label: isRtl ? "عروض الأسعار" : "Quotations", icon: FileText },
+    { href: pagePath("quotations"),    label: lang === "ar" ? "عروض الأسعار" : "Quotations", icon: FileText },
     { href: pagePath("invoices"),      label: t.admin.invoices,   icon: FileText },
     { href: pagePath("contracts"),     label: t.admin.contracts,  icon: FileSignature },
-    { href: pagePath("services"),      label: isRtl ? "إدارة الخدمات" : "Services", icon: Layers3 },
+    { href: pagePath("services"),      label: lang === "ar" ? "إدارة الخدمات" : "Services", icon: Layers3 },
     { href: pagePath("users"),         label: t.admin.users,      icon: Users },
     {
       label: t.admin.cms,
       icon: FileEdit,
       children: [
-        { href: pagePath("cms"),              label: isRtl ? "المدونة والشهادات" : "Blog & Testimonials" },
-        { href: pagePath("cms/site-content"), label: isRtl ? "محرر المحتوى" : "Site Content Editor" },
+        { href: pagePath("cms"),              label: lang === "ar" ? "المدونة والشهادات" : "Blog & Testimonials" },
+        { href: pagePath("cms/site-content"), label: lang === "ar" ? "محرر المحتوى" : "Site Content Editor" },
       ],
     },
     { href: pagePath("settings"),      label: t.admin.settings,   icon: Settings },
     // Client copy lives in the shared UI translations; the legacy `t` pack
     // does not include a `client` section for the Arabic admin layout.
-    { href: pagePath("service-requests"), label: ui.client.newRequest,   icon: ClipboardList, badge: sidebarCounts.requests },
-    { href: pagePath("support"),          label: ui.client.support,       icon: HeadphonesIcon },
+    { href: pagePath("service-requests"), label: lang === "ar" ? "طلبات الخدمات" : "Service requests", icon: ClipboardList, badge: sidebarCounts.requests },
+    { href: pagePath("support"),          label: lang === "ar" ? "الدعم" : "Support", icon: HeadphonesIcon },
     { href: pagePath("contact"),          label: t.contact.consultTitle, icon: MessageSquare },
     { href: pagePath("employee/card"),    label: t.admin.myCard,   icon: CreditCard },
   ];
@@ -270,7 +270,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
 
           <div className="flex-1 min-w-0">
             <p className="hidden sm:block text-xs font-semibold text-gray-400">
-              {isRtl ? "منصة إدارة أفق" : "OFOQ Operations"}
+              {lang === "ar" ? "منصة إدارة أفق" : "OFOQ Operations"}
             </p>
           </div>
 

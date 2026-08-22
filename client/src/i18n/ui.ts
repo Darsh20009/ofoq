@@ -1144,5 +1144,10 @@ export function getUiCopy(lang: Lang): UiCopy {
   if (lang === "ar") return merge(merge(ar, { client: clientDetailOverrides.ar }), { adminPages: adminContentOverrides.ar }) as UiCopy;
   if (lang === "en") return en;
   const patch = overrides[lang] || {};
-  return merge(merge(merge(merge(en, patch), publicPageOverrides[lang] || {}), { client: clientDetailOverrides[lang] || {} }), { adminPages: adminContentOverrides[lang] || {} }) as UiCopy;
+  // The admin area must not combine partial language packs with English
+  // labels. Until a language has a complete admin pack, keep its admin UI
+  // consistently English while public/client copy can still be localized.
+  const localized = merge(merge(merge(en, patch), publicPageOverrides[lang] || {}), { client: clientDetailOverrides[lang] || {} });
+  localized.adminPages = en.adminPages;
+  return localized as UiCopy;
 }
