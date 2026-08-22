@@ -114,21 +114,64 @@ export default function EmployeePortalLoginPage() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
       streamRef.current = stream;
-      if (videoRef.current) videoRef.current.srcObject = stream;
       setCameraActive(true);
-      if ("BarcodeDetector" in window) {
-        const det = new (window as any).BarcodeDetector({ formats: ["qr_code"] });
-        detectRef.current = det;
-        const scan = async () => {
-          if (!videoRef.current || !detectRef.current) return;
-          try {
-            const codes = await detectRef.current.detect(videoRef.current);
-            if (codes.length) { handleBarcodeLogin(codes[0].rawValue); return; }
-          } catch {}
-          requestAnimationFrame(scan);
+
+      // cameraActive renders the video element. Attach the stream after the
+      // ref is available; attaching it before this point leaves a black view.
+      await new Promise<void>((resolve) => {
+        const attach = () => {
+          const video = videoRef.current;
+          if (!video) {
+            requestAnimationFrame(attach);
+            return;
+          }
+          video.srcObject = stream;
+          if (video.readyState >= 2) resolve();
+          else video.onloadeddata = () => resolve();
         };
-        scan();
-      }
+        requestAnimationFrame(attach);
+      });
+
+      const nativeDetector =
+        "BarcodeDetector" in window
+          ? new (window as any).BarcodeDetector({ formats: ["qr_code"] })
+          : null;
+      detectRef.current = nativeDetector;
+      const scan = async () => {
+        if (!videoRef.current || !streamRef.current) return;
+        const video = videoRef.current;
+        if (video.readyState < 2 || video.videoWidth === 0) {
+          requestAnimationFrame(scan);
+          return;
+        }
+
+        try {
+          let value: string | null = null;
+          if (nativeDetector) {
+            const codes = await nativeDetector.detect(video);
+            value = codes[0]?.rawValue || null;
+          } else {
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext("2d", { willReadFrequently: true });
+            if (context) {
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+              const image = context.getImageData(0, 0, canvas.width, canvas.height);
+              const { default: jsQR } = await import("jsqr");
+              value = jsQR(image.data, image.width, image.height, {
+                inversionAttempts: "attemptBoth",
+              })?.data || null;
+            }
+          }
+          if (value) {
+            await handleBarcodeLogin(value);
+            return;
+          }
+        } catch {}
+        requestAnimationFrame(scan);
+      };
+      requestAnimationFrame(scan);
     } catch { /* silent */ }
   };
 

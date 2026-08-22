@@ -148,15 +148,27 @@ export default function LoginPage() {
         video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 640 } },
       });
       streamRef.current = stream;
-      if (videoRef.current) videoRef.current.srcObject = stream;
       setCameraActive(true);
       scanningRef.current = true;
 
-      // انتظر حتى يبدأ الفيديو بالفعل
+      // The video is rendered only after cameraActive changes. Wait for the
+      // ref to exist before attaching the stream, otherwise the scanner opens
+      // with a black frame and the old code silently stopped.
       await new Promise<void>((resolve) => {
-        const v = videoRef.current!;
-        if (v.readyState >= 2) return resolve();
-        v.onloadeddata = () => resolve();
+        const attach = () => {
+          const v = videoRef.current;
+          if (!v) {
+            requestAnimationFrame(attach);
+            return;
+          }
+          v.srcObject = stream;
+          if (v.readyState >= 2) {
+            resolve();
+          } else {
+            v.onloadeddata = () => resolve();
+          }
+        };
+        requestAnimationFrame(attach);
       });
 
       const canvas = canvasRef.current;
