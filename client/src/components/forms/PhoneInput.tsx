@@ -1,3 +1,9 @@
+import PhoneInputLibrary from "react-phone-number-input";
+import type { Country, Labels } from "react-phone-number-input";
+import enLabels from "react-phone-number-input/locale/en.json";
+import { useLang } from "../../i18n/LangContext";
+import "react-phone-number-input/style.css";
+
 interface PhoneInputProps {
   value?: string;
   onChange: (value: string) => void;
@@ -9,8 +15,9 @@ interface PhoneInputProps {
 }
 
 /**
- * A single phone field that accepts local or international numbers.
- * Existing saved values are kept intact instead of being split into a country selector.
+ * International phone field used across public forms and the portals.
+ * The library provides the complete ISO country list and E.164 formatting.
+ * `value` is therefore stored as a normalized international number.
  */
 export default function PhoneInput({
   value = "",
@@ -18,21 +25,47 @@ export default function PhoneInput({
   onBlur,
   required,
   disabled,
-  placeholder = "5X XXX XXXX",
+  placeholder,
   className = "input-field",
 }: PhoneInputProps) {
+  const { lang } = useLang();
+  const locale = lang === "ar" ? "ar" : lang === "de" ? "de" : lang === "es" ? "es" : "en";
+  const regionNames = typeof Intl !== "undefined" && "DisplayNames" in Intl
+    ? new Intl.DisplayNames([locale], { type: "region" })
+    : null;
+
+  const labels: Labels = {
+    ...(enLabels as Labels),
+    country: locale === "ar" ? "الدولة" : locale === "de" ? "Land" : locale === "es" ? "País" : "Country",
+    phone: locale === "ar" ? "رقم الهاتف" : locale === "de" ? "Telefonnummer" : locale === "es" ? "Número de teléfono" : "Phone number",
+  };
+
+  // The package renders every country automatically. Replace its English
+  // country labels with the active language where the browser supports it.
+  for (const country of Object.keys(labels)) {
+    if (country.length === 2 && regionNames) {
+      try {
+        labels[country as Country] = regionNames.of(country) || labels[country as Country];
+      } catch {
+        // Keep the package's English label for an uncommon/unsupported region.
+      }
+    }
+  }
+
   return (
-    <input
-      type="tel"
-      dir="ltr"
-      value={value}
-      onChange={(event) => onChange(event.target.value.replace(/[^\d\s()+-]/g, ""))}
+    <PhoneInputLibrary
+      international
+      defaultCountry="SA"
+      countryCallingCodeEditable={false}
+      value={value || undefined}
+      onChange={(next) => onChange(next || "")}
       onBlur={onBlur}
       required={required}
       disabled={disabled}
-      placeholder={placeholder}
-      className={className}
-      inputMode="tel"
+      placeholder={placeholder || undefined}
+      className={`ofoq-phone-input ${className}`}
+      labels={labels}
+      inputProps={{ dir: "ltr", inputMode: "tel" }}
     />
   );
 }
