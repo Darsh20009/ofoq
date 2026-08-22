@@ -50,10 +50,6 @@ function issueAndRedirect(req: any, res: any) {
     res.redirect(oauthFailureRedirect(req));
     return;
   }
-  if (context.audience === "client" && user.role !== "client") {
-    res.redirect(`${OAUTH_BASE_URL}/client/login?error=client_account_required`);
-    return;
-  }
   const token = signToken({ userId: String(user._id), role: user.role, email: user.email });
   logAction(String(user._id), "login_oauth", "User", String(user._id), req);
   const callbackPath = context.audience === "client"

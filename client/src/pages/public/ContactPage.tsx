@@ -207,7 +207,6 @@ export default function ContactPage() {
                     onChange={(phone) => setForm({ ...form, phone })}
                     required
                     className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
-                    selectClassName="bg-white/[0.04] border border-white/10 text-white text-xs px-2 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
                   />
                 </motion.div>
               </div>

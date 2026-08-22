@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   LayoutDashboard, FolderOpen, MessageCircle, LogOut, Menu, X,
-  Bell, User, ChevronDown,
+  Bell, ChevronDown, ArrowUpRight, Building2, Landmark, Scale, UsersRound,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
@@ -15,6 +15,13 @@ const NAV = [
   { href: "/client/dashboard", icon: LayoutDashboard },
   { href: "/client/requests",  icon: FolderOpen },
   { href: "/client/support",   icon: MessageCircle },
+];
+
+const SERVICE_NAV = [
+  { href: "/services/hr", key: "hr_management", icon: UsersRound },
+  { href: "/services/government", key: "government_services", icon: Landmark },
+  { href: "/services/formation", key: "company_formation", icon: Building2 },
+  { href: "/services/legal", key: "legal_services", icon: Scale },
 ];
 
 export default function ClientLayout() {
@@ -43,9 +50,9 @@ export default function ClientLayout() {
     <div className="min-h-screen bg-gray-50 flex" dir={dir}>
 
       {/* ── Sidebar (desktop) ──────────────────────────────── */}
-      <aside className={`hidden lg:flex flex-col w-64 bg-ofoq-navy text-white fixed inset-y-0 shadow-2xl z-30 ${dir === "rtl" ? "right-0" : "left-0"}`}>
+      <aside className={`hidden lg:flex flex-col w-[280px] bg-[#211d36] text-white fixed inset-y-0 border-white/10 z-30 ${dir === "rtl" ? "right-0 border-l" : "left-0 border-r"}`}>
         {/* Logo */}
-        <div className="p-6 border-b border-white/10">
+        <div className="border-b border-white/10 p-6">
           <Link to="/client/dashboard" className="flex items-center gap-3">
             <OfoqLogo className="w-14 h-10" />
             <div>
@@ -56,20 +63,20 @@ export default function ClientLayout() {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="space-y-1 p-4">
           {NAV.map(({ href, icon: Icon }, index) => {
             const active = pathname === href || pathname.startsWith(href + "/");
             return (
               <Link key={href} to={href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
                   active
-                    ? "bg-ofoq-red text-white shadow-sm"
-                    : "text-white/65 hover:text-white hover:bg-white/10"
+                    ? "bg-white text-[#211d36]"
+                    : "text-white/65 hover:bg-white/10 hover:text-white"
                 }`}>
                 <Icon size={18} />
                 <span>{navLabels[index]}</span>
                 {href === "/client/support" && unread > 0 && (
-                  <span className="mr-auto bg-ofoq-red text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                  <span className="ms-auto flex h-5 w-5 items-center justify-center rounded-full bg-[#E5FE04] text-xs font-bold text-[#211d36]">
                     {unread}
                   </span>
                 )}
@@ -78,10 +85,39 @@ export default function ClientLayout() {
           })}
         </nav>
 
+        {/* Service shortcuts */}
+        <div className="flex-1 border-t border-white/10 px-4 py-6">
+          <div className="mb-3 flex items-center justify-between px-2">
+            <p className="text-[10px] font-bold uppercase tracking-[.18em] text-white/40">
+              {dir === "rtl" ? "خدمات أفق" : "OFOQ services"}
+            </p>
+            <ArrowUpRight size={14} className="text-[#E5FE04]" />
+          </div>
+          <div className="space-y-1">
+            {SERVICE_NAV.map(({ href, key, icon: Icon }) => (
+              <Link
+                key={href}
+                to={href}
+                className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                <Icon size={16} className="text-white/40 transition-colors group-hover:text-[#E5FE04]" />
+                <span>{(ui.client.services as Record<string, string>)[key] || key}</span>
+              </Link>
+            ))}
+          </div>
+          <Link
+            to="/client/requests/new"
+            className="mt-5 flex items-center justify-between rounded-xl border border-[#E5FE04]/35 px-3 py-3 text-xs font-bold text-[#E5FE04] transition-colors hover:bg-[#E5FE04] hover:text-[#211d36]"
+          >
+            <span>{ui.client.newRequest}</span>
+            <ArrowUpRight size={14} />
+          </Link>
+        </div>
+
         {/* User footer */}
-        <div className="p-4 border-t border-white/10">
+        <div className="border-t border-white/10 p-4">
           <div className="flex items-center gap-3 mb-3 px-2">
-            <div className="w-9 h-9 rounded-xl bg-ofoq-red/20 flex items-center justify-center text-white font-bold flex-shrink-0">
+            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#E5FE04] font-bold text-[#211d36]">
               {user?.name?.charAt(0) || "ع"}
             </div>
             <div className="min-w-0">
@@ -90,7 +126,7 @@ export default function ClientLayout() {
             </div>
           </div>
           <button onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-white/60 hover:text-white hover:bg-white/10 text-sm transition-all">
+            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-white/60 transition-colors hover:bg-white/10 hover:text-white">
              <LogOut size={15} /> {ui.client.logout}
           </button>
         </div>
@@ -138,9 +174,9 @@ export default function ClientLayout() {
       </header>
 
       {/* ── Main content ───────────────────────────────────── */}
-      <main className={`flex-1 mt-14 lg:mt-0 min-h-screen ${dir === "rtl" ? "lg:mr-64" : "lg:ml-64"}`}>
+      <main className={`mt-14 min-h-screen flex-1 lg:mt-0 ${dir === "rtl" ? "lg:mr-[280px]" : "lg:ml-[280px]"}`}>
         {/* Top bar (desktop) */}
-        <div className="hidden lg:flex items-center justify-between h-16 px-8 bg-white border-b border-gray-100 sticky top-0 z-20">
+        <div className="sticky top-0 z-20 hidden h-16 items-center justify-between border-b border-gray-100 bg-white px-8 lg:flex">
           <div />
           <div className="flex items-center gap-3">
             <Link to="/client/support" className="relative p-2 rounded-lg text-gray-400 hover:text-ofoq-navy hover:bg-gray-50 transition-all">

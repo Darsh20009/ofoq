@@ -19,6 +19,7 @@ export default function ResetPasswordPage() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!token) {
@@ -37,9 +38,10 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirm) { return; }
-    if (password.length < 8)  { return; }
+    if (password !== confirm) { setError(copy.mismatch); return; }
+    if (password.length < 8)  { setError(copy.minPassword); return; }
 
+    setError("");
     setLoading(true);
     try {
       await authApi.resetPassword(token, password);
@@ -81,6 +83,11 @@ export default function ResetPasswordPage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
+              {error && (
+                <div role="alert" className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+                  {error}
+                </div>
+              )}
               {/* كلمة المرور الجديدة */}
               <div>
                  <label className="block text-sm font-medium text-gray-700 mb-1.5">{copy.newPassword}</label>

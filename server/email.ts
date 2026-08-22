@@ -15,10 +15,14 @@ interface EmailConfig {
   smtpSecure: boolean;
 }
 
+export function getSiteUrl(): string {
+  return (process.env.APP_URL || "https://ofoq.qirox.online").replace(/\/+$/, "");
+}
+
 function getConfig(): EmailConfig {
   return {
     senderName: process.env.EMAIL_SENDER_NAME || "أفق لحلول الأعمال",
-    siteUrl: process.env.APP_URL || "https://ofoq.qirox.online",
+    siteUrl: getSiteUrl(),
     smtpHost: process.env.CPANEL_SMTP_HOST || "",
     smtpPort: parseInt(process.env.CPANEL_SMTP_PORT || "465"),
     smtpUser: process.env.CPANEL_SMTP_USER || "",
@@ -27,7 +31,12 @@ function getConfig(): EmailConfig {
   };
 }
 
-// ── Logo (base64-embedded for maximum compatibility across all email clients) ──
+export function isEmailConfigured(): boolean {
+  const cfg = getConfig();
+  return Boolean(cfg.smtpHost && cfg.smtpUser && cfg.smtpPass);
+}
+
+// ── Logo (CID attachment for reliable display in email clients) ──────────────
 let cachedLogoBase64: string | null | undefined;
 function getLogoBase64(): string | null {
   if (cachedLogoBase64 !== undefined) return cachedLogoBase64;
@@ -86,7 +95,6 @@ async function sendMail(
       port: cfg.smtpPort,
       secure: cfg.smtpSecure,
       auth: { user: cfg.smtpUser, pass: cfg.smtpPass },
-      tls: { rejectUnauthorized: false },
     });
 
     const logo = getLogoBuffer();
@@ -126,10 +134,9 @@ const COLORS = {
   navyDark: "#1C1930",
   green: "#33B27C",
   greenDark: "#259964",
-  yellow: "#E5FE04",
   text: "#3A3750",
   muted: "#8B879C",
-  bgSoft: "#F6F5FA",
+  bgSoft: "#F7F7F8",
   border: "#EDEBF3",
 };
 
@@ -172,9 +179,9 @@ function baseTemplate(opts: {
   const year = new Date().getFullYear();
   const logoB64 = getLogoBase64();
   const logoSrc = logoB64
-    ? `data:image/png;base64,${logoB64}`
+    ? "cid:ofoq-logo"
     : `${cfg.siteUrl}/icons/logo.png`;
-  const logoTag = `<img src="${logoSrc}" width="56" height="56" alt="OFOQ" style="display:block;border-radius:14px;" />`;
+  const logoTag = `<img src="${logoSrc}" width="72" height="72" alt="شعار أفق" style="display:block;width:72px;height:72px;border:0;border-radius:12px;" />`;
 
   return `<!DOCTYPE html>
 <html dir="rtl" lang="ar" xmlns="http://www.w3.org/1999/xhtml">
@@ -190,71 +197,35 @@ function baseTemplate(opts: {
 </style>
 <![endif]-->
 </head>
-<body style="margin:0;padding:0;background-color:#EEECF3;">
+<body style="margin:0;padding:0;background-color:#F1F2F4;">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${opts.preheader || ""}</div>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#EEECF3;padding:32px 12px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F1F2F4;padding:28px 12px;">
     <tr>
       <td align="center">
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"
-               style="width:600px;max-width:100%;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 8px 30px rgba(43,39,63,0.08);">
+               style="width:600px;max-width:100%;background:#ffffff;border:1px solid ${COLORS.border};border-radius:14px;overflow:hidden;">
 
-          <!-- Accent bar -->
-          <tr>
-            <td style="background:linear-gradient(90deg, ${COLORS.green} 0%, ${COLORS.yellow} 100%);height:6px;line-height:6px;font-size:0;">&nbsp;</td>
-          </tr>
-
-          <!-- Header -->
+          <!-- OFOQ brand banner -->
           <tr>
             <td align="center" bgcolor="${COLORS.navy}" style="background-color:${COLORS.navy};padding:28px 30px 24px;">
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
                 <tr>
-                  <td style="padding-inline-end:12px;" valign="middle">${logoTag}</td>
-                  <td valign="middle" align="right">
-                    <div style="font-family:Tahoma,Arial,sans-serif;font-size:19px;font-weight:bold;color:#ffffff;">أفق لحلول الأعمال</div>
-                    <div style="font-family:Tahoma,Arial,sans-serif;font-size:11px;color:#B7B2CC;letter-spacing:.5px;margin-top:2px;">OFOQ BUSINESS SOLUTIONS</div>
+                  <td align="center" style="background:#ffffff;padding:5px;border-radius:14px;" valign="middle">${logoTag}</td>
+                  <td style="padding-right:16px;" valign="middle" align="right">
+                    <div style="font-family:Tahoma,Arial,sans-serif;font-size:20px;font-weight:bold;color:#ffffff;">أفق لحلول الأعمال</div>
+                    <div style="font-family:Tahoma,Arial,sans-serif;font-size:11px;color:#B7B2CC;margin-top:4px;">OFOQ BUSINESS SOLUTIONS</div>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
 
-          <!-- Business Banner -->
           <tr>
-            <td style="padding:0;font-size:0;line-height:0;" bgcolor="${COLORS.navy}">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-                     style="background:linear-gradient(135deg,#0A1640 0%,#1C2B6E 40%,#0C1338 100%);">
+            <td bgcolor="${COLORS.navyDark}" style="background-color:${COLORS.navyDark};border-top:3px solid ${COLORS.green};padding:16px 30px 18px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="padding:20px 30px 28px;">
-                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <!-- Stats blocks -->
-                        <td align="center" style="padding:0 6px;">
-                          <div style="background:rgba(51,178,124,0.15);border:1px solid rgba(51,178,124,0.3);border-radius:10px;padding:10px 16px;text-align:center;">
-                            <div style="font-family:Tahoma,Arial,sans-serif;font-size:20px;font-weight:bold;color:#33B27C;">+١٠</div>
-                            <div style="font-family:Tahoma,Arial,sans-serif;font-size:10px;color:#B7B2CC;margin-top:2px;">دول</div>
-                          </div>
-                        </td>
-                        <td align="center" style="padding:0 6px;">
-                          <div style="background:rgba(229,254,4,0.1);border:1px solid rgba(229,254,4,0.25);border-radius:10px;padding:10px 16px;text-align:center;">
-                            <div style="font-family:Tahoma,Arial,sans-serif;font-size:20px;font-weight:bold;color:#E5FE04;">٨</div>
-                            <div style="font-family:Tahoma,Arial,sans-serif;font-size:10px;color:#B7B2CC;margin-top:2px;">خدمات</div>
-                          </div>
-                        </td>
-                        <td align="center" style="padding:0 6px;">
-                          <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 16px;text-align:center;">
-                            <div style="font-family:Tahoma,Arial,sans-serif;font-size:20px;font-weight:bold;color:#ffffff;">٣</div>
-                            <div style="font-family:Tahoma,Arial,sans-serif;font-size:10px;color:#B7B2CC;margin-top:2px;">باقات</div>
-                          </div>
-                        </td>
-                        <td align="right" style="padding-right:4px;">
-                          <div style="font-family:Tahoma,Arial,sans-serif;font-size:11px;color:#33B27C;font-weight:bold;line-height:1.6;">
-                            حلول أعمال متكاملة<br/>
-                            <span style="color:#B7B2CC;font-weight:normal;">من الاستراتيجية إلى التنفيذ</span>
-                          </div>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
+                  <td align="right" style="font-family:Tahoma,Arial,sans-serif;font-size:12px;color:#ffffff;font-weight:bold;">حلول أعمال متكاملة</td>
+                  <td align="left" style="font-family:Tahoma,Arial,sans-serif;font-size:12px;color:#B7B2CC;">من الاستراتيجية إلى التنفيذ</td>
                 </tr>
               </table>
             </td>
@@ -314,7 +285,7 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<boolea
   const html = baseTemplate({
     title: "مرحباً بك",
     preheader: "نرحب بانضمامك إلى أفق لحلول الأعمال",
-    heading: "مرحباً بك في أفق 👋",
+    heading: "مرحباً بك في أفق",
     bodyHtml: `
       ${p(`مرحباً ${accent(name)}،`)}
       ${p(`نرحب بك في منظومة <strong>أفق لحلول الأعمال</strong>. نحن سعداء بانضمامك إلينا وحريصون على مرافقتك في كل خطوة من مشوارك معنا.`)}
@@ -372,21 +343,21 @@ export async function sendNewEmployeeEmail(
   const html = baseTemplate({
     title: "بيانات حسابك في أفق",
     preheader: "تم إنشاء حسابك في نظام أفق لحلول الأعمال",
-    heading: `مرحباً ${name} 👋`,
+    heading: `مرحباً ${name}`,
     bodyHtml: `
       ${p(`تم إنشاء حسابك في نظام <strong>أفق لحلول الأعمال</strong> بنجاح. فيما يلي بيانات الدخول الخاصة بك:`)}
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:20px 0;">
         <tr>
           <td style="background:#f0f4f8;border-radius:12px;padding:20px 24px;">
-            <p style="margin:0 0 10px;font-size:14px;color:#555;">📧 البريد الإلكتروني</p>
-            <p style="margin:0 0 18px;font-size:16px;font-weight:700;color:#1B3A5C;direction:ltr;">${loginEmail}</p>
-            <p style="margin:0 0 10px;font-size:14px;color:#555;">🔑 كلمة المرور المؤقتة</p>
-            <p style="margin:0;font-size:18px;font-weight:700;color:#E63329;letter-spacing:2px;font-family:monospace;" dir="ltr">${plainPassword}</p>
+            <p style="margin:0 0 10px;font-size:14px;color:${COLORS.muted};">البريد الإلكتروني</p>
+            <p style="margin:0 0 18px;font-size:16px;font-weight:700;color:${COLORS.navy};direction:ltr;">${loginEmail}</p>
+            <p style="margin:0 0 10px;font-size:14px;color:${COLORS.muted};">كلمة المرور المؤقتة</p>
+            <p style="margin:0;font-size:18px;font-weight:700;color:${COLORS.navy};letter-spacing:2px;font-family:monospace;" dir="ltr">${plainPassword}</p>
           </td>
         </tr>
       </table>
       ${button("الدخول إلى حسابي", `${cfg.siteUrl}/admin/login`)}
-      ${p(`<strong style="color:#E63329;">⚠️ مهم:</strong> يُرجى تغيير كلمة المرور فور تسجيل دخولك الأول من صفحة الملف الشخصي.`)}
+      ${p(`<strong style="color:${COLORS.navy};">مهم:</strong> يُرجى تغيير كلمة المرور فور تسجيل دخولك الأول من صفحة الملف الشخصي.`)}
       ${p("إذا كنت لا تعرف شيئاً عن هذا الحساب، يُرجى التواصل مع المسؤول فوراً.")}
     `,
   });
@@ -442,7 +413,7 @@ export async function sendInvoiceEmail(
   const html = baseTemplate({
     title: "فاتورة جديدة",
     preheader: `فاتورة رقم ${invoiceNumber} بمبلغ ${total.toLocaleString()} ${currency}`,
-    heading: "لديك فاتورة جديدة 🧾",
+    heading: "لديك فاتورة جديدة",
     bodyHtml: `
       ${p(`مرحباً ${accent(name)}،`)}
       ${p(`تم إصدار فاتورة جديدة من <strong>أفق لحلول الأعمال</strong>.`)}
@@ -469,7 +440,7 @@ export async function sendContractEmail(
   const html = baseTemplate({
     title: "عقد جديد",
     preheader: `عقد رقم ${contractNumber} يتطلب مراجعتكم`,
-    heading: "عقد جديد يتطلب مراجعتكم 📄",
+    heading: "عقد جديد يتطلب مراجعتكم",
     bodyHtml: `
       ${p(`مرحباً ${accent(name)}،`)}
       ${p(`تم إعداد عقد جديد بعنوان <strong>${title}</strong> ويتطلب مراجعتكم وتوقيعكم.`)}
@@ -486,7 +457,7 @@ export async function sendContactConfirmation(to: string, name: string): Promise
   const html = baseTemplate({
     title: "تأكيد استلام رسالتك",
     preheader: "شكراً لتواصلك معنا، سيتواصل معك فريقنا قريباً",
-    heading: "شكراً لتواصلك معنا 🙌",
+    heading: "شكراً لتواصلك معنا",
     bodyHtml: `
       ${p(`مرحباً ${accent(name)}،`)}
       ${p(`شكراً لتواصلك مع <strong>أفق لحلول الأعمال</strong>.`)}
@@ -526,7 +497,7 @@ export async function sendServiceRequestAdminNotify(opts: {
   const html = baseTemplate({
     title: "طلب خدمة جديد",
     preheader: `طلب خدمة جديد من ${opts.companyName}`,
-    heading: "📋 طلب خدمة جديد",
+    heading: "طلب خدمة جديد",
     bodyHtml: `
       ${p(`وردنا طلب خدمة جديد من منصة العملاء. يُرجى المراجعة والتواصل مع العميل في أقرب وقت.`)}
       ${infoBox([
@@ -555,7 +526,7 @@ export async function sendServiceRequestClientConfirm(opts: {
   const html = baseTemplate({
     title: "تأكيد استلام طلبك",
     preheader: `تم استلام طلبك بنجاح — ${opts.serviceLabel}`,
-    heading: "✅ تم استلام طلبك بنجاح",
+    heading: "تم استلام طلبك بنجاح",
     bodyHtml: `
       ${p(`مرحباً ${accent(opts.clientName)}،`)}
       ${p(`شكراً لثقتك بـ<strong>أفق لحلول الأعمال</strong>. تلقّينا طلبك وسيتواصل معك فريقنا خلال 24–48 ساعة عمل.`)}
@@ -585,7 +556,7 @@ export async function sendServiceRequestStageUpdate(opts: {
   const html = baseTemplate({
     title: "تحديث حالة طلبك",
     preheader: `حالة طلبك تغيّرت إلى: ${opts.newStatusAr}`,
-    heading: "🔄 تحديث على حالة طلبك",
+    heading: "تحديث على حالة طلبك",
     bodyHtml: `
       ${p(`مرحباً،`)}
       ${p(`تم تحديث حالة طلبك المقدّم من شركة <strong>${opts.companyName}</strong>.`)}
@@ -610,8 +581,8 @@ export async function sendNewsletterWelcome(
   const isAr = lang === "ar" || lang === "ur";
 
   const subject = isAr
-    ? "مرحباً بك في مجتمع أفق 🎉"
-    : "Welcome to OFOQ Community 🎉";
+    ? "مرحباً بك في مجتمع أفق"
+    : "Welcome to OFOQ Community";
 
   const heading = isAr ? "تم اشتراكك بنجاح!" : "You're subscribed!";
 
@@ -626,13 +597,13 @@ export async function sendNewsletterWelcome(
       ${p(`شكراً لاشتراكك في نشرة ${accent("أفق لحلول الأعمال")} البريدية.`)}
       ${p("سنرسل لك آخر المقالات، التحديثات، والعروض الخاصة مباشرةً إلى بريدك الإلكتروني.")}
       ${button("زيارة الموقع", cfg.siteUrl)}
-      ${p(`إذا لم تشترك بنفسك، يمكنك تجاهل هذا البريد.`, true)}
+      ${p(`إذا لم تشترك بنفسك، يمكنك تجاهل هذا البريد.`)}
     `
       : `
       ${p(`Thank you for subscribing to the ${accent("OFOQ Business Solutions")} newsletter.`)}
       ${p("We'll send you the latest articles, updates, and special offers directly to your inbox.")}
       ${button("Visit our website", cfg.siteUrl)}
-      ${p(`If you didn't subscribe, you can safely ignore this email.`, true)}
+      ${p(`If you didn't subscribe, you can safely ignore this email.`)}
     `,
   });
 
@@ -650,7 +621,7 @@ export async function sendSupportReplyNotify(opts: {
   const html = baseTemplate({
     title: "رد جديد من فريق الدعم",
     preheader: `${opts.adminName} ردّ على رسالتك`,
-    heading: "💬 رد جديد من فريق الدعم",
+    heading: "رد جديد من فريق الدعم",
     bodyHtml: `
       ${p(`مرحباً ${accent(opts.clientName)}،`)}
       ${p(`أرسل ${accent(opts.adminName)} ردّاً على رسالتك في منصة الدعم:`)}

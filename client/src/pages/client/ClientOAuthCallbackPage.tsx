@@ -27,13 +27,13 @@ export default function ClientOAuthCallbackPage() {
     authApi.me()
       .then((res) => {
         const user = res.data.user;
-        if (user.role !== "client") {
-          clearAuth();
-          navigate("/client/login?error=client_account_required", { replace: true });
-          return;
-        }
         setAuth(user, token);
-        navigate(redirect, { replace: true });
+        const destination = user.role === "client"
+          ? redirect
+          : user.role === "employee"
+            ? "/admin/employee/dashboard"
+            : "/admin";
+        navigate(destination, { replace: true });
       })
       .catch(() => {
         clearAuth();

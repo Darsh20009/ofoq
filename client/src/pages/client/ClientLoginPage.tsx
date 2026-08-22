@@ -30,6 +30,12 @@ function AppleIcon() {
 
 interface Form { email: string; password: string; }
 
+function getRoleHome(role: string, requestedRedirect: string): string {
+  if (role === "client") return requestedRedirect;
+  if (role === "employee") return "/admin/employee/dashboard";
+  return "/admin";
+}
+
 export default function ClientLoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm<Form>();
   const [loading, setLoading] = useState(false);
@@ -64,12 +70,8 @@ export default function ClientLoginPage() {
     try {
       const res = await axios.post("/api/auth/login", data);
       const { token, user } = res.data;
-      if (user.role !== "client") {
-        setErr(ui.auth.invalid);
-        setLoading(false); return;
-      }
       setAuth({ id: user.id, name: user.name, email: user.email, role: user.role, lang: user.lang }, token);
-      navigate(redirect, { replace: true });
+      navigate(getRoleHome(user.role, redirect), { replace: true });
     } catch (e: any) {
       setErr(e.response?.data?.error || ui.auth.invalid);
     } finally { setLoading(false); }

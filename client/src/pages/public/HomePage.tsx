@@ -187,6 +187,21 @@ export default function HomePage() {
   const aboutQuote = lang === "ar"
     ? "خدمات أعمال تعزّز النمو وتدعم التنمية المستدامة بما يتماشى مع رؤية السعودية"
     : "Business services that advance sustainable growth in line with Saudi Vision.";
+  const joinOfoqTitle = lang === "ar" ? "كن جزءًا من أفق" : "Be part of OFOQ";
+  const joinOfoqDescription = lang === "ar"
+    ? "انضم إلى أفق وكن جزءًا من رحلة نمو نصنع فيها حلولًا أوضح، وأعمالًا أقوى، ومستقبلًا أوسع."
+    : "Join OFOQ and be part of a growth journey built around clearer solutions, stronger businesses, and a wider horizon.";
+  const portalTitle = lang === "ar"
+    ? "جميع خدمات أعمالك في مكان واحد"
+    : "All your business services in one place";
+  const portalDescription = lang === "ar"
+    ? "توفّر بوابة أفق لحلول الأعمال للشركات داخل المملكة وخارجها منظومة متكاملة من الخدمات، تدعم تأسيس أعمالكم وتشغيلها وتوسيع نطاقها."
+    : "OFOQ's business portal gives companies inside and outside Saudi Arabia one connected place to establish, operate, and expand their businesses.";
+  const portalDetail = lang === "ar"
+    ? "من إدارة الموارد البشرية والرواتب إلى الخدمات الحكومية والتأسيس والاستشارات، تقدّم أفق تجربة موحّدة واضحة وسريعة، مع متابعة عملية في كل مرحلة."
+    : "From HR and payroll to government services, formation, and advisory support, OFOQ brings every step into one clear and efficient experience.";
+  const portalEntryLabel = lang === "ar" ? "الدخول إلى بوابة أفق" : "Open the OFOQ client portal";
+  const portalDiscoverLabel = lang === "ar" ? "اكتشف المزيد" : "Discover more";
   const activeServicePreview = servicesCatalog[servicePreviewIndex];
 
   const updateServicesRailProgress = () => {
@@ -376,6 +391,7 @@ export default function HomePage() {
                 className="block h-auto w-full object-contain"
               />
             </motion.figure>
+
           </div>
         </section>
 
@@ -677,85 +693,156 @@ export default function HomePage() {
             WHY OFOQ — light gray / off-white section
         ════════════════════════════════════════════════════════ */}
         <section className="bg-[#f5f4fa] text-gray-900">
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 py-24 sm:py-32">
-            <div className="text-center mb-16">
-              <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-4">
-                {ui.home.whyBadge}
-              </p>
-              <h2 className="text-4xl sm:text-5xl font-black text-[#2B273F]">
-                {ui.home.whyTitle}
-              </h2>
+          <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
+            <div className="grid items-center gap-12 lg:grid-cols-[.78fr_1.22fr] lg:gap-20">
+              <motion.figure
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "0px 0px -70px 0px" }}
+                transition={{ duration: 0.85, ease }}
+                className="relative overflow-hidden rounded-[24px] border border-[#2B273F]/10 bg-[#2B273F] p-2"
+              >
+                <div aria-hidden="true" className="pointer-events-none absolute inset-2 z-10 rounded-[18px] bg-[#2B273F]/10 backdrop-blur-[2px]" />
+                <img
+                  src="/images/ofoq-client-portal-dashboard.png"
+                  alt={lang === "ar" ? "لقطة من بوابة عملاء أفق" : "OFOQ client portal preview"}
+                  loading="lazy"
+                  className="block h-auto max-h-[620px] w-full rounded-[18px] object-contain opacity-95"
+                />
+              </motion.figure>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-gray-200">
-              {(ui.home.reasons ?? []).map((r, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1, duration: 0.7, ease }}
-                  className="bg-[#f5f4fa] p-8"
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "0px 0px -60px 0px" }}
+              transition={{ duration: 0.75, ease }}
+              className={`mt-14 max-w-4xl border-t border-[#2B273F]/10 pt-10 ${isRtl ? "mr-auto text-right" : "ml-auto text-left"}`}
+            >
+              <p className="mb-4 text-sm font-black text-[#33B27C]">{ui.home.whyBadge}</p>
+              <h2 className="max-w-3xl text-3xl font-black leading-[1.2] tracking-[-.04em] text-[#2B273F] sm:text-5xl">
+                {portalTitle}
+              </h2>
+              <p className="mt-6 max-w-3xl text-base leading-8 text-[#2B273F]/75 sm:text-lg sm:leading-9">
+                {portalDescription}
+              </p>
+              <p className="mt-4 max-w-3xl text-base leading-8 text-[#2B273F]/65 sm:text-lg sm:leading-9">
+                {portalDetail}
+              </p>
+              <div className={`mt-8 flex flex-wrap gap-3 ${isRtl ? "justify-start" : "justify-start"}`}>
+                <Link
+                  to="/client/login"
+                  className="inline-flex items-center gap-3 rounded-full bg-[#2B273F] py-2 pe-6 ps-2 text-sm font-black text-white transition-colors hover:bg-[#33B27C]"
                 >
-                  <div className="w-10 h-10 rounded-full bg-[#33B27C]/15 flex items-center justify-center mb-5">
-                    <span className="text-[#33B27C] font-black text-sm">0{i + 1}</span>
-                  </div>
-                  <h3 className="font-black text-[#2B273F] mb-3">{r.title}</h3>
-                  <p className="text-gray-500 text-sm leading-7">{r.desc}</p>
-                </motion.div>
-              ))}
-            </div>
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#B8E8A0] text-[#2B273F]">
+                    <svg viewBox="0 0 16 16" fill="none" className={`h-4 w-4 ${isRtl ? "rotate-180" : ""}`} aria-hidden="true">
+                      <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                  {portalEntryLabel}
+                </Link>
+                <Link
+                  to="/services"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#2B273F]/20 px-6 py-3 text-sm font-black text-[#2B273F] transition-colors hover:border-[#33B27C] hover:text-[#33B27C]"
+                >
+                  {portalDiscoverLabel}
+                </Link>
+              </div>
+            </motion.div>
           </div>
         </section>
 
         {/* ════════════════════════════════════════════════════════
-            CTA — GREEN accent section (tasama style)
+            CTA — quiet, centered invitation
         ════════════════════════════════════════════════════════ */}
-        <section className="bg-[#33B27C] text-white relative overflow-hidden">
-          {/* Subtle grid overlay */}
+        <section className="relative overflow-hidden bg-[#f8f8f7] text-[#2B273F]">
           <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)",
-              backgroundSize: "60px 60px",
-            }}
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-20 top-8 h-[560px] w-[360px] rounded-[100px_0_0_0] border border-[#C5B278]/25 sm:-right-10 sm:w-[430px]"
           />
-          <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-24 sm:py-32">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute right-0 top-24 h-[470px] w-[250px] border-l border-t border-[#C5B278]/15 sm:w-[310px]"
+          />
+          <div className="relative z-10 mx-auto max-w-3xl px-6 py-24 text-center sm:px-10 sm:py-32">
             <motion.div
               initial="hidden"
               whileInView="show"
               viewport={{ once: true }}
               variants={stagger}
-              className="max-w-3xl"
+              className="mx-auto flex max-w-2xl flex-col items-center"
             >
-              <motion.p variants={fadeUp} className="text-[10px] font-bold uppercase tracking-[.3em] text-white/60 mb-6">
-                {ui.home.ctaTitle1}
-              </motion.p>
-              <motion.h2 variants={fadeUp} className="text-4xl sm:text-6xl font-black leading-tight mb-8">
-                {ui.home.ctaTitle2}
-              </motion.h2>
-              <motion.p variants={fadeUp} className="text-white/70 text-lg max-w-lg mb-10">
+              <motion.p
+                variants={fadeUp}
+                className="max-w-md text-base leading-8 text-[#2B273F]/75 sm:text-lg sm:leading-9"
+              >
                 {ui.home.ctaDesc}
               </motion.p>
-              <motion.div variants={fadeUp} className="flex flex-wrap gap-4">
+              <motion.h2
+                variants={fadeUp}
+                className="mt-10 max-w-xl text-4xl font-black leading-[1.18] tracking-[-.045em] sm:text-6xl"
+              >
+                <span className="text-[#2B273F]">{ui.home.ctaTitle1}</span>{" "}
+                <span className="text-[#33B27C]">{ui.home.ctaTitle2}</span>
+              </motion.h2>
+              <motion.div variants={fadeUp} className="mt-10">
                 <Link
                   to="/contact"
-                  className="group inline-flex items-center gap-3 bg-white text-[#33B27C] font-bold text-sm px-8 py-4 rounded-full hover:bg-[#E5FE04] hover:text-[#2B273F] transition-all duration-300"
+                  className="inline-flex items-center gap-3 rounded-full bg-white py-2 pe-6 ps-2 text-sm font-black text-[#2B273F] ring-1 ring-[#2B273F]/10 transition-colors hover:text-[#33B27C]"
                 >
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#B8E8A0]">
+                    <svg viewBox="0 0 16 16" fill="none" className={`h-4 w-4 ${isRtl ? "rotate-180" : ""}`} aria-hidden="true">
+                      <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
                   {ui.home.contact}
-                  <svg viewBox="0 0 16 16" fill="none" className={`w-4 h-4 ${isRtl ? "rotate-180" : ""}`}>
-                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </Link>
-                <Link
-                  to="/about"
-                  className="inline-flex items-center gap-3 border border-white/40 text-white font-bold text-sm px-8 py-4 rounded-full hover:border-white hover:bg-white/10 transition-all duration-300"
-                >
-                  {ui.about.badge}
                 </Link>
               </motion.div>
             </motion.div>
+          </div>
+        </section>
+
+        <section className="bg-white text-[#2B273F]">
+          <div className="mx-auto max-w-4xl px-6 py-20 sm:px-10 sm:py-28">
+            <div className="border-t border-[#2B273F]/10 pt-12 sm:pt-16">
+              <div className={`grid items-end gap-10 lg:grid-cols-[.8fr_1.2fr] lg:gap-16 ${isRtl ? "lg:[direction:rtl]" : ""}`}>
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "0px 0px -60px 0px" }}
+                  transition={{ duration: 0.7, ease }}
+                  className={isRtl ? "text-right" : "text-left"}
+                >
+                  <h2 className="max-w-md text-4xl font-black leading-[1.15] tracking-[-.04em] sm:text-5xl">
+                    {joinOfoqTitle}
+                  </h2>
+                  <p className="mt-5 max-w-md text-base leading-8 text-[#2B273F]/70 sm:text-lg sm:leading-9">
+                    {joinOfoqDescription}
+                  </p>
+                  <Link
+                    to="/contact"
+                    className="mt-7 inline-flex border-b border-[#33B27C] pb-2 text-sm font-black text-[#2B273F] transition-colors hover:text-[#33B27C]"
+                  >
+                    {ui.about.requestService}
+                  </Link>
+                </motion.div>
+
+                <motion.figure
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "0px 0px -60px 0px" }}
+                  transition={{ duration: 0.8, ease }}
+                  className="overflow-hidden rounded-sm bg-[#2B273F]"
+                >
+                  <img
+                    src="/images/ofoq-brand-photo2.jpg"
+                    alt={joinOfoqTitle}
+                    loading="lazy"
+                    className="block h-auto max-h-[520px] w-full object-cover"
+                  />
+                </motion.figure>
+              </div>
+            </div>
           </div>
         </section>
 

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { FolderOpen, Clock, CheckCircle2, PlusCircle, MessageCircle, Loader2 } from "lucide-react";
+import { FolderOpen, Clock, CheckCircle2, PlusCircle, MessageCircle, Loader2, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { clientApi } from "../../api/clientApi";
 import { useLang } from "../../i18n/LangContext";
@@ -52,52 +52,81 @@ export default function ClientDashboardPage() {
 
   return (
     <div className="space-y-8" dir={dir}>
-      {/* Welcome */}
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-2xl font-bold text-ofoq-navy">
-           {ui.client.welcome}، {user?.name?.split(" ")[0] || ui.client.client} 👋
-        </h1>
-        <p className="text-gray-500 text-sm mt-1">{ui.client.dashboardSub}</p>
-      </motion.div>
+      {/* Welcome banner */}
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden rounded-[28px] border border-[#2B273F]/10 bg-[#211d36] text-white"
+      >
+        <div className="grid min-h-[280px] md:grid-cols-[1.15fr_.85fr]">
+          <div className={`relative z-10 flex flex-col justify-center px-7 py-9 sm:px-10 ${dir === "rtl" ? "text-right" : "text-left"}`}>
+            <p className="text-xs font-bold text-[#E5FE04]">{ui.client.portal}</p>
+            <h1 className="mt-3 text-3xl font-black leading-tight sm:text-4xl">
+              {ui.client.welcome}، {user?.name?.split(" ")[0] || ui.client.client}
+            </h1>
+            <p className="mt-3 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
+              {ui.client.dashboardSub}
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                to="/client/requests/new"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#E5FE04] px-4 py-3 text-sm font-bold text-[#211d36] transition-colors hover:bg-white"
+              >
+                <PlusCircle size={17} />
+                {ui.client.newRequest}
+              </Link>
+              <Link
+                to="/client/support"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/25 px-4 py-3 text-sm font-bold text-white transition-colors hover:border-white"
+              >
+                <MessageCircle size={17} />
+                {ui.client.supportAction}
+              </Link>
+            </div>
+          </div>
+          <div className="relative hidden overflow-hidden md:block">
+            <img
+              src="/images/ofoq-brand-photo2.jpg"
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover object-center opacity-70"
+            />
+            <div className="absolute inset-0 bg-[#211d36]/45" />
+            <div className={`absolute bottom-7 flex items-center gap-2 text-xs font-bold text-white/80 ${dir === "rtl" ? "right-7" : "left-7"}`}>
+              <span className="h-2 w-2 rounded-full bg-[#E5FE04]" />
+              {ui.client.portal}
+            </div>
+          </div>
+        </div>
+      </motion.section>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
         {[
-          { label: ui.client.total, value: requests.length, icon: FolderOpen, color: "bg-ofoq-navy" },
-          { label: ui.client.active, value: active.length, icon: Clock, color: "bg-amber-500" },
-          { label: ui.client.completed, value: completed.length, icon: CheckCircle2, color: "bg-emerald-500" },
-          { label: ui.client.newRequests, value: requests.filter((r: any) => r.status === "new").length, icon: PlusCircle, color: "bg-blue-500" },
+          { label: ui.client.total, value: requests.length, icon: FolderOpen, color: "text-[#2B273F]" },
+          { label: ui.client.active, value: active.length, icon: Clock, color: "text-[#C5B278]" },
+          { label: ui.client.completed, value: completed.length, icon: CheckCircle2, color: "text-[#33B27C]" },
+          { label: ui.client.newRequests, value: requests.filter((r: any) => r.status === "new").length, icon: PlusCircle, color: "text-[#6D73DD]" },
         ].map((s, i) => (
           <motion.div key={s.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
-            className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-            <div className={`${s.color} w-10 h-10 rounded-xl flex items-center justify-center mb-3`}>
-              <s.icon size={18} className="text-white" />
+            className="border border-[#2B273F]/10 bg-white p-5">
+            <div className="mb-5 flex items-center justify-between">
+              <s.icon size={20} className={s.color} />
+              <span className="h-px w-8 bg-[#2B273F]/10" />
             </div>
-            <p className="text-2xl font-bold text-ofoq-navy">{s.value}</p>
-            <p className="text-gray-500 text-xs mt-0.5">{s.label}</p>
+            <p className="text-3xl font-black text-[#2B273F]">{s.value}</p>
+            <p className="mt-1 text-xs text-[#2B273F]/55">{s.label}</p>
           </motion.div>
         ))}
       </div>
 
-      {/* Actions */}
-      <div className="flex flex-wrap gap-3">
-        <Link to="/client/requests/new"
-          className="flex items-center gap-2 bg-ofoq-navy text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-ofoq-red transition-all shadow-sm">
-          <PlusCircle size={16} /> {ui.client.newRequest}
-        </Link>
-        <Link to="/client/support"
-          className="flex items-center gap-2 bg-white text-ofoq-navy border border-ofoq-navy/20 px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-ofoq-navy hover:text-white transition-all">
-          <MessageCircle size={16} /> {ui.client.supportAction}
-        </Link>
-      </div>
-
       {/* Recent Requests */}
-      <div>
+      <div className="border border-[#2B273F]/10 bg-white p-5 sm:p-7">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-ofoq-navy">{ui.client.latest}</h2>
-          <Link to="/client/requests" className="text-sm text-ofoq-navy/70 hover:text-ofoq-red transition-colors">
-            {ui.category.details} ←
+          <h2 className="text-lg font-black text-[#2B273F]">{ui.client.latest}</h2>
+          <Link to="/client/requests" className="inline-flex items-center gap-1 text-sm font-bold text-[#2B273F]/60 transition-colors hover:text-[#33B27C]">
+            {ui.category.details}
+            <ArrowUpRight size={15} className={dir === "rtl" ? "rotate-[-90deg]" : ""} />
           </Link>
         </div>
 
@@ -106,12 +135,12 @@ export default function ClientDashboardPage() {
             <Loader2 size={28} className="animate-spin" />
           </div>
         ) : requests.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center">
+          <div className="border border-dashed border-gray-200 p-10 text-center">
             <FolderOpen size={40} className="text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500 font-medium">{ui.client.noRequests}</p>
             <p className="text-gray-400 text-sm mt-1 mb-4">{ui.client.noRequestsSub}</p>
             <Link to="/client/requests/new"
-              className="inline-flex items-center gap-2 bg-ofoq-navy text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-ofoq-red transition-all">
+              className="inline-flex items-center gap-2 bg-[#211d36] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#33B27C]">
               <PlusCircle size={14} /> {ui.client.submitNow}
             </Link>
           </div>
@@ -121,7 +150,7 @@ export default function ClientDashboardPage() {
               <motion.div key={req._id} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}>
                 <Link to={`/client/requests/${req._id}`}
-                  className="block bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md hover:border-ofoq-navy/20 transition-all">
+                  className="block border border-[#2B273F]/10 p-5 transition-colors hover:border-[#33B27C]/60">
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div>
                       <p className="font-semibold text-ofoq-navy text-sm">{req.companyName}</p>

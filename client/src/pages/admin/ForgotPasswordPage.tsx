@@ -13,16 +13,18 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
     setLoading(true);
+    setError("");
     try {
       await authApi.forgotPassword(email.trim());
       setSent(true);
-    } catch {
-      // silent
+    } catch (requestError: any) {
+      setError(requestError.response?.data?.error || "تعذر إرسال رسالة إعادة التعيين حاليًا. يرجى المحاولة لاحقًا.");
     } finally {
       setLoading(false);
     }
@@ -63,6 +65,11 @@ export default function ForgotPasswordPage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
+              {error && (
+                <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
+                  {error}
+                </p>
+              )}
               <div>
                  <label className="block text-sm font-medium text-gray-700 mb-1.5">{copy.email}</label>
                 <div className="relative">

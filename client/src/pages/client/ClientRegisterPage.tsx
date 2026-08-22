@@ -158,7 +158,6 @@ export default function ClientRegisterPage() {
                       onBlur={field.onBlur}
                       required
                       className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 transition-all ${errors.phone ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`}
-                      selectClassName={`px-2 py-3 rounded-xl border text-xs focus:outline-none focus:ring-2 focus:ring-ofoq-navy/30 ${errors.phone ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50 focus:bg-white"}`}
                     />
                   )}
                 />

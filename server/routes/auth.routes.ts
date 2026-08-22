@@ -8,9 +8,9 @@ import {
   requireAuth, generateOtp, generateSecureToken, logAction
 } from "../auth.js";
 import { loginLimiter, otpLimiter, registerLimiter, adminLoginLimiter, twoFALimiter, barcodeLoginLimiter } from "../middleware/rateLimiter.js";
-import { validate, registerSchema, loginSchema } from "../middleware/validate.js";
+import { validate, registerSchema, loginSchema, resetPasswordSchema } from "../middleware/validate.js";
 import { fireNotify, fireNotifyAdmins } from "../notify.js";
-import { sendOtpEmail, sendPasswordResetEmail, sendEmailVerification, sendWelcomeEmail } from "../email.js";
+import { getSiteUrl, isEmailConfigured, sendOtpEmail, sendPasswordResetEmail, sendEmailVerification, sendWelcomeEmail } from "../email.js";
 import { isDBConnected } from "../db.js";
 import {
   UserModel, Pending2FAModel, WebAuthnCredentialModel,
@@ -30,7 +30,8 @@ function normalizeOtpCode(value: unknown): string {
 // ── Register ─────────────────────────────────────────────────────
 authRouter.post("/register", registerLimiter, validate(registerSchema), async (req, res) => {
   try {
-    const { fullName, email, password, phone, lang } = req.body;
+    const { fullName, password, phone, lang } = req.body;
+    const email = String(req.body.email).trim().toLowerCase();
 
     const existing = await UserModel.findOne({ email });
     if (existing) {
@@ -55,7 +56,7 @@ authRouter.post("/register", registerLimiter, validate(registerSchema), async (r
       emailVerificationExpiry: verifyExpiry,
     });
 
-    const verifyLink = `${process.env.APP_URL}/verify-email?token=${verifyToken}`;
+    const verifyLink = `${getSiteUrl()}/verify-email?token=${encodeURIComponent(verifyToken)}`;
     await sendEmailVerification(email, fullName, verifyLink);
     await sendWelcomeEmail(email, fullName);
     await fireNotifyAdmins(
@@ -92,7 +93,8 @@ authRouter.post("/login", loginLimiter, validate(loginSchema), async (req, res) 
   }
 
   try {
-    const { email, password } = req.body;
+    const { password } = req.body;
+    const email = String(req.body.email).trim().toLowerCase();
     const user = await UserModel.findOne({ email }).select("+password +totpSecret +recoveryPassphrase");
     if (!user || !user.password) {
       res.status(401).json({ error: "بريد إلكتروني أو كلمة مرور غير صحيحة" });
@@ -282,7 +284,12 @@ authRouter.post("/verify-email", async (req, res) => {
 // ── Forgot Password ──────────────────────────────────────────────
 authRouter.post("/forgot-password", otpLimiter, async (req, res) => {
   try {
-    const { email } = req.body;
+    const email = String(req.body.email ?? "").trim().toLowerCase();
+    if (!isEmailConfigured()) {
+      res.status(503).json({ error: "خدمة البريد غير مهيأة حاليًا. يرجى المحاولة لاحقًا أو التواصل مع الدعم." });
+      return;
+    }
+
     const user = await UserModel.findOne({ email });
     // Always return 200 for security
     if (!user) {
@@ -295,8 +302,16 @@ authRouter.post("/forgot-password", otpLimiter, async (req, res) => {
       passwordResetToken: resetToken,
       passwordResetExpiry: resetExpiry,
     });
-    const resetLink = `${process.env.APP_URL}/admin/reset-password?token=${resetToken}`;
-    await sendPasswordResetEmail(email, user.fullName, resetLink);
+    const resetPath = user.role === "client" ? "/client/reset-password" : "/admin/reset-password";
+    const resetLink = `${getSiteUrl()}${resetPath}?token=${encodeURIComponent(resetToken)}`;
+    const sent = await sendPasswordResetEmail(email, user.fullName, resetLink);
+    if (!sent) {
+      await UserModel.findByIdAndUpdate(user._id, {
+        $unset: { passwordResetToken: 1, passwordResetExpiry: 1 },
+      });
+      res.status(503).json({ error: "تعذر إرسال رسالة إعادة التعيين. يرجى المحاولة لاحقًا." });
+      return;
+    }
     res.json({ message: "إذا كان البريد مسجّلاً، ستصلك رسالة إعادة التعيين" });
   } catch {
     res.status(500).json({ error: "خطأ في إرسال رابط إعادة التعيين" });
@@ -304,7 +319,7 @@ authRouter.post("/forgot-password", otpLimiter, async (req, res) => {
 });
 
 // ── Reset Password ────────────────────────────────────────────────
-authRouter.post("/reset-password", async (req, res) => {
+authRouter.post("/reset-password", validate(resetPasswordSchema), async (req, res) => {
   try {
     const { token, newPassword } = req.body;
     const user = await UserModel.findOne({
@@ -318,8 +333,7 @@ authRouter.post("/reset-password", async (req, res) => {
     const hashed = await hashPassword(newPassword);
     await UserModel.findByIdAndUpdate(user._id, {
       password: hashed,
-      passwordResetToken: undefined,
-      passwordResetExpiry: undefined,
+      $unset: { passwordResetToken: 1, passwordResetExpiry: 1 },
     });
     await logAction(String(user._id), "password_reset", "User", String(user._id), req);
     res.json({ message: "تم تغيير كلمة المرور بنجاح" });
