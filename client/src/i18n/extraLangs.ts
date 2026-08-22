@@ -56,6 +56,10 @@ export function deepMerge<T>(base: T, patch: any): T {
   for (const k of Object.keys(patch)) {
     const b = (base as any)?.[k];
     const p = patch[k];
+    // CMS content may contain empty/null values for fields that were never
+    // edited. Do not let those values erase a complete static translation
+    // section and crash pages that read nested copy.
+    if (p === null || p === undefined) continue;
     out[k] = p && typeof p === "object" && !Array.isArray(p) && b && typeof b === "object" && !Array.isArray(b)
       ? deepMerge(b, p)
       : p;
