@@ -3,6 +3,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 // @ts-ignore — passport-apple has no bundled types
 import AppleStrategy from "passport-apple";
 import { UserModel } from "./models/index.js";
+import { ensureCustomerForUser } from "./services/customer-sync.service.js";
 
 // This app can be reached from several domains depending on environment
 // (Replit dev preview subdomain, a custom production domain, Render). OAuth
@@ -61,6 +62,7 @@ if (googleEnabled) {
           if (!user.emailVerified) user.emailVerified = true;
           await user.save();
         }
+        if (user.role === "client") await ensureCustomerForUser(user);
         return done(null, user);
       } catch (err) {
         return done(err as Error);
@@ -111,6 +113,7 @@ if (appleEnabled) {
           user.appleId = appleId;
           await user.save();
         }
+        if (user.role === "client") await ensureCustomerForUser(user);
         return done(null, user);
       } catch (err) {
         return done(err as Error);

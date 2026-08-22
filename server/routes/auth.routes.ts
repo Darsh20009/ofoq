@@ -16,6 +16,7 @@ import {
   UserModel, Pending2FAModel, WebAuthnCredentialModel,
   AuditLogModel
 } from "../models/index.js";
+import { ensureCustomerForUser } from "../services/customer-sync.service.js";
 
 export const authRouter = Router();
 
@@ -55,6 +56,7 @@ authRouter.post("/register", registerLimiter, validate(registerSchema), async (r
       emailVerificationToken: verifyToken,
       emailVerificationExpiry: verifyExpiry,
     });
+    await ensureCustomerForUser(user);
 
     const verifyLink = `${getSiteUrl()}/verify-email?token=${encodeURIComponent(verifyToken)}`;
     await sendEmailVerification(email, fullName, verifyLink);
