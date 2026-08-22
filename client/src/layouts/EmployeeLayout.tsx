@@ -7,6 +7,7 @@ import { authApi } from "../api/client";
 import OfoqLogo from "../components/OfoqLogo";
 import toast from "react-hot-toast";
 import { useLang } from "../i18n/LangContext";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 const NAV = [
   { href: "/",        label: "لوحتي",    icon: LayoutDashboard },
@@ -69,6 +70,8 @@ export default function EmployeeLayout() {
           {/* Spacer */}
           <div className="flex-1" />
 
+          <LanguageSwitcher dark compact />
+
           {/* User Info */}
           <div className="hidden sm:flex items-center gap-3">
             {user?.avatar ? (
@@ -130,6 +133,7 @@ export default function EmployeeLayout() {
                     <p className="text-white/50 text-xs">{user?.position || ui.employee.employee}</p>
                   </div>
                 </div>
+                <LanguageSwitcher dark />
                 {NAV.map((item) => {
                   const active = pathname === item.href;
                   return (

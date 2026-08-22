@@ -15,6 +15,7 @@ import type { Notification } from "../types";
 import OfoqLogo from "../components/OfoqLogo";
 import { useLang } from "../i18n/LangContext";
 import NotificationPermissionModal from "../components/NotificationPermissionModal";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 interface NavItem {
   href?: string;
@@ -275,6 +276,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
           </div>
 
           <div className="flex items-center gap-2" ref={notifRef}>
+            <LanguageSwitcher compact />
             {/* Notifications */}
             <div className="relative">
               <button

@@ -193,7 +193,7 @@ export default function SiteContentPage() {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch {
-      alert(lang === "ar" ? "خطأ في الحفظ" : "Save failed");
+      alert(adminLang === "ar" ? "خطأ في الحفظ" : "Save failed");
     }
     setSaving(false);
   };
@@ -208,7 +208,7 @@ export default function SiteContentPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-gray-900">
-            {lang === "ar" ? "محرر محتوى الموقع" : "Site Content Editor"}
+            {adminLang === "ar" ? "محرر محتوى الموقع" : "Site Content Editor"}
           </h1>
           <p className="text-gray-500 text-sm mt-1">
             {isRtl
@@ -233,7 +233,7 @@ export default function SiteContentPage() {
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="border-b border-gray-200 px-4 pt-4">
           <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">
-            {lang === "ar" ? "اختر اللغة" : "Select language"}
+            {adminLang === "ar" ? "اختر اللغة" : "Select language"}
           </p>
           <div className="flex flex-wrap gap-2 pb-0">
             {LANGS.map(l => (
