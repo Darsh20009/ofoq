@@ -73,6 +73,24 @@ invoicesRouter.get("/:id", requireAuth, async (req, res) => {
 // ── Create Invoice ────────────────────────────────────────────────
 invoicesRouter.post("/", requireAuth, requireRole("super_admin", "admin", "manager", "employee"), async (req, res) => {
   try {
+    const { customerId, items } = req.body;
+    if (!customerId) {
+      res.status(400).json({ error: "يرجى اختيار العميل أولاً" });
+      return;
+    }
+    const customerExists = await CustomerModel.exists({ _id: customerId });
+    if (!customerExists) {
+      res.status(400).json({ error: "العميل المختار غير موجود" });
+      return;
+    }
+    if (!Array.isArray(items) || items.length === 0 || items.some((item) =>
+      !item?.description?.trim() || !Number.isFinite(Number(item.quantity)) || Number(item.quantity) <= 0 ||
+      !Number.isFinite(Number(item.unitPrice)) || Number(item.unitPrice) < 0
+    )) {
+      res.status(400).json({ error: "أدخل بند فاتورة صحيحًا واحدًا على الأقل" });
+      return;
+    }
+
     const invoiceNumber = await generateInvoiceNumber();
     const invoice = await InvoiceModel.create({
       ...req.body,

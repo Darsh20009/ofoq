@@ -31,16 +31,19 @@ export default function InvoicesPage() {
   const sendMut = useMutation({
     mutationFn: (id: string) => invoicesApi.send(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["invoices"] }); toast.success(copy.send); },
+    onError: (error: any) => toast.error(error?.response?.data?.error || (lang === "ar" ? "تعذر إرسال الفاتورة" : "Couldn't send the invoice")),
   });
 
   const paidMut = useMutation({
     mutationFn: (id: string) => invoicesApi.markPaid(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["invoices"] }); toast.success(copy.markPaid); },
+    onError: (error: any) => toast.error(error?.response?.data?.error || (lang === "ar" ? "تعذر تسجيل الدفع" : "Couldn't record the payment")),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => invoicesApi.delete(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["invoices"] }); toast.success(copy.deleteConfirm.replace("؟", "")); },
+    onError: (error: any) => toast.error(error?.response?.data?.error || (lang === "ar" ? "تعذر حذف الفاتورة" : "Couldn't delete the invoice")),
   });
 
   const downloadPdf = async (id: string, number: string) => {
@@ -49,14 +52,16 @@ export default function InvoicesPage() {
       const res = await fetch(`/api/invoices/${id}/pdf`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) { return; }
+       if (!res.ok) {
+         throw new Error("PDF download failed");
+       }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url; a.download = `${number}.pdf`; a.click();
       URL.revokeObjectURL(url);
-    } catch {
-      // silent
+     } catch {
+       toast.error(lang === "ar" ? "تعذر تحميل ملف الفاتورة" : "Couldn't download the invoice PDF");
     }
   };
 

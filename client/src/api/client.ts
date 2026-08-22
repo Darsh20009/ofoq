@@ -134,9 +134,9 @@ export const analyticsApi = {
 /* ── CMS ───────────────────────────────────── */
 export const cmsApi = {
   pages: {
-    list: () => api.get("/cms/pages"),
-    get: (key: string) => api.get(`/cms/pages/${key}`),
-    update: (key: string, data: object) => api.put(`/cms/pages/${key}`, data),
+    list: () => api.get("/cms/admin/pages"),
+    get: (key: string) => api.get(`/cms/admin/pages/${key}`),
+    update: (key: string, data: object) => api.patch(`/cms/admin/pages/${key}`, data),
   },
   blog: {
     list: (params?: object) => api.get("/cms/blog", { params }),

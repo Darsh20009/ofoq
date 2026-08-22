@@ -1,39 +1,101 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { AnimatePresence, motion } from "framer-motion";
-import { projectsApi } from "../../../api/client";
-import type { Project } from "../../../types";
+import { crmApi, projectsApi, usersApi } from "../../../api/client";
+import type { Customer, Project } from "../../../types";
 import { useLang } from "../../../i18n/LangContext";
+
+type ProjectForm = {
+  name: string;
+  customerId: string;
+  manager: string;
+  stage: string;
+  priority: string;
+  startDate?: string;
+  dueDate?: string;
+  budget?: number;
+  currency: string;
+  progress: number;
+  status: string;
+  description?: string;
+};
+
+function relatedId(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object" && "_id" in value) {
+    return String((value as { _id: string })._id);
+  }
+  return "";
+}
 
 export default function ProjectModal({ open, onClose, project, onSaved }: {
   open: boolean; onClose: () => void; project: Project | null; onSaved: () => void;
 }) {
-  const { ui, dir } = useLang();
+  const { ui, dir, lang } = useLang();
   const copy = ui.adminPages.projects;
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset } = useForm<ProjectForm>();
+  const [formError, setFormError] = useState("");
+  const projectRecord = project as (Project & {
+    name?: string;
+    customerId?: Customer | string;
+  }) | null;
+
+  const { data: customersData, isLoading: customersLoading } = useQuery({
+    queryKey: ["project-customers"],
+    queryFn: () => crmApi.customers.list({ status: "active", limit: 200 }).then((response) => response.data),
+    enabled: open,
+  });
+  const { data: usersData, isLoading: managersLoading } = useQuery({
+    queryKey: ["project-managers"],
+    queryFn: () => usersApi.list({ status: "active", limit: 200 }).then((response) => response.data),
+    enabled: open,
+  });
+  const customers: Customer[] = customersData?.customers || [];
+  const managers = (usersData?.users || []).filter((user: { role?: string }) =>
+    ["super_admin", "admin", "manager", "employee"].includes(user.role || "")
+  );
 
   useEffect(() => {
-    if (project) {
+    setFormError("");
+    if (projectRecord) {
       reset({
-        ...project,
-        title: project.title?.ar || "",
-        dueDate: project.dueDate?.split("T")[0],
-        startDate: project.startDate?.split("T")[0],
+        name: projectRecord.name || projectRecord.title?.ar || "",
+        customerId: relatedId(projectRecord.customerId || projectRecord.customer),
+        manager: relatedId(projectRecord.manager),
+        stage: projectRecord.stage,
+        priority: projectRecord.priority,
+        dueDate: projectRecord.dueDate?.split("T")[0],
+        startDate: projectRecord.startDate?.split("T")[0],
+        budget: projectRecord.budget,
+        currency: projectRecord.currency,
+        progress: projectRecord.progress,
+        status: projectRecord.status,
+        description: typeof projectRecord.description === "string" ? projectRecord.description : projectRecord.description?.ar,
       });
     } else {
-      reset({ currency: "SAR", priority: "medium", stage: "request", progress: 0, status: "active" });
+      reset({ name: "", customerId: "", manager: "", currency: "SAR", priority: "medium", stage: "request", progress: 0, status: "active", description: "" });
     }
-  }, [project, reset]);
+  }, [open, projectRecord, reset]);
 
   const mut = useMutation({
-    mutationFn: (data: Record<string, unknown>) => {
-      const payload = { ...data, title: { ar: data.title as string } };
-      return project ? projectsApi.update(project._id, payload) : projectsApi.create(payload);
+    mutationFn: (data: ProjectForm) => {
+      const payload = {
+        ...data,
+        name: data.name.trim(),
+        description: data.description?.trim() || undefined,
+        startDate: data.startDate || undefined,
+        dueDate: data.dueDate || undefined,
+        budget: Number.isFinite(data.budget) ? data.budget : undefined,
+      };
+      return projectRecord ? projectsApi.update(projectRecord._id, payload) : projectsApi.create(payload);
     },
     onSuccess: () => { toast.success(project ? copy.updated : copy.created); onSaved(); },
+    onError: (error: any) => {
+      setFormError(error?.response?.data?.error || (lang === "ar" ? "تعذر حفظ المشروع. تحقق من البيانات وحاول مجددًا." : "Couldn't save the project. Check the details and try again."));
+    },
   });
 
   return (
@@ -49,11 +111,43 @@ export default function ProjectModal({ open, onClose, project, onSaved }: {
               <h2 className="font-bold text-navy-700">{project ? copy.formEdit : copy.formNew}</h2>
               <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400"><X size={18} /></button>
             </div>
-            <form onSubmit={handleSubmit((d) => mut.mutate(d as Record<string, unknown>))} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit((data) => { setFormError(""); mut.mutate(data); })} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <label className="label">{copy.name} (عربي) *</label>
-                  <input {...register("title", { required: true })} className="input-field" placeholder={copy.namePlaceholder} />
+                  <label className="label">{copy.name} *</label>
+                  <input {...register("name", { required: true })} className="input-field" placeholder={copy.namePlaceholder} />
+                </div>
+                <div>
+                  <label className="label">{ui.adminPages.invoices.customer} *</label>
+                  <select {...register("customerId", { required: true })} className="input-field" disabled={customersLoading}>
+                    <option value="">
+                      {customersLoading ? (lang === "ar" ? "جارٍ تحميل العملاء..." : "Loading customers...") : (lang === "ar" ? "اختر العميل..." : "Select customer...")}
+                    </option>
+                    {customers.map((customer) => (
+                      <option key={customer._id} value={customer._id}>
+                        {customer.name}{customer.companyName ? ` - ${customer.companyName}` : ""}
+                      </option>
+                    ))}
+                  </select>
+                  {!customersLoading && customers.length === 0 && (
+                    <p className="mt-1 text-xs text-amber-600">{lang === "ar" ? "أضف عميلاً أولاً قبل إنشاء المشروع." : "Add a customer before creating a project."}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="label">{lang === "ar" ? "مدير المشروع" : "Project manager"} *</label>
+                  <select {...register("manager", { required: true })} className="input-field" disabled={managersLoading}>
+                    <option value="">
+                      {managersLoading ? (lang === "ar" ? "جارٍ تحميل الموظفين..." : "Loading team members...") : (lang === "ar" ? "اختر مدير المشروع..." : "Select project manager...")}
+                    </option>
+                    {managers.map((manager: { _id: string; fullName?: string; name?: string; email?: string }) => (
+                      <option key={manager._id} value={manager._id}>
+                        {manager.fullName || manager.name || manager.email}
+                      </option>
+                    ))}
+                  </select>
+                  {!managersLoading && managers.length === 0 && (
+                    <p className="mt-1 text-xs text-amber-600">{lang === "ar" ? "لا يوجد موظفون نشطون يمكن تعيينهم." : "No active team members are available."}</p>
+                  )}
                 </div>
                 <div>
                   <label className="label">{copy.stage}</label>
@@ -103,8 +197,9 @@ export default function ProjectModal({ open, onClose, project, onSaved }: {
                   <textarea {...register("description")} rows={3} className="input-field resize-none" placeholder={copy.descriptionPlaceholder} />
                 </div>
               </div>
+              {formError && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{formError}</p>}
               <div className="flex gap-3 pt-2">
-                <button type="submit" disabled={mut.isPending} className="btn-primary flex-1 justify-center">
+                <button type="submit" disabled={mut.isPending || customersLoading || managersLoading || customers.length === 0 || managers.length === 0} className="btn-primary flex-1 justify-center">
                   {mut.isPending ? copy.saving : project ? copy.update : copy.create}
                 </button>
                 <button type="button" onClick={onClose} className="btn-ghost">{copy.cancel}</button>

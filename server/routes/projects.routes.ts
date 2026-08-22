@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { requireAuth, requireRole, logAction } from "../auth.js";
-import { ProjectModel, TaskModel, CustomerModel } from "../models/index.js";
+import { ProjectModel, TaskModel, CustomerModel, UserModel } from "../models/index.js";
 import { fireNotify, fireNotifyAdmins, fireNotifyMany } from "../notify.js";
 import { sendProjectUpdateEmail } from "../email.js";
 import { aiService } from "../services/ai.service.js";
@@ -87,9 +87,29 @@ projectsRouter.get("/:id", requireAuth, async (req, res) => {
 
 projectsRouter.post("/", requireAuth, requireRole("super_admin", "admin", "manager"), async (req, res) => {
   try {
+    const { name, customerId, manager } = req.body;
+    if (typeof name !== "string" || !name.trim() || !customerId || !manager) {
+      res.status(400).json({ error: "اسم المشروع والعميل ومدير المشروع حقول مطلوبة" });
+      return;
+    }
+
+    const [customerExists, managerExists] = await Promise.all([
+      CustomerModel.exists({ _id: customerId }),
+      UserModel.exists({ _id: manager, status: "active" }),
+    ]);
+    if (!customerExists) {
+      res.status(400).json({ error: "العميل المختار غير موجود أو غير نشط" });
+      return;
+    }
+    if (!managerExists) {
+      res.status(400).json({ error: "مدير المشروع المختار غير موجود أو غير نشط" });
+      return;
+    }
+
     const projectNumber = await generateProjectNumber();
     const project = await ProjectModel.create({
       ...req.body,
+      name: name.trim(),
       projectNumber,
       stageHistory: [{ stage: "request", changedAt: new Date(), changedBy: (req as any).user._id }],
     });

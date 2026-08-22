@@ -8,6 +8,8 @@ import type { Project } from "../../../types";
 import ProjectModal from "./ProjectModal";
 import { useLang } from "../../../i18n/LangContext";
 
+type ProjectRecord = Project & { name?: string };
+
 const STAGE_CONFIG: Record<string, { color: string; bg: string }> = {
   request:   { color: "#6366f1", bg: "#EEF2FF" },
   review:    { color: "#f59e0b", bg: "#FFFBEB" },
@@ -26,6 +28,10 @@ function StageTag({ stage, labels }: { stage: string; labels: Record<string, str
       {labels[stage] || stage}
     </span>
   );
+}
+
+function projectName(project: ProjectRecord): string {
+  return project.name || project.title?.ar || project.title?.en || "-";
 }
 
 export default function ProjectsPage() {
@@ -49,9 +55,10 @@ export default function ProjectsPage() {
   const deleteMut = useMutation({
     mutationFn: (id: string) => projectsApi.delete(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["projects"] }); toast.success(copy.deleted); },
+    onError: (error: any) => toast.error(error?.response?.data?.error || (lang === "ar" ? "تعذر إلغاء المشروع" : "Couldn't cancel the project")),
   });
 
-  const projects: Project[] = data?.data?.projects || [];
+  const projects: ProjectRecord[] = data?.projects || data?.data?.projects || [];
   const now = new Date();
 
   if (view === "kanban") {
@@ -88,7 +95,7 @@ export default function ProjectsPage() {
                   {stageProjects.map((p) => (
                     <div key={p._id} className="card p-4 cursor-pointer hover:shadow-ofoq transition-shadow"
                       onClick={() => { setEditProject(p); setModalOpen(true); }}>
-                      <p className="font-semibold text-sm text-navy-700 mb-1">{p.title.ar}</p>
+                       <p className="font-semibold text-sm text-navy-700 mb-1">{projectName(p)}</p>
                       <p className="text-xs text-gray-400 mb-2">#{p.projectNumber}</p>
                       {/* Progress bar */}
                       <div className="w-full bg-gray-100 rounded-full h-1.5 mb-2">
@@ -172,7 +179,7 @@ export default function ProjectsPage() {
                     <motion.tr key={p._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.03 }} className="group">
                       <td>
-                        <p className="font-semibold text-navy-700">{p.title.ar}</p>
+                         <p className="font-semibold text-navy-700">{projectName(p)}</p>
                         <p className="text-xs text-gray-400">#{p.projectNumber}</p>
                       </td>
                        <td><StageTag stage={p.stage} labels={copy.stages} /></td>
@@ -216,6 +223,13 @@ export default function ProjectsPage() {
                     </motion.tr>
                   );
                 })}
+                {projects.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-sm text-gray-400">
+                      {lang === "ar" ? "لا توجد مشاريع مطابقة." : "No matching projects."}
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
