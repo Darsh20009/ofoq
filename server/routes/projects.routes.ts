@@ -198,10 +198,18 @@ projectsRouter.patch("/:id", requireAuth, async (req, res) => {
 
 projectsRouter.delete("/:id", requireAuth, requireRole("super_admin", "admin"), async (req, res) => {
   try {
-    await ProjectModel.findByIdAndUpdate(req.params.id, { status: "cancelled" });
-    await logAction(String((req as any).user._id), "cancel_project", "Project", req.params.id, req);
-    res.json({ message: "تم إلغاء المشروع" });
-  } catch {
+    const project = await ProjectModel.findByIdAndDelete(req.params.id);
+    if (!project) {
+      res.status(404).json({ error: "المشروع غير موجود أو تم حذفه مسبقًا" });
+      return;
+    }
+
+    // A task without its project cannot be managed from the portal.
+    await TaskModel.deleteMany({ projectId: project._id });
+    await logAction(String((req as any).user._id), "delete_project", "Project", req.params.id, req);
+    res.json({ deleted: true, id: req.params.id, message: "تم حذف المشروع نهائيًا" });
+  } catch (error) {
+    console.error("[Projects] delete error:", error);
     res.status(500).json({ error: "خطأ في إلغاء المشروع" });
   }
 });
