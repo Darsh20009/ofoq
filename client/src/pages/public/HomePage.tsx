@@ -752,8 +752,52 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section className="bg-white text-[#2B273F]">
+          <div className="mx-auto max-w-4xl px-6 py-20 sm:px-10 sm:py-28">
+            <div className="border-t border-[#2B273F]/10 pt-12 sm:pt-16">
+              <div className={`grid items-end gap-10 lg:grid-cols-[.8fr_1.2fr] lg:gap-16 ${isRtl ? "lg:[direction:rtl]" : ""}`}>
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "0px 0px -60px 0px" }}
+                  transition={{ duration: 0.7, ease }}
+                  className={isRtl ? "text-right" : "text-left"}
+                >
+                  <h2 className="max-w-md text-4xl font-black leading-[1.15] tracking-[-.04em] sm:text-5xl">
+                    {joinOfoqTitle}
+                  </h2>
+                  <p className="mt-5 max-w-md text-base leading-8 text-[#2B273F]/70 sm:text-lg sm:leading-9">
+                    {joinOfoqDescription}
+                  </p>
+                  <Link
+                    to="/contact"
+                    className="mt-7 inline-flex border-b border-[#33B27C] pb-2 text-sm font-black text-[#2B273F] transition-colors hover:text-[#33B27C]"
+                  >
+                    {ui.about.requestService}
+                  </Link>
+                </motion.div>
+
+                <motion.figure
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "0px 0px -60px 0px" }}
+                  transition={{ duration: 0.8, ease }}
+                  className="overflow-hidden rounded-sm bg-[#2B273F]"
+                >
+                  <img
+                    src="/images/ofoq-brand-photo2.jpg"
+                    alt={joinOfoqTitle}
+                    loading="lazy"
+                    className="block h-auto max-h-[520px] w-full object-cover"
+                  />
+                </motion.figure>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ════════════════════════════════════════════════════════
-            CTA — quiet, centered invitation
+            CTA — final centered invitation
         ════════════════════════════════════════════════════════ */}
         <section className="relative overflow-hidden bg-[#f8f8f7] text-[#2B273F]">
           <div
@@ -799,50 +843,6 @@ export default function HomePage() {
                 </Link>
               </motion.div>
             </motion.div>
-          </div>
-        </section>
-
-        <section className="bg-white text-[#2B273F]">
-          <div className="mx-auto max-w-4xl px-6 py-20 sm:px-10 sm:py-28">
-            <div className="border-t border-[#2B273F]/10 pt-12 sm:pt-16">
-              <div className={`grid items-end gap-10 lg:grid-cols-[.8fr_1.2fr] lg:gap-16 ${isRtl ? "lg:[direction:rtl]" : ""}`}>
-                <motion.div
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "0px 0px -60px 0px" }}
-                  transition={{ duration: 0.7, ease }}
-                  className={isRtl ? "text-right" : "text-left"}
-                >
-                  <h2 className="max-w-md text-4xl font-black leading-[1.15] tracking-[-.04em] sm:text-5xl">
-                    {joinOfoqTitle}
-                  </h2>
-                  <p className="mt-5 max-w-md text-base leading-8 text-[#2B273F]/70 sm:text-lg sm:leading-9">
-                    {joinOfoqDescription}
-                  </p>
-                  <Link
-                    to="/contact"
-                    className="mt-7 inline-flex border-b border-[#33B27C] pb-2 text-sm font-black text-[#2B273F] transition-colors hover:text-[#33B27C]"
-                  >
-                    {ui.about.requestService}
-                  </Link>
-                </motion.div>
-
-                <motion.figure
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "0px 0px -60px 0px" }}
-                  transition={{ duration: 0.8, ease }}
-                  className="overflow-hidden rounded-sm bg-[#2B273F]"
-                >
-                  <img
-                    src="/images/ofoq-brand-photo2.jpg"
-                    alt={joinOfoqTitle}
-                    loading="lazy"
-                    className="block h-auto max-h-[520px] w-full object-cover"
-                  />
-                </motion.figure>
-              </div>
-            </div>
           </div>
         </section>
 
