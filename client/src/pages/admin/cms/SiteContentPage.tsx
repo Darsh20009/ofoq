@@ -225,7 +225,7 @@ export default function SiteContentPage() {
               : "bg-[#33B27C] text-white hover:bg-[#2a9a6a]"
           } disabled:opacity-60`}
         >
-          {saving ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : saved ? (lang === "ar" ? "✓ تم الحفظ" : "✓ Saved") : (lang === "ar" ? "حفظ التغييرات" : "Save changes")}
+          {saving ? (adminLang === "ar" ? "جاري الحفظ..." : "Saving...") : saved ? (adminLang === "ar" ? "✓ تم الحفظ" : "✓ Saved") : (adminLang === "ar" ? "حفظ التغييرات" : "Save changes")}
         </button>
       </div>
 
@@ -265,7 +265,7 @@ export default function SiteContentPage() {
                     : "text-gray-600 hover:bg-gray-50"
                 }`}
               >
-                {lang === "ar" ? s.labelAr : s.label}
+                {adminLang === "ar" ? s.labelAr : s.label}
               </button>
             ))}
           </aside>
@@ -278,7 +278,7 @@ export default function SiteContentPage() {
                   <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
                   <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
                 </svg>
-                {lang === "ar" ? "جاري التحميل..." : "Loading..."}
+                {adminLang === "ar" ? "جاري التحميل..." : "Loading..."}
               </div>
             ) : (
               <div className="space-y-4">
@@ -296,7 +296,7 @@ export default function SiteContentPage() {
                         {field.label}
                         {defaultVal && (
                           <span className="ms-2 font-normal text-gray-400 truncate max-w-[200px] inline-block align-bottom">
-                            ({lang === "ar" ? "افتراضي" : "default"}: {defaultVal.slice(0, 40)}{defaultVal.length > 40 ? "…" : ""})
+                            ({adminLang === "ar" ? "افتراضي" : "default"}: {defaultVal.slice(0, 40)}{defaultVal.length > 40 ? "…" : ""})
                           </span>
                         )}
                       </label>
@@ -330,7 +330,7 @@ export default function SiteContentPage() {
 
       {/* Info box */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700">
-        <p className="font-bold mb-1">{lang === "ar" ? "كيف يعمل؟" : "How it works"}</p>
+        <p className="font-bold mb-1">{adminLang === "ar" ? "كيف يعمل؟" : "How it works"}</p>
         <p className="text-blue-600">
           {isRtl
             ? "كل تغيير تحفظه يتطبق على الموقع فوراً لجميع زوار هذه اللغة. لا حاجة لإعادة نشر أو بناء الكود."
