@@ -12,6 +12,7 @@ import { authApi, webauthnApi } from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
 import OfoqLogo from "../../components/OfoqLogo";
 import { useLang } from "../../i18n/LangContext";
+import LanguageSwitcher from "../../components/LanguageSwitcher";
 
 interface LoginForm { email: string; password: string; }
 
@@ -205,9 +206,12 @@ export default function EmployeePortalLoginPage() {
   /* ── UI ────────────────────────── */
   return (
     <div
-      className="min-h-screen bg-[#0C1338] flex flex-col items-center justify-center px-4"
+      className="min-h-screen bg-[#0C1338] flex flex-col items-center justify-center px-4 relative"
       dir={dir}
     >
+      <div className="absolute top-4 end-4">
+        <LanguageSwitcher dark />
+      </div>
       {/* Logo */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -217,7 +221,7 @@ export default function EmployeePortalLoginPage() {
         <OfoqLogo className="w-20 h-14" />
         <div className="text-center">
           <h1 className="text-white text-2xl font-bold">{ui.employee.portal}</h1>
-          <p className="text-white/50 text-sm mt-1">OFOQ Employee Portal</p>
+          <p className="text-white/50 text-sm mt-1">{ui.employee.portal}</p>
         </div>
       </motion.div>
 
@@ -421,7 +425,7 @@ export default function EmployeePortalLoginPage() {
       )}
 
       <p className="text-white/30 text-xs mt-8">
-        © {new Date().getFullYear()} OFOQ Business Solutions
+        © {new Date().getFullYear()} {ui.adminLogin.title}
       </p>
     </div>
   );
