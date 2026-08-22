@@ -80,16 +80,17 @@ export default function UsersPage() {
               <tbody>
                 {users.map((u, i) => {
                   const role = roleConfig[u.role] || { label: u.role, color: "badge-gray" };
+                  const displayName = u.name || u.fullName || u.email || "—";
                   return (
                     <motion.tr key={u._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.03 }} className="group">
                       <td>
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-full bg-ofoq-navy flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                            {u.name.charAt(0)}
+                            {displayName.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <p className="font-semibold text-navy-700">{u.name}</p>
+                            <p className="font-semibold text-navy-700">{displayName}</p>
                             <p className="text-xs text-gray-400">{u.email}</p>
                           </div>
                         </div>
