@@ -72,6 +72,37 @@
   .input-field {
     @apply w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-navy-700 text-sm font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ofoq-red/30 focus:border-ofoq-red transition-all duration-200;
   }
+  /* International phone input: keep the country selector and number in one
+     field instead of exposing the library's narrow default layout. */
+  .ofoq-phone-input {
+    @apply flex w-full items-center rounded-xl border border-gray-200 bg-white text-sm transition-all;
+    direction: ltr;
+    min-height: 48px;
+  }
+  .ofoq-phone-input:focus-within {
+    @apply border-ofoq-red ring-2 ring-ofoq-red/30;
+  }
+  .ofoq-phone-input .PhoneInputCountry {
+    @apply ml-3 mr-2 flex-shrink-0;
+  }
+  .ofoq-phone-input .PhoneInputInput {
+    @apply min-w-0 flex-1 border-0 bg-transparent px-2 py-3 text-sm text-navy-700 outline-none;
+  }
+  .ofoq-phone-input .PhoneInputInput::placeholder {
+    @apply text-gray-400;
+  }
+  .ofoq-phone-input-dark {
+    @apply border-white/10 bg-white/[0.04] text-white;
+  }
+  .ofoq-phone-input-dark .PhoneInputInput {
+    @apply text-white;
+  }
+  .ofoq-phone-input-dark .PhoneInputInput::placeholder {
+    @apply text-white/25;
+  }
+  .ofoq-phone-input-error {
+    @apply border-red-400 bg-red-50;
+  }
   .label {
     @apply block text-sm font-semibold text-navy-600 mb-1.5;
   }

@@ -39,6 +39,8 @@ export default function PhoneInput({
     country: locale === "ar" ? "الدولة" : locale === "de" ? "Land" : locale === "es" ? "País" : "Country",
     phone: locale === "ar" ? "رقم الهاتف" : locale === "de" ? "Telefonnummer" : locale === "es" ? "Número de teléfono" : "Phone number",
   };
+  const isDark = className.includes("bg-white/[0.04]") || className.includes("text-white");
+  const hasError = className.includes("border-red");
 
   // The package renders every country automatically. Replace its English
   // country labels with the active language where the browser supports it.
@@ -63,9 +65,8 @@ export default function PhoneInput({
       required={required}
       disabled={disabled}
       placeholder={placeholder || undefined}
-      className={`ofoq-phone-input ${className}`}
+      className={`ofoq-phone-input ${isDark ? "ofoq-phone-input-dark" : ""} ${hasError ? "ofoq-phone-input-error" : ""}`}
       labels={labels}
-      inputProps={{ dir: "ltr", inputMode: "tel" }}
     />
   );
 }

@@ -436,8 +436,14 @@ authRouter.post("/totp/verify-setup", requireAuth, async (req, res) => {
 authRouter.post("/totp/disable", requireAuth, async (req, res) => {
   try {
     const code = normalizeOtpCode(req.body?.code);
+    if (code.length !== 6) {
+      res.status(400).json({ error: "يرجى إدخال رمز مكوّن من 6 أرقام" });
+      return;
+    }
     const user = await UserModel.findById((req as any).user._id).select("+totpSecret");
-    if (!user?.totpVerified || !user.totpSecret) {
+    // Older accounts may have twoFactorEnabled=true while the verification
+    // marker was not persisted. The secret is the source of truth for TOTP.
+    if (!user?.twoFactorEnabled || !user.totpSecret) {
       res.status(400).json({ error: "المصادقة الثنائية غير مفعّلة" });
       return;
     }
@@ -445,7 +451,8 @@ authRouter.post("/totp/disable", requireAuth, async (req, res) => {
       secret: user.totpSecret,
       encoding: "base32",
       token: code,
-      window: 2,
+      // Allow a small clock drift without accepting stale codes.
+      window: 4,
     });
     if (!valid) {
       res.status(400).json({ error: "الرمز غير صحيح" });
