@@ -43,6 +43,7 @@ export const authApi = {
   resetPassword: (token: string, password: string) =>
     api.post("/auth/reset-password", { token, newPassword: password }),
   verify2FA: (data: object) => api.post("/auth/verify-2fa", data),
+  sendEmailOtp: (tempToken: string) => api.post("/auth/send-email-otp", { tempToken }),
   oauthStatus: () => api.get("/auth/status"),
   totpSetup: () => api.post("/auth/totp/setup"),
   totpVerify: (code: string) => api.post("/auth/totp/verify-setup", { code }),

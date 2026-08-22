@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { Eye, EyeOff, LogIn } from "lucide-react";
+import { Eye, EyeOff, LogIn, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuthStore } from "../../store/authStore";
 import OfoqLogo from "../../components/OfoqLogo";
@@ -30,6 +30,14 @@ function AppleIcon() {
 
 interface Form { email: string; password: string; }
 
+function normalizeOtpInput(value: string): string {
+  return value
+    .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+    .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+    .replace(/\D/g, "")
+    .slice(0, 6);
+}
+
 function getRoleHome(role: string, requestedRedirect: string): string {
   if (role === "client") return requestedRedirect;
   if (role === "employee") return "/admin/employee/dashboard";
@@ -41,6 +49,8 @@ export default function ClientLoginPage() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [twoFAStep, setTwoFAStep] = useState<{ tempToken: string; method: string } | null>(null);
+  const [otpCode, setOtpCode] = useState("");
   const [oauthStatus, setOauthStatus] = useState<{ google: boolean; apple: boolean }>({ google: false, apple: false });
   const { setAuth } = useAuthStore();
   const navigate = useNavigate();
@@ -69,12 +79,47 @@ export default function ClientLoginPage() {
     setLoading(true); setErr("");
     try {
       const res = await axios.post("/api/auth/login", data);
-      const { token, user } = res.data;
+      const { token, user, requires2FA, tempToken, method, methods } = res.data;
+      if (requires2FA) {
+        const verificationMethod = method || methods?.[0] || "totp";
+        setTwoFAStep({ tempToken, method: verificationMethod });
+        setOtpCode("");
+        if (verificationMethod === "email") {
+          await authApi.sendEmailOtp(tempToken);
+        }
+        return;
+      }
       setAuth({ id: user.id, name: user.name, email: user.email, role: user.role, lang: user.lang }, token);
       navigate(getRoleHome(user.role, redirect), { replace: true });
     } catch (e: any) {
       setErr(e.response?.data?.error || ui.auth.invalid);
     } finally { setLoading(false); }
+  }
+
+  async function handle2FA() {
+    if (!twoFAStep || otpCode.length < 6) return;
+    setLoading(true);
+    setErr("");
+    try {
+      const res = await authApi.verify2FA({
+        tempToken: twoFAStep.tempToken,
+        method: twoFAStep.method,
+        code: otpCode,
+      });
+      const { token, user } = res.data;
+      setAuth(user, token);
+      navigate(getRoleHome(user.role, redirect), { replace: true });
+    } catch (e: any) {
+      setErr(e.response?.data?.error || ui.auth.invalid);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function backToLogin() {
+    setTwoFAStep(null);
+    setOtpCode("");
+    setErr("");
   }
 
   const hasOAuth = oauthStatus.google || oauthStatus.apple;
@@ -128,6 +173,7 @@ export default function ClientLoginPage() {
               </div>
             )}
 
+            {!twoFAStep ? (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {/* Email */}
               <div>
@@ -177,6 +223,46 @@ export default function ClientLoginPage() {
                 )}
               </button>
             </form>
+            ) : (
+              <div className="space-y-4">
+                {err && (
+                  <div role="alert" className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+                    {err}
+                  </div>
+                )}
+                <div className="flex items-center gap-3 rounded-xl bg-emerald-50 border border-emerald-200 p-4">
+                  <ShieldCheck size={20} className="text-emerald-600 shrink-0" />
+                  <p className="text-gray-700 text-sm">
+                    {twoFAStep.method === "totp" ? ui.adminLogin.twoFactor : ui.adminLogin.code}
+                  </p>
+                </div>
+                <input
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(normalizeOtpInput(e.target.value))}
+                  maxLength={6}
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  placeholder="000000"
+                  className="w-full border border-gray-200 bg-gray-50 text-ofoq-navy text-center text-2xl tracking-[0.5em] placeholder-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:border-ofoq-navy focus:ring-2 focus:ring-ofoq-navy/20"
+                  dir="ltr"
+                />
+                <button
+                  type="button"
+                  onClick={handle2FA}
+                  disabled={loading || otpCode.length < 6}
+                  className="w-full bg-ofoq-navy text-white py-3 rounded-xl font-semibold text-sm hover:bg-ofoq-red transition-all disabled:opacity-60"
+                >
+                  {loading ? ui.adminLogin.verifying : ui.adminLogin.verify}
+                </button>
+                <button
+                  type="button"
+                  onClick={backToLogin}
+                  className="w-full text-gray-400 text-sm hover:text-ofoq-navy transition-colors"
+                >
+                  {ui.adminLogin.back}
+                </button>
+              </div>
+            )}
 
             <div className="mt-6 text-center text-sm text-gray-500">
               {ui.auth.noAccount}{" "}
