@@ -5,7 +5,7 @@ import {
   FileText, Settings, Menu, X, Bell, LogOut,
   ChevronDown, TrendingUp, FileEdit, User,
   Building2, Target, ChevronRight, FileSignature, CreditCard, MessageSquare,
-  ClipboardList, HeadphonesIcon,
+  ClipboardList, HeadphonesIcon, Layers3,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
@@ -111,8 +111,10 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
       ],
     },
     { href: pagePath("projects"),      label: t.admin.projects,   icon: FolderKanban },
+    { href: pagePath("quotations"),    label: isRtl ? "عروض الأسعار" : "Quotations", icon: FileText },
     { href: pagePath("invoices"),      label: t.admin.invoices,   icon: FileText },
     { href: pagePath("contracts"),     label: t.admin.contracts,  icon: FileSignature },
+    { href: pagePath("services"),      label: isRtl ? "إدارة الخدمات" : "Services", icon: Layers3 },
     { href: pagePath("users"),         label: t.admin.users,      icon: Users },
     {
       label: t.admin.cms,
@@ -177,7 +179,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
       </AnimatePresence>
 
       <aside
-        className={`fixed top-0 ${dir === "rtl" ? "right-0" : "left-0"} h-full z-50 flex flex-col transition-all duration-300 bg-navy-gradient
+          className={`fixed top-0 ${dir === "rtl" ? "right-0" : "left-0"} h-full z-50 flex flex-col transition-all duration-300 bg-[#101B4C]
           ${collapsed ? "w-16" : "w-64"}
           ${sidebarOpen ? "translate-x-0" : dir === "rtl" ? "translate-x-full lg:translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
@@ -215,7 +217,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
         <div className="p-3 border-t border-white/10">
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="sidebar-link w-full justify-center hidden lg:flex"
+            className="sidebar-link w-full justify-center hidden lg:flex hover:bg-white/5"
           >
             <ChevronRight
               size={18}
@@ -241,7 +243,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
       {/* ── Main content ─────────────────── */}
       <div className={`flex-1 flex flex-col transition-all duration-300 ${dir === "rtl" ? (collapsed ? "lg:mr-16" : "lg:mr-64") : (collapsed ? "lg:ml-16" : "lg:ml-64")}`}>
         {/* Top bar */}
-        <header className="h-16 bg-white border-b border-gray-100 flex items-center px-4 sm:px-6 gap-4 sticky top-0 z-30 shadow-sm">
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center px-4 sm:px-6 gap-4 sticky top-0 z-30">
           <button
             className="text-navy-600 hover:text-navy-900 lg:hidden"
             onClick={() => setSidebarOpen(true)}
@@ -249,14 +251,18 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
             <Menu size={22} />
           </button>
 
-          <div className="flex-1" />
+          <div className="flex-1 min-w-0">
+            <p className="hidden sm:block text-xs font-semibold text-gray-400">
+              {isRtl ? "منصة إدارة أفق" : "OFOQ Operations"}
+            </p>
+          </div>
 
           <div className="flex items-center gap-2" ref={notifRef}>
             {/* Notifications */}
             <div className="relative">
               <button
                 onClick={() => { setNotifOpen(!notifOpen); setUserMenuOpen(false); }}
-                className="relative p-2 rounded-xl text-gray-500 hover:bg-gray-100 hover:text-navy-700 transition-colors"
+                className="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-navy-700 transition-colors"
               >
                 <Bell size={20} />
                 {unreadCount > 0 && (
@@ -304,7 +310,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
             <div className="relative">
               <button
                 onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifOpen(false); }}
-                className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-100 transition-colors"
+                className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
                  <div className="w-8 h-8 rounded-full bg-ofoq-red flex items-center justify-center">
                   <span className="text-white text-xs font-bold">

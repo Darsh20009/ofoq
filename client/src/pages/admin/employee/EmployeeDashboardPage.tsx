@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { CheckCircle, Clock, FolderKanban, CreditCard, Calendar, AlertTriangle } from "lucide-react";
+import { CheckCircle, FolderKanban, CreditCard, User, AlertTriangle, HeadphonesIcon, ClipboardList, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format, isAfter } from "date-fns";
 import { arSA } from "date-fns/locale";
@@ -10,11 +10,11 @@ import { useLang } from "../../../i18n/LangContext";
 
 export default function EmployeeDashboardPage() {
   const { user } = useAuthStore();
-  const { ui, lang } = useLang();
+  const { ui, lang, dir } = useLang();
   const copy = ui.adminPages.adminPortal;
   const now = new Date();
 
-  const { data: projectsData } = useQuery({
+  const { data: projectsData, isLoading, isError, refetch } = useQuery({
     queryKey: ["employee-projects"],
     queryFn: () => projectsApi.list({ limit: 20 }).then((r) => r.data),
   });
@@ -43,24 +43,14 @@ export default function EmployeeDashboardPage() {
   const dateLocale = lang === "ar" || lang === "ur" ? arSA : undefined;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={dir}>
       {/* Welcome */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl overflow-hidden relative"
+        className="rounded-2xl overflow-hidden border border-navy-700 bg-[#1C2B6E]"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1C2B6E] to-[#0C1338]" />
-        <svg className="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 600 160">
-          <defs>
-            <pattern id="dash-grid" width="30" height="30" patternUnits="userSpaceOnUse">
-              <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#33B27C" strokeWidth="0.5"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#dash-grid)" />
-          <circle cx="550" cy="-30" r="150" fill="none" stroke="#33B27C" strokeWidth="40" opacity="0.15"/>
-        </svg>
-        <div className="relative px-6 py-5 flex items-center gap-4">
+        <div className="px-6 py-5 flex flex-wrap items-center gap-4">
           {user?.avatar ? (
             <img src={user.avatar} alt="" className="w-14 h-14 rounded-xl object-cover border-2 border-[#33B27C]/40" />
           ) : (
@@ -71,10 +61,10 @@ export default function EmployeeDashboardPage() {
           <div>
             <p className="text-white/60 text-sm">{greeting()}،</p>
             <h1 className="text-white text-xl font-bold">{user?.name}</h1>
-            <p className="text-[#33B27C] text-xs">{user?.position || copy.roleEmployee}{user?.department ? ` • ${user.department}` : ""}</p>
+            <p className="text-[#A7E8C7] text-xs">{user?.position || copy.roleEmployee}{user?.department ? ` • ${user.department}` : ""}</p>
           </div>
-          <div className="mr-auto">
-            <p className="text-white/40 text-xs text-left">
+          <div className="ms-auto">
+            <p className="text-white/50 text-xs">
               {format(now, lang === "ar" || lang === "ur" ? "EEEE، d MMMM yyyy" : "EEEE, d MMMM yyyy", { locale: dateLocale })}
             </p>
           </div>
@@ -82,12 +72,21 @@ export default function EmployeeDashboardPage() {
       </motion.div>
 
       {/* Stats */}
+      {isError ? (
+        <div className="card border-red-100 bg-red-50/60 flex flex-wrap items-center gap-3">
+          <AlertTriangle size={22} className="text-red-500" />
+          <p className="flex-1 text-sm text-red-700">{lang === "ar" ? "تعذر تحميل مشاريعك." : "Your projects could not be loaded."}</p>
+          <button onClick={() => refetch()} className="btn-ghost border border-red-200 text-red-700">
+            <RefreshCw size={15} /> {lang === "ar" ? "إعادة المحاولة" : "Try again"}
+          </button>
+        </div>
+      ) : (
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { label: copy.activeProjects, value: myProjects.length, icon: FolderKanban, color: "bg-blue-500" },
           { label: copy.completedProjects, value: completedProjects.length, icon: CheckCircle, color: "bg-ofoq-green" },
           { label: copy.overdueProjects, value: overdueProjects.length, icon: AlertTriangle, color: "bg-red-500" },
-          { label: copy.totalProjects, value: projects.length, icon: Clock, color: "bg-amber-500" },
+          { label: copy.totalProjects, value: projects.length, icon: FolderKanban, color: "bg-slate-500" },
         ].map((s, i) => (
           <motion.div key={s.label} initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
@@ -100,6 +99,7 @@ export default function EmployeeDashboardPage() {
           </motion.div>
         ))}
       </div>
+      )}
 
       {/* Projects */}
       <div className="card">
@@ -110,7 +110,11 @@ export default function EmployeeDashboardPage() {
           </h3>
             <Link to="/projects" className="text-xs text-ofoq-green hover:underline">{copy.viewAll}</Link>
         </div>
-        {myProjects.length === 0 ? (
+        {isLoading ? (
+          <div className="space-y-3">
+            {[...Array(3)].map((_, index) => <div key={index} className="skeleton h-14 w-full rounded-xl" />)}
+          </div>
+        ) : myProjects.length === 0 ? (
           <p className="text-gray-400 text-sm text-center py-6">{copy.noActiveProjects}</p>
         ) : (
           <div className="space-y-3">
@@ -147,25 +151,45 @@ export default function EmployeeDashboardPage() {
       </div>
 
       {/* Quick links */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Link to="/employee/card"
-          className="card hover:shadow-ofoq-green/20 hover:shadow-lg transition-all group cursor-pointer flex items-center gap-3 py-4">
+           className="card hover:border-ofoq-green/40 transition-colors group cursor-pointer flex items-center gap-3 py-4">
           <div className="w-10 h-10 rounded-xl bg-[#1C2B6E] flex items-center justify-center">
-            <CreditCard size={18} className="text-[#33B27C]" />
+             <CreditCard size={18} className="text-[#33B27C]" />
           </div>
           <div>
             <p className="font-bold text-navy-700 text-sm">{copy.myCard}</p>
             <p className="text-xs text-gray-400">{copy.barcodePreview}</p>
           </div>
         </Link>
-        <Link to="/profile"
-          className="card hover:shadow-lg transition-all group cursor-pointer flex items-center gap-3 py-4">
+         <Link to="/profile"
+           className="card hover:border-navy-200 transition-colors group cursor-pointer flex items-center gap-3 py-4">
           <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
-            <Calendar size={18} className="text-gray-500" />
+             <User size={18} className="text-gray-500" />
           </div>
           <div>
             <p className="font-bold text-navy-700 text-sm">{copy.myProfile}</p>
             <p className="text-xs text-gray-400">{copy.accountSettings}</p>
+          </div>
+        </Link>
+        <Link to="/service-requests"
+          className="card hover:border-ofoq-green/40 transition-colors group cursor-pointer flex items-center gap-3 py-4">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+            <ClipboardList size={18} className="text-ofoq-green" />
+          </div>
+          <div>
+            <p className="font-bold text-navy-700 text-sm">{ui.client.newRequest}</p>
+            <p className="text-xs text-gray-400">{ui.client.requests}</p>
+          </div>
+        </Link>
+        <Link to="/support"
+          className="card hover:border-navy-200 transition-colors group cursor-pointer flex items-center gap-3 py-4">
+          <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+            <HeadphonesIcon size={18} className="text-gray-500" />
+          </div>
+          <div>
+            <p className="font-bold text-navy-700 text-sm">{ui.client.support}</p>
+            <p className="text-xs text-gray-400">{ui.client.supportSub}</p>
           </div>
         </Link>
       </div>

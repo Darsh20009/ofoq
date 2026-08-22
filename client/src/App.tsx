@@ -59,6 +59,7 @@ import ServiceRequestsPage from "./pages/admin/service-requests/ServiceRequestsP
 import ServiceRequestDetailPage from "./pages/admin/service-requests/ServiceRequestDetailPage";
 import AdminSupportPage from "./pages/admin/support/AdminSupportPage";
 import EmployeeContactPage from "./pages/admin/EmployeeContactPage";
+import ServicesManagementPage from "./pages/admin/ServicesManagementPage";
 
 // Page Transition Loader
 import PageLoader from "./components/PageLoader";
@@ -259,12 +260,14 @@ export default function App() {
           <Route path="crm/customers" element={<CustomersPage />} />
           <Route path="projects" element={<ProjectsPage />} />
           <Route path="invoices" element={<InvoicesPage />} />
+          <Route path="quotations" element={<InvoicesPage documentType="proforma" />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="cms" element={<CmsPage />} />
           <Route path="cms/site-content" element={<SiteContentPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="contracts" element={<ContractsPage />} />
+          <Route path="services" element={<ServicesManagementPage />} />
           <Route path="employee/card" element={<EmployeeCardPage />} />
           <Route path="employee/dashboard" element={<EmployeeDashboardPage />} />
           <Route path="contact" element={<EmployeeContactPage />} />

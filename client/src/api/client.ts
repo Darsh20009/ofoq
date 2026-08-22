@@ -121,6 +121,8 @@ export const invoicesApi = {
   delete: (id: string) => api.delete(`/invoices/${id}`),
   send: (id: string) => api.post(`/invoices/${id}/send`),
   markPaid: (id: string, data?: object) => api.post(`/invoices/${id}/mark-paid`, data),
+  acceptQuotation: (id: string) => api.post(`/invoices/${id}/accept-quotation`),
+  convertToInvoice: (id: string) => api.post(`/invoices/${id}/convert-to-invoice`),
 };
 
 /* ── Analytics ─────────────────────────────── */

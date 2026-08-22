@@ -9,12 +9,16 @@ import { crmApi, invoicesApi } from "../../../api/client";
 import type { Customer, Invoice } from "../../../types";
 import { useLang } from "../../../i18n/LangContext";
 
-export default function InvoicesPage() {
+export default function InvoicesPage({ documentType = "invoice" }: { documentType?: "invoice" | "proforma" }) {
   const { ui, lang } = useLang();
   const copy = ui.adminPages.invoices;
+  const isQuotation = documentType === "proforma";
+  const documentLabel = isQuotation ? (lang === "ar" ? "عروض الأسعار" : "Quotations") : copy.title;
+  const documentSingular = isQuotation ? (lang === "ar" ? "عرض سعر" : "quotation") : (lang === "ar" ? "فاتورة" : "invoice");
   const statusConfig: Record<string, { label: string; color: string }> = {
     draft: { label: copy.draft, color: "badge-gray" }, sent: { label: copy.sent, color: "badge-blue" },
     viewed: { label: copy.viewed, color: "badge-navy" }, paid: { label: copy.paid, color: "badge-green" },
+    accepted: { label: lang === "ar" ? "معتمد" : "Accepted", color: "badge-green" },
     overdue: { label: copy.overdueStatus, color: "badge-red" }, cancelled: { label: copy.cancelled, color: "badge-gray" },
   };
   const qc = useQueryClient();
@@ -23,15 +27,15 @@ export default function InvoicesPage() {
   const [createOpen, setCreateOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["invoices", search, status],
+    queryKey: ["invoices", documentType, search, status],
     queryFn: () =>
-      invoicesApi.list({ search, status: status || undefined, limit: 50 }).then((r) => r.data),
+      invoicesApi.list({ type: documentType, search, status: status || undefined, limit: 50 }).then((r) => r.data),
   });
 
   const sendMut = useMutation({
     mutationFn: (id: string) => invoicesApi.send(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["invoices"] }); toast.success(copy.send); },
-    onError: (error: any) => toast.error(error?.response?.data?.error || (lang === "ar" ? "تعذر إرسال الفاتورة" : "Couldn't send the invoice")),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["invoices"] }); toast.success(isQuotation ? (lang === "ar" ? "تم إرسال عرض السعر" : "Quotation sent") : copy.send); },
+    onError: (error: any) => toast.error(error?.response?.data?.error || (isQuotation ? (lang === "ar" ? "تعذر إرسال عرض السعر" : "Couldn't send the quotation") : (lang === "ar" ? "تعذر إرسال الفاتورة" : "Couldn't send the invoice"))),
   });
 
   const paidMut = useMutation({
@@ -44,6 +48,22 @@ export default function InvoicesPage() {
     mutationFn: (id: string) => invoicesApi.delete(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["invoices"] }); toast.success(copy.deleteConfirm.replace("؟", "")); },
     onError: (error: any) => toast.error(error?.response?.data?.error || (lang === "ar" ? "تعذر حذف الفاتورة" : "Couldn't delete the invoice")),
+  });
+  const convertMut = useMutation({
+    mutationFn: (id: string) => invoicesApi.convertToInvoice(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["invoices"] });
+      toast.success(lang === "ar" ? "تم تحويل عرض السعر إلى فاتورة مسودة" : "Quotation converted to an invoice draft");
+    },
+    onError: (error: any) => toast.error(error?.response?.data?.error || (lang === "ar" ? "تعذر تحويل عرض السعر" : "Couldn't convert the quotation")),
+  });
+  const acceptMut = useMutation({
+    mutationFn: (id: string) => invoicesApi.acceptQuotation(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["invoices"] });
+      toast.success(lang === "ar" ? "تم اعتماد عرض السعر" : "Quotation accepted");
+    },
+    onError: (error: any) => toast.error(error?.response?.data?.error || (lang === "ar" ? "تعذر اعتماد عرض السعر" : "Couldn't accept the quotation")),
   });
 
   const downloadPdf = async (id: string, number: string) => {
@@ -76,11 +96,11 @@ export default function InvoicesPage() {
     <div className="space-y-6">
       <div className="page-header">
         <div>
-           <h1 className="page-title">{copy.title}</h1>
+           <h1 className="page-title">{documentLabel}</h1>
            <p className="page-subtitle">{invoices.length} {copy.count}</p>
         </div>
          <button onClick={() => setCreateOpen(true)} className="btn-primary">
-           <Plus size={16} /> {copy.new}
+            <Plus size={16} /> {isQuotation ? (lang === "ar" ? "عرض سعر جديد" : "New quotation") : copy.new}
         </button>
       </div>
 
@@ -89,21 +109,21 @@ export default function InvoicesPage() {
         <div className="card flex items-center gap-4">
           <div className="stat-icon bg-ofoq-green"><CheckCircle size={20} className="text-white" /></div>
           <div>
-             <p className="text-xs text-gray-400">{copy.collected}</p>
+             <p className="text-xs text-gray-400">{isQuotation ? (lang === "ar" ? "إجمالي عروض الأسعار" : "Quotation value") : copy.collected}</p>
              <p className="text-xl font-bold text-navy-700">{totalRevenue.toLocaleString(lang)} {lang === "id" ? "SAR" : "ر.س"}</p>
           </div>
         </div>
         <div className="card flex items-center gap-4">
           <div className="stat-icon bg-amber-500"><FileText size={20} className="text-white" /></div>
           <div>
-             <p className="text-xs text-gray-400">{copy.pending}</p>
+             <p className="text-xs text-gray-400">{isQuotation ? (lang === "ar" ? "بانتظار الاعتماد" : "Awaiting approval") : copy.pending}</p>
              <p className="text-xl font-bold text-navy-700">{pending.toLocaleString(lang)} {lang === "id" ? "SAR" : "ر.س"}</p>
           </div>
         </div>
         <div className="card flex items-center gap-4">
           <div className="stat-icon bg-red-500"><FileText size={20} className="text-white" /></div>
           <div>
-             <p className="text-xs text-gray-400">{copy.overdue}</p>
+             <p className="text-xs text-gray-400">{isQuotation ? (lang === "ar" ? "عروض منتهية" : "Expired quotations") : copy.overdue}</p>
              <p className="text-xl font-bold text-navy-700">{overdue} {copy.count}</p>
           </div>
         </div>
@@ -133,15 +153,15 @@ export default function InvoicesPage() {
           </div>
         ) : invoices.length === 0 ? (
           <div className="py-16 text-center">
-            <FileText size={40} className="mx-auto text-gray-200 mb-3" />
-             <p className="text-gray-400">{copy.empty}</p>
+             <FileText size={40} className="mx-auto text-gray-200 mb-3" />
+              <p className="text-gray-400">{isQuotation ? (lang === "ar" ? "لا توجد عروض أسعار" : "No quotations yet") : copy.empty}</p>
           </div>
         ) : (
           <div className="table-wrapper">
             <table className="table">
               <thead>
                 <tr>
-                   <th>{copy.number}</th><th>{copy.customer}</th><th>{copy.total}</th>
+                   <th>{isQuotation ? (lang === "ar" ? "رقم العرض" : "Quotation #") : copy.number}</th><th>{copy.customer}</th><th>{copy.total}</th>
                    <th>{copy.dueDate}</th><th>{copy.status}</th><th>{copy.actions}</th>
                 </tr>
               </thead>
@@ -171,12 +191,24 @@ export default function InvoicesPage() {
                               <Send size={14} />
                             </button>
                           )}
-                          {["sent", "viewed", "overdue"].includes(inv.status) && (
+                           {!isQuotation && ["sent", "viewed", "overdue"].includes(inv.status) && (
                             <button onClick={() => paidMut.mutate(inv._id)}
                                className="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600" title={copy.markPaid}>
                               <CheckCircle size={14} />
                             </button>
                           )}
+                           {isQuotation && ["sent", "viewed"].includes(inv.status) && (
+                             <button onClick={() => { if (confirm(lang === "ar" ? "تأكيد اعتماد عرض السعر؟" : "Confirm quotation acceptance?")) acceptMut.mutate(inv._id); }}
+                               className="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600" title={lang === "ar" ? "اعتماد العرض" : "Accept quotation"}>
+                               <CheckCircle size={14} />
+                             </button>
+                           )}
+                           {isQuotation && inv.status === "accepted" && (
+                             <button onClick={() => { if (confirm(lang === "ar" ? "تحويل عرض السعر إلى فاتورة؟" : "Convert this quotation to an invoice?")) convertMut.mutate(inv._id); }}
+                               className="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600" title={lang === "ar" ? "تحويل إلى فاتورة" : "Convert to invoice"}>
+                               <FileText size={14} />
+                             </button>
+                           )}
                           <button onClick={() => downloadPdf(inv._id, inv.invoiceNumber)}
                              className="p-1.5 rounded-lg hover:bg-purple-50 text-gray-400 hover:text-purple-600" title={copy.download}>
                             <Download size={14} />
@@ -199,6 +231,7 @@ export default function InvoicesPage() {
       <InvoiceModal
         open={createOpen}
         onClose={() => setCreateOpen(false)}
+        documentType={documentType}
         onSaved={() => {
           qc.invalidateQueries({ queryKey: ["invoices"] });
           setCreateOpen(false);
@@ -219,18 +252,20 @@ function defaultDueDate() {
   return date.toISOString().slice(0, 10);
 }
 
-function InvoiceModal({ open, onClose, onSaved }: {
+type DraftItem = { description: string; quantity: number; unitPrice: number };
+
+function InvoiceModal({ open, onClose, onSaved, documentType }: {
   open: boolean;
   onClose: () => void;
   onSaved: () => void;
+  documentType: "invoice" | "proforma";
 }) {
   const { ui, dir, lang } = useLang();
   const copy = ui.adminPages.invoices;
   const isArabic = lang === "ar";
+  const isQuotation = documentType === "proforma";
   const [customerId, setCustomerId] = useState("");
-  const [description, setDescription] = useState("");
-  const [quantity, setQuantity] = useState(1);
-  const [unitPrice, setUnitPrice] = useState(0);
+  const [items, setItems] = useState<DraftItem[]>([{ description: "", quantity: 1, unitPrice: 0 }]);
   const [taxRate, setTaxRate] = useState(15);
   const [currency, setCurrency] = useState("SAR");
   const [dueDate, setDueDate] = useState(defaultDueDate);
@@ -243,22 +278,26 @@ function InvoiceModal({ open, onClose, onSaved }: {
   });
   const customers: Customer[] = customerData?.customers || [];
 
-  const subtotal = Math.max(0, quantity) * Math.max(0, unitPrice);
+  const subtotal = items.reduce((sum, item) => sum + Math.max(0, item.quantity) * Math.max(0, item.unitPrice), 0);
   const taxAmount = subtotal * Math.max(0, taxRate) / 100;
   const total = subtotal + taxAmount;
+
+  function updateItem(index: number, patch: Partial<DraftItem>) {
+    setItems((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, ...patch } : item));
+  }
 
   const createMutation = useMutation({
     mutationFn: () => invoicesApi.create({
       customerId,
-      type: "invoice",
-      items: [{
-        description: description.trim(),
-        quantity: Math.max(1, quantity),
-        unitPrice: Math.max(0, unitPrice),
+      type: documentType,
+      items: items.map((item) => ({
+        description: item.description.trim(),
+        quantity: Math.max(1, item.quantity),
+        unitPrice: Math.max(0, item.unitPrice),
         discount: 0,
         tax: Math.max(0, taxRate),
-        total: subtotal,
-      }],
+        total: Math.max(1, item.quantity) * Math.max(0, item.unitPrice),
+      })),
       subtotal,
       discount: 0,
       tax: taxAmount,
@@ -268,11 +307,9 @@ function InvoiceModal({ open, onClose, onSaved }: {
       notes: notes.trim() || undefined,
     }),
     onSuccess: () => {
-      toast.success(isArabic ? "تم إنشاء الفاتورة كمسودة" : "Invoice draft created");
+      toast.success(isQuotation ? (isArabic ? "تم إنشاء عرض السعر كمسودة" : "Quotation draft created") : (isArabic ? "تم إنشاء الفاتورة كمسودة" : "Invoice draft created"));
       setCustomerId("");
-      setDescription("");
-      setQuantity(1);
-      setUnitPrice(0);
+      setItems([{ description: "", quantity: 1, unitPrice: 0 }]);
       setTaxRate(15);
       setCurrency("SAR");
       setDueDate(defaultDueDate());
@@ -290,12 +327,8 @@ function InvoiceModal({ open, onClose, onSaved }: {
       toast.error(isArabic ? "اختر العميل أولاً" : "Select a customer first");
       return;
     }
-    if (!description.trim()) {
-      toast.error(isArabic ? "أدخل وصف بند الفاتورة" : "Enter an invoice item description");
-      return;
-    }
-    if (unitPrice <= 0) {
-      toast.error(isArabic ? "أدخل قيمة صحيحة للبند" : "Enter a valid item price");
+    if (items.some((item) => !item.description.trim() || item.quantity <= 0 || item.unitPrice <= 0)) {
+      toast.error(isArabic ? "أدخل وصفًا وكمية وسعرًا صحيحًا لكل بند" : "Enter a valid description, quantity, and price for every item");
       return;
     }
     createMutation.mutate();
@@ -317,7 +350,7 @@ function InvoiceModal({ open, onClose, onSaved }: {
             className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl"
           >
             <div className="flex items-center justify-between border-b p-6">
-              <h2 className="text-lg font-bold text-navy-700">{copy.new}</h2>
+              <h2 className="text-lg font-bold text-navy-700">{isQuotation ? (isArabic ? "عرض سعر جديد" : "New quotation") : copy.new}</h2>
               <button type="button" onClick={onClose} className="rounded-xl p-2 text-gray-400 hover:bg-gray-100">
                 <X size={18} />
               </button>
@@ -345,23 +378,43 @@ function InvoiceModal({ open, onClose, onSaved }: {
                 )}
               </div>
 
-              <div>
-                <label className="label">{isArabic ? "وصف الخدمة أو البند" : "Service or item description"} *</label>
-                <input value={description} onChange={(event) => setDescription(event.target.value)}
-                  className="input-field" placeholder={isArabic ? "مثال: رسوم تأسيس شركة" : "Example: Company formation fee"} required />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="label mb-0">{isArabic ? "بنود المستند" : "Document items"} *</label>
+                  <button type="button" onClick={() => setItems((current) => [...current, { description: "", quantity: 1, unitPrice: 0 }])} className="btn-ghost px-2 text-ofoq-green">
+                    <Plus size={15} /> {isArabic ? "إضافة بند" : "Add item"}
+                  </button>
+                </div>
+                {items.map((item, index) => (
+                  <div key={index} className="grid grid-cols-12 gap-2 rounded-xl border border-gray-100 bg-gray-50 p-3">
+                    <div className="col-span-12 sm:col-span-6">
+                      <label className="mb-1 block text-xs font-semibold text-gray-500">{isArabic ? "الوصف" : "Description"}</label>
+                      <input value={item.description} onChange={(event) => updateItem(index, { description: event.target.value })}
+                        className="input-field bg-white" placeholder={isArabic ? "مثال: رسوم تأسيس شركة" : "Example: Company formation fee"} required />
+                    </div>
+                    <div className="col-span-4 sm:col-span-2">
+                      <label className="mb-1 block text-xs font-semibold text-gray-500">{isArabic ? "الكمية" : "Qty"}</label>
+                      <input type="number" min="1" value={item.quantity} onChange={(event) => updateItem(index, { quantity: Number(event.target.value) })}
+                        className="input-field bg-white" dir="ltr" required />
+                    </div>
+                    <div className="col-span-5 sm:col-span-3">
+                      <label className="mb-1 block text-xs font-semibold text-gray-500">{isArabic ? "سعر الوحدة" : "Unit price"}</label>
+                      <input type="number" min="0" step="0.01" value={item.unitPrice || ""} onChange={(event) => updateItem(index, { unitPrice: Number(event.target.value) })}
+                        className="input-field bg-white" dir="ltr" required />
+                    </div>
+                    <div className="col-span-3 flex items-end justify-end">
+                      {items.length > 1 && (
+                        <button type="button" onClick={() => setItems((current) => current.filter((_, itemIndex) => itemIndex !== index))}
+                          className="rounded-lg p-2 text-red-500 hover:bg-red-50" aria-label={isArabic ? "حذف البند" : "Remove item"}>
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
 
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <div>
-                  <label className="label">{isArabic ? "الكمية" : "Quantity"}</label>
-                  <input type="number" min="1" value={quantity} onChange={(event) => setQuantity(Number(event.target.value))}
-                    className="input-field" dir="ltr" required />
-                </div>
-                <div>
-                  <label className="label">{isArabic ? "سعر الوحدة" : "Unit price"} *</label>
-                  <input type="number" min="0" step="0.01" value={unitPrice || ""} onChange={(event) => setUnitPrice(Number(event.target.value))}
-                    className="input-field" dir="ltr" required />
-                </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="label">{isArabic ? "الضريبة %" : "Tax %"}</label>
                   <input type="number" min="0" max="100" value={taxRate} onChange={(event) => setTaxRate(Number(event.target.value))}
@@ -379,7 +432,7 @@ function InvoiceModal({ open, onClose, onSaved }: {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="label">{isArabic ? "تاريخ الاستحقاق" : "Due date"}</label>
+                  <label className="label">{isQuotation ? (isArabic ? "تاريخ صلاحية العرض" : "Valid until") : (isArabic ? "تاريخ الاستحقاق" : "Due date")}</label>
                   <input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} className="input-field" dir="ltr" />
                 </div>
                 <div className="rounded-xl bg-gray-50 p-3 text-sm">
@@ -396,7 +449,7 @@ function InvoiceModal({ open, onClose, onSaved }: {
 
               <div className="flex gap-3 pt-2">
                 <button type="submit" disabled={createMutation.isPending || customers.length === 0} className="btn-primary flex-1 justify-center">
-                  {createMutation.isPending ? (isArabic ? "جارٍ الحفظ..." : "Saving...") : (isArabic ? "إنشاء مسودة الفاتورة" : "Create invoice draft")}
+                  {createMutation.isPending ? (isArabic ? "جارٍ الحفظ..." : "Saving...") : (isQuotation ? (isArabic ? "إنشاء مسودة العرض" : "Create quotation draft") : (isArabic ? "إنشاء مسودة الفاتورة" : "Create invoice draft"))}
                 </button>
                 <button type="button" onClick={onClose} className="btn-ghost">{isArabic ? "إلغاء" : "Cancel"}</button>
               </div>

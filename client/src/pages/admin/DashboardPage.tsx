@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   TrendingUp, Users, FolderKanban, FileText,
   DollarSign, AlertTriangle, ArrowUpRight, ArrowDownRight,
-  Target, CheckCircle2, Clock, Zap, MessageSquare,
+  Target, CheckCircle2, Zap, MessageSquare, Plus, RefreshCw, UserPlus, HeadphonesIcon,
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -14,7 +14,7 @@ import { useAuthStore } from "../../store/authStore";
 import { Link } from "react-router-dom";
 import { useLang } from "../../i18n/LangContext";
 
-const COLORS = ["#C13229", "#1C2B6E", "#E5FE04", "#33B27C", "#F97316", "#8B5CF6"];
+const COLORS = ["#1C2B6E", "#33B27C", "#C13229", "#64748B", "#8B5CF6", "#0F766E"];
 
 const MONTHS: Record<string, string[]> = {
   ar: ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"],
@@ -32,12 +32,12 @@ function StatCard({
 }) {
   const inner = (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ delay, duration: 0.4 }}
-      className="card flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow"
+      className={`card flex items-center gap-4 ${href ? "cursor-pointer hover:border-navy-200 transition-colors" : ""}`}
     >
-      <div className={`stat-icon ${color}`}>
+      <div className={`stat-icon ${color} rounded-xl`}>
         <Icon size={22} className="text-white" />
       </div>
       <div className="flex-1 min-w-0">
@@ -58,10 +58,10 @@ function StatCard({
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
-  const { lang, ui } = useLang();
+  const { lang, ui, t, dir } = useLang();
   const copy = ui.adminPages.dashboard;
 
-  const { data: overview, isLoading } = useQuery({
+  const { data: overview, isLoading, isError, refetch } = useQuery({
     queryKey: ["dashboard-overview"],
     queryFn: () => analyticsApi.overview().then((r) => r.data),
     staleTime: 2 * 60 * 1000,   // 2 min cache
@@ -120,27 +120,40 @@ export default function DashboardPage() {
     greetingHour < 12 ? copy.morning : greetingHour < 17 ? copy.afternoon : copy.evening;
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in" dir={dir}>
       {/* Header */}
-      <div>
-        <h1 className="page-title">
-          {greeting}، {user?.name?.split(" ")[0]} 👋
-        </h1>
-        <p className="page-subtitle">{copy.subtitle}</p>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-ofoq-green mb-2">
+            OFOQ / {lang === "ar" ? "لوحة العمل" : "WORKSPACE"}
+          </p>
+          <h1 className="page-title">
+            {greeting}، {user?.name?.split(" ")[0]}
+          </h1>
+          <p className="page-subtitle">{copy.subtitle}</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link to="/admin/projects" className="btn-primary py-2.5">
+            <Plus size={16} /> {lang === "ar" ? "مشروع جديد" : "New project"}
+          </Link>
+          <button onClick={() => refetch()} className="btn-ghost border border-gray-200 bg-white">
+            <RefreshCw size={16} /> {lang === "ar" ? "تحديث" : "Refresh"}
+          </button>
+        </div>
       </div>
 
-      {/* AI Insight Banner */}
+      {/* Operational summary */}
       {insights?.summary && (
         <motion.div
           initial={{ opacity: 0, x: -16 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-gradient-to-l from-ofoq-navy to-navy-800 rounded-2xl p-5 flex items-start gap-4"
+          className="rounded-2xl border border-navy-700 bg-[#1C2B6E] p-5 flex items-start gap-4"
         >
-          <div className="w-10 h-10 rounded-xl bg-ofoq-yellow/20 flex items-center justify-center flex-shrink-0">
-            <Zap size={20} className="text-ofoq-yellow" />
+          <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+            <Zap size={20} className="text-[#E5FE04]" />
           </div>
           <div>
-            <p className="text-ofoq-yellow text-xs font-semibold mb-1">{copy.smartInsight}</p>
+            <p className="text-[#E5FE04] text-xs font-semibold mb-1">{copy.smartInsight}</p>
             <p className="text-white text-sm leading-relaxed">{insights.summary}</p>
             {insights.actions?.slice(0, 2).map((a: string, i: number) => (
               <p key={i} className="text-white/60 text-xs mt-1">• {a}</p>
@@ -149,8 +162,42 @@ export default function DashboardPage() {
         </motion.div>
       )}
 
+      {/* Quick access */}
+      <section className="card border-gray-200">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="font-bold text-navy-700">{lang === "ar" ? "الوصول السريع" : "Quick access"}</h2>
+            <p className="text-xs text-gray-400 mt-1">{lang === "ar" ? "ابدأ من العمليات الأكثر استخدامًا" : "Start with the operations your team uses most"}</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+          {[
+            { href: "/admin/crm/customers", label: t.admin.customers, icon: Users },
+            { href: "/admin/projects", label: t.admin.projects, icon: FolderKanban },
+            { href: "/admin/invoices", label: t.admin.invoices, icon: FileText },
+            { href: "/admin/service-requests", label: ui.client.newRequest, icon: MessageSquare },
+            { href: "/admin/users", label: t.admin.users, icon: UserPlus },
+            { href: "/admin/support", label: ui.client.support, icon: HeadphonesIcon },
+          ].map(({ href, label, icon: Icon }) => (
+            <Link key={href} to={href} className="flex min-h-20 flex-col items-center justify-center gap-2 rounded-xl border border-gray-100 bg-gray-50 px-2 py-3 text-center text-xs font-semibold text-navy-700 transition-colors hover:border-ofoq-green/40 hover:bg-emerald-50">
+              <Icon size={18} className="text-ofoq-green" />
+              <span>{label}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Stats grid */}
-      {isLoading ? (
+      {isError ? (
+        <div className="card border-red-100 bg-red-50/60 flex flex-col items-center justify-center gap-3 py-10 text-center">
+          <AlertTriangle size={28} className="text-red-500" />
+          <div>
+            <p className="font-semibold text-red-700">{lang === "ar" ? "تعذر تحميل ملخص اللوحة" : "Dashboard summary could not be loaded"}</p>
+            <p className="text-sm text-red-600/80 mt-1">{lang === "ar" ? "تحقق من الاتصال ثم حاول مرة أخرى." : "Check the connection and try again."}</p>
+          </div>
+          <button onClick={() => refetch()} className="btn-ghost border border-red-200 text-red-700">{lang === "ar" ? "إعادة المحاولة" : "Try again"}</button>
+        </div>
+      ) : isLoading ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="card">
@@ -177,7 +224,7 @@ export default function DashboardPage() {
             icon={CheckCircle2} color="bg-indigo-500" delay={0.1} />
           <StatCard href="/admin/projects"
              title={copy.activeProjects} value={projects.active || 0}
-             sub={tasks.overdue ? `⚠️ ${tasks.overdue} ${copy.overdueTasks}` : `${projects.completed || 0} ${copy.completed}`}
+             sub={tasks.overdue ? `${tasks.overdue} ${copy.overdueTasks}` : `${projects.completed || 0} ${copy.completed}`}
             icon={FolderKanban} color="bg-orange-500"
             trend={tasks.overdue ? { value: tasks.overdue, up: false } : undefined} delay={0.15} />
           <StatCard href="/admin/invoices"

@@ -9,8 +9,10 @@ export const servicesRouter = Router();
 // ── Public: Get Active Services ───────────────────────────────────
 servicesRouter.get("/", optionalAuth, async (req, res) => {
   try {
-    const { category, featured, lang } = req.query;
-    const filter: any = { isActive: true };
+    const { category, featured, all } = req.query;
+    const user = (req as any).user;
+    const canViewAll = all === "true" && ["super_admin", "admin", "manager"].includes(user?.role);
+    const filter: any = canViewAll ? {} : { isActive: true };
     if (category) filter.category = category;
     if (featured === "true") filter.isFeatured = true;
 
@@ -53,7 +55,9 @@ servicesRouter.get("/categories", async (_req, res) => {
 // ── Get Single Service ────────────────────────────────────────────
 servicesRouter.get("/:id", requireAuth, async (req, res) => {
   try {
-    const service = await ServiceModel.findById(req.params.id).lean();
+    const role = (req as any).user?.role;
+    const canManage = ["super_admin", "admin", "manager"].includes(role);
+    const service = await ServiceModel.findOne(canManage ? { _id: req.params.id } : { _id: req.params.id, isActive: true }).lean();
     if (!service) {
       res.status(404).json({ error: "الخدمة غير موجودة" });
       return;

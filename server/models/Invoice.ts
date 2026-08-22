@@ -5,6 +5,8 @@ export interface IInvoice extends Document {
   type: "invoice" | "proforma" | "receipt" | "credit_note";
   customerId: mongoose.Types.ObjectId;
   projectId?: mongoose.Types.ObjectId;
+  sourceQuotationId?: mongoose.Types.ObjectId;
+  convertedToInvoiceId?: mongoose.Types.ObjectId;
   items: {
     description: string;
     descriptionAr?: string;
@@ -19,7 +21,7 @@ export interface IInvoice extends Document {
   tax: number;
   total: number;
   currency: string;
-  status: "draft" | "sent" | "viewed" | "partial" | "paid" | "overdue" | "cancelled";
+  status: "draft" | "sent" | "viewed" | "accepted" | "partial" | "paid" | "overdue" | "cancelled";
   dueDate?: Date;
   paidAt?: Date;
   paidAmount: number;
@@ -43,6 +45,8 @@ const InvoiceSchema = new Schema<IInvoice>({
   },
   customerId: { type: Schema.Types.ObjectId, ref: "Customer", required: true },
   projectId: { type: Schema.Types.ObjectId, ref: "Project" },
+  sourceQuotationId: { type: Schema.Types.ObjectId, ref: "Invoice" },
+  convertedToInvoiceId: { type: Schema.Types.ObjectId, ref: "Invoice" },
   items: [{
     description: { type: String, required: true },
     descriptionAr: String,
@@ -59,7 +63,7 @@ const InvoiceSchema = new Schema<IInvoice>({
   currency: { type: String, default: "SAR" },
   status: {
     type: String,
-    enum: ["draft", "sent", "viewed", "partial", "paid", "overdue", "cancelled"],
+    enum: ["draft", "sent", "viewed", "accepted", "partial", "paid", "overdue", "cancelled"],
     default: "draft",
   },
   dueDate: Date,
@@ -75,5 +79,6 @@ const InvoiceSchema = new Schema<IInvoice>({
 
 InvoiceSchema.index({ customerId: 1, status: 1 });
 InvoiceSchema.index({ dueDate: 1, status: 1 });
+InvoiceSchema.index({ sourceQuotationId: 1 }, { unique: true, sparse: true });
 
 export const InvoiceModel = mongoose.model<IInvoice>("Invoice", InvoiceSchema);

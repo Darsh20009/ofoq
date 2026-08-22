@@ -33,8 +33,8 @@ export default function EmployeeLayout() {
     <div className="min-h-screen bg-gray-50 font-cairo" dir={dir}>
 
       {/* ── Top Bar ─────────────────────────────── */}
-      <header className="bg-[#1C2B6E] shadow-md sticky top-0 z-40">
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center gap-4">
+      <header className="bg-[#1C2B6E] border-b border-white/10 sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center gap-4">
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
@@ -55,7 +55,7 @@ export default function EmployeeLayout() {
                   to={item.href}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                     active
-                      ? "bg-[#33B27C] text-white"
+                      ? "bg-white/15 text-white"
                       : "text-white/70 hover:bg-white/10 hover:text-white"
                   }`}
                 >
@@ -162,7 +162,7 @@ export default function EmployeeLayout() {
       </header>
 
       {/* ── Content ─────────────────────────────── */}
-      <main className="max-w-5xl mx-auto px-4 py-6">
+        <main className="max-w-6xl mx-auto px-4 py-6">
         <Outlet />
       </main>
 
