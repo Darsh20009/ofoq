@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { arSA } from "date-fns/locale";
 import { contractsApi, crmApi } from "../../../api/client";
 import { useLang } from "../../../i18n/LangContext";
+import CustomerQuickCreate from "../../../components/admin/CustomerQuickCreate";
 
 async function downloadContractPdf(id: string, number: string) {
   const token = localStorage.getItem("ofoq_token");
@@ -62,8 +63,9 @@ export default function ContractsPage() {
   const [viewing, setViewing] = useState<any>(null);
   const [sections, setSections] = useState<ContractSection[]>([]);
   const [approvalFields, setApprovalFields] = useState<ApprovalField[]>([]);
+  const [quickCustomerOpen, setQuickCustomerOpen] = useState(false);
 
-  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<ContractForm>({
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<ContractForm>({
     defaultValues: { currency: "SAR" },
   });
   const watchedForm = watch();
@@ -465,8 +467,13 @@ export default function ContractsPage() {
                 </div>
 
                 {/* Customer */}
-                <div>
-                   <label className="label">{copy.customer} <span className="text-red-500">*</span></label>
+                 <div>
+                    <div className="flex items-center justify-between gap-2">
+                      <label className="label mb-1">{copy.customer} <span className="text-red-500">*</span></label>
+                      <button type="button" onClick={() => setQuickCustomerOpen(true)} className="text-xs font-semibold text-ofoq-green hover:underline">
+                        {isArabic ? "+ إنشاء عميل جديد" : "+ Create customer"}
+                      </button>
+                    </div>
                    <select {...register("customerId", { required: copy.required })} className="input-field">
                      <option value="">{copy.chooseCustomer}</option>
                     {customers.map((c: any) => (
@@ -474,6 +481,9 @@ export default function ContractsPage() {
                     ))}
                   </select>
                   {errors.customerId && <p className="text-red-500 text-xs mt-1">{errors.customerId.message}</p>}
+                   {customers.length === 0 && (
+                     <p className="mt-1 text-xs text-amber-600">{isArabic ? "أنشئ عميلاً جديدًا من الرابط أعلاه للمتابعة." : "Create a customer using the link above to continue."}</p>
+                   )}
                 </div>
 
                 {/* Value + Currency */}
@@ -588,7 +598,12 @@ export default function ContractsPage() {
                      {(createMut.isPending || updateMut.isPending) ? "..." : editing ? copy.save : copy.create}
                   </button>
                 </div>
-              </form>
+               </form>
+               <CustomerQuickCreate
+                 open={quickCustomerOpen}
+                 onClose={() => setQuickCustomerOpen(false)}
+                 onCreated={(customer) => setValue("customerId", customer._id, { shouldValidate: true })}
+               />
             </motion.div>
           </motion.div>
         )}

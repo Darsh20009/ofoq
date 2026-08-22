@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Search, Trash2, Edit2, Shield, UserCheck, UserX } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -37,7 +37,7 @@ export default function UsersPage() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["users"] }); toast.success(copy.userDeleted || "Deleted"); },
   });
 
-  const users: User[] = data?.data?.users || [];
+  const users: User[] = data?.users || data?.data?.users || [];
 
   return (
     <div className="space-y-6">
@@ -147,7 +147,12 @@ function UserModal({ open, onClose, user, onSaved }: {
   const { ui } = useLang();
   const copy = ui.adminPages.adminPortal;
 
-  useState(() => { if (user) reset(user); else reset({ role: "employee", status: "active" }); });
+  useEffect(() => {
+    if (open) {
+      if (user) reset(user);
+      else reset({ role: "employee", status: "active" });
+    }
+  }, [open, user, reset]);
 
   const mut = useMutation({
     mutationFn: (data: object) =>
