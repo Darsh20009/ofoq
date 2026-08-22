@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { crmApi, projectsApi, usersApi } from "../../../api/client";
 import type { Customer, Project } from "../../../types";
 import { useLang } from "../../../i18n/LangContext";
+import CustomerQuickCreate from "../../../components/admin/CustomerQuickCreate";
 
 type ProjectForm = {
   name: string;
@@ -38,6 +39,7 @@ export default function ProjectModal({ open, onClose, project, onSaved }: {
   const copy = ui.adminPages.projects;
   const { register, handleSubmit, reset } = useForm<ProjectForm>();
   const [formError, setFormError] = useState("");
+  const [quickCustomerOpen, setQuickCustomerOpen] = useState(false);
   const projectRecord = project as (Project & {
     name?: string;
     customerId?: Customer | string;
@@ -118,7 +120,12 @@ export default function ProjectModal({ open, onClose, project, onSaved }: {
                   <input {...register("name", { required: true })} className="input-field" placeholder={copy.namePlaceholder} />
                 </div>
                 <div>
-                  <label className="label">{ui.adminPages.invoices.customer} *</label>
+                  <div className="flex items-center justify-between gap-2">
+                    <label className="label mb-1">{ui.adminPages.invoices.customer} *</label>
+                    <button type="button" onClick={() => setQuickCustomerOpen(true)} className="text-xs font-semibold text-ofoq-green hover:underline">
+                      {lang === "ar" ? "+ إنشاء عميل جديد" : "+ Create customer"}
+                    </button>
+                  </div>
                   <select {...register("customerId", { required: true })} className="input-field" disabled={customersLoading}>
                     <option value="">
                       {customersLoading ? (lang === "ar" ? "جارٍ تحميل العملاء..." : "Loading customers...") : (lang === "ar" ? "اختر العميل..." : "Select customer...")}
@@ -130,7 +137,7 @@ export default function ProjectModal({ open, onClose, project, onSaved }: {
                     ))}
                   </select>
                   {!customersLoading && customers.length === 0 && (
-                    <p className="mt-1 text-xs text-amber-600">{lang === "ar" ? "أضف عميلاً أولاً قبل إنشاء المشروع." : "Add a customer before creating a project."}</p>
+                    <p className="mt-1 text-xs text-amber-600">{lang === "ar" ? "أنشئ عميلاً جديدًا من الرابط أعلاه للمتابعة." : "Create a customer using the link above to continue."}</p>
                   )}
                 </div>
                 <div>
@@ -205,6 +212,13 @@ export default function ProjectModal({ open, onClose, project, onSaved }: {
                 <button type="button" onClick={onClose} className="btn-ghost">{copy.cancel}</button>
               </div>
             </form>
+            <CustomerQuickCreate
+              open={quickCustomerOpen}
+              onClose={() => setQuickCustomerOpen(false)}
+              onCreated={(customer) => {
+                reset((current) => ({ ...current, customerId: customer._id }));
+              }}
+            />
           </motion.div>
         </div>
       )}

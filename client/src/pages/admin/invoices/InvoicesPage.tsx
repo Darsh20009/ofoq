@@ -8,6 +8,7 @@ import { arSA } from "date-fns/locale";
 import { crmApi, invoicesApi } from "../../../api/client";
 import type { Customer, Invoice } from "../../../types";
 import { useLang } from "../../../i18n/LangContext";
+import CustomerQuickCreate from "../../../components/admin/CustomerQuickCreate";
 
 export default function InvoicesPage({ documentType = "invoice" }: { documentType?: "invoice" | "proforma" }) {
   const { ui, lang } = useLang();
@@ -270,6 +271,7 @@ function InvoiceModal({ open, onClose, onSaved, documentType }: {
   const [currency, setCurrency] = useState("SAR");
   const [dueDate, setDueDate] = useState(defaultDueDate);
   const [notes, setNotes] = useState("");
+  const [quickCustomerOpen, setQuickCustomerOpen] = useState(false);
 
   const { data: customerData, isLoading: customersLoading } = useQuery({
     queryKey: ["invoice-customers"],
@@ -358,7 +360,12 @@ function InvoiceModal({ open, onClose, onSaved, documentType }: {
 
             <form onSubmit={submit} className="space-y-4 p-6">
               <div>
-                <label className="label">{isArabic ? "العميل" : "Customer"} *</label>
+                <div className="flex items-center justify-between gap-2">
+                  <label className="label mb-1">{isArabic ? "العميل" : "Customer"} *</label>
+                  <button type="button" onClick={() => setQuickCustomerOpen(true)} className="text-xs font-semibold text-ofoq-green hover:underline">
+                    {isArabic ? "+ إنشاء عميل جديد" : "+ Create customer"}
+                  </button>
+                </div>
                 <select
                   value={customerId}
                   onChange={(event) => setCustomerId(event.target.value)}
@@ -374,7 +381,7 @@ function InvoiceModal({ open, onClose, onSaved, documentType }: {
                   ))}
                 </select>
                 {!customersLoading && customers.length === 0 && (
-                  <p className="mt-1 text-xs text-amber-600">{isArabic ? "أضف عميلاً أولاً قبل إنشاء الفاتورة." : "Add a customer before creating an invoice."}</p>
+                  <p className="mt-1 text-xs text-amber-600">{isArabic ? "أنشئ عميلاً جديدًا من الرابط أعلاه للمتابعة." : "Create a customer using the link above to continue."}</p>
                 )}
               </div>
 
@@ -454,6 +461,11 @@ function InvoiceModal({ open, onClose, onSaved, documentType }: {
                 <button type="button" onClick={onClose} className="btn-ghost">{isArabic ? "إلغاء" : "Cancel"}</button>
               </div>
             </form>
+            <CustomerQuickCreate
+              open={quickCustomerOpen}
+              onClose={() => setQuickCustomerOpen(false)}
+              onCreated={(customer) => setCustomerId(customer._id)}
+            />
           </motion.div>
         </div>
       )}
