@@ -65,6 +65,7 @@ export const webauthnApi = {
 
 /* ── Users ─────────────────────────────────── */
 export const usersApi = {
+  sidebarCounts: () => api.get("/users/me/sidebar-counts"),
   list: (params?: object) => api.get("/users", { params }),
   get: (id: string) => api.get(`/users/${id}`),
   create: (data: object) => api.post("/users", data),

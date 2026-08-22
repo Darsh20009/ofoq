@@ -20,6 +20,7 @@ interface NavItem {
   href?: string;
   label: string;
   icon: React.ComponentType<{ size?: number }>;
+  badge?: number;
   children?: { href: string; label: string }[];
 }
 
@@ -42,6 +43,11 @@ function NavLink({ item, collapsed, onNavigate }: {
           <div className="flex items-center gap-3">
             <item.icon size={18} />
             {!collapsed && <span>{item.label}</span>}
+            {item.badge ? (
+              <span className="ms-auto min-w-5 h-5 px-1 rounded-full bg-[#E5FE04] text-[#101B4C] text-[10px] font-bold flex items-center justify-center">
+                {item.badge > 99 ? "99+" : item.badge}
+              </span>
+            ) : null}
           </div>
           {!collapsed && (
             <ChevronDown
@@ -127,11 +133,22 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
     { href: pagePath("settings"),      label: t.admin.settings,   icon: Settings },
     // Client copy lives in the shared UI translations; the legacy `t` pack
     // does not include a `client` section for the Arabic admin layout.
-    { href: pagePath("service-requests"), label: ui.client.newRequest,   icon: ClipboardList },
+    { href: pagePath("service-requests"), label: ui.client.newRequest,   icon: ClipboardList, badge: sidebarCounts.requests },
     { href: pagePath("support"),          label: ui.client.support,       icon: HeadphonesIcon },
     { href: pagePath("contact"),          label: t.contact.consultTitle, icon: MessageSquare },
     { href: pagePath("employee/card"),    label: t.admin.myCard,   icon: CreditCard },
   ];
+
+  const { data: sidebarCountsData } = useQuery({
+    queryKey: ["sidebar-counts", user?._id, user?.role],
+    queryFn: () => usersApi.sidebarCounts().then((r) => r.data),
+    enabled: !!user,
+    refetchInterval: 30_000,
+    staleTime: 15_000,
+    refetchOnWindowFocus: true,
+    retry: false,
+  });
+  const sidebarCounts = sidebarCountsData || { notifications: 0, requests: 0, users: 0 };
 
   // Load notifications — cached 60s, polling every 2 min (was a hot loop hitting wrong URL)
   const { data: notifData } = useQuery({

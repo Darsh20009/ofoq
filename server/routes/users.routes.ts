@@ -1,13 +1,55 @@
 import { Router } from "express";
 import { requireAuth, requireRole, hashPassword, verifyPassword, logAction } from "../auth.js";
 import { uploadAvatar } from "../middleware/upload.js";
-import { UserModel, NotificationModel } from "../models/index.js";
+import { UserModel, NotificationModel, ServiceRequestModel } from "../models/index.js";
 import { fireNotify } from "../notify.js";
 import { sendNewEmployeeEmail } from "../email.js";
 import path from "path";
 import fs from "fs";
 
 export const usersRouter = Router();
+
+// ── Sidebar counters (scoped to the signed-in user's role) ───────
+usersRouter.get("/me/sidebar-counts", requireAuth, async (req, res) => {
+  try {
+    const user = (req as any).user;
+    const notificationFilter = { userId: user._id, read: false };
+    const counters: {
+      notifications: number;
+      requests: number;
+      users: number;
+    } = { notifications: 0, requests: 0, users: 0 };
+
+    if (["super_admin", "admin", "manager"].includes(user.role)) {
+      const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      const [notifications, requests, users] = await Promise.all([
+        NotificationModel.countDocuments(notificationFilter),
+        ServiceRequestModel.countDocuments({ status: "new" }),
+        UserModel.countDocuments({ createdAt: { $gte: since }, _id: { $ne: user._id } }),
+      ]);
+      counters.notifications = notifications;
+      counters.requests = requests;
+      counters.users = users;
+    } else if (user.role === "employee") {
+      const [notifications, requests] = await Promise.all([
+        NotificationModel.countDocuments(notificationFilter),
+        ServiceRequestModel.countDocuments({ status: "new", assignedTo: user._id }),
+      ]);
+      counters.notifications = notifications;
+      counters.requests = requests;
+    } else if (user.role === "client") {
+      counters.notifications = await NotificationModel.countDocuments(notificationFilter);
+      counters.requests = await ServiceRequestModel.countDocuments({
+        clientId: user._id,
+        status: { $in: ["new", "reviewing", "approved", "in_progress"] },
+      });
+    }
+
+    res.json(counters);
+  } catch {
+    res.status(500).json({ error: "خطأ في جلب عدادات الشريط" });
+  }
+});
 
 // ── Get All Users (Admin) ─────────────────────────────────────────
 usersRouter.get("/", requireAuth, requireRole("super_admin", "admin", "manager"), async (req, res) => {
