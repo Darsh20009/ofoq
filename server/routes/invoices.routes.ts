@@ -176,20 +176,49 @@ invoicesRouter.post("/", requireAuth, requireRole("super_admin", "admin", "manag
       createFields.filter((field) => Object.prototype.hasOwnProperty.call(req.body, field))
         .map((field) => [field, req.body[field]]),
     );
-    const invoiceNumber = await generateInvoiceNumber(type === "proforma" ? "QTE" : "INV");
-    const invoice = await InvoiceModel.create({
+    const prefix = type === "proforma" ? "QTE" : "INV";
+    const invoiceData = {
       ...documentData,
       ...totals,
-      invoiceNumber,
       type,
       status: "draft",
       paidAmount: 0,
       createdBy: (req as any).user._id,
-    });
+    };
+
+    // The counter may predate documents imported into the database. If its
+    // first number collides with the unique invoiceNumber index, advance the
+    // counter and retry instead of returning a misleading generic 500.
+    let invoice;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        const invoiceNumber = await generateInvoiceNumber(prefix);
+        invoice = await InvoiceModel.create({ ...invoiceData, invoiceNumber });
+        break;
+      } catch (error: any) {
+        const isDuplicateNumber =
+          error?.code === 11000 && Boolean(error?.keyPattern?.invoiceNumber);
+        if (!isDuplicateNumber || attempt === 2) throw error;
+      }
+    }
+    if (!invoice) throw new Error("تعذر إنشاء رقم فريد للمستند");
     await logAction(String((req as any).user._id), "create_invoice", "Invoice", String(invoice._id), req);
     res.status(201).json({ invoice });
-  } catch (error) {
-    res.status((error as any)?.statusCode || 500).json({ error: (error as any)?.statusCode ? (error as Error).message : "خطأ في إنشاء الفاتورة" });
+  } catch (error: any) {
+    console.error("[Invoices] create error:", error);
+    if (error?.statusCode) {
+      res.status(error.statusCode).json({ error: error.message });
+      return;
+    }
+    if (error?.name === "ValidationError") {
+      res.status(400).json({ error: "تحقق من بيانات الفاتورة: " + Object.values(error.errors || {}).map((item: any) => item.message).join("، ") });
+      return;
+    }
+    if (error?.code === 11000) {
+      res.status(409).json({ error: "تعذر إنشاء رقم فريد للمستند، أعد المحاولة" });
+      return;
+    }
+    res.status(500).json({ error: "تعذر إنشاء الفاتورة حاليًا، تحقق من البيانات وحاول مرة أخرى" });
   }
 });
 
