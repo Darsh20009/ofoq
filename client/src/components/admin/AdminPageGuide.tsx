@@ -22,12 +22,37 @@ const GUIDES: Record<string, { ar: Guide; en: Guide }> = {
     ar: { title: "دليل المشاريع", intro: "تابع مراحل تنفيذ كل مشروع في مكان واحد.", steps: ["أنشئ مشروعًا واربطه بالعميل والمسؤول.", "حدّث المرحلة ونسبة الإنجاز كلما تقدم العمل.", "استخدم عرض الجدول أو كانبان لمتابعة المشاريع، واحذف المشروع فقط عند التأكد."] },
     en: { title: "Projects guide", intro: "Track every project and its progress in one place.", steps: ["Create a project and link it to a customer and manager.", "Update its stage and progress as work moves forward.", "Use table or Kanban view to follow projects, and delete only when confirmed."] },
   },
+  crm: {
+    ar: { title: "دليل العملاء والفرص", intro: "نظّم بيانات العملاء وتابع فرص البيع من هنا.", steps: ["أضف العميل مع بيانات التواصل الصحيحة.", "استخدم البحث للوصول إلى سجل العميل أو الفرصة.", "حدّث مرحلة الفرصة وملاحظات المتابعة بعد كل تواصل."] },
+    en: { title: "CRM guide", intro: "Manage customer records and sales opportunities here.", steps: ["Add the customer with accurate contact details.", "Use search to find a customer or opportunity.", "Update the opportunity stage and follow-up notes after each contact."] },
+  },
+  contracts: {
+    ar: { title: "دليل العقود", intro: "أنشئ العقد وراجعه ثم أرسله للتوقيع.", steps: ["أنشئ العقد واربطه بالعميل والمشروع.", "راجع القيمة والبنود قبل الإرسال.", "لا تعدّل العقد بعد اعتماده، واستخدم حالة العقد لمعرفة المرحلة الحالية."] },
+    en: { title: "Contracts guide", intro: "Create, review, and send contracts for signature.", steps: ["Create the contract and link it to the customer and project.", "Review the value and terms before sending.", "After approval, use the contract status to track its current stage."] },
+  },
+  cms: {
+    ar: { title: "دليل المحتوى", intro: "أدر المقالات والشهادات ونصوص الموقع.", steps: ["استخدم المدونة لإضافة المقالات ونشرها أو حفظها كمسودة.", "استخدم محرر محتوى الموقع لتعديل النصوص حسب اللغة.", "احفظ التعديلات ثم راجع الموقع للتأكد من ظهورها."] },
+    en: { title: "Content guide", intro: "Manage blog posts, testimonials, and website copy.", steps: ["Use Blog to create, publish, or save articles as drafts.", "Use Site Content to edit website text by language.", "Save changes and review the public site."] },
+  },
+  settings: {
+    ar: { title: "دليل الإعدادات", intro: "اضبط إعدادات الشركة والتنبيهات والحماية.", steps: ["ابدأ بالإعدادات العامة وبيانات التواصل.", "راجع إعدادات البريد والتنبيهات.", "فعّل الحماية الإضافية ولا تحفظ تغييرات غير مقصودة."] },
+    en: { title: "Settings guide", intro: "Configure company, notification, and security settings.", steps: ["Start with general company and contact details.", "Review email and notification settings.", "Enable extra security and save only intended changes."] },
+  },
+  users: {
+    ar: { title: "دليل المستخدمين", intro: "أضف حسابات الفريق وحدد الصلاحيات.", steps: ["أنشئ المستخدم بالبريد الصحيح.", "اختر الدور المناسب، لأن الدور يحدد الصفحات والصلاحيات.", "أوقف الحساب بدل حذفه إذا كان هناك سجل أو نشاط مرتبط به."] },
+    en: { title: "Users guide", intro: "Add team accounts and control access.", steps: ["Create the user with the correct email.", "Choose the right role because it controls access.", "Disable an account instead of deleting it when history must remain."] },
+  },
 };
 
 function guideKey(pathname: string) {
   if (pathname.includes("/quotations")) return "quotations";
   if (pathname.includes("/invoices")) return "invoices";
   if (pathname.includes("/projects")) return "projects";
+  if (pathname.includes("/crm/")) return "crm";
+  if (pathname.includes("/contracts")) return "contracts";
+  if (pathname.includes("/cms")) return "cms";
+  if (pathname.includes("/settings")) return "settings";
+  if (pathname.includes("/users")) return "users";
   return "dashboard";
 }
 
