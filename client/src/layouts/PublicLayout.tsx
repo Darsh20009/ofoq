@@ -134,6 +134,9 @@ export default function PublicLayout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#2B273F]" dir={isRtl ? "rtl" : "ltr"}>
+      {isHomePage && (
+        <div aria-hidden="true" className="pointer-events-none fixed inset-y-0 right-4 z-[60] hidden w-px bg-[#D8CDBD]/80 sm:block" />
+      )}
 
       {/* ══ الهيدر الثابت — مطابق لتكوين الصفحة الرئيسية ═══════════ */}
       <header

@@ -48,7 +48,7 @@ export default function HomePage() {
         <title>{ui.home.metaTitle}</title>
         <meta name="description" content={copy.description} />
       </Helmet>
-      <main dir={dir} className="overflow-hidden bg-[#F4F1EC] text-[#071936]">
+      <main dir={dir} className="relative overflow-hidden bg-[#F4F1EC] text-[#071936]">
         <section className="relative min-h-[720px] overflow-hidden bg-[#F4F1EC] pt-16 sm:min-h-[785px] sm:pt-[78px]">
           <div className="absolute inset-0 bg-[#F4F1EC]" />
           <div className="pointer-events-none absolute left-[-12%] top-[12%] h-[430px] w-[430px] rounded-full border border-[#071936]/[.035] sm:h-[620px] sm:w-[620px]" />
@@ -101,17 +101,17 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="relative bg-[#071936] pb-20 pt-24 text-white sm:pb-28 sm:pt-32">
-          <div className="pointer-events-none absolute -top-16 left-[-5%] h-32 w-[110%] rounded-[50%] bg-[#071936]" />
-          <div className="relative mx-auto grid max-w-[1480px] gap-10 px-5 sm:px-10 lg:grid-cols-[.72fr_1.8fr] lg:items-center lg:px-16">
+        <section className="relative bg-[#071936] pb-16 pt-20 text-white sm:pb-28 sm:pt-32">
+          <div className="pointer-events-none absolute -top-16 left-[-5%] hidden h-32 w-[110%] rounded-[50%] bg-[#071936] sm:block" />
+          <div className="relative mx-auto grid max-w-[1480px] gap-9 px-5 sm:gap-10 sm:px-10 lg:grid-cols-[.72fr_1.8fr] lg:items-center lg:px-16">
             <div className={isArabic ? "text-right" : "text-left"}>
               <p className="mb-4 text-xs font-bold uppercase tracking-[.16em] text-[#C5B278]">{isArabic ? "خدمات أفق" : "OFOQ SERVICES"}</p>
-              <h2 className="text-4xl font-black leading-[1.2] sm:text-5xl"><span className="block">{copy.servicesTitleOne}</span><span className="block text-[#C5B278]">{copy.servicesTitleTwo}</span></h2>
+              <h2 className="text-[2.7rem] font-black leading-[1.2] tracking-[-.03em] sm:text-5xl"><span className="block">{copy.servicesTitleOne}</span><span className="block text-[#C5B278]">{copy.servicesTitleTwo}</span></h2>
               <p className="mt-5 max-w-xs text-sm leading-7 text-white/60">{copy.servicesDescription}</p>
               <Link to="/services" className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-[#C13229]">{copy.allServices}<span>←</span></Link>
             </div>
 
-            <div className="flex snap-x gap-3 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div dir={dir} className="flex snap-x gap-3 overflow-x-auto px-1 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {services.map((service, index) => {
                 const title = isArabic ? service.ar : service.en;
                 const description = isArabic ? service.descriptionAr : service.descriptionEn;
