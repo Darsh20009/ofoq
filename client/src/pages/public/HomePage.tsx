@@ -86,7 +86,7 @@ export default function HomePage() {
             className="relative z-10 mx-auto block h-[245px] w-full object-cover object-center sm:hidden"
           />
 
-          <div className="absolute bottom-[-1px] left-1/2 z-20 grid w-[calc(100%-2rem)] max-w-[1050px] -translate-x-1/2 grid-cols-2 overflow-hidden rounded-t-[22px] bg-[#071936] text-white sm:grid-cols-4">
+          <div className="relative z-20 mx-auto grid w-[calc(100%-2rem)] max-w-[1050px] grid-cols-2 overflow-hidden rounded-t-[22px] bg-[#071936] text-white sm:absolute sm:bottom-[-1px] sm:left-1/2 sm:mx-0 sm:-translate-x-1/2 sm:grid-cols-4">
             {[
               { value: "98%", label: isArabic ? "نسبة رضا العملاء" : "Client satisfaction", icon: "★" },
               { value: "25,000+", label: isArabic ? "معاملة مكتملة" : "Completed transactions", icon: "✓" },
