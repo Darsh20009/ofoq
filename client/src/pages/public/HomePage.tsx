@@ -59,7 +59,7 @@ export default function HomePage() {
               <img
                 src="/images/ofoq-hero-architecture.png"
                 alt={isArabic ? "أفق الرياض" : "OFOQ Riyadh"}
-                className="absolute inset-0 h-full w-full object-contain object-left-bottom"
+                className="absolute inset-0 h-full w-full object-cover object-left-center"
               />
             </div>
 
