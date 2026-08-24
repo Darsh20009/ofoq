@@ -49,7 +49,7 @@ export default function HomePage() {
         <meta name="description" content={copy.description} />
       </Helmet>
       <main dir={dir} className="relative overflow-hidden bg-[#F4F1EC] text-[#071936]">
-        <section className="relative min-h-[720px] overflow-hidden bg-[#F4F1EC] pt-16 sm:min-h-[785px] sm:pt-[78px]">
+        <section className="relative min-h-0 overflow-hidden bg-[#F4F1EC] pt-16 sm:min-h-[785px] sm:pt-[78px]">
           <div className="absolute inset-0 bg-[#F4F1EC]" />
           <div className="pointer-events-none absolute left-[-12%] top-[12%] h-[430px] w-[430px] rounded-full border border-[#071936]/[.035] sm:h-[620px] sm:w-[620px]" />
           <div className="pointer-events-none absolute left-[4%] top-[30%] h-[260px] w-[260px] rounded-full border border-[#C13229]/[.07]" />
@@ -60,17 +60,17 @@ export default function HomePage() {
             className="pointer-events-none absolute inset-0 hidden h-full w-full object-cover object-center sm:block"
           />
 
-          <div className="relative z-10 mx-auto grid min-h-0 max-w-[1480px] items-center gap-3 px-5 pb-8 [direction:ltr] sm:min-h-[610px] sm:grid-cols-[1.05fr_.95fr] sm:px-10 sm:pb-44 lg:px-16">
-            <div dir={dir} className="order-1 z-10 text-right sm:col-start-2 sm:order-2 sm:pr-8 lg:pr-20">
+          <div className="relative z-10 mx-auto grid min-h-0 max-w-[1480px] items-center gap-3 px-5 pb-7 pt-7 [direction:ltr] sm:min-h-[610px] sm:grid-cols-[1.05fr_.95fr] sm:px-10 sm:pb-44 sm:pt-0 lg:px-16">
+            <div dir={dir} className="order-1 z-10 text-right sm:col-start-2 sm:order-2 sm:pr-8 sm:pt-0 lg:pr-20">
               <p className="mb-5 flex items-center justify-end gap-3 text-[11px] font-bold text-[#C13229] sm:text-sm">
                 {copy.eyebrow}<span className="h-px w-8 bg-[#C13229]" />
               </p>
-              <h1 className="max-w-[580px] text-[clamp(2.35rem,5vw,4.8rem)] font-black leading-[1.14] tracking-[-.045em]">
+              <h1 className="max-w-[580px] text-[2.35rem] font-black leading-[1.14] tracking-[-.045em] sm:text-[clamp(2.35rem,5vw,4.8rem)]">
                 <span className="block whitespace-nowrap">{copy.titleOne}</span>
                 <span className="block whitespace-nowrap">{copy.titleTwo}</span>
               </h1>
-              <p className="mt-6 max-w-[470px] text-base font-semibold leading-8 text-[#071936]/65 sm:text-lg">{copy.description}</p>
-              <div className="mt-8 flex flex-col items-end gap-5 sm:flex-row sm:justify-end">
+              <p className="mt-6 max-w-[345px] text-sm font-semibold leading-8 text-[#071936]/65 sm:max-w-[470px] sm:text-lg">{copy.description}</p>
+              <div className="mt-8 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-end">
                 <Link to="/services" className="inline-flex items-center gap-3 rounded-lg bg-[#071936] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#102b57]">
                   {copy.explore}<span className="text-lg text-[#C5B278]">←</span>
                 </Link>
