@@ -118,16 +118,16 @@ export default function PublicLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-[#2B273F]" dir={isRtl ? "rtl" : "ltr"}>
 
-      {/* ══ الهيدر الثابت — أبيض فوق هيرو الصفحة الرئيسية ═════════ */}
+      {/* ══ الهيدر الثابت — مطابق لتكوين الصفحة الرئيسية ═══════════ */}
       <header
-        className={`fixed top-0 inset-x-0 z-50 flex h-16 items-center justify-between px-6 transition-colors sm:h-[72px] sm:px-10 ${
-          isHomePage ? "bg-white text-[#0B0A35] shadow-[0_1px_0_rgba(11,10,53,.08)]" : "text-white"
+        className={`fixed top-0 inset-x-0 z-50 flex h-[72px] items-center justify-between border-b px-5 transition-colors sm:h-[86px] sm:px-10 lg:px-14 ${
+          isHomePage ? "border-[#071936]/[.08] bg-[#F4F1EC]/95 text-[#071936] backdrop-blur-sm" : "border-white/10 text-white"
         }`}
       >
         {/* الشعار */}
         <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
-          <span className="flex h-9 w-12 items-center justify-center sm:h-10 sm:w-14">
-            <OfoqLogo className="h-7 w-10 sm:h-9 sm:w-12" dark={isHomePage} />
+          <span className="flex h-10 w-12 items-center justify-center sm:h-12 sm:w-14">
+            <OfoqLogo className="h-8 w-11 sm:h-10 sm:w-13" dark={isHomePage} />
           </span>
           <div className="leading-none hidden sm:block">
             <p className={`font-black text-sm ${isHomePage ? "text-[#0B0A35]" : "text-white"}`}>أفق</p>
@@ -135,14 +135,43 @@ export default function PublicLayout() {
           </div>
         </Link>
 
-        {/* أزرار اليمين */}
-        <div className="flex items-center gap-4">
+        {/* التنقل الرئيسي */}
+        <nav className="hidden items-center gap-7 lg:flex xl:gap-10" aria-label={isRtl ? "التنقل الرئيسي" : "Primary navigation"}>
+          {navLinks.map((link, index) => (
+            <Link
+              key={link.href}
+              to={link.href}
+              className={`relative whitespace-nowrap py-7 text-[13px] font-bold transition-colors ${
+                isHomePage ? "text-[#071936]/75 hover:text-[#071936]" : "text-white/70 hover:text-white"
+              } ${isHomePage && index === 0 ? "after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-[#C13229]" : ""}`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* أزرار الإجراءات */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link
+            to="/client/login"
+            className={`hidden rounded-lg border px-4 py-2.5 text-xs font-bold transition-colors sm:inline-flex ${
+              isHomePage ? "border-[#071936] bg-[#071936] text-white hover:bg-[#102b57]" : "border-white/30 text-white"
+            }`}
+          >
+            {isRtl ? "تسجيل الدخول" : "Sign in"}
+          </Link>
+          <Link
+            to="/request"
+            className="hidden rounded-lg bg-[#C13229] px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#a82922] sm:inline-flex"
+          >
+            + {isRtl ? "طلب خدمة" : "Request service"}
+          </Link>
           {/* مبدّل اللغة */}
           <select
             value={lang}
             onChange={(e) => setLang(e.target.value as typeof lang)}
-            className={`bg-transparent text-xs font-bold outline-none cursor-pointer transition-colors ${
-              isHomePage ? "text-[#0B0A35]/75 hover:text-[#0B0A35]" : "text-white/60 hover:text-white"
+            className={`hidden cursor-pointer bg-transparent text-[11px] font-bold outline-none transition-colors md:block ${
+              isHomePage ? "text-[#071936]/65 hover:text-[#071936]" : "text-white/60 hover:text-white"
             }`}
           >
             {langs.map((l) => (
@@ -152,24 +181,12 @@ export default function PublicLayout() {
             ))}
           </select>
 
-          {/* زر بوابة العميل */}
-          <Link
-            to="/client/login"
-            className={`hidden sm:flex text-xs font-bold transition-colors ${
-              isHomePage ? "text-[#0B0A35]/75 hover:text-[#0B0A35]" : "text-white/60 hover:text-white"
-            }`}
-          >
-            {ui.header.clientLogin}
-          </Link>
-
-          {/* زر المزيد */}
+          {/* القائمة على الجوال */}
           <button
             onClick={() => setDrawerOpen(true)}
-            className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-colors ${
-              isHomePage ? "text-[#0B0A35]/80 hover:text-[#0B0A35]" : "text-white/70 hover:text-white"
-            }`}
+            aria-label={isRtl ? "فتح القائمة" : "Open menu"}
+            className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-colors lg:hidden ${isHomePage ? "text-[#071936]/80" : "text-white/70"}`}
           >
-            {ui.header.menu}
             <span className="flex flex-col gap-[5px]">
               <span className="block w-5 h-[1.5px] bg-current" />
               <span className="block w-3 h-[1.5px] bg-current" />
