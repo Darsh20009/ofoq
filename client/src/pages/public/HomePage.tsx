@@ -54,10 +54,10 @@ export default function HomePage() {
           <div className="pointer-events-none absolute left-[-12%] top-[12%] h-[430px] w-[430px] rounded-full border border-[#071936]/[.035] sm:h-[620px] sm:w-[620px]" />
           <div className="pointer-events-none absolute left-[4%] top-[30%] h-[260px] w-[260px] rounded-full border border-[#C13229]/[.07]" />
 
-          <div className="relative z-10 mx-auto grid min-h-[610px] max-w-[1480px] items-center gap-3 px-5 pb-40 sm:grid-cols-[1.05fr_.95fr] sm:px-10 sm:pb-44 lg:px-16">
+          <div className="relative z-10 mx-auto grid min-h-[610px] max-w-[1480px] items-center gap-3 px-5 pb-40 [direction:ltr] sm:grid-cols-[1.05fr_.95fr] sm:px-10 sm:pb-44 lg:px-16">
             <div className="relative order-2 h-[355px] sm:order-1 sm:h-[545px]">
               <div className="absolute bottom-0 left-1/2 h-[90%] w-[84%] -translate-x-1/2 overflow-hidden rounded-t-[47%] border-[16px] border-[#071936] bg-[#d8d4cd] sm:w-[76%] sm:border-[27px]">
-                <img src="/attached_assets/Screenshot_1448-03-11_at_7.34.53_PM_1787589296314.png" alt={isArabic ? "أفق الرياض" : "OFOQ Riyadh"} className="h-full w-full object-cover object-center" />
+                <img src="/images/ofoq-hero-architecture.png" alt={isArabic ? "أفق الرياض" : "OFOQ Riyadh"} className="h-full w-full object-cover object-center" />
                 <div className="absolute inset-0 bg-[#071936]/[.06]" />
               </div>
               <div className="absolute bottom-0 left-1/2 h-[84%] w-[69%] -translate-x-1/2 rounded-t-[43%] border-x-2 border-[#C13229]/75" />
@@ -65,7 +65,7 @@ export default function HomePage() {
               <div className="absolute bottom-8 left-[3%] h-36 w-20 rounded-t-[80px] border-l-[12px] border-t-[12px] border-[#e6e0d7] sm:h-56 sm:w-28" />
             </div>
 
-            <div className="order-1 z-10 text-right sm:order-2 sm:pr-8 lg:pr-20">
+            <div dir={dir} className="order-1 z-10 text-right sm:order-2 sm:pr-8 lg:pr-20">
               <p className="mb-5 flex items-center justify-end gap-3 text-[11px] font-bold text-[#C13229] sm:text-sm">
                 {copy.eyebrow}<span className="h-px w-8 bg-[#C13229]" />
               </p>

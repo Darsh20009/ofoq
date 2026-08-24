@@ -74,7 +74,24 @@ export default function PublicLayout() {
   const { lang, setLang, langs, ui } = useLang();
   const isRtl = lang === "ar" || lang === "ur";
   const isHomePage = pathname === "/";
-  const navLinks = NAV_HREFS.map((href, i) => ({ href, label: (ui.header.nav ?? [])[i] ?? href }));
+  const homeNavLinks = isRtl
+    ? [
+        { href: "/", label: "الرئيسية" },
+        { href: "/services", label: "خدماتنا" },
+        { href: "/blog", label: "المركز المعرفي" },
+        { href: "/packages", label: "الباقات" },
+        { href: "/about", label: "عن أفق" },
+        { href: "/contact", label: "تواصل معنا" },
+      ]
+    : [
+        { href: "/", label: "Home" },
+        { href: "/services", label: "Our services" },
+        { href: "/blog", label: "Knowledge center" },
+        { href: "/packages", label: "Packages" },
+        { href: "/about", label: "About OFOQ" },
+        { href: "/contact", label: "Contact us" },
+      ];
+  const navLinks = isHomePage ? homeNavLinks : NAV_HREFS.map((href, i) => ({ href, label: (ui.header.nav ?? [])[i] ?? href }));
 
   /* إغلاق الـ drawer عند تغيير الصفحة */
   useEffect(() => {
