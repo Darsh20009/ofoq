@@ -185,29 +185,33 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
                       </td>
                       <td><span className={s.color}>{s.label}</span></td>
                       <td>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                         <div className="flex flex-wrap items-center gap-1 opacity-100">
                           {inv.status === "draft" && (
                             <button onClick={() => sendMut.mutate(inv._id)}
-                               className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600" title={copy.send}>
+                               className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50" title={copy.send}>
                               <Send size={14} />
+                              <span className="hidden lg:inline">{isQuotation ? (lang === "ar" ? "إرسال العرض" : "Send quotation") : copy.send}</span>
                             </button>
                           )}
                            {!isQuotation && ["sent", "viewed", "overdue"].includes(inv.status) && (
                             <button onClick={() => paidMut.mutate(inv._id)}
-                               className="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600" title={copy.markPaid}>
+                               className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-emerald-600 hover:bg-emerald-50" title={copy.markPaid}>
                               <CheckCircle size={14} />
+                               <span className="hidden lg:inline">{copy.markPaid}</span>
                             </button>
                           )}
                            {isQuotation && ["sent", "viewed"].includes(inv.status) && (
                              <button onClick={() => { if (confirm(lang === "ar" ? "تأكيد اعتماد عرض السعر؟" : "Confirm quotation acceptance?")) acceptMut.mutate(inv._id); }}
-                               className="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600" title={lang === "ar" ? "اعتماد العرض" : "Accept quotation"}>
+                               className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-emerald-600 hover:bg-emerald-50" title={lang === "ar" ? "اعتماد العرض" : "Accept quotation"}>
                                <CheckCircle size={14} />
+                               <span className="hidden lg:inline">{lang === "ar" ? "اعتماد العرض" : "Accept"}</span>
                              </button>
                            )}
                            {isQuotation && inv.status === "accepted" && (
                              <button onClick={() => { if (confirm(lang === "ar" ? "تحويل عرض السعر إلى فاتورة؟" : "Convert this quotation to an invoice?")) convertMut.mutate(inv._id); }}
-                               className="p-1.5 rounded-lg hover:bg-emerald-50 text-gray-400 hover:text-emerald-600" title={lang === "ar" ? "تحويل إلى فاتورة" : "Convert to invoice"}>
+                                className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-emerald-600 hover:bg-emerald-50" title={lang === "ar" ? "تحويل إلى فاتورة" : "Convert to invoice"}>
                                <FileText size={14} />
+                               <span className="hidden lg:inline">{lang === "ar" ? "تحويل إلى فاتورة" : "Convert"}</span>
                              </button>
                            )}
                           <button onClick={() => downloadPdf(inv._id, inv.invoiceNumber)}

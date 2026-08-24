@@ -16,6 +16,7 @@ import OfoqLogo from "../components/OfoqLogo";
 import { useLang } from "../i18n/LangContext";
 import NotificationPermissionModal from "../components/NotificationPermissionModal";
 import LanguageSwitcher from "../components/LanguageSwitcher";
+import AdminPageGuide from "../components/admin/AdminPageGuide";
 
 interface NavItem {
   href?: string;
@@ -382,6 +383,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
 
         {/* Page content */}
         <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
+          <AdminPageGuide />
           <Outlet />
         </main>
       </div>
