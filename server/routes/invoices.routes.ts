@@ -71,7 +71,9 @@ async function generateInvoiceNumber(prefix = "INV", session?: mongoose.ClientSe
   const initialSequence = Number(String(latest?.invoiceNumber || "").split("-").pop() || 0);
   const result: any = await mongoose.connection.collection<{ _id: string; sequence: number }>("document_counters").findOneAndUpdate(
     { _id: `${prefix}:${year}` },
-    { $setOnInsert: { sequence: initialSequence }, $inc: { sequence: 1 } },
+    // Do not combine $setOnInsert and $inc on the same path. MongoDB rejects
+    // that combination as a conflicting update operator during upsert.
+    { $inc: { sequence: 1 } },
     { upsert: true, returnDocument: "after", session },
   );
   const sequence = Number(result?.value?.sequence ?? result?.sequence);
