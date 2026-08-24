@@ -141,12 +141,12 @@ const SERVICE_CARD_THEMES = [
   },
   {
     dark: false,
-    card: "bg-[#F9F8F3] text-[#2B273F]",
-    overlay: "bg-gradient-to-b from-white/82 via-[#F9F8F3]/84 to-[#F9F8F3]/98",
-    badge: "border-[#2B273F]/15 bg-white text-[#33B27C]",
-    number: "text-[#33B27C]",
-    copy: "text-[#2B273F]/70",
-    action: "border border-[#2B273F]/15 bg-white text-[#2B273F]",
+    card: "bg-[#F7F4EE] text-[#101B4C] ring-2 ring-[#C5B278]",
+    overlay: "bg-gradient-to-b from-white/88 via-[#F7F4EE]/92 to-[#F7F4EE]/98",
+    badge: "border-[#101B4C]/15 bg-white text-[#C13229]",
+    number: "text-[#C13229]",
+    copy: "text-[#101B4C]/70",
+    action: "border border-[#101B4C]/15 bg-[#C13229] text-white",
   },
   {
     dark: true,
@@ -159,12 +159,12 @@ const SERVICE_CARD_THEMES = [
   },
   {
     dark: false,
-    card: "bg-[#E5FE04] text-[#2B273F]",
-    overlay: "bg-gradient-to-b from-[#E5FE04]/55 via-[#E5FE04]/78 to-[#E5FE04]/96",
-    badge: "border-[#2B273F]/15 bg-white/70 text-[#2B273F]",
-    number: "text-[#2B273F]",
-    copy: "text-[#2B273F]/75",
-    action: "bg-[#2B273F] text-white",
+    card: "bg-[#172951] text-white",
+    overlay: "bg-gradient-to-b from-[#172951]/30 via-[#172951]/68 to-[#101B4C]/98",
+    badge: "border-white/20 bg-white/10 text-[#C5B278]",
+    number: "text-[#C5B278]",
+    copy: "text-white/75",
+    action: "bg-white text-[#101B4C]",
   },
 ] as const;
 
@@ -254,70 +254,83 @@ export default function HomePage() {
             HERO — OFOQ reference: deep blue field, warm wireframe,
             directional light, and a white header provided by the layout.
         ════════════════════════════════════════════════════════ */}
-        <section className="relative isolate flex min-h-dvh overflow-hidden bg-[#2B273F] pt-16 sm:pt-[72px]">
-          <div className="absolute inset-0 bg-[#2B273F]" />
+        <section className="relative isolate min-h-[760px] overflow-hidden bg-[#F4F1EC] pt-16 text-[#101B4C] sm:min-h-[780px] sm:pt-[72px]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_25%,rgba(255,255,255,.95),transparent_42%),linear-gradient(120deg,#eee9e1,#faf9f6_58%,#eeeae3)]" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-[#101B4C]/10 to-transparent" />
 
-          {/* The creative mark belongs to the hero itself; it is not fixed to the viewport. */}
-          <motion.div
-            aria-hidden="true"
-            initial={{ opacity: 0, scale: 0.94 }}
-            animate={{ opacity: 0.13, scale: 1 }}
-            transition={{ duration: 1.1, delay: 0.2, ease }}
-            className={`pointer-events-none absolute bottom-[-8%] z-[1] ${
-              isRtl ? "left-[-13%] sm:left-[-4%]" : "right-[-13%] sm:right-[-4%]"
-            }`}
-          >
-            <OfoqLogo className="relative h-[300px] w-[430px] sm:h-[390px] sm:w-[560px]" />
-          </motion.div>
+          <div className="relative z-10 mx-auto grid min-h-[680px] w-full max-w-7xl items-center gap-4 px-5 pb-36 pt-16 sm:grid-cols-2 sm:px-10 sm:pb-40 sm:pt-20">
+            <motion.div
+              initial={{ opacity: 0, x: isRtl ? -30 : 30 }}
+              animate={splashDone ? { opacity: 1, x: 0 } : { opacity: 0, x: isRtl ? -30 : 30 }}
+              transition={{ duration: 0.8, ease }}
+              className={`order-2 flex justify-center sm:order-1 ${isRtl ? "sm:justify-start" : "sm:justify-end"}`}
+            >
+              <div className="relative h-[360px] w-[min(88vw,520px)] sm:h-[515px]">
+                <div className="absolute inset-x-0 bottom-0 h-[73%] overflow-hidden rounded-t-[48%] border-[24px] border-[#101B4C] bg-[#DAD7D0] shadow-[inset_0_0_0_2px_#C13229] sm:border-[34px]">
+                  <img src="/images/hero-riyadh-towers.jpg" alt="" className="h-full w-full object-cover object-center opacity-85" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#101B4C]/45 via-transparent to-white/10" />
+                </div>
+                <div className="absolute inset-x-[13%] bottom-0 h-[66%] border-x-2 border-[#C13229]/80" />
+                <div className="absolute bottom-0 left-1/2 h-5 w-1 -translate-x-1/2 bg-[#101B4C]" />
+              </div>
+            </motion.div>
 
-          <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center px-6 py-20 sm:px-10 sm:py-24">
             <motion.div
               initial="hidden"
               animate={splashDone ? "show" : "hidden"}
               variants={stagger}
-              className={`w-full max-w-2xl ${isRtl ? "mr-auto text-right sm:mr-0 sm:pr-[7%]" : "ml-auto text-left sm:ml-0 sm:pl-[7%]"}`}
+              className={`order-1 w-full max-w-xl sm:order-2 ${isRtl ? "text-right sm:pr-[7%]" : "text-left sm:pl-[7%]"}`}
             >
-              <motion.p variants={fadeUp} className="mb-6 text-[10px] font-bold uppercase tracking-[.28em] text-[#E5FE04]">
+              <motion.p variants={fadeUp} className="mb-5 flex items-center gap-3 text-xs font-black text-[#C13229]">
+                <span className="h-px w-10 bg-[#C13229]" />
                 {ui.home.badge}
               </motion.p>
 
               <motion.h1
                 variants={fadeUp}
-                className="text-[clamp(3.1rem,7vw,6.8rem)] font-medium leading-[1.12] tracking-[-.045em]"
+                className="max-w-lg text-[clamp(2.8rem,6vw,5.5rem)] font-black leading-[1.16] tracking-[-.04em]"
               >
-                <span className="block text-white">{ui.home.hero1}</span>
-                <span className="block font-black text-[#E5FE04]">
+                <span className="block">{ui.home.hero1}</span>
+                <span className="block text-[#C13229]">
                   {ui.home.hero2}
                   {ui.home.hero3 ? ` ${ui.home.hero3}` : ""}
                 </span>
               </motion.h1>
 
-              <motion.p variants={fadeUp} className="mt-8 max-w-xl text-base leading-9 text-white/80 sm:text-lg">
+              <motion.p variants={fadeUp} className="mt-7 max-w-lg text-base font-semibold leading-8 text-[#101B4C]/70 sm:text-lg">
                 {ui.home.heroSub}
               </motion.p>
 
               <motion.div variants={fadeUp} className="mt-9 flex flex-wrap items-center gap-5">
                 <Link
                   to="/services"
-                  className="group inline-flex items-center gap-3 rounded-full bg-white py-2.5 pl-6 pr-3 text-sm font-extrabold text-[#2B273F] shadow-[0_12px_30px_rgba(0,0,0,.2)] transition-all duration-300 hover:-translate-y-0.5"
+                  className="group inline-flex items-center gap-3 rounded-full bg-[#101B4C] py-2.5 pl-6 pr-3 text-sm font-extrabold text-white transition-all duration-300 hover:bg-[#1C2B6E]"
                 >
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#33B27C] text-xl font-normal text-white transition-transform duration-300 group-hover:translate-x-0.5">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#C13229] text-xl font-normal text-white">
                     {isRtl ? "←" : "→"}
                   </span>
                   {ui.home.explore}
                 </Link>
                 <Link
                   to="/request"
-                  className="text-sm font-bold text-white/75 underline decoration-white/35 underline-offset-8 transition-colors hover:text-white"
+                  className="text-sm font-bold text-[#101B4C]/75 underline decoration-[#C13229]/50 underline-offset-8 transition-colors hover:text-[#C13229]"
                 >
                   {ui.home.request}
                 </Link>
               </motion.div>
             </motion.div>
 
-            <p className={`absolute bottom-8 ${isRtl ? "right-6 sm:right-10" : "left-6 sm:left-10"} text-[9px] tracking-[.38em] text-white/28 uppercase`}>
+            <p className={`absolute bottom-8 ${isRtl ? "right-6 sm:right-10" : "left-6 sm:left-10"} text-[9px] tracking-[.28em] text-[#101B4C]/35 uppercase`}>
               OFOQHC.COM
             </p>
+          </div>
+          <div className="absolute bottom-[-1px] left-1/2 z-20 grid w-[calc(100%-2rem)] max-w-5xl -translate-x-1/2 grid-cols-2 overflow-hidden rounded-t-3xl bg-[#101B4C] text-white shadow-[0_-10px_28px_rgba(16,27,76,.16)] sm:grid-cols-4">
+            {["8+", "1,250+", "25,000+", "98%"].map((value, index) => (
+              <div key={value} className="flex items-center gap-3 border-white/10 px-4 py-5 first:border-0 sm:border-s sm:px-7 sm:py-6">
+                <span className="text-2xl font-black text-[#C5B278] sm:text-3xl">{value}</span>
+                <span className="text-[10px] leading-4 text-white/60">{ui.home.stats[index]}</span>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -525,15 +538,15 @@ export default function HomePage() {
         {/* ════════════════════════════════════════════════════════
             SERVICES — OFOQ editorial cards
         ════════════════════════════════════════════════════════ */}
-        <section className="relative overflow-hidden bg-[#2B273F] text-white">
+        <section className="relative overflow-hidden bg-[#101B4C] text-white">
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/10" />
-          <div className="relative mx-auto max-w-6xl px-6 py-24 sm:px-10 sm:py-32">
+          <div className="relative mx-auto max-w-7xl px-5 py-16 sm:px-10 sm:py-20">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "0px 0px -80px 0px" }}
               transition={{ duration: 0.8, ease }}
-              className="mx-auto flex max-w-xl flex-col items-center text-center"
+              className={`mx-auto flex max-w-5xl flex-col ${isRtl ? "items-end text-right" : "items-start text-left"}`}
             >
               <p className="text-xs font-black tracking-[.18em] text-[#33B27C] sm:text-sm">
                 {ui.services.areaBadge}
@@ -567,9 +580,9 @@ export default function HomePage() {
                   className={`pointer-events-none absolute inset-y-0 w-px bg-white/90 ${isRtl ? "right-1/2 origin-right" : "left-1/2 origin-left"}`}
                 />
               </div>
-              <h2 className="mt-8 text-4xl font-black leading-[1.12] tracking-[-.045em] sm:text-6xl">
-                {ui.services.choose}
-                <span className="mt-1 block text-[#E5FE04]">{ui.services.yourService}</span>
+              <h2 className="mt-8 max-w-2xl text-4xl font-black leading-[1.12] tracking-[-.045em] sm:text-6xl">
+                {ui.home.servicesTitle1}
+                <span className="mt-1 block text-[#C5B278]">{ui.home.servicesTitle2}</span>
               </h2>
               <Link
                 to="/services"
