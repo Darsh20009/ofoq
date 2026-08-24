@@ -187,7 +187,7 @@ export default function PublicLayout() {
           <select
             value={lang}
             onChange={(e) => setLang(e.target.value as typeof lang)}
-            className={`hidden cursor-pointer bg-transparent text-[11px] font-bold outline-none transition-colors md:block ${
+            className={`hidden cursor-pointer bg-transparent text-[11px] font-bold outline-none transition-colors md:block ${isHomePage ? "!hidden" : ""} ${
               isHomePage ? "text-[#071936]/65 hover:text-[#071936]" : "text-white/60 hover:text-white"
             }`}
           >

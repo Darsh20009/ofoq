@@ -56,22 +56,20 @@ export default function HomePage() {
 
           <div className="relative z-10 mx-auto grid min-h-[610px] max-w-[1480px] items-center gap-3 px-5 pb-40 [direction:ltr] sm:grid-cols-[1.05fr_.95fr] sm:px-10 sm:pb-44 lg:px-16">
             <div className="relative order-2 h-[355px] sm:order-1 sm:h-[545px]">
-              <div className="absolute bottom-0 left-1/2 h-[90%] w-[84%] -translate-x-1/2 overflow-hidden rounded-t-[47%] border-[16px] border-[#071936] bg-[#d8d4cd] sm:w-[76%] sm:border-[27px]">
-                <img src="/images/ofoq-hero-architecture.png" alt={isArabic ? "أفق الرياض" : "OFOQ Riyadh"} className="h-full w-full object-cover object-center" />
-                <div className="absolute inset-0 bg-[#071936]/[.06]" />
-              </div>
-              <div className="absolute bottom-0 left-1/2 h-[84%] w-[69%] -translate-x-1/2 rounded-t-[43%] border-x-2 border-[#C13229]/75" />
-              <div className="absolute bottom-[-2px] left-1/2 h-5 w-1 -translate-x-1/2 bg-[#071936]" />
-              <div className="absolute bottom-8 left-[3%] h-36 w-20 rounded-t-[80px] border-l-[12px] border-t-[12px] border-[#e6e0d7] sm:h-56 sm:w-28" />
+              <img
+                src="/images/ofoq-hero-architecture.png"
+                alt={isArabic ? "أفق الرياض" : "OFOQ Riyadh"}
+                className="absolute inset-0 h-full w-full object-contain object-left-bottom"
+              />
             </div>
 
             <div dir={dir} className="order-1 z-10 text-right sm:order-2 sm:pr-8 lg:pr-20">
               <p className="mb-5 flex items-center justify-end gap-3 text-[11px] font-bold text-[#C13229] sm:text-sm">
                 {copy.eyebrow}<span className="h-px w-8 bg-[#C13229]" />
               </p>
-              <h1 className="max-w-[580px] text-[clamp(3rem,6vw,6.2rem)] font-black leading-[1.13] tracking-[-.045em]">
-                <span className="block">{copy.titleOne}</span>
-                <span className="block">{copy.titleTwo}</span>
+              <h1 className="max-w-[580px] text-[clamp(2.6rem,5vw,4.8rem)] font-black leading-[1.14] tracking-[-.045em]">
+                <span className="block whitespace-nowrap">{copy.titleOne}</span>
+                <span className="block whitespace-nowrap">{copy.titleTwo}</span>
               </h1>
               <p className="mt-6 max-w-[470px] text-base font-semibold leading-8 text-[#071936]/65 sm:text-lg">{copy.description}</p>
               <div className="mt-8 flex flex-wrap items-center justify-end gap-5">
