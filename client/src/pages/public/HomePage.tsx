@@ -64,24 +64,24 @@ export default function HomePage() {
         <meta name="description" content={copy.description} />
       </Helmet>
       <main dir={dir} className="relative overflow-hidden bg-[#F4F1EC] text-[#071936]">
-        <section className="relative min-h-0 overflow-hidden bg-[#F4F1EC] pt-16 sm:min-h-[785px] sm:pt-[78px]">
+        <section className="relative min-h-[625px] overflow-hidden bg-[#F4F1EC] pt-16 sm:min-h-[690px] sm:pt-[78px] lg:min-h-[735px]">
           <div className="absolute inset-0 bg-[#F4F1EC]" />
           <div className="pointer-events-none absolute left-[-12%] top-[12%] h-[430px] w-[430px] rounded-full border border-[#071936]/[.035] sm:h-[620px] sm:w-[620px]" />
           <div className="pointer-events-none absolute left-[4%] top-[30%] h-[260px] w-[260px] rounded-full border border-[#C13229]/[.07]" />
           <img
-            src="/images/ofoq-hero-architecture.png"
+            src="/images/ofoq-hero-reference.png"
             alt=""
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 hidden h-full w-full object-cover object-center sm:block"
           />
           <img
-            src="/images/ofoq-hero-architecture-mobile.png"
+            src="/images/ofoq-hero-reference-mobile.png"
             alt=""
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 block h-full w-full object-cover object-center sm:hidden"
           />
 
-          <div className="relative z-10 mx-auto grid min-h-0 max-w-[1480px] items-center gap-3 px-5 pb-7 pt-7 [direction:ltr] sm:min-h-[610px] sm:grid-cols-[1.05fr_.95fr] sm:px-10 sm:pb-44 sm:pt-0 lg:px-16">
+          <div className="relative z-10 mx-auto grid min-h-[520px] max-w-[1480px] items-center gap-3 px-5 pb-24 pt-10 [direction:ltr] sm:min-h-[610px] sm:grid-cols-[1.05fr_.95fr] sm:px-10 sm:pb-44 sm:pt-0 lg:px-16">
             <div dir={dir} className="order-1 z-10 text-right sm:col-start-2 sm:order-2 sm:pr-8 sm:pt-0 lg:pr-20">
               <p className="mb-5 flex items-center justify-end gap-3 text-[11px] font-bold text-[#C13229] sm:text-sm">
                 {copy.eyebrow}<span className="h-px w-8 bg-[#C13229]" />
@@ -116,7 +116,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="relative bg-[#071936] pb-16 pt-20 text-white sm:pb-28 sm:pt-32">
+        <section className="relative bg-[#071936] pb-10 pt-14 text-white sm:pb-20 sm:pt-24">
           <div className="pointer-events-none absolute -top-16 left-[-5%] hidden h-32 w-[110%] rounded-[50%] bg-[#071936] sm:block" />
           <div className="relative mx-auto grid max-w-[1480px] gap-9 px-5 sm:gap-10 sm:px-10 lg:grid-cols-[.72fr_1.8fr] lg:items-center lg:px-16">
             <div className={isArabic ? "text-right" : "text-left"}>
@@ -142,6 +142,35 @@ export default function HomePage() {
                 );
               })}
               <button aria-label={isArabic ? "الخدمات التالية" : "Next services"} className="my-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 text-xl text-white/80">‹</button>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-[#071936] px-5 pb-16 text-white sm:px-10 sm:pb-24 lg:px-16">
+          <div className="mx-auto grid max-w-[1380px] items-center gap-8 overflow-hidden rounded-[28px] border border-white/10 bg-[#122846] px-6 py-8 sm:px-10 lg:grid-cols-[1.1fr_.9fr] lg:px-14 lg:py-10">
+            <div className="order-2 text-right lg:order-1">
+              <p className="mb-3 text-xs font-bold text-[#C5B278]">{isArabic ? "بوابة أفق الذكية" : "OFOQ SMART PORTAL"}</p>
+              <h2 className="max-w-lg text-3xl font-black leading-[1.35] sm:text-4xl">
+                {isArabic ? "لإدارة أعمالك بسهولة" : "Manage your business with ease"}
+              </h2>
+              <p className="mt-4 max-w-lg text-sm leading-7 text-white/60">
+                {isArabic ? "منصة رقمية متكاملة تمنحك رؤية واضحة وتحكمًا كاملًا في خدماتك ومعاملاتك." : "An integrated digital platform giving you complete visibility and control over your services and transactions."}
+              </p>
+              <ul className="mt-6 space-y-3 text-sm text-white/75">
+                {(isArabic
+                  ? ["متابعة الطلبات والمعاملات أولًا بأول", "مستنداتك وفواتيرك في مكان واحد", "تقارير ذكية تساعدك على اتخاذ القرار"]
+                  : ["Track requests and transactions in real time", "Keep documents and invoices in one place", "Smart reports to help you decide"]).map((item) => (
+                  <li key={item} className="flex items-center justify-end gap-3">
+                    <span>{item}</span><span className="flex h-5 w-5 items-center justify-center rounded-full border border-[#C5B278] text-[10px] text-[#C5B278]">✓</span>
+                  </li>
+                ))}
+              </ul>
+              <Link to="/client/login" className="mt-7 inline-flex rounded-lg bg-[#C5B278] px-5 py-3 text-sm font-bold text-[#071936] transition-colors hover:bg-white">
+                {isArabic ? "الدخول إلى البوابة" : "Open the portal"}
+              </Link>
+            </div>
+            <div className="order-1 flex justify-center lg:order-2 lg:justify-start">
+              <img src="/images/ofoq-client-portal-dashboard.png" alt={isArabic ? "لوحة بوابة أفق" : "OFOQ portal dashboard"} className="max-h-[330px] w-auto rounded-xl object-contain shadow-2xl sm:max-h-[390px]" />
             </div>
           </div>
         </section>
