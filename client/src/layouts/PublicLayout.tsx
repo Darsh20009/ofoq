@@ -251,10 +251,10 @@ export default function PublicLayout() {
               animate={{ x: 0 }}
               exit={{ x: isRtl ? -420 : 420 }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className={`fixed top-0 ${isRtl ? "left-0" : "right-0"} h-full w-80 sm:w-96 z-[80] bg-[#1a1726] flex flex-col overflow-y-auto`}
+              className={`fixed ${isHomePage ? "top-[72px] h-[calc(100%-72px)] sm:top-[86px] sm:h-[calc(100%-86px)] bg-[#1a1726]/90 backdrop-blur-xl" : "top-0 h-full bg-[#1a1726]"} ${isRtl ? "left-0" : "right-0"} z-[80] flex w-80 flex-col overflow-y-auto border-white/10 sm:w-96 ${isHomePage ? "border-t" : ""}`}
             >
               {/* رأس الـ Drawer */}
-              <div className="flex items-center justify-between px-8 py-6 border-b border-white/8">
+              <div className={`flex items-center justify-between px-8 py-6 border-b border-white/8 ${isHomePage ? "hidden" : ""}`}>
                 <Link to="/" onClick={() => setDrawerOpen(false)} className="flex items-center gap-2.5">
                   <OfoqLogo className="w-10 h-7" />
                   <div className="leading-none">
@@ -273,7 +273,7 @@ export default function PublicLayout() {
               </div>
 
               {/* الموقع — تسامي style */}
-              <div className="px-8 py-8 border-b border-white/8 flex items-start gap-5">
+              <div className={`px-8 py-8 border-b border-white/8 flex items-start gap-5 ${isHomePage ? "hidden" : ""}`}>
                 <OfoqDecoration className="w-14 h-16 flex-shrink-0 opacity-70 mt-1" />
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-[.25em] text-[#33B27C] mb-1.5">
@@ -289,7 +289,7 @@ export default function PublicLayout() {
               </div>
 
               {/* روابط التنقل */}
-              <nav className="px-8 py-6 flex-1">
+              <nav className={`px-8 flex-1 ${isHomePage ? "py-7" : "py-6"}`}>
                 <p className="text-[10px] font-bold uppercase tracking-[.2em] text-white/30 mb-5">
                   {isRtl ? "الصفحات" : "Navigation"}
                 </p>
