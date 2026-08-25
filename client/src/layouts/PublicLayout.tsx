@@ -201,6 +201,22 @@ export default function PublicLayout() {
             ))}
           </select>
 
+          {/* مبدّل اللغة على الجوال */}
+          <select
+            value={lang}
+            onChange={(e) => setLang(e.target.value as typeof lang)}
+            aria-label={isRtl ? "اختيار اللغة" : "Select language"}
+            className={`block cursor-pointer appearance-none bg-transparent px-1 text-[10px] font-bold outline-none transition-colors md:hidden ${
+              isHomePage ? "text-[#071936]/70" : "text-white/70"
+            }`}
+          >
+            {langs.map((l) => (
+              <option key={l.code} value={l.code} className="bg-white text-[#0B0A35]">
+                {l.code.toUpperCase()}
+              </option>
+            ))}
+          </select>
+
           {/* القائمة على الجوال */}
           <button
             onClick={() => setDrawerOpen(true)}
