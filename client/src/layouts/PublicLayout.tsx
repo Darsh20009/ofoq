@@ -141,7 +141,7 @@ export default function PublicLayout() {
       {/* ══ الهيدر الثابت — مطابق لتكوين الصفحة الرئيسية ═══════════ */}
       <header
         className={`fixed top-0 inset-x-0 z-50 flex h-[72px] items-center justify-between border-b px-5 transition-colors sm:h-[86px] sm:px-10 lg:px-14 ${
-          isHomePage ? "border-[#071936]/[.08] bg-[#F4F1EC]/95 text-[#071936] backdrop-blur-sm" : "border-white/10 text-white"
+          isHomePage ? "border-transparent bg-transparent text-[#071936]" : "border-white/10 text-white"
         }`}
       >
         {/* الشعار */}
