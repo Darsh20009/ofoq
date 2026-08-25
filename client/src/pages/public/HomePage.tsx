@@ -1,9 +1,11 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { useLang } from "../../i18n/LangContext";
+import { servicesCatalog } from "../../data/servicesCatalog";
 
 type Service = {
   number: string;
+  href: string;
   ar: string;
   en: string;
   descriptionAr: string;
@@ -12,11 +14,23 @@ type Service = {
 };
 
 const services: Service[] = [
-  { number: "01", ar: "تأسيس الشركات", en: "Company formation", descriptionAr: "من الفكرة إلى كيان عامل، ننسّق خطوات التأسيس.", descriptionEn: "From idea to operating entity, we coordinate every step.", icon: "building" },
-  { number: "02", ar: "خدمات التأشيرات", en: "Visa services", descriptionAr: "حلول متكاملة لتأشيرات المستثمرين والموظفين.", descriptionEn: "Integrated solutions for investor and employee visas.", icon: "passport" },
-  { number: "03", ar: "الخدمات الحكومية", en: "Government services", descriptionAr: "نتابع معاملاتك الحكومية بوضوح وسرعة.", descriptionEn: "We manage your government transactions clearly and quickly.", icon: "government" },
-  { number: "04", ar: "الموارد البشرية", en: "Human resources", descriptionAr: "إدارة مواردك البشرية لدعم نمو أعمالك.", descriptionEn: "Human resource management that supports your growth.", icon: "people" },
+  { number: "01", href: "/services/formation", ar: "تأسيس الشركات", en: "Company formation", descriptionAr: "من الفكرة إلى كيان عامل، ننسّق خطوات التأسيس.", descriptionEn: "From idea to operating entity, we coordinate every step.", icon: "building" },
+  { number: "02", href: "/services/visas", ar: "خدمات التأشيرات", en: "Visa services", descriptionAr: "حلول متكاملة لتأشيرات المستثمرين والموظفين.", descriptionEn: "Integrated solutions for investor and employee visas.", icon: "passport" },
+  { number: "03", href: "/services/government", ar: "الخدمات الحكومية", en: "Government services", descriptionAr: "نتابع معاملاتك الحكومية بوضوح وسرعة.", descriptionEn: "We manage your government transactions clearly and quickly.", icon: "government" },
+  { number: "04", href: "/services/business", ar: "الموارد البشرية", en: "Human resources", descriptionAr: "إدارة مواردك البشرية لدعم نمو أعمالك.", descriptionEn: "Human resource management that supports your growth.", icon: "people" },
 ];
+
+const catalogServices: Service[] = servicesCatalog.flatMap((category) =>
+  category.services.map((service, index) => ({
+    number: "",
+    href: `/services/${category.slug}/${service.slug}`,
+    ar: service.title.ar,
+    en: service.title.en,
+    descriptionAr: service.desc.ar,
+    descriptionEn: service.desc.en,
+    icon: category.slug === "formation" ? "building" : category.slug === "visas" ? "passport" : category.slug === "government" ? "government" : category.slug === "people" ? "people" : index % 2 ? "passport" : "building",
+  })),
+);
 
 function LineIcon({ type, className = "" }: { type: string; className?: string }) {
   const common = { fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
@@ -41,6 +55,7 @@ export default function HomePage() {
     servicesTitleTwo: isArabic ? "في مكان واحد" : "in one place",
     servicesDescription: isArabic ? "من التأسيس إلى التشغيل، نوفر لك كل ما تحتاجه لنمو أعمالك بثقة ووضوح." : "From formation to operations, everything you need to grow with confidence and clarity.",
   };
+  const allServices = [...services, ...catalogServices];
 
   return (
     <>
@@ -112,13 +127,13 @@ export default function HomePage() {
             </div>
 
             <div dir={dir} className="flex snap-x gap-3 overflow-x-auto px-1 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {services.map((service, index) => {
+              {allServices.map((service, index) => {
                 const title = isArabic ? service.ar : service.en;
                 const description = isArabic ? service.descriptionAr : service.descriptionEn;
-                const active = index === services.length - 1;
+                const active = index === allServices.length - 1;
                 return (
-                  <Link to={`/services/${service.icon}`} key={service.number} className={`group relative min-w-[220px] snap-start rounded-xl border p-5 transition-transform hover:-translate-y-1 sm:min-w-[235px] sm:p-6 ${active ? "border-[#C5B278] bg-[#F4F1EC] text-[#071936]" : "border-white/10 bg-[#0d2548] text-white"}`}>
-                    <span className={`text-sm font-bold ${active ? "text-[#C13229]" : "text-[#C5B278]"}`}>{service.number}</span>
+                  <Link to={service.href} key={service.href} className={`group relative min-w-[220px] snap-start rounded-xl border p-5 transition-transform hover:-translate-y-1 sm:min-w-[235px] sm:p-6 ${active ? "border-[#C5B278] bg-[#F4F1EC] text-[#071936]" : "border-white/10 bg-[#0d2548] text-white"}`}>
+                    <span className={`text-sm font-bold ${active ? "text-[#C13229]" : "text-[#C5B278]"}`}>{String(index + 1).padStart(2, "0")}</span>
                     <LineIcon type={service.icon} className={`my-12 h-12 w-12 ${active ? "text-[#C13229]" : "text-[#C5B278]"}`} />
                     <h3 className="text-lg font-black">{title}</h3>
                     <p className={`mt-3 min-h-12 text-xs leading-6 ${active ? "text-[#071936]/60" : "text-white/55"}`}>{description}</p>
