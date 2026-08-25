@@ -59,6 +59,12 @@ export default function HomePage() {
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 hidden h-full w-full object-cover object-center sm:block"
           />
+          <img
+            src="/images/ofoq-hero-architecture-mobile.png"
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 block h-full w-full object-cover object-center sm:hidden"
+          />
 
           <div className="relative z-10 mx-auto grid min-h-0 max-w-[1480px] items-center gap-3 px-5 pb-7 pt-7 [direction:ltr] sm:min-h-[610px] sm:grid-cols-[1.05fr_.95fr] sm:px-10 sm:pb-44 sm:pt-0 lg:px-16">
             <div dir={dir} className="order-1 z-10 text-right sm:col-start-2 sm:order-2 sm:pr-8 sm:pt-0 lg:pr-20">
@@ -80,12 +86,6 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          <img
-            src="/images/ofoq-hero-architecture-mobile.png"
-            alt={isArabic ? "أفق الرياض" : "OFOQ Riyadh"}
-            className="relative z-10 mx-auto block h-[420px] w-full object-cover object-center sm:hidden"
-          />
-
           <div className="relative z-20 mx-auto grid w-[calc(100%-2rem)] max-w-[1050px] grid-cols-2 overflow-hidden rounded-t-[22px] bg-[#071936] text-white sm:absolute sm:bottom-[-1px] sm:left-1/2 sm:mx-0 sm:-translate-x-1/2 sm:grid-cols-4">
             {[
               { value: "98%", label: isArabic ? "نسبة رضا العملاء" : "Client satisfaction", icon: "★" },
