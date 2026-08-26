@@ -118,8 +118,8 @@ export default function HomePage() {
 
         <section className="relative bg-[#071936] pb-10 pt-14 text-white sm:pb-20 sm:pt-24">
           <div className="pointer-events-none absolute -top-16 left-[-5%] hidden h-32 w-[110%] rounded-[50%] bg-[#071936] sm:block" />
-          <div className="relative mx-auto grid max-w-[1480px] gap-9 px-5 sm:gap-10 sm:px-10 lg:grid-cols-[.72fr_1.8fr] lg:items-center lg:px-16">
-            <div className={isArabic ? "text-right" : "text-left"}>
+          <div className="relative mx-auto grid max-w-[1480px] gap-9 px-5 [direction:ltr] sm:gap-10 sm:px-10 lg:grid-cols-[.72fr_1.8fr] lg:items-center lg:px-16">
+            <div dir={dir} className={isArabic ? "text-right" : "text-left"}>
               <p className="mb-4 text-xs font-bold uppercase tracking-[.16em] text-[#C5B278]">{isArabic ? "خدمات أفق" : "OFOQ SERVICES"}</p>
               <h2 className="text-[2.7rem] font-black leading-[1.2] tracking-[-.03em] sm:text-5xl"><span className="block">{copy.servicesTitleOne}</span><span className="block text-[#C5B278]">{copy.servicesTitleTwo}</span></h2>
               <p className="mt-5 max-w-xs text-sm leading-7 text-white/60">{copy.servicesDescription}</p>
@@ -130,11 +130,11 @@ export default function HomePage() {
               {allServices.map((service, index) => {
                 const title = isArabic ? service.ar : service.en;
                 const description = isArabic ? service.descriptionAr : service.descriptionEn;
-                const active = index === allServices.length - 1;
+                const active = index === 3;
                 return (
-                  <Link to={service.href} key={service.href} className={`group relative min-w-[220px] snap-start rounded-xl border p-5 transition-transform hover:-translate-y-1 sm:min-w-[235px] sm:p-6 ${active ? "border-[#C5B278] bg-[#F4F1EC] text-[#071936]" : "border-white/10 bg-[#0d2548] text-white"}`}>
+                  <Link to={service.href} key={service.href} className={`group relative h-[380px] min-w-[220px] snap-start rounded-xl border p-5 transition-transform hover:-translate-y-1 sm:min-w-[235px] sm:p-6 ${active ? "border-[#C5B278] bg-[#F4F1EC] text-[#071936]" : "border-white/10 bg-[#102d56] text-white"}`}>
                     <span className={`text-sm font-bold ${active ? "text-[#C13229]" : "text-[#C5B278]"}`}>{String(index + 1).padStart(2, "0")}</span>
-                    <LineIcon type={service.icon} className={`my-12 h-12 w-12 ${active ? "text-[#C13229]" : "text-[#C5B278]"}`} />
+                    <LineIcon type={service.icon} className={`mb-12 mt-12 h-12 w-12 ${active ? "text-[#C13229]" : "text-[#C5B278]"}`} />
                     <h3 className="text-lg font-black">{title}</h3>
                     <p className={`mt-3 min-h-12 text-xs leading-6 ${active ? "text-[#071936]/60" : "text-white/55"}`}>{description}</p>
                     <span className={`mt-5 block text-xs font-bold ${active ? "text-[#C13229]" : "text-white/70"}`}>{isArabic ? "اعرف أكثر ←" : "Learn more →"}</span>
@@ -147,8 +147,8 @@ export default function HomePage() {
         </section>
 
         <section className="bg-[#071936] px-5 pb-16 text-white sm:px-10 sm:pb-24 lg:px-16">
-          <div className="mx-auto grid max-w-[1380px] items-center gap-8 overflow-hidden rounded-[28px] border border-white/10 bg-[#122846] px-6 py-8 sm:px-10 lg:grid-cols-[1.1fr_.9fr] lg:px-14 lg:py-10">
-            <div className="order-2 text-right lg:order-1">
+          <div className="mx-auto grid max-w-[1380px] items-center gap-8 overflow-hidden rounded-[28px] border border-white/10 bg-[#122846] px-6 py-8 [direction:ltr] sm:px-10 lg:grid-cols-[1.08fr_.92fr] lg:px-14 lg:py-10">
+            <div dir={dir} className="order-2 text-right lg:order-2">
               <p className="mb-3 text-xs font-bold text-[#C5B278]">{isArabic ? "بوابة أفق الذكية" : "OFOQ SMART PORTAL"}</p>
               <h2 className="max-w-lg text-3xl font-black leading-[1.35] sm:text-4xl">
                 {isArabic ? "لإدارة أعمالك بسهولة" : "Manage your business with ease"}
@@ -169,8 +169,13 @@ export default function HomePage() {
                 {isArabic ? "الدخول إلى البوابة" : "Open the portal"}
               </Link>
             </div>
-            <div className="order-1 flex justify-center lg:order-2 lg:justify-start">
-              <img src="/images/ofoq-client-portal-dashboard.png" alt={isArabic ? "لوحة بوابة أفق" : "OFOQ portal dashboard"} className="max-h-[330px] w-auto rounded-xl object-contain shadow-2xl sm:max-h-[390px]" />
+            <div className="order-1 flex justify-center lg:order-1 lg:justify-start">
+              <div className="relative w-full max-w-[580px] overflow-hidden rounded-[18px] border-[10px] border-[#0a1b31] bg-[#e8ebef] shadow-2xl">
+                <div className="aspect-[1.55] overflow-hidden">
+                  <img src="/images/ofoq-client-portal-dashboard.png" alt={isArabic ? "لوحة بوابة أفق" : "OFOQ portal dashboard"} className="h-full w-full object-cover object-top" />
+                </div>
+                <div className="absolute bottom-[-14px] left-1/2 h-3 w-2/3 -translate-x-1/2 rounded-full bg-[#071936]" />
+              </div>
             </div>
           </div>
         </section>
