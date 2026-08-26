@@ -90,7 +90,7 @@ export default function HomePage() {
                 <span className="block whitespace-nowrap">{copy.titleOne}</span>
                 <span className="block whitespace-nowrap">{copy.titleTwo}</span>
               </h1>
-              <p className="mt-6 max-w-[345px] text-sm font-semibold leading-8 text-[#071936]/65 sm:max-w-[470px] sm:text-lg">{copy.description}</p>
+              <p className="mt-6 max-w-[345px] text-sm font-semibold leading-8 sm:max-w-[470px] sm:text-lg text-[#061a36]">{copy.description}</p>
               <div className="mt-8 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-end">
                 <Link to="/services" className="inline-flex items-center gap-3 rounded-lg bg-[#071936] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#102b57]">
                   {copy.explore}<span className="text-lg text-[#C5B278]">←</span>
