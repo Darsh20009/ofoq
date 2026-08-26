@@ -247,11 +247,11 @@ export default function PublicLayout() {
 
             {/* الـ Drawer نفسه */}
             <motion.div
-              initial={{ x: isRtl ? -420 : 420 }}
-              animate={{ x: 0 }}
-              exit={{ x: isRtl ? -420 : 420 }}
+              initial={isHomePage ? { y: -28, opacity: 0 } : { x: isRtl ? -420 : 420 }}
+              animate={isHomePage ? { y: 0, opacity: 1 } : { x: 0 }}
+              exit={isHomePage ? { y: -28, opacity: 0 } : { x: isRtl ? -420 : 420 }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className={`fixed ${isHomePage ? "top-[72px] h-[calc(100%-72px)] sm:top-[86px] sm:h-[calc(100%-86px)] bg-[#1a1726]/90 backdrop-blur-xl" : "top-0 h-full bg-[#1a1726]"} ${isRtl ? "left-0" : "right-0"} z-[80] flex w-80 flex-col overflow-y-auto border-white/10 sm:w-96 ${isHomePage ? "border-t" : ""}`}
+              className={`fixed ${isHomePage ? "top-[72px] h-[calc(100%-72px)] sm:top-[86px] sm:h-[calc(100%-86px)] bg-[#071936]/75 shadow-[0_18px_50px_rgba(0,0,0,.35)] backdrop-blur-2xl" : "top-0 h-full bg-[#1a1726]"} ${isRtl ? "left-0" : "right-0"} z-[80] flex w-80 flex-col overflow-y-auto border-white/10 sm:w-96 ${isHomePage ? "border-t" : ""}`}
             >
               {/* رأس الـ Drawer */}
               <div className={`flex items-center justify-between px-8 py-6 border-b border-white/8 ${isHomePage ? "hidden" : ""}`}>
