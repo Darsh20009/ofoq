@@ -181,15 +181,15 @@ export default function HomePage() {
           <div className="mx-auto max-w-[1380px] rounded-2xl bg-[#F4F1EC] px-5 py-6 text-[#071936] sm:px-10 sm:py-7">
             <div className="flex flex-col items-center justify-between gap-5 sm:flex-row" dir={dir}>
               <p className="text-center text-xs font-bold text-[#071936]/65 sm:text-right">
-                {isArabic ? "عملاء نفخر بخدمتهم" : "Trusted by businesses we are proud to serve"}
+                {isArabic ? "شركاؤنا" : "Our partners"}
               </p>
               <div className="flex w-full flex-wrap items-center justify-center gap-x-7 gap-y-4 sm:w-auto sm:justify-end sm:gap-x-9">
                 {[
-                  { name: "SNB", detail: isArabic ? "الأهلي السعودي" : "Saudi National Bank" },
+                  { name: "SNB", detail: isArabic ? "البنك الأهلي السعودي" : "Saudi National Bank" },
                   { name: "stc", detail: isArabic ? "حلول الأعمال" : "business" },
                   { name: "مرافق", detail: isArabic ? "للطاقة والمياه" : "utilities" },
-                  { name: "المراعي", detail: isArabic ? "جودة تستحق الثقة" : "quality you trust" },
-                  { name: "سبيك", detail: isArabic ? "للحلول الذكية" : "smart solutions" },
+                  { name: "المراعي", detail: isArabic ? "Almarai" : "Almarai" },
+                  { name: "سابك", detail: isArabic ? "SABIC" : "SABIC" },
                 ].map((partner) => (
                   <div key={partner.name} className="min-w-[72px] text-center opacity-75 transition-opacity hover:opacity-100">
                     <strong className="block text-lg font-black tracking-[-.06em] text-[#071936]">{partner.name}</strong>
