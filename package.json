@@ -13,6 +13,7 @@
     "preview": "vite preview --config vite.config.ts",
     "start": "NODE_ENV=production node dist/server/index.js",
     "lint": "tsc --noEmit",
+    "check:translations": "tsx scripts/check-translations.ts",
     "seed": "tsx server/seed.ts",
     "postinstall": "if [ -n \"$RENDER\" ]; then npm run build; fi"
   },

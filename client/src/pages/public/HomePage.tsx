@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useLang } from "../../i18n/LangContext";
+import type { Lang } from "../../i18n/LangContext";
 import { cmsApi } from "../../api/client";
 import OfoqLogo from "../../components/OfoqLogo";
 import type { Partner } from "../../types";
@@ -29,6 +30,79 @@ const services: Service[] = [
   { number: "08", href: "/services/marketing", ar: "التسويق", en: "Marketing", descriptionAr: "نبني حضورًا واضحًا وطلبًا قابلًا للقياس لعلامتك.", descriptionEn: "We build a clear presence and measurable demand for your brand.", icon: "marketing" },
 ];
 
+type HomePageCopy = {
+  stats: string[];
+  servicesEyebrow: string;
+  learnMore: string;
+  nextServices: string;
+  portalEyebrow: string;
+  portalTitle: string;
+  portalDescription: string;
+  portalFeatures: string[];
+  openPortal: string;
+  portalImageAlt: string;
+  joinEyebrow: string;
+  joinTitle: string;
+  joinDescription: string;
+  joinCta: string;
+  partnersTitle: string;
+  partnersHint: string;
+  partnersLoading: string;
+  partnersFallback: string;
+  partnersEmpty: string;
+  viewPartnerDetails: (name: string) => string;
+  close: string;
+  closePartnerDetails: string;
+  partnershipsEyebrow: string;
+  partnership: string;
+  delivered: string;
+};
+
+const homePageCopy: Record<Lang, HomePageCopy> = {
+  ar: {
+    stats: ["نسبة رضا العملاء", "معاملة مكتملة", "عميل وثق بنا", "سنوات من الخبرة"], servicesEyebrow: "خدمات أفق", learnMore: "اعرف أكثر ←", nextServices: "الخدمات التالية",
+    portalEyebrow: "بوابة أفق الذكية", portalTitle: "لإدارة أعمالك بسهولة", portalDescription: "منصة رقمية متكاملة تمنحك رؤية واضحة وتحكمًا كاملًا في خدماتك ومعاملاتك.", portalFeatures: ["متابعة الطلبات والمعاملات أولًا بأول", "مستنداتك وفواتيرك في مكان واحد", "تقارير ذكية تساعدك على اتخاذ القرار"], openPortal: "الدخول إلى البوابة", portalImageAlt: "لوحة بوابة أفق الذكية",
+    joinEyebrow: "كن جزءًا من أفق", joinTitle: "شريكك في رحلة النمو", joinDescription: "انضم إلى أكثر من 1,250 عميلًا يثقون بأفق لإدارة أعمالهم بثقة ووضوح.", joinCta: "ابدأ معنا الآن",
+    partnersTitle: "شركاؤنا", partnersHint: "اضغط على الشعار للتعرّف على تفاصيل الشراكة", partnersLoading: "جارٍ تحديث الشركاء...", partnersFallback: "نعرض البيانات المحفوظة", partnersEmpty: "سيتم عرض الشركاء هنا قريبًا.", viewPartnerDetails: (name) => `عرض تفاصيل ${name}`, close: "إغلاق", closePartnerDetails: "إغلاق نافذة الشريك", partnershipsEyebrow: "شراكات أفق", partnership: "طبيعة الشراكة", delivered: "ما قدمته أفق",
+  },
+  en: {
+    stats: ["Client satisfaction", "Completed transactions", "Trusted clients", "Years of experience"], servicesEyebrow: "OFOQ SERVICES", learnMore: "Learn more →", nextServices: "Next services",
+    portalEyebrow: "OFOQ SMART PORTAL", portalTitle: "Manage your business with ease", portalDescription: "An integrated digital platform giving you complete visibility and control over your services and transactions.", portalFeatures: ["Track requests and transactions in real time", "Keep documents and invoices in one place", "Smart reports to help you decide"], openPortal: "Open the portal", portalImageAlt: "OFOQ smart portal dashboard",
+    joinEyebrow: "BE PART OF OFOQ", joinTitle: "Your partner for the growth journey", joinDescription: "Join more than 1,250 clients who trust OFOQ to manage their business with confidence and clarity.", joinCta: "Start with us",
+    partnersTitle: "Our partners", partnersHint: "Select a logo to explore our partnership", partnersLoading: "Updating partners...", partnersFallback: "Showing saved partners", partnersEmpty: "Partners will appear here soon.", viewPartnerDetails: (name) => `View ${name} details`, close: "Close", closePartnerDetails: "Close partner details", partnershipsEyebrow: "OFOQ PARTNERSHIPS", partnership: "The partnership", delivered: "What OFOQ delivered",
+  },
+  ur: {
+    stats: ["صارفین کا اطمینان", "مکمل شدہ معاملات", "قابلِ اعتماد کلائنٹس", "سالوں کا تجربہ"], servicesEyebrow: "اُفق خدمات", learnMore: "مزید جانیں ←", nextServices: "اگلی خدمات",
+    portalEyebrow: "اُفق اسمارٹ پورٹل", portalTitle: "اپنے کاروبار کو آسانی سے منظم کریں", portalDescription: "ایک مربوط ڈیجیٹل پلیٹ فارم جو آپ کو اپنی خدمات اور معاملات پر مکمل بصیرت اور کنٹرول دیتا ہے۔", portalFeatures: ["درخواستوں اور معاملات کو بروقت ٹریک کریں", "دستاویزات اور انوائس ایک جگہ رکھیں", "بہتر فیصلوں کے لیے اسمارٹ رپورٹس"], openPortal: "پورٹل کھولیں", portalImageAlt: "اُفق اسمارٹ پورٹل ڈیش بورڈ",
+    joinEyebrow: "اُفق کا حصہ بنیں", joinTitle: "ترقی کے سفر میں آپ کے ساتھی", joinDescription: "1,250 سے زیادہ کلائنٹس میں شامل ہوں جو اعتماد اور وضاحت کے ساتھ کاروبار چلانے کے لیے اُفق پر بھروسا کرتے ہیں۔", joinCta: "آج ہی شروع کریں",
+    partnersTitle: "ہمارے شراکت دار", partnersHint: "شراکت کی تفصیلات دیکھنے کے لیے لوگو منتخب کریں", partnersLoading: "شراکت دار اپ ڈیٹ ہو رہے ہیں...", partnersFallback: "محفوظ شدہ شراکت دار دکھائے جا رہے ہیں", partnersEmpty: "شراکت دار جلد یہاں دکھائی دیں گے۔", viewPartnerDetails: (name) => `${name} کی تفصیلات دیکھیں`, close: "بند کریں", closePartnerDetails: "شراکت دار کی تفصیلات بند کریں", partnershipsEyebrow: "اُفق شراکت داریاں", partnership: "شراکت داری", delivered: "اُفق نے کیا فراہم کیا",
+  },
+  hi: {
+    stats: ["ग्राहक संतुष्टि", "पूर्ण लेनदेन", "विश्वसनीय ग्राहक", "वर्षों का अनुभव"], servicesEyebrow: "OFOQ सेवाएँ", learnMore: "और जानें →", nextServices: "अगली सेवाएँ",
+    portalEyebrow: "OFOQ स्मार्ट पोर्टल", portalTitle: "अपने व्यवसाय को आसानी से प्रबंधित करें", portalDescription: "एक एकीकृत डिजिटल प्लेटफ़ॉर्म जो आपकी सेवाओं और लेनदेन पर पूरी दृश्यता और नियंत्रण देता है।", portalFeatures: ["अनुरोधों और लेनदेन को रियल टाइम में ट्रैक करें", "दस्तावेज़ और इनवॉइस एक जगह रखें", "निर्णय में मदद करने वाली स्मार्ट रिपोर्ट"], openPortal: "पोर्टल खोलें", portalImageAlt: "OFOQ स्मार्ट पोर्टल डैशबोर्ड",
+    joinEyebrow: "OFOQ का हिस्सा बनें", joinTitle: "विकास की यात्रा में आपका साथी", joinDescription: "1,250 से अधिक ग्राहकों से जुड़ें जो अपने व्यवसाय को भरोसे और स्पष्टता के साथ प्रबंधित करने के लिए OFOQ पर विश्वास करते हैं।", joinCta: "हमारे साथ शुरू करें",
+    partnersTitle: "हमारे साझेदार", partnersHint: "हमारी साझेदारी देखने के लिए लोगो चुनें", partnersLoading: "साझेदार अपडेट हो रहे हैं...", partnersFallback: "सहेजे गए साझेदार दिखाए जा रहे हैं", partnersEmpty: "साझेदार जल्द ही यहाँ दिखाई देंगे।", viewPartnerDetails: (name) => `${name} का विवरण देखें`, close: "बंद करें", closePartnerDetails: "साझेदार का विवरण बंद करें", partnershipsEyebrow: "OFOQ साझेदारियाँ", partnership: "साझेदारी", delivered: "OFOQ ने क्या प्रदान किया",
+  },
+  id: {
+    stats: ["Kepuasan klien", "Transaksi selesai", "Klien tepercaya", "Tahun pengalaman"], servicesEyebrow: "LAYANAN OFOQ", learnMore: "Pelajari lebih lanjut →", nextServices: "Layanan berikutnya",
+    portalEyebrow: "PORTAL CERDAS OFOQ", portalTitle: "Kelola bisnis Anda dengan mudah", portalDescription: "Platform digital terpadu yang memberi Anda visibilitas dan kendali penuh atas layanan serta transaksi Anda.", portalFeatures: ["Lacak permintaan dan transaksi secara real time", "Simpan dokumen dan faktur di satu tempat", "Laporan cerdas untuk membantu pengambilan keputusan"], openPortal: "Buka portal", portalImageAlt: "Dasbor portal cerdas OFOQ",
+    joinEyebrow: "JADI BAGIAN DARI OFOQ", joinTitle: "Mitra Anda dalam perjalanan pertumbuhan", joinDescription: "Bergabunglah dengan lebih dari 1.250 klien yang mempercayai OFOQ untuk mengelola bisnis mereka dengan yakin dan jelas.", joinCta: "Mulai bersama kami",
+    partnersTitle: "Mitra kami", partnersHint: "Pilih logo untuk menjelajahi kemitraan kami", partnersLoading: "Memperbarui mitra...", partnersFallback: "Menampilkan mitra tersimpan", partnersEmpty: "Mitra akan segera tampil di sini.", viewPartnerDetails: (name) => `Lihat detail ${name}`, close: "Tutup", closePartnerDetails: "Tutup detail mitra", partnershipsEyebrow: "KEMITRAAN OFOQ", partnership: "Kemitraan", delivered: "Yang OFOQ berikan",
+  },
+  de: {
+    stats: ["Kundenzufriedenheit", "Abgeschlossene Vorgänge", "Vertrauensvolle Kunden", "Jahre Erfahrung"], servicesEyebrow: "OFOQ-LEISTUNGEN", learnMore: "Mehr erfahren →", nextServices: "Nächste Leistungen",
+    portalEyebrow: "OFOQ SMART-PORTAL", portalTitle: "Verwalten Sie Ihr Unternehmen mühelos", portalDescription: "Eine integrierte digitale Plattform, die Ihnen vollständige Transparenz und Kontrolle über Ihre Leistungen und Vorgänge gibt.", portalFeatures: ["Anfragen und Vorgänge in Echtzeit verfolgen", "Dokumente und Rechnungen an einem Ort verwalten", "Intelligente Berichte für Ihre Entscheidungen"], openPortal: "Portal öffnen", portalImageAlt: "OFOQ Smart-Portal-Dashboard",
+    joinEyebrow: "WERDEN SIE TEIL VON OFOQ", joinTitle: "Ihr Partner auf dem Wachstumskurs", joinDescription: "Schließen Sie sich mehr als 1.250 Kunden an, die OFOQ bei der klaren und sicheren Verwaltung ihres Unternehmens vertrauen.", joinCta: "Mit uns starten",
+    partnersTitle: "Unsere Partner", partnersHint: "Wählen Sie ein Logo, um unsere Partnerschaft zu entdecken", partnersLoading: "Partner werden aktualisiert...", partnersFallback: "Gespeicherte Partner werden angezeigt", partnersEmpty: "Partner werden bald hier angezeigt.", viewPartnerDetails: (name) => `Details zu ${name} anzeigen`, close: "Schließen", closePartnerDetails: "Partnerdetails schließen", partnershipsEyebrow: "OFOQ-PARTNERSCHAFTEN", partnership: "Die Partnerschaft", delivered: "Was OFOQ geleistet hat",
+  },
+  es: {
+    stats: ["Satisfacción del cliente", "Transacciones completadas", "Clientes de confianza", "Años de experiencia"], servicesEyebrow: "SERVICIOS OFOQ", learnMore: "Saber más →", nextServices: "Siguientes servicios",
+    portalEyebrow: "PORTAL INTELIGENTE OFOQ", portalTitle: "Gestione su negocio con facilidad", portalDescription: "Una plataforma digital integrada que le brinda visibilidad y control total sobre sus servicios y transacciones.", portalFeatures: ["Siga solicitudes y transacciones en tiempo real", "Guarde documentos y facturas en un solo lugar", "Informes inteligentes para ayudarle a decidir"], openPortal: "Abrir el portal", portalImageAlt: "Panel del portal inteligente OFOQ",
+    joinEyebrow: "SEA PARTE DE OFOQ", joinTitle: "Su aliado en el camino del crecimiento", joinDescription: "Únase a más de 1.250 clientes que confían en OFOQ para gestionar su negocio con confianza y claridad.", joinCta: "Empiece con nosotros",
+    partnersTitle: "Nuestros socios", partnersHint: "Seleccione un logotipo para conocer nuestra alianza", partnersLoading: "Actualizando socios...", partnersFallback: "Mostrando socios guardados", partnersEmpty: "Los socios aparecerán aquí pronto.", viewPartnerDetails: (name) => `Ver detalles de ${name}`, close: "Cerrar", closePartnerDetails: "Cerrar detalles del socio", partnershipsEyebrow: "ALIANZAS OFOQ", partnership: "La alianza", delivered: "Lo que OFOQ entregó",
+  },
+};
+
 function LineIcon({ type, className = "" }: { type: string; className?: string }) {
   const common = { fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   if (type === "people") return <svg viewBox="0 0 48 48" className={className} {...common}><circle cx="18" cy="16" r="5" /><circle cx="31" cy="18" r="4" /><path d="M7 36c1-7 5-10 11-10s10 3 11 10M27 28c6-4 12 0 14 7" /></svg>;
@@ -43,17 +117,18 @@ function LineIcon({ type, className = "" }: { type: string; className?: string }
 
 export default function HomePage() {
   const { ui, lang, dir } = useLang();
-  const isArabic = lang === "ar" || lang === "ur";
+  const pageCopy = homePageCopy[lang];
+  const useArabicContent = lang === "ar";
   const copy = {
-    titleOne: isArabic ? "خدمات ترتقي" : "Services that elevate",
-    titleTwo: isArabic ? "بالشركات" : "your business",
-    description: isArabic ? "نقدم لك منظومة متكاملة من الخدمات تدعم أعمالك في كل مرحلة من التأسيس إلى النمو والتوسع." : "We provide an integrated range of services that supports your business from formation through growth and expansion.",
-    explore: isArabic ? "استكشف خدماتنا" : "Explore our services",
-    watch: isArabic ? "شاهد كيف نعمل" : "See how we work",
-    allServices: isArabic ? "عرض جميع الخدمات" : "View all services",
-    servicesTitleOne: isArabic ? "جميع خدماتك" : "All your services",
-    servicesTitleTwo: isArabic ? "في مكان واحد" : "in one place",
-    servicesDescription: isArabic ? "من التأسيس إلى التشغيل، نوفر لك كل ما تحتاجه لنمو أعمالك بثقة ووضوح." : "From formation to operations, everything you need to grow with confidence and clarity.",
+    titleOne: ui.home.hero1,
+    titleTwo: ui.home.hero2,
+    description: ui.home.heroSub,
+    explore: ui.home.explore,
+    watch: ui.home.aboutCta,
+    allServices: ui.home.servicesAll,
+    servicesTitleOne: ui.home.servicesTitle1,
+    servicesTitleTwo: ui.home.servicesTitle2,
+    servicesDescription: ui.home.aboutDesc,
   };
   const featuredServices = services;
 
@@ -101,10 +176,10 @@ export default function HomePage() {
           </div>
           <div dir="rtl" className="absolute bottom-[-14px] left-1/2 z-20 grid w-[85%] max-w-[1120px] -translate-x-1/2 grid-cols-4 overflow-hidden rounded-[16px] bg-[#071936] text-white shadow-[0_-8px_30px_rgba(7,25,54,.16)] sm:bottom-[-18px] sm:rounded-[20px]">
             {[
-              { value: "98%", label: isArabic ? "نسبة رضا العملاء" : "Client satisfaction", icon: "★" },
-              { value: "25,000+", label: isArabic ? "معاملة مكتملة" : "Completed transactions", icon: "✓" },
-              { value: "1,250+", label: isArabic ? "عميل وثق بنا" : "Trusted clients", icon: "♧" },
-              { value: "8+", label: isArabic ? "سنوات من الخبرة" : "Years of experience", icon: "◉" },
+              { value: "98%", label: pageCopy.stats[0], icon: "★" },
+              { value: "25,000+", label: pageCopy.stats[1], icon: "✓" },
+              { value: "1,250+", label: pageCopy.stats[2], icon: "♧" },
+              { value: "8+", label: pageCopy.stats[3], icon: "◉" },
             ].map((stat, index) => (
               <div key={stat.value} className={`flex min-w-0 items-center justify-center gap-1 px-0.5 py-1.5 sm:gap-3 sm:px-5 sm:py-5 ${index > 0 ? "border-r border-white/10" : ""}`}>
                 <span className="text-[10px] text-[#C5B278] sm:text-2xl">{stat.icon}</span>
@@ -128,8 +203,8 @@ export default function HomePage() {
           </picture>
           <div className="pointer-events-none absolute inset-0 z-0 rounded-tl-[58px] bg-[#071936] sm:rounded-tl-[128px]" />
           <div className="relative z-10 mx-auto grid max-w-[1480px] gap-8 px-5 [direction:ltr] sm:gap-10 sm:px-10 lg:grid-cols-[.62fr_1.85fr] lg:items-start lg:px-16">
-            <div dir={dir} className={isArabic ? "text-right" : "text-left"}>
-              <p className="mb-3 text-[10px] font-bold uppercase tracking-[.16em] text-[#C5B278] sm:mb-4 sm:text-xs">{isArabic ? "خدمات أفق" : "OFOQ SERVICES"}</p>
+            <div dir={dir} className={dir === "rtl" ? "text-right" : "text-left"}>
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-[.16em] text-[#C5B278] sm:mb-4 sm:text-xs">{pageCopy.servicesEyebrow}</p>
               <h2 className="text-[2.25rem] font-black leading-[1.15] tracking-[-.03em] sm:text-[3.25rem]"><span className="block">{copy.servicesTitleOne}</span><span className="block text-[#C5B278]">{copy.servicesTitleTwo}</span></h2>
               <p className="mt-4 max-w-xs text-xs leading-6 text-white/60 sm:mt-5 sm:text-sm sm:leading-7">{copy.servicesDescription}</p>
               <Link to="/services" className="mt-5 inline-flex items-center gap-2 text-xs font-bold text-[#C13229] sm:mt-7 sm:text-sm">{copy.allServices}<span>←</span></Link>
@@ -137,8 +212,8 @@ export default function HomePage() {
 
             <div dir={dir} className="flex snap-x gap-2 overflow-x-auto px-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-3">
               {featuredServices.map((service, index) => {
-                const title = isArabic ? service.ar : service.en;
-                const description = isArabic ? service.descriptionAr : service.descriptionEn;
+                const title = useArabicContent ? service.ar : service.en;
+                const description = useArabicContent ? service.descriptionAr : service.descriptionEn;
                 const active = index === 0;
                 return (
                   <Link to={service.href} key={service.href} className={`group relative flex h-[230px] min-w-[190px] snap-start flex-col rounded-lg border p-3.5 transition-transform hover:-translate-y-1 sm:h-[250px] sm:min-w-[225px] sm:rounded-xl sm:p-5 ${active ? "border-[#C5B278] bg-[#F4F1EC] text-[#071936] shadow-[0_12px_25px_rgba(0,0,0,.12)]" : "border-white/10 bg-[#102d56] text-white"}`}>
@@ -146,11 +221,11 @@ export default function HomePage() {
                     <LineIcon type={service.icon} className={`mb-3 mt-4 h-8 w-8 sm:mb-3 sm:mt-5 sm:h-9 sm:w-9 ${active ? "text-[#C13229]" : "text-[#C5B278]"}`} />
                     <h3 className="min-h-[2.5rem] text-sm font-black sm:text-base">{title}</h3>
                     <p className={`mt-2 min-h-10 line-clamp-2 text-[10px] leading-5 sm:text-[11px] sm:leading-5 ${active ? "text-[#071936]/60" : "text-white/55"}`}>{description}</p>
-                    <span className={`mt-auto block pt-3 text-[9px] font-bold sm:text-[10px] ${active ? "text-[#C13229]" : "text-white/70"}`}>{isArabic ? "اعرف أكثر ←" : "Learn more →"}</span>
+                    <span className={`mt-auto block pt-3 text-[9px] font-bold sm:text-[10px] ${active ? "text-[#C13229]" : "text-white/70"}`}>{pageCopy.learnMore}</span>
                   </Link>
                 );
               })}
-              <button aria-label={isArabic ? "الخدمات التالية" : "Next services"} className="my-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 text-lg text-white/80 transition-colors hover:border-[#C5B278] hover:text-[#C5B278] sm:h-10 sm:w-10">‹</button>
+              <button aria-label={pageCopy.nextServices} className="my-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 text-lg text-white/80 transition-colors hover:border-[#C5B278] hover:text-[#C5B278] sm:h-10 sm:w-10">‹</button>
             </div>
           </div>
         </section>
@@ -158,37 +233,35 @@ export default function HomePage() {
         <section className="bg-[#071936] px-5 pb-16 text-white sm:px-10 sm:pb-24 lg:px-16">
           <div className="mx-auto grid max-w-[1380px] items-center gap-8 overflow-hidden rounded-[24px] border border-white/10 bg-[#122846] px-6 py-8 [direction:ltr] sm:px-10 lg:grid-cols-[1.08fr_.92fr] lg:px-14 lg:py-10">
             <div dir={dir} className="order-2 text-right lg:order-2">
-              <p className="mb-3 text-xs font-bold text-[#C5B278]">{isArabic ? "بوابة أفق الذكية" : "OFOQ SMART PORTAL"}</p>
+              <p className="mb-3 text-xs font-bold text-[#C5B278]">{pageCopy.portalEyebrow}</p>
               <h2 className="max-w-lg text-3xl font-black leading-[1.35] sm:text-4xl">
-                {isArabic ? "لإدارة أعمالك بسهولة" : "Manage your business with ease"}
+                {pageCopy.portalTitle}
               </h2>
               <p className="mt-4 max-w-lg text-sm leading-7 text-white/60">
-                {isArabic ? "منصة رقمية متكاملة تمنحك رؤية واضحة وتحكمًا كاملًا في خدماتك ومعاملاتك." : "An integrated digital platform giving you complete visibility and control over your services and transactions."}
+                {pageCopy.portalDescription}
               </p>
               <ul className="mt-6 space-y-3 text-sm text-white/75">
-                {(isArabic
-                  ? ["متابعة الطلبات والمعاملات أولًا بأول", "مستنداتك وفواتيرك في مكان واحد", "تقارير ذكية تساعدك على اتخاذ القرار"]
-                  : ["Track requests and transactions in real time", "Keep documents and invoices in one place", "Smart reports to help you decide"]).map((item) => (
+                {pageCopy.portalFeatures.map((item) => (
                   <li key={item} className="flex items-center justify-end gap-3">
                     <span>{item}</span><span className="flex h-5 w-5 items-center justify-center rounded-full border border-[#C5B278] text-[10px] text-[#C5B278]">✓</span>
                   </li>
                 ))}
               </ul>
               <Link to="/client/login" className="mt-7 inline-flex rounded-lg bg-[#C5B278] px-5 py-3 text-sm font-bold text-[#071936] transition-colors hover:bg-white">
-                {isArabic ? "الدخول إلى البوابة" : "Open the portal"}
+                {pageCopy.openPortal}
               </Link>
             </div>
             <div className="order-1 flex justify-center lg:order-1 lg:justify-start">
               <div className="relative w-full max-w-[580px] overflow-hidden rounded-[18px]">
                 <div className="aspect-[856/538] overflow-hidden rounded-[14px]">
-                  <img src="/images/ofoq-smart-portal-dashboard.png" alt={isArabic ? "لوحة بوابة أفق الذكية" : "OFOQ smart portal dashboard"} loading="lazy" decoding="async" className="h-full w-full object-contain object-center" />
+                  <img src="/images/ofoq-smart-portal-dashboard.png" alt={pageCopy.portalImageAlt} loading="lazy" decoding="async" className="h-full w-full object-contain object-center" />
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <PartnersSection dir={dir} isArabic={isArabic} />
+        <PartnersSection dir={dir} useArabicContent={useArabicContent} copy={pageCopy} />
 
         <section className="bg-[#071936] px-5 pb-12 sm:px-10 sm:pb-16 lg:px-16">
           <div className="relative mx-auto min-h-[235px] max-w-[1380px] overflow-hidden rounded-[24px] border border-white/10 bg-[#102d56]">
@@ -199,13 +272,13 @@ export default function HomePage() {
                 <OfoqOutlineMark />
               </div>
               <div dir={dir} className="text-right">
-                <p className="mb-2 text-xs font-bold text-[#C5B278]">{isArabic ? "كن جزءًا من أفق" : "BE PART OF OFOQ"}</p>
-                <h2 className="text-2xl font-black text-white sm:text-3xl">{isArabic ? "شريكك في رحلة النمو" : "Your partner for the growth journey"}</h2>
+                <p className="mb-2 text-xs font-bold text-[#C5B278]">{pageCopy.joinEyebrow}</p>
+                <h2 className="text-2xl font-black text-white sm:text-3xl">{pageCopy.joinTitle}</h2>
                 <p className="mt-3 max-w-lg text-xs leading-6 text-white/65 sm:text-sm sm:leading-7">
-                  {isArabic ? "انضم إلى أكثر من 1,250 عميلًا يثقون بأفق لإدارة أعمالهم بثقة ووضوح." : "Join more than 1,250 clients who trust OFOQ to manage their business with confidence and clarity."}
+                  {pageCopy.joinDescription}
                 </p>
                 <Link to="/contact" className="mt-5 inline-flex items-center gap-2 rounded-md bg-[#C13229] px-5 py-3 text-xs font-bold text-white transition-colors hover:bg-[#d34a42] sm:text-sm">
-                  {isArabic ? "ابدأ معنا الآن" : "Start with us"} <span>←</span>
+                  {pageCopy.joinCta} <span>←</span>
                 </Link>
               </div>
             </div>
@@ -244,7 +317,7 @@ const fallbackPartners: Partner[] = [
   updatedAt: "",
 }));
 
-function PartnersSection({ dir, isArabic }: { dir: "rtl" | "ltr"; isArabic: boolean }) {
+function PartnersSection({ dir, useArabicContent, copy }: { dir: "rtl" | "ltr"; useArabicContent: boolean; copy: HomePageCopy }) {
   const [selected, setSelected] = useState<Partner | null>(null);
   const [paused, setPaused] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -281,19 +354,19 @@ function PartnersSection({ dir, isArabic }: { dir: "rtl" | "ltr"; isArabic: bool
       <div className="mx-auto max-w-[1380px] overflow-hidden rounded-2xl bg-[#F4F1EC] py-6 text-[#071936] sm:py-7" dir={dir}>
         <div className="mb-5 flex items-center justify-between gap-4 px-5 sm:px-10">
           <div>
-            <p className="text-xs font-black text-[#071936]">{isArabic ? "شركاؤنا" : "Our partners"}</p>
+            <p className="text-xs font-black text-[#071936]">{copy.partnersTitle}</p>
             <p className="mt-1 text-[10px] text-[#071936]/50">
-              {isArabic ? "اضغط على الشعار للتعرّف على تفاصيل الشراكة" : "Select a logo to explore our partnership"}
+              {copy.partnersHint}
             </p>
           </div>
           {isLoading && (
             <span className="rounded-full bg-[#071936]/5 px-3 py-1 text-[10px] font-bold text-[#071936]/55">
-              {isArabic ? "جارٍ تحديث الشركاء..." : "Updating partners..."}
+              {copy.partnersLoading}
             </span>
           )}
           {isError && (
             <span className="rounded-full bg-[#C5B278]/15 px-3 py-1 text-[10px] font-bold text-[#7b6a37]">
-              {isArabic ? "نعرض البيانات المحفوظة" : "Showing saved partners"}
+              {copy.partnersFallback}
             </span>
           )}
         </div>
@@ -324,7 +397,7 @@ function PartnersSection({ dir, isArabic }: { dir: "rtl" | "ltr"; isArabic: bool
                       tabIndex={copyIndex !== 0 ? -1 : 0}
                       onClick={() => setSelected(partner)}
                       className="group flex h-20 w-36 shrink-0 items-center justify-center rounded-lg px-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C13229] focus-visible:ring-offset-2 sm:w-44"
-                      aria-label={isArabic ? `عرض تفاصيل ${partner.nameAr}` : `View ${partner.nameEn} details`}
+                      aria-label={copy.viewPartnerDetails(useArabicContent ? partner.nameAr : partner.nameEn)}
                     >
                       <img
                         src={partner.logo}
@@ -339,43 +412,43 @@ function PartnersSection({ dir, isArabic }: { dir: "rtl" | "ltr"; isArabic: bool
             </div>
           </div>
         ) : (
-          <p className="px-5 py-8 text-center text-sm text-[#071936]/50">{isArabic ? "سيتم عرض الشركاء هنا قريبًا." : "Partners will appear here soon."}</p>
+          <p className="px-5 py-8 text-center text-sm text-[#071936]/50">{copy.partnersEmpty}</p>
         )}
       </div>
 
       {selected && (
         <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-6" dir={dir}>
-          <button type="button" className="absolute inset-0 bg-[#071936]/80 backdrop-blur-sm" aria-label={isArabic ? "إغلاق" : "Close"} onClick={() => setSelected(null)} />
+          <button type="button" className="absolute inset-0 bg-[#071936]/80 backdrop-blur-sm" aria-label={copy.close} onClick={() => setSelected(null)} />
           <article role="dialog" aria-modal="true" aria-labelledby="partner-dialog-title" className="relative max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[24px] bg-[#F4F1EC] shadow-2xl">
             <button
               ref={closeButtonRef}
               type="button"
               onClick={() => setSelected(null)}
               className="absolute end-4 top-4 z-10 rounded-full border border-[#071936]/10 bg-white/80 p-2 text-[#071936] hover:bg-white"
-              aria-label={isArabic ? "إغلاق نافذة الشريك" : "Close partner details"}
+              aria-label={copy.closePartnerDetails}
             >
               <X size={19} />
             </button>
             <div className="grid gap-0 md:grid-cols-[.8fr_1.2fr]">
               <div className="flex min-h-56 flex-col items-center justify-center gap-8 bg-white p-8 md:min-h-full">
-                <img src={selected.logo} alt={isArabic ? selected.nameAr : selected.nameEn} className="max-h-28 max-w-[220px] object-contain" />
+                <img src={selected.logo} alt={useArabicContent ? selected.nameAr : selected.nameEn} className="max-h-28 max-w-[220px] object-contain" />
                 <div className="h-px w-28 bg-[#071936]/10" />
                 <OfoqLogo className="h-16 w-28 text-[#071936]" />
               </div>
               <div className="p-6 pt-16 sm:p-9 sm:pt-16">
-                <p className="text-[10px] font-black uppercase tracking-[.16em] text-[#C13229]">{isArabic ? "شراكات أفق" : "OFOQ PARTNERSHIPS"}</p>
+                <p className="text-[10px] font-black uppercase tracking-[.16em] text-[#C13229]">{copy.partnershipsEyebrow}</p>
                 <h2 id="partner-dialog-title" className="mt-2 text-2xl font-black text-[#071936] sm:text-3xl">
-                  {isArabic ? selected.nameAr : selected.nameEn}
+                  {useArabicContent ? selected.nameAr : selected.nameEn}
                 </h2>
-                <p className="mt-4 text-sm leading-7 text-[#071936]/65">{isArabic ? selected.descriptionAr : selected.descriptionEn}</p>
+                <p className="mt-4 text-sm leading-7 text-[#071936]/65">{useArabicContent ? selected.descriptionAr : selected.descriptionEn}</p>
                 <div className="mt-6 space-y-5 border-t border-[#071936]/10 pt-6">
                   <div>
-                    <h3 className="text-xs font-black text-[#071936]">{isArabic ? "طبيعة الشراكة" : "The partnership"}</h3>
-                    <p className="mt-2 text-sm leading-7 text-[#071936]/60">{isArabic ? selected.partnershipAr : selected.partnershipEn}</p>
+                    <h3 className="text-xs font-black text-[#071936]">{copy.partnership}</h3>
+                    <p className="mt-2 text-sm leading-7 text-[#071936]/60">{useArabicContent ? selected.partnershipAr : selected.partnershipEn}</p>
                   </div>
                   <div>
-                    <h3 className="text-xs font-black text-[#071936]">{isArabic ? "ما قدمته أفق" : "What OFOQ delivered"}</h3>
-                    <p className="mt-2 text-sm leading-7 text-[#071936]/60">{isArabic ? selected.servicesAr : selected.servicesEn}</p>
+                    <h3 className="text-xs font-black text-[#071936]">{copy.delivered}</h3>
+                    <p className="mt-2 text-sm leading-7 text-[#071936]/60">{useArabicContent ? selected.servicesAr : selected.servicesEn}</p>
                   </div>
                 </div>
               </div>

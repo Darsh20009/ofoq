@@ -79,24 +79,7 @@ export default function PublicLayout() {
   const { lang, setLang, langs, ui } = useLang();
   const isRtl = lang === "ar" || lang === "ur";
   const isHomePage = pathname === "/";
-  const homeNavLinks = isRtl
-    ? [
-        { href: "/", label: "الرئيسية" },
-        { href: "/services", label: "خدماتنا" },
-        { href: "/blog", label: "المركز المعرفي" },
-        { href: "/packages", label: "الباقات" },
-        { href: "/about", label: "عن أفق" },
-        { href: "/contact", label: "تواصل معنا" },
-      ]
-    : [
-        { href: "/", label: "Home" },
-        { href: "/services", label: "Our services" },
-        { href: "/blog", label: "Knowledge center" },
-        { href: "/packages", label: "Packages" },
-        { href: "/about", label: "About OFOQ" },
-        { href: "/contact", label: "Contact us" },
-      ];
-  const navLinks = isHomePage ? homeNavLinks : NAV_HREFS.map((href, i) => ({ href, label: (ui.header.nav ?? [])[i] ?? href }));
+  const navLinks = NAV_HREFS.map((href, i) => ({ href, label: (ui.header.nav ?? [])[i] ?? href }));
 
   /* إغلاق الـ drawer عند تغيير الصفحة */
   useEffect(() => {
@@ -217,7 +200,7 @@ export default function PublicLayout() {
         </Link>
 
         {/* التنقل الرئيسي */}
-        <nav className="hidden items-center gap-7 lg:flex xl:gap-10" aria-label={isRtl ? "التنقل الرئيسي" : "Primary navigation"}>
+        <nav className="hidden items-center gap-7 lg:flex xl:gap-10" aria-label={ui.header.menu}>
           {navLinks.map((link, index) => (
             <Link
               key={link.href}
@@ -243,13 +226,13 @@ export default function PublicLayout() {
               isHomePage && !isScrolled ? "bg-[#071936] text-white hover:bg-[#102b57]" : "text-white/90 hover:bg-white/10"
             }`}
           >
-            {isRtl ? "تسجيل الدخول" : "Sign in"}
+            {ui.auth.login}
           </Link>
           <Link
             to="/client/requests/new"
             className={`${isHomePage ? "hidden sm:inline-flex" : "hidden xl:inline-flex"} rounded-lg bg-[#C13229] px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#a82922]`}
           >
-            + {isRtl ? "طلب خدمة" : "Request service"}
+            + {ui.category.request}
           </Link>
           {/* مبدّل اللغة */}
           <select
@@ -270,7 +253,7 @@ export default function PublicLayout() {
           <select
             value={lang}
             onChange={(e) => setLang(e.target.value as typeof lang)}
-            aria-label={isRtl ? "اختيار اللغة" : "Select language"}
+            aria-label={ui.header.language}
             className={`block cursor-pointer appearance-none bg-transparent px-1 text-[10px] font-bold outline-none transition-colors md:hidden ${
               isHomePage && !isScrolled ? "text-[#071936]/70" : "text-white/70"
             }`}
@@ -286,7 +269,7 @@ export default function PublicLayout() {
           <button
             ref={menuButtonRef}
             onClick={() => setDrawerOpen(true)}
-            aria-label={isRtl ? "فتح القائمة" : "Open menu"}
+            aria-label={ui.header.menu}
             aria-expanded={drawerOpen}
             aria-controls="public-mobile-menu"
             className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-colors lg:hidden ${isHomePage && !isScrolled ? "text-[#071936]/80" : "text-white/70"}`}
@@ -321,7 +304,7 @@ export default function PublicLayout() {
               id="public-mobile-menu"
               role="dialog"
               aria-modal="true"
-              aria-label={isRtl ? "قائمة التنقل" : "Navigation menu"}
+              aria-label={ui.header.menu}
               initial={{ y: -28, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -28, opacity: 0 }}
@@ -340,7 +323,7 @@ export default function PublicLayout() {
                 <button
                   ref={closeButtonRef}
                   onClick={() => setDrawerOpen(false)}
-                  aria-label={isRtl ? "إغلاق القائمة" : "Close menu"}
+                  aria-label={ui.header.menu}
                   className="w-8 h-8 flex items-center justify-center text-white/50 hover:text-white transition-colors"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
@@ -354,10 +337,10 @@ export default function PublicLayout() {
                 <OfoqDecoration className="w-14 h-16 flex-shrink-0 opacity-70 mt-1" />
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-[.25em] text-[#33B27C] mb-1.5">
-                    {isRtl ? "المقر الرئيسي" : "Head Office"}
+                    {ui.contact.locationLabel}
                   </p>
                   <p className="text-white/70 text-sm font-semibold leading-snug">
-                    {isRtl ? "الرياض، المملكة العربية السعودية" : "Riyadh, Saudi Arabia"}
+                    {ui.contact.locationVal}
                   </p>
                   <p className="text-white/35 text-xs mt-2 leading-relaxed">
                     info@ofoqhc.com<br />+966 500 851 177
@@ -368,7 +351,7 @@ export default function PublicLayout() {
               {/* روابط التنقل */}
               <nav className="flex-1 px-6 py-5 sm:px-8 sm:py-7">
                 <p className="text-[10px] font-bold uppercase tracking-[.2em] text-white/30 mb-5">
-                  {isRtl ? "الصفحات" : "Navigation"}
+                  {ui.header.menu}
                 </p>
                 <ul className="space-y-1">
                   {navLinks.map((link, i) => (
@@ -413,14 +396,14 @@ export default function PublicLayout() {
                   onClick={() => setDrawerOpen(false)}
                   className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-white/20 px-5 py-3 text-sm font-bold text-white transition-colors hover:border-[#C13229] hover:bg-[#C13229]"
                 >
-                  {isRtl ? "طلب خدمة" : "Request service"}
+                  {ui.category.request}
                 </Link>
               </nav>
 
               {/* تابعنا */}
               <div className="px-8 py-6 border-t border-white/8">
                 <p className="text-[10px] font-bold uppercase tracking-[.25em] text-white/30 mb-4">
-                  {isRtl ? "تابعنا" : "Follow us"}
+                  {ui.footer.contact}
                 </p>
                 <div className="flex items-center gap-3">
                   {SOCIAL.map((s) => (
@@ -455,12 +438,10 @@ export default function PublicLayout() {
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
               <div className="max-w-md">
                 <p className="mb-3 text-[10px] font-bold uppercase tracking-[.25em] text-[#C13229]">
-                  {isRtl ? "انضم لمجتمعنا" : "Join our community"}
+                  {ui.footer.newsletter}
                 </p>
                 <h3 className="mb-2 text-2xl font-black text-[#071936]">
-                  {isRtl
-                    ? "اشترك لتعرف كيف نرفع حلول الأعمال"
-                    : "Sign up to learn how we elevate business solutions"}
+                  {ui.footer.newsletterSub}
                 </h3>
               </div>
               <div className="w-full lg:w-auto min-w-[320px]">
@@ -469,14 +450,14 @@ export default function PublicLayout() {
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-5 h-5 flex-shrink-0">
                       <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    {isRtl ? "تم الاشتراك! تحقق من بريدك." : "Subscribed! Check your inbox."}
+                    {ui.footer.newsletter}
                   </div>
                 ) : newsletterState === "already" ? (
                   <div className="flex items-center gap-3 bg-amber-400/15 border border-amber-400/30 rounded-full px-5 py-3.5 text-amber-300 font-bold text-sm">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-5 h-5 flex-shrink-0">
                       <circle cx="12" cy="12" r="10" /><path d="M12 8v4m0 4h.01" strokeLinecap="round" />
                     </svg>
-                    {isRtl ? "أنت مشترك بالفعل." : "You're already subscribed."}
+                    {ui.footer.newsletter}
                   </div>
                 ) : (
                   <form
@@ -489,7 +470,7 @@ export default function PublicLayout() {
                       required
                       value={newsletterEmail}
                       onChange={(e) => setNewsletterEmail(e.target.value)}
-                      placeholder={isRtl ? "بريدك الإلكتروني" : "Your email address"}
+                      placeholder={ui.footer.email}
                       className="min-w-0 flex-1 rounded-l-full border border-[#071936]/10 bg-white px-5 py-3.5 text-sm text-[#071936] outline-none transition-colors placeholder:text-[#071936]/35 focus:border-[#33B27C]"
                     />
                     <button
@@ -500,8 +481,8 @@ export default function PublicLayout() {
                       {newsletterState === "loading"
                         ? "..."
                         : newsletterState === "error"
-                          ? (isRtl ? "خطأ!" : "Error!")
-                          : (isRtl ? "اشترك" : "JOIN")}
+                          ? ui.common.error
+                          : ui.footer.join}
                     </button>
                   </form>
                 )}
@@ -524,9 +505,7 @@ export default function PublicLayout() {
                 </div>
               </div>
               <p className="text-white/40 text-sm leading-relaxed max-w-sm mb-6">
-                {isRtl
-                  ? "شريكك الموثوق في الموارد البشرية، الخدمات الحكومية، التأشيرات، وتأسيس الشركات في المملكة."
-                  : "Your trusted partner for HR, government services, visas, and company formation in Saudi Arabia."}
+                {ui.footer.description}
               </p>
               <div className="flex items-center gap-2.5 mb-6">
                 {SOCIAL.map((s) => (
@@ -548,19 +527,19 @@ export default function PublicLayout() {
             <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
               <div>
                 <h4 className="font-bold text-xs uppercase tracking-[.2em] text-white/50 mb-5">
-                  {isRtl ? "خدماتنا" : "Services"}
+                  {ui.footer.services}
                 </h4>
                 <ul className="space-y-3">
                   {[
-                    { ar: "تأسيس الشركات", en: "Company Formation", href: "/services" },
-                    { ar: "الخدمات القانونية", en: "Legal Services", href: "/services" },
-                    { ar: "الموارد البشرية", en: "Human Resources", href: "/services" },
-                    { ar: "الخدمات الحكومية", en: "Gov. Services", href: "/services" },
-                    { ar: "تأشيرات المستثمرين", en: "Investor Visas", href: "/services" },
+                    { label: ui.footer.formation, href: "/services" },
+                    { label: ui.footer.legal, href: "/services" },
+                    { label: ui.footer.hr, href: "/services" },
+                    { label: ui.footer.government, href: "/services" },
+                    { label: ui.footer.investors, href: "/services" },
                   ].map((l) => (
-                    <li key={l.ar}>
+                    <li key={l.label}>
                       <Link to={l.href} className="text-white/35 hover:text-white text-xs transition-colors">
-                        {isRtl ? l.ar : l.en}
+                        {l.label}
                       </Link>
                     </li>
                   ))}
@@ -568,18 +547,18 @@ export default function PublicLayout() {
               </div>
               <div>
                 <h4 className="font-bold text-xs uppercase tracking-[.2em] text-white/50 mb-5">
-                  {isRtl ? "الباقات" : "Packages"}
+                  {ui.footer.packages}
                 </h4>
                 <ul className="space-y-3">
                   {[
-                    { ar: "الفضية", en: "Silver", href: "/packages" },
-                    { ar: "الذهبية", en: "Gold", href: "/packages" },
-                    { ar: "البلاتينية", en: "Platinum", href: "/packages" },
-                    { ar: "قارن الباقات", en: "Compare", href: "/packages" },
+                    { label: ui.footer.silver, href: "/packages" },
+                    { label: ui.footer.gold, href: "/packages" },
+                    { label: ui.footer.platinum, href: "/packages" },
+                    { label: ui.footer.compare, href: "/packages" },
                   ].map((l) => (
-                    <li key={l.ar}>
+                    <li key={l.label}>
                       <Link to={l.href} className="text-white/35 hover:text-white text-xs transition-colors">
-                        {isRtl ? l.ar : l.en}
+                        {l.label}
                       </Link>
                     </li>
                   ))}
@@ -587,17 +566,17 @@ export default function PublicLayout() {
               </div>
               <div>
                 <h4 className="font-bold text-xs uppercase tracking-[.2em] text-white/50 mb-5">
-                  {isRtl ? "تواصل" : "Contact"}
+                  {ui.footer.contact}
                 </h4>
                 <ul className="space-y-3 text-xs text-white/35">
                   <li><a href="mailto:info@ofoqhc.com" className="hover:text-white transition-colors">info@ofoqhc.com</a></li>
                   <li><a href="tel:+966500851177" className="hover:text-white transition-colors" dir="ltr">+966 500 851 177</a></li>
                   <li className="leading-relaxed">
-                    {isRtl ? "الرياض، المملكة العربية السعودية" : "Riyadh, Saudi Arabia"}
+                    {ui.footer.location}
                   </li>
                   <li>
                     <Link to="/contact" className="text-[#E5FE04] hover:text-white transition-colors font-bold">
-                      {isRtl ? "نموذج التواصل" : "Contact Form"}
+                      {ui.footer.form}
                     </Link>
                   </li>
                 </ul>
@@ -606,10 +585,10 @@ export default function PublicLayout() {
           </div>
 
           <div className="border-t border-white/8 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-white/20 text-xs">
-            <p>© {new Date().getFullYear()} OFOQ For Business Solutions. {isRtl ? "جميع الحقوق محفوظة." : "All rights reserved."}</p>
+            <p>© {new Date().getFullYear()} OFOQ For Business Solutions. {ui.footer.rights}</p>
             <div className="flex gap-5">
-              <a href="#" className="hover:text-white transition-colors">{isRtl ? "سياسة الخصوصية" : "Privacy"}</a>
-              <Link to="/terms" className="hover:text-white transition-colors">{isRtl ? "الشروط والأحكام" : "Terms"}</Link>
+              <a href="#" className="hover:text-white transition-colors">{ui.footer.privacy}</a>
+              <Link to="/terms" className="hover:text-white transition-colors">{ui.footer.terms}</Link>
             </div>
           </div>
         </div>
@@ -617,7 +596,7 @@ export default function PublicLayout() {
         {/* Qirox */}
         <div className="border-t border-white/5 py-3 text-center">
           <span className="text-white/15 text-xs">
-            {isRtl ? "تطوير " : "Built by "}
+            {ui.footer.madeBy}{" "}
             <a href="https://qiroxstudio.online" target="_blank" rel="noopener noreferrer" className="hover:text-white/40 transition-colors">
               Qirox Studio Group
             </a>

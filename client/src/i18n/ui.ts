@@ -1,4 +1,9 @@
 import type { Lang } from "./extraLangs";
+import { ur as urLocale } from "./locales/ur";
+import { hi as hiLocale } from "./locales/hi";
+import { id as idLocale } from "./locales/id";
+import { de as deLocale } from "./locales/de";
+import { es as esLocale } from "./locales/es";
 
 export type UiCopy = {
   header: { clientLogin: string; menu: string; language: string; nav: string[] };
@@ -544,6 +549,9 @@ const ar: UiCopy = {
   adminLogin: { ...en.adminLogin, title: "أفق لحلول الأعمال", subtitle: "سجّل دخولك إلى لوحة تحكم أفق", email: "البريد الإلكتروني", password: "كلمة المرور", forgot: "نسيت كلمة المرور؟", login: "تسجيل الدخول", loggingIn: "جارٍ تسجيل الدخول...", emailRequired: "البريد الإلكتروني مطلوب", passwordRequired: "كلمة المرور مطلوبة", invalid: "تعذر تسجيل الدخول. تحقق من البيانات وحاول مرة أخرى.", twoFactor: "أدخل رمز التحقق الثنائي", code: "رمز التحقق", verify: "تأكيد", verifying: "جارٍ التحقق...", back: "العودة لتسجيل الدخول", employeeBarcode: "تسجيل الدخول بباركود الموظف", employeeLogin: "تسجيل دخول الموظف", passkeyLogin: "تسجيل الدخول بمفتاح المرور", or: "أو", twoFactorInvalid: "رمز التحقق غير صحيح.", oauthCompleting: "جاري إتمام تسجيل الدخول...", welcome: "مرحباً", successfulProjects: "مشروع ناجح", customerSatisfaction: "رضا العملاء" },
   footer: { ...en.footer, newsletter: "للتسجيل في نشرتنا", newsletterSub: "لمعرفة المزيد حول خدمات الأعمال المتقدمة", email: "بريدك الإلكتروني", join: "انضم", about: "من نحن", services: "الخدمات", packages: "الباقات", contact: "التواصل", story: "قصتنا", vision: "رؤيتنا ومهمتنا", why: "لماذا أفق؟", formation: "تأسيس الشركات", legal: "الخدمات القانونية", hr: "الموارد البشرية", government: "المنصات الحكومية", investors: "خدمات المستثمرين", silver: "الباقة الفضية", gold: "الباقة الذهبية", platinum: "الباقة البلاتينية", compare: "مقارنة الباقات", form: "نموذج التواصل", rights: "جميع الحقوق محفوظة.", privacy: "سياسة الخصوصية", terms: "الشروط والأحكام", madeBy: "صُنع بواسطة", location: "جدة — طريق الملك عبدالله", description: "شريكك الموثوق لأعمالك في السعودية — نقدم حلولاً شاملة لتسهيل أعمالك ودعم نموك المستدام." },
 };
+
+ar.home.hero3 = "حلول أعمال متكاملة.";
+ar.home.splash = ["نرتب", "التفاصيل،", "لتتمكنوا من", "النمو."];
 
 type DeepPartial<T> = {
   [K in keyof T]?: T[K] extends Array<any> ? T[K] : T[K] extends object ? DeepPartial<T[K]> : T[K];
@@ -1141,8 +1149,20 @@ export function getUiCopy(lang: Lang): UiCopy {
     for (const key of Object.keys(next)) output[key] = merge(base?.[key], next[key]);
     return output;
   };
-  if (lang === "ar") return merge(merge(ar, { client: clientDetailOverrides.ar }), { adminPages: adminContentOverrides.ar }) as UiCopy;
+  if (lang === "ar") {
+    const arabic = merge(merge(ar, { client: clientDetailOverrides.ar }), { adminPages: adminContentOverrides.ar });
+    return merge(en, arabic) as UiCopy;
+  }
   if (lang === "en") return en;
+  const completeLocales: Partial<Record<Lang, UiCopy>> = {
+    ur: urLocale,
+    hi: hiLocale,
+    id: idLocale,
+    de: deLocale,
+    es: esLocale,
+  };
+  const completeLocale = completeLocales[lang];
+  if (completeLocale) return completeLocale;
   const patch = overrides[lang] || {};
   // The admin area must not combine partial language packs with English
   // labels. Until a language has a complete admin pack, keep its admin UI

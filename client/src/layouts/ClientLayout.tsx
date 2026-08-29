@@ -90,7 +90,7 @@ export default function ClientLayout() {
         <div className="flex-1 border-t border-white/10 px-4 py-6">
           <div className="mb-3 flex items-center justify-between px-2">
             <p className="text-[10px] font-bold uppercase tracking-[.18em] text-white/40">
-              {dir === "rtl" ? "خدمات أفق" : "OFOQ services"}
+              {ui.footer.services}
             </p>
             <ArrowUpRight size={14} className="text-[#E5FE04]" />
           </div>

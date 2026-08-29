@@ -17,6 +17,7 @@ import { useLang } from "../i18n/LangContext";
 import NotificationPermissionModal from "../components/NotificationPermissionModal";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import AdminPageGuide from "../components/admin/AdminPageGuide";
+import type { LangCode } from "../i18n/extraLangs";
 
 interface NavItem {
   href?: string;
@@ -25,6 +26,80 @@ interface NavItem {
   badge?: number;
   children?: { href: string; label: string }[];
 }
+
+const adminLayoutLabels: Record<LangCode, {
+  quotations: string;
+  services: string;
+  blogTestimonials: string;
+  siteContentEditor: string;
+  serviceRequests: string;
+  support: string;
+  operations: string;
+}> = {
+  ar: {
+    quotations: "عروض الأسعار",
+    services: "إدارة الخدمات",
+    blogTestimonials: "المدونة والشهادات",
+    siteContentEditor: "محرر المحتوى",
+    serviceRequests: "طلبات الخدمات",
+    support: "الدعم",
+    operations: "منصة إدارة أفق",
+  },
+  en: {
+    quotations: "Quotations",
+    services: "Services",
+    blogTestimonials: "Blog & Testimonials",
+    siteContentEditor: "Site Content Editor",
+    serviceRequests: "Service requests",
+    support: "Support",
+    operations: "OFOQ Operations",
+  },
+  ur: {
+    quotations: "قیمت کی پیشکشیں",
+    services: "سروسز کا انتظام",
+    blogTestimonials: "بلاگ اور تعریفی اسناد",
+    siteContentEditor: "ویب سائٹ مواد کا مدیر",
+    serviceRequests: "سروس کی درخواستیں",
+    support: "سپورٹ",
+    operations: "اُفق آپریشنز پلیٹ فارم",
+  },
+  hi: {
+    quotations: "मूल्य उद्धरण",
+    services: "सेवा प्रबंधन",
+    blogTestimonials: "ब्लॉग और प्रशंसापत्र",
+    siteContentEditor: "साइट सामग्री संपादक",
+    serviceRequests: "सेवा अनुरोध",
+    support: "सहायता",
+    operations: "OFOQ संचालन मंच",
+  },
+  id: {
+    quotations: "Penawaran",
+    services: "Manajemen layanan",
+    blogTestimonials: "Blog & Testimoni",
+    siteContentEditor: "Editor Konten Situs",
+    serviceRequests: "Permintaan layanan",
+    support: "Dukungan",
+    operations: "Operasional OFOQ",
+  },
+  de: {
+    quotations: "Angebote",
+    services: "Leistungsverwaltung",
+    blogTestimonials: "Blog & Erfahrungsberichte",
+    siteContentEditor: "Website-Inhaltseditor",
+    serviceRequests: "Serviceanfragen",
+    support: "Support",
+    operations: "OFOQ-Betrieb",
+  },
+  es: {
+    quotations: "Cotizaciones",
+    services: "Gestión de servicios",
+    blogTestimonials: "Blog y testimonios",
+    siteContentEditor: "Editor de contenido del sitio",
+    serviceRequests: "Solicitudes de servicio",
+    support: "Soporte",
+    operations: "Operaciones de OFOQ",
+  },
+};
 
 // navItems built dynamically in the component using useLang — see buildNavItems()
 
@@ -106,6 +181,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
   const notifRef = useRef<HTMLDivElement>(null);
   const { t, dir, ui, lang } = useLang();
   const isRtl = dir === "rtl";
+  const labels = adminLayoutLabels[lang];
   const pagePath = (path: string) => `${basePath}${path ? `/${path}` : ""}` || "/";
 
   const { data: sidebarCountsData } = useQuery({
@@ -130,24 +206,22 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
       ],
     },
     { href: pagePath("projects"),      label: t.admin.projects,   icon: FolderKanban },
-    { href: pagePath("quotations"),    label: lang === "ar" ? "عروض الأسعار" : "Quotations", icon: FileText },
+    { href: pagePath("quotations"),    label: labels.quotations, icon: FileText },
     { href: pagePath("invoices"),      label: t.admin.invoices,   icon: FileText },
     { href: pagePath("contracts"),     label: t.admin.contracts,  icon: FileSignature },
-    { href: pagePath("services"),      label: lang === "ar" ? "إدارة الخدمات" : "Services", icon: Layers3 },
+    { href: pagePath("services"),      label: labels.services, icon: Layers3 },
     { href: pagePath("users"),         label: t.admin.users,      icon: Users },
     {
       label: t.admin.cms,
       icon: FileEdit,
       children: [
-        { href: pagePath("cms"),              label: lang === "ar" ? "المدونة والشهادات" : "Blog & Testimonials" },
-        { href: pagePath("cms/site-content"), label: lang === "ar" ? "محرر المحتوى" : "Site Content Editor" },
+         { href: pagePath("cms"),              label: labels.blogTestimonials },
+         { href: pagePath("cms/site-content"), label: labels.siteContentEditor },
       ],
     },
     { href: pagePath("settings"),      label: t.admin.settings,   icon: Settings },
-    // Client copy lives in the shared UI translations; the legacy `t` pack
-    // does not include a `client` section for the Arabic admin layout.
-    { href: pagePath("service-requests"), label: lang === "ar" ? "طلبات الخدمات" : "Service requests", icon: ClipboardList, badge: sidebarCounts.requests },
-    { href: pagePath("support"),          label: lang === "ar" ? "الدعم" : "Support", icon: HeadphonesIcon },
+    { href: pagePath("service-requests"), label: labels.serviceRequests, icon: ClipboardList, badge: sidebarCounts.requests },
+    { href: pagePath("support"),          label: labels.support, icon: HeadphonesIcon },
     { href: pagePath("contact"),          label: t.contact.consultTitle, icon: MessageSquare },
     { href: pagePath("employee/card"),    label: t.admin.myCard,   icon: CreditCard },
   ];
@@ -272,7 +346,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
 
           <div className="flex-1 min-w-0">
             <p className="hidden sm:block text-xs font-semibold text-gray-400">
-              {lang === "ar" ? "منصة إدارة أفق" : "OFOQ Operations"}
+               {labels.operations}
             </p>
           </div>
 

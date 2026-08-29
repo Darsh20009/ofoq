@@ -68,10 +68,10 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
   }, [lang]);
 
   const ui = useMemo(() => {
-    // Keep the complete English shape as a safety net. Some older language
-    // packs and CMS documents only contain partial sections, while admin
-    // pages expect nested groups such as adminPages.adminPortal to exist.
-    const base = deepMerge(getUiCopy("en") as any, getUiCopy(lang) as any) as UiCopy;
+    // Every language now ships as a complete static pack. CMS content may
+    // override translated values, but must never replace the selected locale
+    // with another language or erase unedited fields.
+    const base = getUiCopy(lang);
     const patch = siteContent[lang];
     if (!patch || typeof patch !== "object") return base;
     // Deep-merge DB content over the static default
