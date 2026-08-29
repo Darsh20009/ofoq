@@ -75,6 +75,7 @@ export default function PublicLayout() {
   const drawerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const { pathname } = useLocation();
+  const normalizedPathname = pathname !== "/" ? pathname.replace(/\/+$/, "") : pathname;
   const { lang, setLang, langs, ui } = useLang();
   const isRtl = lang === "ar" || lang === "ur";
   const isHomePage = pathname === "/";
@@ -449,7 +450,7 @@ export default function PublicLayout() {
       <footer className="bg-[#071936] text-white border-t border-white/8">
 
         {/* النشرة البريدية */}
-        {pathname !== "/about" && <div className="border-b border-[#071936]/10 bg-[#071936] px-5 py-2 sm:px-10 sm:py-4">
+        {!["/about", "/packages"].includes(normalizedPathname) && <div className="border-b border-[#071936]/10 bg-[#071936] px-5 py-2 sm:px-10 sm:py-4">
           <div className="mx-auto max-w-7xl rounded-2xl bg-[#F4F1EC] px-5 py-8 sm:px-10 sm:py-9">
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
               <div className="max-w-md">
