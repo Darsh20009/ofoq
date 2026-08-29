@@ -68,6 +68,7 @@ function OfoqDecoration({ className = "" }: { className?: string }) {
 /* ══ المكوّن الرئيسي ═══════════════════════════════════════════ */
 export default function PublicLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterState, setNewsletterState] = useState<"idle" | "loading" | "success" | "already" | "error">("idle");
   const { pathname } = useLocation();
@@ -98,6 +99,19 @@ export default function PublicLayout() {
     setDrawerOpen(false);
     window.scrollTo(0, 0);
   }, [pathname]);
+
+  /* تغيير مظهر الهيدر بعد مغادرة بداية الصفحة الرئيسية */
+  useEffect(() => {
+    if (!isHomePage) {
+      setIsScrolled(true);
+      return;
+    }
+
+    const handleScroll = () => setIsScrolled(window.scrollY > 12);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isHomePage]);
 
   /* إرسال الاشتراك البريدي */
   async function handleNewsletterSubmit(e: React.FormEvent) {
@@ -140,18 +154,22 @@ export default function PublicLayout() {
 
       {/* ══ الهيدر الثابت — مطابق لتكوين الصفحة الرئيسية ═══════════ */}
       <header
-        className={`fixed top-0 inset-x-0 z-50 flex h-[72px] items-center justify-between border-b px-5 transition-colors sm:h-[86px] sm:px-10 lg:px-14 ${
-          isHomePage ? "border-transparent bg-transparent text-[#071936]" : "border-white/10 text-white"
+        className={`fixed top-0 inset-x-0 z-50 flex h-[72px] items-center justify-between border-b px-5 transition-all duration-300 sm:h-[86px] sm:px-10 lg:px-14 ${
+          isHomePage
+            ? isScrolled
+              ? "border-white/10 bg-[#071936]/80 text-white shadow-[0_10px_30px_rgba(7,25,54,.18)] backdrop-blur-xl"
+              : "border-transparent bg-transparent text-[#071936]"
+            : "border-white/10 bg-[#071936]/90 text-white backdrop-blur-xl"
         }`}
       >
         {/* الشعار */}
         <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
           <span className="flex h-10 w-12 items-center justify-center sm:h-12 sm:w-14">
-            <OfoqLogo className="h-8 w-11 sm:h-10 sm:w-13" dark={isHomePage} />
+            <OfoqLogo className="h-8 w-11 sm:h-10 sm:w-13" dark={isHomePage && !isScrolled} />
           </span>
           <div className="leading-none hidden sm:block">
-            <p className={`font-black text-sm ${isHomePage ? "text-[#0B0A35]" : "text-white"}`}>أفق</p>
-            <p className={`text-[9px] tracking-wide ${isHomePage ? "text-[#8B825B]" : "text-white/40"}`}>OFOQ BUSINESS SERVICES</p>
+            <p className={`font-black text-sm ${isHomePage && !isScrolled ? "text-[#0B0A35]" : "text-white"}`}>أفق</p>
+            <p className={`text-[9px] tracking-wide ${isHomePage && !isScrolled ? "text-[#8B825B]" : "text-white/40"}`}>OFOQ BUSINESS SERVICES</p>
           </div>
         </Link>
 
@@ -162,7 +180,7 @@ export default function PublicLayout() {
               key={link.href}
               to={link.href}
               className={`relative whitespace-nowrap py-7 text-[13px] font-bold transition-colors ${
-                isHomePage ? "text-[#071936]/75 hover:text-[#071936]" : "text-white/70 hover:text-white"
+                isHomePage && !isScrolled ? "text-[#071936]/75 hover:text-[#071936]" : "text-white/70 hover:text-white"
               } ${isHomePage && index === 0 ? "after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-[#C13229]" : ""}`}
             >
               {link.label}
@@ -175,7 +193,7 @@ export default function PublicLayout() {
           <Link
             to="/client/login"
             className={`hidden rounded-lg border px-4 py-2.5 text-xs font-bold transition-colors sm:inline-flex ${
-              isHomePage ? "border-[#071936] bg-[#071936] text-white hover:bg-[#102b57]" : "border-white/30 text-white"
+              isHomePage && !isScrolled ? "border-[#071936] bg-[#071936] text-white hover:bg-[#102b57]" : "border-white/30 text-white"
             }`}
           >
             {isRtl ? "تسجيل الدخول" : "Sign in"}
@@ -191,11 +209,11 @@ export default function PublicLayout() {
             value={lang}
             onChange={(e) => setLang(e.target.value as typeof lang)}
             className={`hidden cursor-pointer bg-transparent text-[11px] font-bold outline-none transition-colors md:block ${isHomePage ? "!hidden" : ""} ${
-              isHomePage ? "text-[#071936]/65 hover:text-[#071936]" : "text-white/60 hover:text-white"
+              isHomePage && !isScrolled ? "text-[#071936]/65 hover:text-[#071936]" : "text-white/60 hover:text-white"
             }`}
           >
             {langs.map((l) => (
-              <option key={l.code} value={l.code} className={isHomePage ? "bg-white text-[#0B0A35]" : "bg-[#2B273F] text-white"}>
+              <option key={l.code} value={l.code} className={isHomePage && !isScrolled ? "bg-white text-[#0B0A35]" : "bg-[#2B273F] text-white"}>
                 {l.label}
               </option>
             ))}
@@ -207,7 +225,7 @@ export default function PublicLayout() {
             onChange={(e) => setLang(e.target.value as typeof lang)}
             aria-label={isRtl ? "اختيار اللغة" : "Select language"}
             className={`block cursor-pointer appearance-none bg-transparent px-1 text-[10px] font-bold outline-none transition-colors md:hidden ${
-              isHomePage ? "text-[#071936]/70" : "text-white/70"
+              isHomePage && !isScrolled ? "text-[#071936]/70" : "text-white/70"
             }`}
           >
             {langs.map((l) => (
@@ -221,7 +239,7 @@ export default function PublicLayout() {
           <button
             onClick={() => setDrawerOpen(true)}
             aria-label={isRtl ? "فتح القائمة" : "Open menu"}
-            className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-colors lg:hidden ${isHomePage ? "text-[#071936]/80" : "text-white/70"}`}
+            className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-colors lg:hidden ${isHomePage && !isScrolled ? "text-[#071936]/80" : "text-white/70"}`}
           >
             <span className="flex flex-col gap-[5px]">
               <span className="block w-5 h-[1.5px] bg-current" />
@@ -363,17 +381,17 @@ export default function PublicLayout() {
       </main>
 
       {/* ══ الفوتر ══════════════════════════════════════════════ */}
-      <footer className="bg-[#1a1726] text-white border-t border-white/8">
+      <footer className="bg-[#071936] text-white border-t border-white/8">
 
         {/* النشرة البريدية */}
-        <div className="border-b border-white/8">
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 py-12">
+        <div className="border-b border-[#071936]/10 bg-[#071936] px-5 py-2 sm:px-10 sm:py-4">
+          <div className="mx-auto max-w-7xl rounded-2xl bg-[#F4F1EC] px-5 py-8 sm:px-10 sm:py-9">
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
               <div className="max-w-md">
-                <p className="text-[10px] font-bold uppercase tracking-[.25em] text-[#33B27C] mb-3">
+                <p className="mb-3 text-[10px] font-bold uppercase tracking-[.25em] text-[#C13229]">
                   {isRtl ? "انضم لمجتمعنا" : "Join our community"}
                 </p>
-                <h3 className="text-2xl font-black text-white mb-2">
+                <h3 className="mb-2 text-2xl font-black text-[#071936]">
                   {isRtl
                     ? "اشترك لتعرف كيف نرفع حلول الأعمال"
                     : "Sign up to learn how we elevate business solutions"}
@@ -406,7 +424,7 @@ export default function PublicLayout() {
                       value={newsletterEmail}
                       onChange={(e) => setNewsletterEmail(e.target.value)}
                       placeholder={isRtl ? "بريدك الإلكتروني" : "Your email address"}
-                      className="flex-1 bg-white/6 border border-white/12 text-white placeholder-white/30 text-sm px-5 py-3.5 rounded-l-full outline-none focus:border-[#33B27C] transition-colors min-w-0"
+                      className="min-w-0 flex-1 rounded-l-full border border-[#071936]/10 bg-white px-5 py-3.5 text-sm text-[#071936] outline-none transition-colors placeholder:text-[#071936]/35 focus:border-[#33B27C]"
                     />
                     <button
                       type="submit"

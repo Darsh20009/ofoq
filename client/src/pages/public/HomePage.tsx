@@ -44,7 +44,6 @@ export default function HomePage() {
   const { ui, lang, dir } = useLang();
   const isArabic = lang === "ar" || lang === "ur";
   const copy = {
-    eyebrow: isArabic ? "أفق / خدمات الأعمال السعودية" : "OFOQ / Saudi Business Services",
     titleOne: isArabic ? "خدمات ترتقي" : "Services that elevate",
     titleTwo: isArabic ? "بالشركات" : "your business",
     description: isArabic ? "نقدم لك منظومة متكاملة من الخدمات تدعم أعمالك في كل مرحلة من التأسيس إلى النمو والتوسع." : "We provide an integrated range of services that supports your business from formation through growth and expansion.",
@@ -145,7 +144,7 @@ export default function HomePage() {
         </section>
 
         <section className="bg-[#071936] px-5 pb-16 text-white sm:px-10 sm:pb-24 lg:px-16">
-          <div className="mx-auto grid max-w-[1380px] items-center gap-8 overflow-hidden rounded-[28px] border border-white/10 bg-[#122846] px-6 py-8 [direction:ltr] sm:px-10 lg:grid-cols-[1.08fr_.92fr] lg:px-14 lg:py-10">
+          <div className="mx-auto grid max-w-[1380px] items-center gap-8 overflow-hidden rounded-[24px] border border-white/10 bg-[#122846] px-6 py-8 [direction:ltr] sm:px-10 lg:grid-cols-[1.08fr_.92fr] lg:px-14 lg:py-10">
             <div dir={dir} className="order-2 text-right lg:order-2">
               <p className="mb-3 text-xs font-bold text-[#C5B278]">{isArabic ? "بوابة أفق الذكية" : "OFOQ SMART PORTAL"}</p>
               <h2 className="max-w-lg text-3xl font-black leading-[1.35] sm:text-4xl">
@@ -177,7 +176,64 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        <section className="bg-[#071936] px-5 pb-10 sm:px-10 sm:pb-14 lg:px-16">
+          <div className="mx-auto max-w-[1380px] rounded-2xl bg-[#F4F1EC] px-5 py-6 text-[#071936] sm:px-10 sm:py-7">
+            <div className="flex flex-col items-center justify-between gap-5 sm:flex-row" dir={dir}>
+              <p className="text-center text-xs font-bold text-[#071936]/65 sm:text-right">
+                {isArabic ? "عملاء نفخر بخدمتهم" : "Trusted by businesses we are proud to serve"}
+              </p>
+              <div className="flex w-full flex-wrap items-center justify-center gap-x-7 gap-y-4 sm:w-auto sm:justify-end sm:gap-x-9">
+                {[
+                  { name: "SNB", detail: isArabic ? "الأهلي السعودي" : "Saudi National Bank" },
+                  { name: "stc", detail: isArabic ? "حلول الأعمال" : "business" },
+                  { name: "مرافق", detail: isArabic ? "للطاقة والمياه" : "utilities" },
+                  { name: "المراعي", detail: isArabic ? "جودة تستحق الثقة" : "quality you trust" },
+                  { name: "سبيك", detail: isArabic ? "للحلول الذكية" : "smart solutions" },
+                ].map((partner) => (
+                  <div key={partner.name} className="min-w-[72px] text-center opacity-75 transition-opacity hover:opacity-100">
+                    <strong className="block text-lg font-black tracking-[-.06em] text-[#071936]">{partner.name}</strong>
+                    <span className="block text-[7px] font-bold text-[#071936]/50">{partner.detail}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-[#071936] px-5 pb-12 sm:px-10 sm:pb-16 lg:px-16">
+          <div className="relative mx-auto min-h-[235px] max-w-[1380px] overflow-hidden rounded-[24px] border border-white/10 bg-[#102d56]">
+            <img src="/images/riyadh-district-dark.png" alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover object-center opacity-80" />
+            <div className="absolute inset-0 bg-gradient-to-l from-[#071936]/95 via-[#071936]/75 to-[#071936]/25" />
+            <div className="relative grid min-h-[235px] items-center gap-8 px-6 py-8 [direction:ltr] sm:px-12 lg:grid-cols-[1fr_1.2fr] lg:px-16">
+              <div className="hidden justify-center lg:flex">
+                <OfoqOutlineMark />
+              </div>
+              <div dir={dir} className="text-right">
+                <p className="mb-2 text-xs font-bold text-[#C5B278]">{isArabic ? "كن جزءًا من أفق" : "BE PART OF OFOQ"}</p>
+                <h2 className="text-2xl font-black text-white sm:text-3xl">{isArabic ? "شريكك في رحلة النمو" : "Your partner for the growth journey"}</h2>
+                <p className="mt-3 max-w-lg text-xs leading-6 text-white/65 sm:text-sm sm:leading-7">
+                  {isArabic ? "انضم إلى أكثر من 1,250 عميلًا يثقون بأفق لإدارة أعمالهم بثقة ووضوح." : "Join more than 1,250 clients who trust OFOQ to manage their business with confidence and clarity."}
+                </p>
+                <Link to="/contact" className="mt-5 inline-flex items-center gap-2 rounded-md bg-[#C13229] px-5 py-3 text-xs font-bold text-white transition-colors hover:bg-[#d34a42] sm:text-sm">
+                  {isArabic ? "ابدأ معنا الآن" : "Start with us"} <span>←</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </>
+  );
+}
+
+function OfoqOutlineMark() {
+  return (
+    <svg viewBox="0 0 210 148" className="h-40 w-56 opacity-25" fill="none" aria-hidden="true">
+      <rect x="6" y="5" width="58" height="90" rx="11" stroke="#FFFFFF" strokeWidth="7" />
+      <path d="M73 10v80M73 10h52M73 47h39" stroke="#C13229" strokeWidth="9" strokeLinecap="square" />
+      <rect x="72" y="103" width="26" height="38" rx="6" stroke="#FFFFFF" strokeWidth="5" />
+      <rect x="102" y="103" width="26" height="38" rx="6" stroke="#FFFFFF" strokeWidth="5" />
+    </svg>
   );
 }
