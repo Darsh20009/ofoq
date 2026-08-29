@@ -119,8 +119,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="relative bg-[#071936] pb-10 pt-14 text-white sm:pb-16 sm:pt-14">
-          <div className="pointer-events-none absolute -top-9 left-[-5%] h-16 w-[110%] rounded-[50%] bg-[#071936]" />
+        <section className="relative overflow-hidden rounded-tl-[58px] bg-[#071936] pb-10 pt-14 text-white sm:rounded-tl-[128px] sm:pb-16 sm:pt-14">
           <div className="relative mx-auto grid max-w-[1480px] gap-8 px-5 [direction:ltr] sm:gap-10 sm:px-10 lg:grid-cols-[.62fr_1.85fr] lg:items-start lg:px-16">
             <div dir={dir} className={isArabic ? "text-right" : "text-left"}>
               <p className="mb-3 text-[10px] font-bold uppercase tracking-[.16em] text-[#C5B278] sm:mb-4 sm:text-xs">{isArabic ? "خدمات أفق" : "OFOQ SERVICES"}</p>
