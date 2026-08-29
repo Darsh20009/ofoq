@@ -19,10 +19,10 @@ type Service = {
 };
 
 const services: Service[] = [
-  { number: "01", href: "/services/formation", ar: "تأسيس الشركات", en: "Company formation", descriptionAr: "من الفكرة إلى كيان عامل، ننسّق خطوات التأسيس.", descriptionEn: "From idea to operating entity, we coordinate every step.", icon: "building" },
-  { number: "02", href: "/services/visas", ar: "خدمات التأشيرات", en: "Visa services", descriptionAr: "حلول متكاملة لتأشيرات المستثمرين والموظفين.", descriptionEn: "Integrated solutions for investor and employee visas.", icon: "passport" },
-  { number: "03", href: "/services/government", ar: "الخدمات الحكومية", en: "Government services", descriptionAr: "نتابع معاملاتك الحكومية بوضوح وسرعة.", descriptionEn: "We manage your government transactions clearly and quickly.", icon: "government" },
-  { number: "04", href: "/services/hr", ar: "الموارد البشرية", en: "Human resources", descriptionAr: "إدارة مواردك البشرية لدعم نمو أعمالك.", descriptionEn: "Human resource management that supports your growth.", icon: "people" },
+  { number: "01", href: "/services/hr", ar: "الموارد البشرية", en: "Human resources", descriptionAr: "إدارة مواردك البشرية لدعم نمو أعمالك.", descriptionEn: "Human resource management that supports your growth.", icon: "people" },
+  { number: "02", href: "/services/formation", ar: "تأسيس الشركات", en: "Company formation", descriptionAr: "من الفكرة إلى كيان عامل، ننسّق خطوات التأسيس.", descriptionEn: "From idea to operating entity, we coordinate every step.", icon: "building" },
+  { number: "03", href: "/services/visas", ar: "خدمات التأشيرات", en: "Visa services", descriptionAr: "حلول متكاملة لتأشيرات المستثمرين والموظفين.", descriptionEn: "Integrated solutions for investor and employee visas.", icon: "passport" },
+  { number: "04", href: "/services/government", ar: "الخدمات الحكومية", en: "Government services", descriptionAr: "نتابع معاملاتك الحكومية بوضوح وسرعة.", descriptionEn: "We manage your government transactions clearly and quickly.", icon: "government" },
   { number: "05", href: "/services/contracts", ar: "العقود والاتفاقيات", en: "Contracts & agreements", descriptionAr: "نصيغ ونراجع عقودك لحماية علاقاتك التجارية.", descriptionEn: "We draft and review contracts that protect your commercial relationships.", icon: "contract" },
   { number: "06", href: "/services/legal", ar: "الخدمات القانونية", en: "Legal services", descriptionAr: "إرشاد قانوني عملي يساعدك على العمل بثقة وامتثال.", descriptionEn: "Practical legal guidance to help you operate with confidence and compliance.", icon: "legal" },
   { number: "07", href: "/services/business", ar: "حلول الأعمال", en: "Business solutions", descriptionAr: "خدمات تشغيلية مرنة تمنح فريقك مساحة أكبر للنمو.", descriptionEn: "Flexible operational services that give your team more room to grow.", icon: "briefcase" },
@@ -62,24 +62,25 @@ export default function HomePage() {
       <Helmet>
         <title>{ui.home.metaTitle}</title>
         <meta name="description" content={copy.description} />
+        <link rel="preload" as="image" href="/images/ofoq-hero-reference.webp" media="(min-width: 640px)" />
+        <link rel="preload" as="image" href="/images/ofoq-hero-reference-mobile.webp" media="(max-width: 639px)" />
       </Helmet>
       <main dir={dir} className="relative overflow-hidden bg-[#F4F1EC] text-[#071936]">
         <section className="relative min-h-[620px] overflow-visible bg-[#F4F1EC] pt-16 sm:min-h-[625px] sm:pt-[78px] lg:min-h-[535px]">
           <div className="absolute inset-0 bg-[#F4F1EC]" />
           <div className="pointer-events-none absolute left-[-14%] top-[7%] h-[430px] w-[430px] rounded-full border border-[#071936]/[.035] sm:h-[620px] sm:w-[620px]" />
           <div className="pointer-events-none absolute left-[4%] top-[26%] h-[260px] w-[260px] rounded-full border border-[#C13229]/[.07]" />
-          <img
-            src="/images/ofoq-hero-reference.png"
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 hidden h-full w-full object-cover object-center sm:block"
-          />
-          <img
-            src="/images/ofoq-hero-reference-mobile.png"
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 block h-full w-full object-cover object-center sm:hidden"
-          />
+          <picture className="pointer-events-none absolute inset-0">
+            <source media="(max-width: 639px)" srcSet="/images/ofoq-hero-reference-mobile.webp" />
+            <img
+              src="/images/ofoq-hero-reference.webp"
+              alt=""
+              aria-hidden="true"
+              loading="eager"
+              decoding="async"
+              className="h-full w-full object-cover object-center"
+            />
+          </picture>
 
           <div className="relative z-10 mx-auto grid min-h-[510px] max-w-[1480px] items-center gap-3 px-5 pb-24 pt-10 [direction:ltr] sm:min-h-[470px] sm:grid-cols-[1.02fr_.98fr] sm:px-10 sm:pb-24 sm:pt-0 lg:min-h-[440px] lg:px-16">
             <div dir={dir} className="order-1 z-10 text-right sm:col-start-2 sm:order-2 sm:pr-8 lg:pr-16 xl:pr-24">
@@ -114,18 +115,17 @@ export default function HomePage() {
         </section>
 
         <section className="relative isolate overflow-hidden pb-10 pt-14 text-white sm:pb-16 sm:pt-14">
-          <img
-            src="/images/ofoq-hero-reference-mobile.png"
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[150px] w-full object-cover object-bottom sm:hidden"
-          />
-          <img
-            src="/images/ofoq-hero-reference.png"
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 z-0 hidden h-[190px] w-full object-cover object-bottom sm:block"
-          />
+          <picture className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[150px] sm:h-[190px]">
+            <source media="(max-width: 639px)" srcSet="/images/ofoq-hero-reference-mobile.webp" />
+            <img
+              src="/images/ofoq-hero-reference.webp"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover object-bottom"
+            />
+          </picture>
           <div className="pointer-events-none absolute inset-0 z-0 rounded-tl-[58px] bg-[#071936] sm:rounded-tl-[128px]" />
           <div className="relative z-10 mx-auto grid max-w-[1480px] gap-8 px-5 [direction:ltr] sm:gap-10 sm:px-10 lg:grid-cols-[.62fr_1.85fr] lg:items-start lg:px-16">
             <div dir={dir} className={isArabic ? "text-right" : "text-left"}>
@@ -139,14 +139,14 @@ export default function HomePage() {
               {featuredServices.map((service, index) => {
                 const title = isArabic ? service.ar : service.en;
                 const description = isArabic ? service.descriptionAr : service.descriptionEn;
-                const active = index === 3;
+                const active = index === 0;
                 return (
-                  <Link to={service.href} key={service.href} className={`group relative h-[188px] min-w-[170px] snap-start rounded-lg border p-3.5 transition-transform hover:-translate-y-1 sm:h-[204px] sm:min-w-[205px] sm:rounded-xl sm:p-5 ${active ? "border-[#C5B278] bg-[#F4F1EC] text-[#071936] shadow-[0_12px_25px_rgba(0,0,0,.12)]" : "border-white/10 bg-[#102d56] text-white"}`}>
+                  <Link to={service.href} key={service.href} className={`group relative flex h-[230px] min-w-[190px] snap-start flex-col rounded-lg border p-3.5 transition-transform hover:-translate-y-1 sm:h-[250px] sm:min-w-[225px] sm:rounded-xl sm:p-5 ${active ? "border-[#C5B278] bg-[#F4F1EC] text-[#071936] shadow-[0_12px_25px_rgba(0,0,0,.12)]" : "border-white/10 bg-[#102d56] text-white"}`}>
                     <span className={`text-[10px] font-bold sm:text-xs ${active ? "text-[#C13229]" : "text-[#C5B278]"}`}>{String(index + 1).padStart(2, "0")}</span>
                     <LineIcon type={service.icon} className={`mb-3 mt-4 h-8 w-8 sm:mb-3 sm:mt-5 sm:h-9 sm:w-9 ${active ? "text-[#C13229]" : "text-[#C5B278]"}`} />
-                    <h3 className="text-sm font-black sm:text-base">{title}</h3>
-                    <p className={`mt-2 min-h-10 text-[10px] leading-5 sm:text-[11px] sm:leading-5 ${active ? "text-[#071936]/60" : "text-white/55"}`}>{description}</p>
-                    <span className={`absolute bottom-3.5 right-3.5 text-[9px] font-bold sm:bottom-5 sm:right-5 sm:text-[10px] ${active ? "text-[#C13229]" : "text-white/70"}`}>{isArabic ? "اعرف أكثر ←" : "Learn more →"}</span>
+                    <h3 className="min-h-[2.5rem] text-sm font-black sm:text-base">{title}</h3>
+                    <p className={`mt-2 min-h-10 line-clamp-2 text-[10px] leading-5 sm:text-[11px] sm:leading-5 ${active ? "text-[#071936]/60" : "text-white/55"}`}>{description}</p>
+                    <span className={`mt-auto block pt-3 text-[9px] font-bold sm:text-[10px] ${active ? "text-[#C13229]" : "text-white/70"}`}>{isArabic ? "اعرف أكثر ←" : "Learn more →"}</span>
                   </Link>
                 );
               })}
@@ -181,7 +181,7 @@ export default function HomePage() {
             <div className="order-1 flex justify-center lg:order-1 lg:justify-start">
               <div className="relative w-full max-w-[580px] overflow-hidden rounded-[18px]">
                 <div className="aspect-[856/538] overflow-hidden rounded-[14px]">
-                  <img src="/images/ofoq-smart-portal-dashboard.png" alt={isArabic ? "لوحة بوابة أفق الذكية" : "OFOQ smart portal dashboard"} className="h-full w-full object-contain object-center" />
+                  <img src="/images/ofoq-smart-portal-dashboard.png" alt={isArabic ? "لوحة بوابة أفق الذكية" : "OFOQ smart portal dashboard"} loading="lazy" decoding="async" className="h-full w-full object-contain object-center" />
                 </div>
               </div>
             </div>
@@ -192,7 +192,7 @@ export default function HomePage() {
 
         <section className="bg-[#071936] px-5 pb-12 sm:px-10 sm:pb-16 lg:px-16">
           <div className="relative mx-auto min-h-[235px] max-w-[1380px] overflow-hidden rounded-[24px] border border-white/10 bg-[#102d56]">
-            <img src="/images/riyadh-district-dark.png" alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover object-center opacity-80" />
+            <img src="/images/riyadh-district-dark.png" alt="" aria-hidden="true" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover object-center opacity-80" />
             <div className="absolute inset-0 bg-gradient-to-l from-[#071936]/95 via-[#071936]/75 to-[#071936]/25" />
             <div className="relative grid min-h-[235px] items-center gap-8 px-6 py-8 [direction:ltr] sm:px-12 lg:grid-cols-[1fr_1.2fr] lg:px-16">
               <div className="hidden justify-center lg:flex">
@@ -299,7 +299,7 @@ function PartnersSection({ dir, isArabic }: { dir: "rtl" | "ltr"; isArabic: bool
         </div>
         {partners.length > 0 ? (
           <div
-            className="partners-marquee overflow-hidden"
+            className="partners-marquee overflow-x-auto touch-pan-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
             onFocusCapture={() => setPaused(true)}

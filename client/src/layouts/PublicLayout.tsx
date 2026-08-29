@@ -154,7 +154,7 @@ export default function PublicLayout() {
 
       {/* ══ الهيدر الثابت — مطابق لتكوين الصفحة الرئيسية ═══════════ */}
       <header
-        className={`fixed top-0 inset-x-0 z-50 flex h-[72px] items-center justify-between border-b px-5 transition-all duration-300 sm:h-[86px] sm:px-10 lg:px-14 ${
+        className={`fixed top-0 inset-x-0 z-50 flex h-[66px] items-center justify-between border-b px-5 transition-all duration-300 sm:h-[78px] sm:px-10 lg:px-14 ${
           isHomePage
             ? isScrolled
               ? "border-white/10 bg-[#071936]/80 text-white shadow-[0_10px_30px_rgba(7,25,54,.18)] backdrop-blur-xl"
