@@ -183,17 +183,26 @@ export default function HomePage() {
               <p className="text-center text-xs font-bold text-[#071936]/65 sm:text-right">
                 {isArabic ? "شركاؤنا" : "Our partners"}
               </p>
-              <div className="flex w-full flex-wrap items-center justify-center gap-x-7 gap-y-4 sm:w-auto sm:justify-end sm:gap-x-9">
+              <div className="flex w-full snap-x items-center gap-6 overflow-x-auto px-1 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-1 sm:justify-between sm:gap-5">
                 {[
-                  { name: "SNB", detail: isArabic ? "البنك الأهلي السعودي" : "Saudi National Bank" },
-                  { name: "stc", detail: isArabic ? "حلول الأعمال" : "business" },
-                  { name: "مرافق", detail: isArabic ? "للطاقة والمياه" : "utilities" },
-                  { name: "المراعي", detail: isArabic ? "Almarai" : "Almarai" },
-                  { name: "سابك", detail: isArabic ? "SABIC" : "SABIC" },
+                  { src: "/images/partner-01.png", alt: "جان" },
+                  { src: "/images/partner-02.png", alt: "Osten" },
+                  { src: "/images/partner-03.png", alt: "Mabaat" },
+                  { src: "/images/partner-04.png", alt: "Protime" },
+                  { src: "/images/partner-05.png", alt: "Golden Lines Lifts" },
+                  { src: "/images/partner-06.png", alt: "Lens Maintenance and Operation Company" },
+                  { src: "/images/partner-07.png", alt: "المسكن الوافي" },
+                  { src: "/images/partner-08.png", alt: "الجونة" },
+                  { src: "/images/partner-09.png", alt: "Calma" },
+                  { src: "/images/partner-10.png", alt: "Ibtikarat" },
                 ].map((partner) => (
-                  <div key={partner.name} className="min-w-[72px] text-center opacity-75 transition-opacity hover:opacity-100">
-                    <strong className="block text-lg font-black tracking-[-.06em] text-[#071936]">{partner.name}</strong>
-                    <span className="block text-[7px] font-bold text-[#071936]/50">{partner.detail}</span>
+                  <div key={partner.src} className="flex h-16 min-w-[92px] snap-start items-center justify-center sm:min-w-0 sm:flex-1">
+                    <img
+                      src={partner.src}
+                      alt={partner.alt}
+                      loading="lazy"
+                      className="max-h-12 w-auto max-w-[105px] object-contain transition-transform duration-300 hover:scale-105"
+                    />
                   </div>
                 ))}
               </div>
