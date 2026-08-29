@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useLang } from "../../i18n/LangContext";
-import { servicesCatalog } from "../../data/servicesCatalog";
 import { cmsApi } from "../../api/client";
 import OfoqLogo from "../../components/OfoqLogo";
 import type { Partner } from "../../types";
@@ -23,26 +22,22 @@ const services: Service[] = [
   { number: "01", href: "/services/formation", ar: "تأسيس الشركات", en: "Company formation", descriptionAr: "من الفكرة إلى كيان عامل، ننسّق خطوات التأسيس.", descriptionEn: "From idea to operating entity, we coordinate every step.", icon: "building" },
   { number: "02", href: "/services/visas", ar: "خدمات التأشيرات", en: "Visa services", descriptionAr: "حلول متكاملة لتأشيرات المستثمرين والموظفين.", descriptionEn: "Integrated solutions for investor and employee visas.", icon: "passport" },
   { number: "03", href: "/services/government", ar: "الخدمات الحكومية", en: "Government services", descriptionAr: "نتابع معاملاتك الحكومية بوضوح وسرعة.", descriptionEn: "We manage your government transactions clearly and quickly.", icon: "government" },
-  { number: "04", href: "/services/business", ar: "الموارد البشرية", en: "Human resources", descriptionAr: "إدارة مواردك البشرية لدعم نمو أعمالك.", descriptionEn: "Human resource management that supports your growth.", icon: "people" },
+  { number: "04", href: "/services/hr", ar: "الموارد البشرية", en: "Human resources", descriptionAr: "إدارة مواردك البشرية لدعم نمو أعمالك.", descriptionEn: "Human resource management that supports your growth.", icon: "people" },
+  { number: "05", href: "/services/contracts", ar: "العقود والاتفاقيات", en: "Contracts & agreements", descriptionAr: "نصيغ ونراجع عقودك لحماية علاقاتك التجارية.", descriptionEn: "We draft and review contracts that protect your commercial relationships.", icon: "contract" },
+  { number: "06", href: "/services/legal", ar: "الخدمات القانونية", en: "Legal services", descriptionAr: "إرشاد قانوني عملي يساعدك على العمل بثقة وامتثال.", descriptionEn: "Practical legal guidance to help you operate with confidence and compliance.", icon: "legal" },
+  { number: "07", href: "/services/business", ar: "حلول الأعمال", en: "Business solutions", descriptionAr: "خدمات تشغيلية مرنة تمنح فريقك مساحة أكبر للنمو.", descriptionEn: "Flexible operational services that give your team more room to grow.", icon: "briefcase" },
+  { number: "08", href: "/services/marketing", ar: "التسويق", en: "Marketing", descriptionAr: "نبني حضورًا واضحًا وطلبًا قابلًا للقياس لعلامتك.", descriptionEn: "We build a clear presence and measurable demand for your brand.", icon: "marketing" },
 ];
-
-const catalogServices: Service[] = servicesCatalog.flatMap((category) =>
-  category.services.map((service, index) => ({
-    number: "",
-    href: `/services/${category.slug}/${service.slug}`,
-    ar: service.title.ar,
-    en: service.title.en,
-    descriptionAr: service.desc.ar,
-    descriptionEn: service.desc.en,
-    icon: category.slug === "formation" ? "building" : category.slug === "visas" ? "passport" : category.slug === "government" ? "government" : category.slug === "people" ? "people" : index % 2 ? "passport" : "building",
-  })),
-);
 
 function LineIcon({ type, className = "" }: { type: string; className?: string }) {
   const common = { fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   if (type === "people") return <svg viewBox="0 0 48 48" className={className} {...common}><circle cx="18" cy="16" r="5" /><circle cx="31" cy="18" r="4" /><path d="M7 36c1-7 5-10 11-10s10 3 11 10M27 28c6-4 12 0 14 7" /></svg>;
   if (type === "passport") return <svg viewBox="0 0 48 48" className={className} {...common}><rect x="10" y="6" width="28" height="36" rx="3" /><circle cx="24" cy="20" r="5" /><path d="M17 32h14M17 37h9M24 15v10M19 20h10" /></svg>;
   if (type === "government") return <svg viewBox="0 0 48 48" className={className} {...common}><path d="m7 18 17-9 17 9M10 20h28M13 20v15M21 20v15M29 20v15M37 20v15M8 39h32M6 43h36" /></svg>;
+  if (type === "contract") return <svg viewBox="0 0 48 48" className={className} {...common}><path d="M12 6h18l7 7v29H12zM30 6v9h7M18 23h13M18 29h13M18 35h8" /><path d="m29 35 3 3 6-7" /></svg>;
+  if (type === "legal") return <svg viewBox="0 0 48 48" className={className} {...common}><path d="M24 8v31M16 40h16M12 12h24M8 15l-6 12h12zM36 15l-6 12h12zM2 27c1 4 11 4 12 0M30 27c1 4 11 4 12 0" /></svg>;
+  if (type === "briefcase") return <svg viewBox="0 0 48 48" className={className} {...common}><rect x="6" y="14" width="36" height="26" rx="3" /><path d="M17 14v-4h14v4M6 24h36M21 24v4h6v-4" /></svg>;
+  if (type === "marketing") return <svg viewBox="0 0 48 48" className={className} {...common}><path d="M8 27h8l20 9V12l-20 9H8zM16 27l3 12h6l-3-12M36 20c4 2 5 7 0 10" /></svg>;
   return <svg viewBox="0 0 48 48" className={className} {...common}><path d="M7 40V18l10-5v27M17 40V10l11-5v35M28 40V21l13-6v25M5 43h38" /><path d="M12 23h1M12 29h1M22 16h1M22 22h1M34 27h1M34 33h1" /></svg>;
 }
 
@@ -60,8 +55,7 @@ export default function HomePage() {
     servicesTitleTwo: isArabic ? "في مكان واحد" : "in one place",
     servicesDescription: isArabic ? "من التأسيس إلى التشغيل، نوفر لك كل ما تحتاجه لنمو أعمالك بثقة ووضوح." : "From formation to operations, everything you need to grow with confidence and clarity.",
   };
-  const allServices = [...services, ...catalogServices];
-  const featuredServices = allServices.slice(0, 4);
+  const featuredServices = services;
 
   return (
     <>
@@ -111,16 +105,29 @@ export default function HomePage() {
               { value: "1,250+", label: isArabic ? "عميل وثق بنا" : "Trusted clients", icon: "♧" },
               { value: "8+", label: isArabic ? "سنوات من الخبرة" : "Years of experience", icon: "◉" },
             ].map((stat, index) => (
-              <div key={stat.value} className={`flex items-center justify-center gap-2 px-2 py-3.5 sm:gap-3 sm:px-5 sm:py-4 ${index > 0 ? "border-r border-white/10" : ""} ${index === 2 ? "border-t border-white/10 sm:border-t-0" : ""} ${index === 3 ? "border-t border-white/10 sm:border-t-0" : ""}`}>
-                <span className="text-lg text-[#C5B278] sm:text-2xl">{stat.icon}</span>
-                <div><strong className="block text-base font-black sm:text-xl">{stat.value}</strong><span className="block text-[8px] text-white/60 sm:text-[10px]">{stat.label}</span></div>
+              <div key={stat.value} className={`flex min-w-0 items-center justify-center gap-1 px-1 py-2 sm:gap-3 sm:px-5 sm:py-4 ${index > 0 ? "border-r border-white/10" : ""} ${index === 2 ? "border-t border-white/10 sm:border-t-0" : ""} ${index === 3 ? "border-t border-white/10 sm:border-t-0" : ""}`}>
+                <span className="text-sm text-[#C5B278] sm:text-2xl">{stat.icon}</span>
+                <div className="min-w-0"><strong className="block text-xs font-black sm:text-xl">{stat.value}</strong><span className="block truncate text-[6px] text-white/60 sm:text-[10px]">{stat.label}</span></div>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="relative overflow-hidden rounded-tl-[58px] bg-[#071936] pb-10 pt-14 text-white sm:rounded-tl-[128px] sm:pb-16 sm:pt-14">
-          <div className="relative mx-auto grid max-w-[1480px] gap-8 px-5 [direction:ltr] sm:gap-10 sm:px-10 lg:grid-cols-[.62fr_1.85fr] lg:items-start lg:px-16">
+        <section className="relative isolate overflow-hidden pb-10 pt-14 text-white sm:pb-16 sm:pt-14">
+          <img
+            src="/images/ofoq-hero-reference-mobile.png"
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[150px] w-full object-cover object-bottom sm:hidden"
+          />
+          <img
+            src="/images/ofoq-hero-reference.png"
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 z-0 hidden h-[190px] w-full object-cover object-bottom sm:block"
+          />
+          <div className="pointer-events-none absolute inset-0 z-0 rounded-tl-[58px] bg-[#071936] sm:rounded-tl-[128px]" />
+          <div className="relative z-10 mx-auto grid max-w-[1480px] gap-8 px-5 [direction:ltr] sm:gap-10 sm:px-10 lg:grid-cols-[.62fr_1.85fr] lg:items-start lg:px-16">
             <div dir={dir} className={isArabic ? "text-right" : "text-left"}>
               <p className="mb-3 text-[10px] font-bold uppercase tracking-[.16em] text-[#C5B278] sm:mb-4 sm:text-xs">{isArabic ? "خدمات أفق" : "OFOQ SERVICES"}</p>
               <h2 className="text-[2.25rem] font-black leading-[1.15] tracking-[-.03em] sm:text-[3.25rem]"><span className="block">{copy.servicesTitleOne}</span><span className="block text-[#C5B278]">{copy.servicesTitleTwo}</span></h2>
