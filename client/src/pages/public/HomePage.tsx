@@ -84,9 +84,6 @@ export default function HomePage() {
 
           <div className="relative z-10 mx-auto grid min-h-[510px] max-w-[1480px] items-center gap-3 px-5 pb-24 pt-10 [direction:ltr] sm:min-h-[470px] sm:grid-cols-[1.02fr_.98fr] sm:px-10 sm:pb-24 sm:pt-0 lg:min-h-[440px] lg:px-16">
             <div dir={dir} className="order-1 z-10 text-right sm:col-start-2 sm:order-2 sm:pr-8 lg:pr-16 xl:pr-24">
-              <p className="mb-4 flex items-center justify-end gap-3 text-[10px] font-bold text-[#C13229] sm:mb-5 sm:text-sm">
-                {copy.eyebrow}<span className="h-px w-8 bg-[#C13229]" />
-              </p>
               <h1 className="max-w-[540px] text-[2.15rem] font-black leading-[1.12] tracking-[-.045em] sm:text-[clamp(2.5rem,5vw,4.55rem)]">
                 <span className="block whitespace-nowrap">{copy.titleOne}</span>
                 <span className="block whitespace-nowrap">{copy.titleTwo}</span>
