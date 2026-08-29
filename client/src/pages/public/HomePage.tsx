@@ -169,7 +169,7 @@ export default function HomePage() {
             <div className="order-1 flex justify-center lg:order-1 lg:justify-start">
               <div className="relative w-full max-w-[580px] overflow-hidden rounded-[18px] border-[10px] border-[#0a1b31] bg-[#e8ebef] shadow-2xl">
                 <div className="aspect-[1.55] overflow-hidden">
-                  <img src="/images/ofoq-client-portal-dashboard.png" alt={isArabic ? "لوحة بوابة أفق" : "OFOQ portal dashboard"} className="h-full w-full object-cover object-top" />
+                  <img src="/images/ofoq-smart-portal-dashboard.png" alt={isArabic ? "لوحة بوابة أفق الذكية" : "OFOQ smart portal dashboard"} className="h-full w-full object-cover object-top" />
                 </div>
                 <div className="absolute bottom-[-14px] left-1/2 h-3 w-2/3 -translate-x-1/2 rounded-full bg-[#071936]" />
               </div>
