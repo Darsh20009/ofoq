@@ -269,10 +269,10 @@ export default function PublicLayout() {
               animate={isHomePage ? { y: 0, opacity: 1 } : { x: 0 }}
               exit={isHomePage ? { y: -28, opacity: 0 } : { x: isRtl ? -420 : 420 }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className={`fixed ${isHomePage ? "top-[72px] h-[calc(100%-72px)] sm:top-[86px] sm:h-[calc(100%-86px)] bg-[#071936]/75 shadow-[0_18px_50px_rgba(0,0,0,.35)] backdrop-blur-2xl" : "top-0 h-full bg-[#1a1726]"} ${isRtl ? "left-0" : "right-0"} z-[80] flex w-80 flex-col overflow-y-auto border-white/10 sm:w-96 ${isHomePage ? "border-t" : ""}`}
+              className={`fixed ${isHomePage ? "inset-x-0 top-[66px] h-[calc(100%-66px)] w-full rounded-b-[24px] bg-[#071936]/95 shadow-[0_18px_50px_rgba(0,0,0,.35)] backdrop-blur-2xl sm:top-[78px] sm:h-[calc(100%-78px)]" : "top-0 h-full bg-[#1a1726]"} ${isHomePage ? "" : isRtl ? "left-0" : "right-0"} z-[80] flex flex-col overflow-y-auto border-white/10 sm:w-96 ${isHomePage ? "border-t" : ""}`}
             >
               {/* رأس الـ Drawer */}
-              <div className={`flex items-center justify-between px-8 py-6 border-b border-white/8 ${isHomePage ? "hidden" : ""}`}>
+              <div className="flex items-center justify-between border-b border-white/8 px-6 py-5 sm:px-8">
                 <Link to="/" onClick={() => setDrawerOpen(false)} className="flex items-center gap-2.5">
                   <OfoqLogo className="w-10 h-7" />
                   <div className="leading-none">
@@ -307,7 +307,7 @@ export default function PublicLayout() {
               </div>
 
               {/* روابط التنقل */}
-              <nav className={`px-8 flex-1 ${isHomePage ? "py-7" : "py-6"}`}>
+              <nav className={`flex-1 px-6 sm:px-8 ${isHomePage ? "py-5 sm:py-7" : "py-6"}`}>
                 <p className="text-[10px] font-bold uppercase tracking-[.2em] text-white/30 mb-5">
                   {isRtl ? "الصفحات" : "Navigation"}
                 </p>
@@ -322,7 +322,7 @@ export default function PublicLayout() {
                       <Link
                         to={link.href}
                         onClick={() => setDrawerOpen(false)}
-                        className={`flex items-center justify-between py-3 text-lg font-bold border-b border-white/5 transition-colors ${
+                        className={`flex items-center justify-between py-3.5 text-base font-bold border-b border-white/5 transition-colors sm:text-lg ${
                           pathname === link.href
                             ? "text-[#33B27C]"
                             : "text-white/70 hover:text-white"
@@ -340,7 +340,7 @@ export default function PublicLayout() {
                 <Link
                   to="/client/login"
                   onClick={() => setDrawerOpen(false)}
-                  className="mt-6 flex items-center gap-2 bg-[#33B27C] text-white font-bold text-sm px-5 py-3 rounded-full hover:bg-[#2a9668] transition-colors"
+                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-[#33B27C] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#2a9668]"
                 >
                   <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3">
