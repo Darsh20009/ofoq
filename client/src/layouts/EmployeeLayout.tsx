@@ -32,149 +32,41 @@ export default function EmployeeLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F5F1] font-cairo text-navy-700" dir={dir}>
-
-      {/* ── Top Bar ─────────────────────────────── */}
-      <header className="bg-[#2B273F] border-b border-white/10 sticky top-0 z-40 shadow-xl shadow-navy-950/10">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
-
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <OfoqLogo className="w-8 h-6" />
-            <div className="hidden sm:block">
-              <p className="text-white font-bold text-sm leading-none">{ui.employee.portal}</p>
-              <p className="text-white/50 text-[10px]">OFOQ Employee Portal</p>
-            </div>
-          </Link>
-
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-1 mr-4">
-            {nav.map((item) => {
-              const active = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                    active
-                       ? "bg-[#237A57] text-white shadow-lg shadow-emerald-950/20"
-                      : "text-white/70 hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  <item.icon size={15} />
-                   {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Spacer */}
-          <div className="flex-1" />
-
-          <LanguageSwitcher dark compact />
-
-          {/* User Info */}
-          <div className="hidden sm:flex items-center gap-3">
-            {user?.avatar ? (
-              <img
-                src={user.avatar}
-                alt={user?.name || ui.employee.employeePhoto}
-                className="w-9 h-9 rounded-full object-cover border-2 border-[#33B27C]/40"
-              />
-            ) : (
-              <div className="w-9 h-9 rounded-full bg-[#33B27C]/20 flex items-center justify-center text-sm font-bold text-[#33B27C]">
-                {user?.name?.charAt(0)}
-              </div>
-            )}
-            <div className="text-right">
-              <p className="text-white text-sm font-semibold leading-none">
-                {user?.name}
-              </p>
-              <p className="text-white/50 text-xs mt-0.5">
-                {user?.position || ui.employee.employee}
-              </p>
-            </div>
-          </div>
-
-          {/* Logout */}
-          <button
-            onClick={handleLogout}
-            className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl text-white/70 hover:bg-red-500/20 hover:text-red-300 transition-all text-sm"
-          >
-            <LogOut size={16} />
-            {ui.employee.logout}
-          </button>
-
-          {/* Mobile Hamburger */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="lg:hidden p-2 text-white/70 hover:text-white"
-          >
-            {menuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
+    <div className="ofoq-shell min-h-screen bg-[#f5f1eb] font-cairo text-navy-700" dir={dir}>
+      <AnimatePresence>
+        {menuOpen && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          onClick={() => setMenuOpen(false)} className="fixed inset-0 z-40 bg-[#071a30]/55 lg:hidden" />}
+      </AnimatePresence>
+      <aside className={`fixed inset-y-0 ${dir === "rtl" ? "right-0" : "left-0"} z-50 w-64 bg-[#071a30] shadow-[0_0_45px_rgba(7,26,48,.28)] transition-transform lg:translate-x-0 ${menuOpen ? "translate-x-0" : dir === "rtl" ? "translate-x-full" : "-translate-x-full"}`}>
+        <div className="flex h-[72px] items-center gap-3 border-b border-white/10 px-5">
+          <OfoqLogo className="h-12 w-16" />
+          <div><p className="text-sm font-bold text-white">{ui.employee.portal}</p><p className="text-[10px] text-white/45">OFOQ Workspace</p></div>
+          <button onClick={() => setMenuOpen(false)} className="ms-auto text-white/60 lg:hidden"><X size={18} /></button>
         </div>
-
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {menuOpen && (
-            <motion.div
-              initial={{ height: 0 }}
-              animate={{ height: "auto" }}
-              exit={{ height: 0 }}
-              className="overflow-hidden lg:hidden border-t border-white/10"
-            >
-              <div className="px-4 py-3 space-y-1">
-                {/* User info on mobile */}
-                <div className="flex items-center gap-3 pb-3 border-b border-white/10 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-[#33B27C]/20 flex items-center justify-center text-sm font-bold text-[#33B27C]">
-                    {user?.name?.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="text-white text-sm font-semibold">{user?.name}</p>
-                    <p className="text-white/50 text-xs">{user?.position || ui.employee.employee}</p>
-                  </div>
-                </div>
-                <LanguageSwitcher dark />
-             {nav.map((item) => {
-                  const active = pathname === item.href;
-                  return (
-                    <Link
-                      key={item.href}
-                      to={item.href}
-                      onClick={() => setMenuOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                        active
-                          ? "bg-[#237A57] text-white"
-                          : "text-white/70 hover:bg-white/10 hover:text-white"
-                      }`}
-                    >
-                      <item.icon size={16} />
-                       {item.label}
-                    </Link>
-                  );
-                })}
-                <button
-                  onClick={handleLogout}
-                  className="flex w-full items-center gap-3 px-4 py-3 rounded-xl text-sm text-red-300 hover:bg-red-500/20 transition-all"
-                >
-                  <LogOut size={16} />
-                  {ui.employee.logout}
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
-
-      {/* ── Content ─────────────────────────────── */}
-         <main className="max-w-7xl mx-auto px-4 py-7 sm:py-9">
-        <Outlet />
-      </main>
-
-      {/* ── Footer ──────────────────────────────── */}
-       <footer className="text-center py-6 text-navy-400 text-xs border-t border-navy-100 mt-10 bg-[#FFFEFC]">
-        © {new Date().getFullYear()} OFOQ Business Solutions — {ui.employee.portal}
-      </footer>
+        <nav className="space-y-1 p-3">
+          {nav.map((item) => {
+            const active = pathname === item.href;
+            return <Link key={item.href} to={item.href} onClick={() => setMenuOpen(false)}
+              className={`sidebar-link ${active ? "active" : ""}`}><item.icon size={18} /><span>{item.label}</span></Link>;
+          })}
+        </nav>
+        <div className="absolute inset-x-0 bottom-0 border-t border-white/10 p-4">
+          <div className="mb-3 flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#b88a4a] text-sm font-bold text-white">{user?.name?.charAt(0)}</div>
+            <div className="min-w-0"><p className="truncate text-xs font-semibold text-white">{user?.name}</p><p className="truncate text-[11px] text-white/45">{user?.position || ui.employee.employee}</p></div>
+          </div>
+          <button onClick={handleLogout} className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs text-white/60 transition-colors hover:bg-red-500/15 hover:text-red-200"><LogOut size={15} />{ui.employee.logout}</button>
+        </div>
+      </aside>
+      <div className={`min-h-screen ${dir === "rtl" ? "lg:mr-64" : "lg:ml-64"}`}>
+        <header className="sticky top-0 z-30 flex h-[72px] items-center gap-4 border-b border-[#e8e1d7] bg-[#fffdfa]/92 px-4 backdrop-blur-xl sm:px-7">
+          <button onClick={() => setMenuOpen(true)} className="text-navy-600 lg:hidden"><Menu size={22} /></button>
+          <div className="flex-1"><p className="hidden text-xs font-semibold text-[#a0835d] sm:block">{ui.employee.portal}</p></div>
+          <LanguageSwitcher compact />
+          <div className="hidden items-center gap-2 sm:flex"><div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#b88a4a] text-sm font-bold text-white">{user?.name?.charAt(0)}</div><span className="text-sm font-semibold text-navy-700">{user?.name?.split(" ")[0]}</span></div>
+        </header>
+        <main className="relative min-h-[calc(100dvh-72px)] overflow-auto p-4 sm:p-6 lg:p-8"><Outlet /></main>
+      </div>
     </div>
   );
 }

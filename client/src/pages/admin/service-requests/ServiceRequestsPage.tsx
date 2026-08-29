@@ -92,8 +92,8 @@ export default function ServiceRequestsPage() {
            </p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-          <table className="w-full">
+        <div className="table-wrapper">
+          <table className="table min-w-[760px]">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">
                 <th className="text-right text-xs font-semibold text-gray-400 px-5 py-3">{ui.request.company}</th>

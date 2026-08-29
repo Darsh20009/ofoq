@@ -15,3 +15,4 @@
 - [International phone input](international-phone-input.md) — keep country selection and E.164 formatting centralized with wrapper-specific styling.
 - [Post-merge setup](post-merge-setup.md) — task merges require an explicitly configured, non-interactive setup hook.
 - [Partner legacy records](partner-legacy-records.md) — preserve incomplete old records in CMS, but require complete bilingual data before public display.
+- [Admin workspace styling](admin-workspace-styling.md) — admin and employee surfaces share a navy/gold workspace system scoped away from public and client portals.

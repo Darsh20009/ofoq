@@ -257,7 +257,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
   };
 
   return (
-    <div className="min-h-screen flex bg-[#F7F5F1] text-navy-700" dir={dir}>
+    <div className="ofoq-shell min-h-screen flex bg-[#f5f1eb] text-navy-700" dir={dir}>
       <NotificationPermissionModal />
       {/* ── Sidebar ─────────────────────── */}
       {/* Mobile overlay */}
@@ -272,14 +272,14 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
       </AnimatePresence>
 
       <aside
-          className={`fixed top-0 ${dir === "rtl" ? "right-0" : "left-0"} h-full z-50 flex flex-col transition-all duration-300 bg-[#2B273F] shadow-[0_0_45px_rgba(43,39,63,.22)]
+          className={`fixed top-0 ${dir === "rtl" ? "right-0" : "left-0"} h-full z-50 flex flex-col transition-all duration-300 bg-[#071a30] shadow-[0_0_45px_rgba(7,26,48,.28)]
           ${collapsed ? "w-16" : "w-64"}
           ${sidebarOpen ? "translate-x-0" : dir === "rtl" ? "translate-x-full lg:translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
         {/* Logo */}
         <div className="flex items-center gap-3 p-4 h-16 border-b border-white/10">
-           <OfoqLogo className="w-16 h-12 text-white flex-shrink-0" />
+             <OfoqLogo className="w-16 h-12 text-white flex-shrink-0" />
           {!collapsed && (
             <div className="overflow-hidden">
               <p className="text-white font-bold text-sm leading-none whitespace-nowrap">{t.admin.brand}</p>
@@ -336,7 +336,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
       {/* ── Main content ─────────────────── */}
       <div className={`flex-1 flex flex-col transition-all duration-300 ${dir === "rtl" ? (collapsed ? "lg:mr-16" : "lg:mr-64") : (collapsed ? "lg:ml-16" : "lg:ml-64")}`}>
         {/* Top bar */}
-        <header className="h-16 bg-[#FFFEFC]/90 backdrop-blur-xl border-b border-navy-100 flex items-center px-4 sm:px-6 gap-4 sticky top-0 z-30">
+        <header className="h-[72px] bg-[#fffdfa]/92 backdrop-blur-xl border-b border-[#e8e1d7] flex items-center px-4 sm:px-7 gap-4 sticky top-0 z-30">
           <button
             className="text-navy-600 hover:text-navy-900 lg:hidden"
             onClick={() => setSidebarOpen(true)}
@@ -456,7 +456,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
         </header>
 
         {/* Page content */}
-        <main className="relative flex-1 overflow-auto p-4 sm:p-6 lg:p-8 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-44 before:bg-gradient-to-b before:from-navy-50/80 before:to-transparent">
+         <main className="relative flex-1 overflow-auto p-4 sm:p-6 lg:p-8 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-44 before:bg-gradient-to-b before:from-[#eee7dd]/70 before:to-transparent">
           <div className="relative">
             <AdminPageGuide />
             <Outlet />

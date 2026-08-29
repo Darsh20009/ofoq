@@ -43,25 +43,25 @@ export default function EmployeeDashboardPage() {
   const dateLocale = lang === "ar" ? arSA : undefined;
 
   return (
-    <div className="space-y-6" dir={dir}>
+    <div className="space-y-5" dir={dir}>
       {/* Welcome */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl overflow-hidden border border-navy-700 bg-[#1C2B6E]"
+        className="rounded-2xl overflow-hidden border border-[#17314d] bg-[#0b223d] shadow-[0_12px_30px_rgba(7,26,48,.14)]"
       >
         <div className="px-6 py-5 flex flex-wrap items-center gap-4">
           {user?.avatar ? (
             <img src={user.avatar} alt="" className="w-14 h-14 rounded-xl object-cover border-2 border-[#33B27C]/40" />
           ) : (
-            <div className="w-14 h-14 rounded-xl bg-[#33B27C]/20 flex items-center justify-center text-2xl font-bold text-[#33B27C]">
+            <div className="w-14 h-14 rounded-xl bg-[#b88a4a]/20 flex items-center justify-center text-2xl font-bold text-[#d5aa6d]">
               {user?.name?.charAt(0)}
             </div>
           )}
           <div>
             <p className="text-white/60 text-sm">{greeting()}،</p>
             <h1 className="text-white text-xl font-bold">{user?.name}</h1>
-            <p className="text-[#A7E8C7] text-xs">{user?.position || copy.roleEmployee}{user?.department ? ` • ${user.department}` : ""}</p>
+             <p className="text-[#e0c18f] text-xs">{user?.position || copy.roleEmployee}{user?.department ? ` • ${user.department}` : ""}</p>
           </div>
           <div className="ms-auto">
             <p className="text-white/50 text-xs">
@@ -90,7 +90,7 @@ export default function EmployeeDashboardPage() {
         ].map((s, i) => (
           <motion.div key={s.label} initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
-            className="card flex items-center gap-3">
+             className="card flex items-center gap-3 border-[#e8e1d7]">
             <div className={`stat-icon ${s.color}`}><s.icon size={18} className="text-white" /></div>
             <div>
               <p className="text-xs text-gray-400">{s.label}</p>
@@ -123,7 +123,7 @@ export default function EmployeeDashboardPage() {
               return (
                 <div key={p._id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
                   <div className="w-2 h-2 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: isOverdue ? "#ef4444" : "#33B27C" }} />
+                    style={{ backgroundColor: isOverdue ? "#c13229" : "#b88a4a" }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-navy-700 truncate">
                       {p.title?.ar || p.title || "—"}
@@ -138,7 +138,7 @@ export default function EmployeeDashboardPage() {
                       <span className="badge-red text-[10px]">{copy.overdue}</span>
                     )}
                     <div className="w-14 bg-gray-200 rounded-full h-1.5">
-                      <div className="h-1.5 rounded-full bg-ofoq-green transition-all"
+                       <div className="h-1.5 rounded-full bg-[#b88a4a] transition-all"
                         style={{ width: `${p.progress || 0}%` }} />
                     </div>
                     <span className="text-[10px] text-gray-400 w-7 text-left">{p.progress || 0}%</span>

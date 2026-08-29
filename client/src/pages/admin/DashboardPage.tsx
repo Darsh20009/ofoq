@@ -120,11 +120,11 @@ export default function DashboardPage() {
     greetingHour < 12 ? copy.morning : greetingHour < 17 ? copy.afternoon : copy.evening;
 
   return (
-    <div className="space-y-6 animate-fade-in" dir={dir}>
+    <div className="space-y-5 animate-fade-in" dir={dir}>
       {/* Header */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-ofoq-green mb-2">
+           <p className="text-xs font-semibold uppercase tracking-wide text-[#a57a3e] mb-2">
             OFOQ / {lang === "ar" ? "لوحة العمل" : "WORKSPACE"}
           </p>
           <h1 className="page-title">
@@ -133,7 +133,7 @@ export default function DashboardPage() {
           <p className="page-subtitle">{copy.subtitle}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link to="/admin/projects" className="btn-primary py-2.5">
+           <Link to="/admin/projects" className="btn-primary py-2.5">
             <Plus size={16} /> {lang === "ar" ? "مشروع جديد" : "New project"}
           </Link>
           <button onClick={() => refetch()} className="btn-ghost border border-gray-200 bg-white">
@@ -147,7 +147,7 @@ export default function DashboardPage() {
         <motion.div
           initial={{ opacity: 0, x: -16 }}
           animate={{ opacity: 1, x: 0 }}
-          className="rounded-2xl border border-navy-700 bg-[#1C2B6E] p-5 flex items-start gap-4"
+           className="rounded-2xl border border-[#17314d] bg-[#0b223d] p-5 flex items-start gap-4 shadow-[0_12px_30px_rgba(7,26,48,.14)]"
         >
           <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
             <Zap size={20} className="text-[#E5FE04]" />
@@ -163,7 +163,7 @@ export default function DashboardPage() {
       )}
 
       {/* Quick access */}
-      <section className="card border-gray-200">
+       <section className="card border-[#e3d9cc]">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="font-bold text-navy-700">{lang === "ar" ? "الوصول السريع" : "Quick access"}</h2>
@@ -179,8 +179,8 @@ export default function DashboardPage() {
             { href: "/admin/users", label: t.admin.users, icon: UserPlus },
             { href: "/admin/support", label: ui.client.support, icon: HeadphonesIcon },
           ].map(({ href, label, icon: Icon }) => (
-            <Link key={href} to={href} className="flex min-h-20 flex-col items-center justify-center gap-2 rounded-xl border border-gray-100 bg-gray-50 px-2 py-3 text-center text-xs font-semibold text-navy-700 transition-colors hover:border-ofoq-green/40 hover:bg-emerald-50">
-              <Icon size={18} className="text-ofoq-green" />
+             <Link key={href} to={href} className="flex min-h-20 flex-col items-center justify-center gap-2 rounded-xl border border-[#ece4d9] bg-[#f8f4ee] px-2 py-3 text-center text-xs font-semibold text-navy-700 transition-colors hover:border-[#b88a4a]/50 hover:bg-[#f2e6d3]">
+               <Icon size={18} className="text-[#b88a4a]" />
               <span>{label}</span>
             </Link>
           ))}
