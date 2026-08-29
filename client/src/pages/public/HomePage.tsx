@@ -310,7 +310,7 @@ function PartnersSection({ dir, isArabic }: { dir: "rtl" | "ltr"; isArabic: bool
               } as React.CSSProperties}
             >
               {Array.from({ length: copyCount }, (_, copyIndex) => (
-                <div key={copyIndex} className="partners-marquee-copy flex shrink-0 items-center" aria-hidden={copyIndex !== 0}>
+                <div key={copyIndex} className="partners-marquee-copy flex shrink-0 items-center gap-6 sm:gap-10" aria-hidden={copyIndex !== 0}>
                   {partners.map((partner) => (
                     <button
                       key={`${copyIndex}-${partner._id}`}
