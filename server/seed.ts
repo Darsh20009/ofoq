@@ -7,8 +7,9 @@
 import mongoose from "mongoose";
 import { hashPassword } from "./auth.js";
 import {
-  UserModel, ServiceModel, PageModel, SystemSettingsModel, BlogPostModel, TestimonialModel,
+  UserModel, ServiceModel, PageModel, SystemSettingsModel, BlogPostModel, TestimonialModel, PartnerModel,
 } from "./models/index.js";
+import { defaultPartners } from "./data/defaultPartners.js";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) {
@@ -273,7 +274,18 @@ async function seed() {
     console.log(`⏭️  الشهادات موجودة مسبقاً (${existingTestimonials})`);
   }
 
-  // ── 6. Sample Blog Post ────────────────────────────────────────
+  // ── 6. Default Partners ───────────────────────────────────────
+  let partnersCreated = 0;
+  for (const partner of defaultPartners) {
+    const existing = await PartnerModel.findOne({ nameEn: partner.nameEn });
+    if (!existing) {
+      await PartnerModel.create(partner);
+      partnersCreated++;
+    }
+  }
+  console.log(`✅ الشركاء: ${partnersCreated} شعار جديد`);
+
+  // ── 7. Sample Blog Post ────────────────────────────────────────
   const existingPosts = await BlogPostModel.countDocuments();
   if (existingPosts === 0) {
     // Get admin user for author field

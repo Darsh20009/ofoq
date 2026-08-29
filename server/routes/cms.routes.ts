@@ -1,11 +1,40 @@
 import { Router } from "express";
 import { requireAuth, requireRole, optionalAuth } from "../auth.js";
-import { PageModel, BlogPostModel, TestimonialModel, SystemSettingsModel } from "../models/index.js";
-import { uploadMultiple, uploadSingle } from "../middleware/upload.js";
+import { PageModel, BlogPostModel, TestimonialModel, SystemSettingsModel, PartnerModel } from "../models/index.js";
+import { uploadMultiple, uploadSingle, uploadPartnerLogo } from "../middleware/upload.js";
+import { removePartnerLogoFile, processPartnerLogo } from "../services/logo-processing.js";
 import slugify from "slugify";
 import path from "path";
 
 export const cmsRouter = Router();
+
+const PARTNER_EDIT_ROLES = ["super_admin", "admin", "manager", "employee"];
+const PARTNER_DELETE_ROLES = ["super_admin", "admin"];
+const partnerFields = [
+  "nameAr", "nameEn", "logo", "descriptionAr", "descriptionEn",
+  "partnershipAr", "partnershipEn", "servicesAr", "servicesEn",
+] as const;
+
+function partnerPayload(body: Record<string, any>, partial = false): { payload?: Record<string, unknown>; error?: string } {
+  const payload: Record<string, unknown> = {};
+  for (const field of partnerFields) {
+    if (!partial || Object.prototype.hasOwnProperty.call(body, field)) {
+      if (typeof body[field] !== "string" || !body[field].trim()) {
+        return { error: `الحقل ${field} مطلوب` };
+      }
+      payload[field] = body[field].trim();
+    }
+  }
+  if (!partial || Object.prototype.hasOwnProperty.call(body, "order")) {
+    const order = Number(body.order);
+    if (!Number.isInteger(order) || order < 0 || order > 9999) return { error: "الترتيب يجب أن يكون رقمًا صحيحًا من 0 إلى 9999" };
+    payload.order = order;
+  }
+  if (!partial || Object.prototype.hasOwnProperty.call(body, "isPublished")) {
+    payload.isPublished = body.isPublished === true || body.isPublished === "true";
+  }
+  return { payload };
+}
 
 // ═══════════════════════════════════════════════════
 // BLOG
@@ -90,6 +119,114 @@ cmsRouter.delete("/blog/:id", requireAuth, requireRole("super_admin", "admin", "
     res.json({ success: true });
   } catch {
     res.status(500).json({ error: "خطأ في حذف المقال" });
+  }
+});
+
+// ═══════════════════════════════════════════════════
+// PARTNERS
+// ═══════════════════════════════════════════════════
+
+// Public: only published partners are exposed to the marketing site.
+cmsRouter.get("/partners", async (_req, res) => {
+  try {
+    const completeString = { $type: "string", $ne: "" };
+    const partners = await PartnerModel.find({
+      isPublished: true,
+      nameAr: completeString,
+      nameEn: completeString,
+      logo: completeString,
+      descriptionAr: completeString,
+      descriptionEn: completeString,
+      partnershipAr: completeString,
+      partnershipEn: completeString,
+      servicesAr: completeString,
+      servicesEn: completeString,
+    })
+      .sort({ order: 1, createdAt: -1 }).lean();
+    res.json({ partners });
+  } catch {
+    res.status(500).json({ error: "تعذر جلب الشركاء" });
+  }
+});
+
+// Admin: staff can view and edit; deletion is restricted below.
+cmsRouter.get("/admin/partners", requireAuth, requireRole(...PARTNER_EDIT_ROLES), async (_req, res) => {
+  try {
+    const partners = await PartnerModel.find().sort({ order: 1, createdAt: -1 }).lean();
+    res.json({ partners });
+  } catch {
+    res.status(500).json({ error: "تعذر جلب الشركاء" });
+  }
+});
+
+cmsRouter.post("/admin/partners/upload-logo", requireAuth, requireRole(...PARTNER_EDIT_ROLES), (req, res, next) => {
+  uploadPartnerLogo(req, res, (error) => {
+    if (error) {
+      res.status(400).json({ error: error.message || "تعذر رفع الشعار" });
+      return;
+    }
+    next();
+  });
+}, async (req, res) => {
+  try {
+    if (!req.file) {
+      res.status(400).json({ error: "لم يتم رفع أي شعار" });
+      return;
+    }
+    const { filename } = await processPartnerLogo(req.file.buffer);
+    res.status(201).json({ url: `/uploads/partners/${filename}`, filename });
+  } catch (error: any) {
+    res.status(400).json({ error: error?.message || "تعذر معالجة الشعار" });
+  }
+});
+
+cmsRouter.post("/admin/partners", requireAuth, requireRole(...PARTNER_EDIT_ROLES), async (req, res) => {
+  try {
+    const { payload, error } = partnerPayload(req.body || {});
+    if (error) {
+      res.status(400).json({ error });
+      return;
+    }
+    const partner = await PartnerModel.create(payload);
+    res.status(201).json({ partner });
+  } catch {
+    res.status(500).json({ error: "تعذر إنشاء الشريك" });
+  }
+});
+
+cmsRouter.patch("/admin/partners/:id", requireAuth, requireRole(...PARTNER_EDIT_ROLES), async (req, res) => {
+  try {
+    const existing = await PartnerModel.findById(req.params.id);
+    if (!existing) {
+      res.status(404).json({ error: "الشريك غير موجود" });
+      return;
+    }
+    const { payload, error } = partnerPayload(req.body || {}, true);
+    if (error) {
+      res.status(400).json({ error });
+      return;
+    }
+    const oldLogo = existing.logo;
+    Object.assign(existing, payload);
+    await existing.save();
+    if (payload.logo && payload.logo !== oldLogo) await removePartnerLogoFile(oldLogo);
+    res.json({ partner: existing });
+  } catch {
+    res.status(500).json({ error: "تعذر تعديل الشريك" });
+  }
+});
+
+cmsRouter.delete("/admin/partners/:id", requireAuth, requireRole(...PARTNER_DELETE_ROLES), async (req, res) => {
+  try {
+    const partner = await PartnerModel.findByIdAndDelete(req.params.id);
+    if (!partner) {
+      res.status(404).json({ error: "الشريك غير موجود" });
+      return;
+    }
+    await removePartnerLogoFile(partner.logo);
+    res.json({ success: true });
+  } catch {
+    res.status(500).json({ error: "تعذر حذف الشريك" });
   }
 });
 

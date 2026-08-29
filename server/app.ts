@@ -43,6 +43,7 @@ const ALLOWED_ORIGINS = [
   "https://employee.ofoqhc.com",             // hardcoded fallback
   "http://localhost:3000",
   "http://localhost:5000",
+  "http://127.0.0.1:3000",
   "http://127.0.0.1:5000",
   process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : null,
 ].filter((o): o is string => Boolean(o));

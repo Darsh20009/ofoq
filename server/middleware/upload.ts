@@ -51,3 +51,16 @@ export const upload = multer({
 export const uploadSingle = upload.single("file");
 export const uploadMultiple = upload.array("files", 10);
 export const uploadAvatar = upload.single("avatar");
+
+// Partner logos are processed from memory and written as normalized PNG files
+// only after Sharp has removed a connected edge background.
+const logoUpload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: (_req, file, cb) => {
+    if (["image/jpeg", "image/png", "image/webp"].includes(file.mimetype)) cb(null, true);
+    else cb(new Error("يسمح برفع شعارات بصيغة JPG أو PNG أو WEBP فقط"));
+  },
+  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+});
+
+export const uploadPartnerLogo = logoUpload.single("file");

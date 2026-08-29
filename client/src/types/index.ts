@@ -158,6 +158,23 @@ export interface BlogPost {
   createdAt: string;
 }
 
+export interface Partner {
+  _id: string;
+  nameAr: string;
+  nameEn: string;
+  logo: string;
+  descriptionAr: string;
+  descriptionEn: string;
+  partnershipAr: string;
+  partnershipEn: string;
+  servicesAr: string;
+  servicesEn: string;
+  order: number;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 /* ── Notifications ─────────────────────────── */
 export interface Notification {
   _id: string;

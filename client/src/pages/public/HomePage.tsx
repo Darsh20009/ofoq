@@ -1,7 +1,13 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { X } from "lucide-react";
 import { useLang } from "../../i18n/LangContext";
 import { servicesCatalog } from "../../data/servicesCatalog";
+import { cmsApi } from "../../api/client";
+import OfoqLogo from "../../components/OfoqLogo";
+import type { Partner } from "../../types";
 
 type Service = {
   number: string;
@@ -176,38 +182,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="bg-[#071936] px-5 pb-10 sm:px-10 sm:pb-14 lg:px-16">
-          <div className="mx-auto max-w-[1380px] rounded-2xl bg-[#F4F1EC] px-5 py-6 text-[#071936] sm:px-10 sm:py-7">
-            <div className="flex flex-col items-center justify-between gap-5 sm:flex-row" dir={dir}>
-              <p className="text-center text-xs font-bold text-[#071936]/65 sm:text-right">
-                {isArabic ? "شركاؤنا" : "Our partners"}
-              </p>
-              <div className="flex w-full snap-x items-center gap-6 overflow-x-auto px-1 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-1 sm:justify-between sm:gap-5">
-                {[
-                  { src: "/images/partner-01.png", alt: "جان" },
-                  { src: "/images/partner-02.png", alt: "Osten" },
-                  { src: "/images/partner-03.png", alt: "Mabaat" },
-                  { src: "/images/partner-04.png", alt: "Protime" },
-                  { src: "/images/partner-05.png", alt: "Golden Lines Lifts" },
-                  { src: "/images/partner-06.png", alt: "Lens Maintenance and Operation Company" },
-                  { src: "/images/partner-07.png", alt: "المسكن الوافي" },
-                  { src: "/images/partner-08.png", alt: "الجونة" },
-                  { src: "/images/partner-09.png", alt: "Calma" },
-                  { src: "/images/partner-10.png", alt: "Ibtikarat" },
-                ].map((partner) => (
-                  <div key={partner.src} className="flex h-16 min-w-[92px] snap-start items-center justify-center sm:min-w-0 sm:flex-1">
-                    <img
-                      src={partner.src}
-                      alt={partner.alt}
-                      loading="lazy"
-                      className="max-h-12 w-auto max-w-[105px] object-contain transition-transform duration-300 hover:scale-105"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
+        <PartnersSection dir={dir} isArabic={isArabic} />
 
         <section className="bg-[#071936] px-5 pb-12 sm:px-10 sm:pb-16 lg:px-16">
           <div className="relative mx-auto min-h-[235px] max-w-[1380px] overflow-hidden rounded-[24px] border border-white/10 bg-[#102d56]">
@@ -232,6 +207,177 @@ export default function HomePage() {
         </section>
       </main>
     </>
+  );
+}
+
+const fallbackPartners: Partner[] = [
+  ["jaan", "جان", "Jaan", "/images/partner-01.png"],
+  ["osten", "أوستن", "Osten", "/images/partner-02.png"],
+  ["mabaat", "مبات", "Mabaat", "/images/partner-03.png"],
+  ["protime", "بروتايم", "Protime", "/images/partner-04.png"],
+  ["golden-lines", "جولدن لاينز للمصاعد", "Golden Lines Lifts", "/images/partner-05.png"],
+  ["lens", "شركة عدسات للصيانة والتشغيل", "Lens Maintenance and Operation Company", "/images/partner-06.png"],
+  ["almaskan", "المسكن الوافي", "Almaskan Alwafi", "/images/partner-07.png"],
+  ["aljounah", "الجونة", "Aljounah", "/images/partner-08.png"],
+  ["calma", "كالما", "Calma", "/images/partner-09.png"],
+  ["ibtikarat", "ابتكارات", "Ibtikarat", "/images/partner-10.png"],
+].map(([id, nameAr, nameEn, logo], index) => ({
+  _id: `fallback-${id}`,
+  nameAr,
+  nameEn,
+  logo,
+  descriptionAr: `${nameAr} من شركاء أفق الذين نعتز بدعم رحلتهم وتطوير أعمالهم.`,
+  descriptionEn: `${nameEn} is an OFOQ partner whose business journey we are proud to support.`,
+  partnershipAr: "شراكة أعمال تركز على تيسير الإجراءات وبناء أساس تشغيلي واضح للنمو.",
+  partnershipEn: "A business partnership focused on simpler processes and a clear foundation for growth.",
+  servicesAr: "خدمات تأسيس وتشغيل واستشارات أعمال وفق احتياج الشريك.",
+  servicesEn: "Formation, operations, and business advisory services tailored to the partner.",
+  order: index + 1,
+  isPublished: true,
+  createdAt: "",
+  updatedAt: "",
+}));
+
+function PartnersSection({ dir, isArabic }: { dir: "rtl" | "ltr"; isArabic: boolean }) {
+  const [selected, setSelected] = useState<Partner | null>(null);
+  const [paused, setPaused] = useState(false);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const { data, isError, isLoading } = useQuery({
+    queryKey: ["public-partners"],
+    queryFn: () => cmsApi.partners.list().then((response) => response.data),
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+  });
+  const partners: Partner[] = isError
+    ? fallbackPartners
+    : Array.isArray(data?.partners)
+      ? data.partners
+      : fallbackPartners;
+  const copyCount = Math.max(2, Math.ceil(1600 / Math.max(144, partners.length * 144)) + 1);
+
+  useEffect(() => {
+    if (!selected) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelected(null);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [selected]);
+
+  return (
+    <section className="bg-[#071936] px-5 pb-10 sm:px-10 sm:pb-14 lg:px-16">
+      <div className="mx-auto max-w-[1380px] overflow-hidden rounded-2xl bg-[#F4F1EC] py-6 text-[#071936] sm:py-7" dir={dir}>
+        <div className="mb-5 flex items-center justify-between gap-4 px-5 sm:px-10">
+          <div>
+            <p className="text-xs font-black text-[#071936]">{isArabic ? "شركاؤنا" : "Our partners"}</p>
+            <p className="mt-1 text-[10px] text-[#071936]/50">
+              {isArabic ? "اضغط على الشعار للتعرّف على تفاصيل الشراكة" : "Select a logo to explore our partnership"}
+            </p>
+          </div>
+          {isLoading && (
+            <span className="rounded-full bg-[#071936]/5 px-3 py-1 text-[10px] font-bold text-[#071936]/55">
+              {isArabic ? "جارٍ تحديث الشركاء..." : "Updating partners..."}
+            </span>
+          )}
+          {isError && (
+            <span className="rounded-full bg-[#C5B278]/15 px-3 py-1 text-[10px] font-bold text-[#7b6a37]">
+              {isArabic ? "نعرض البيانات المحفوظة" : "Showing saved partners"}
+            </span>
+          )}
+        </div>
+        {partners.length > 0 ? (
+          <div
+            className="partners-marquee overflow-hidden"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+            onFocusCapture={() => setPaused(true)}
+            onBlurCapture={() => setPaused(false)}
+            onPointerDown={() => setPaused(true)}
+            onPointerUp={() => setPaused(false)}
+          >
+            <div
+              className={`partners-marquee-track flex w-max items-center ${paused ? "[animation-play-state:paused]" : ""}`}
+              dir="ltr"
+              style={{
+                "--partners-copy-shift": `${100 / copyCount}%`,
+                animationDuration: `${Math.max(12, partners.length * 2.5)}s`,
+              } as React.CSSProperties}
+            >
+              {Array.from({ length: copyCount }, (_, copyIndex) => (
+                <div key={copyIndex} className="partners-marquee-copy flex shrink-0 items-center" aria-hidden={copyIndex !== 0}>
+                  {partners.map((partner) => (
+                    <button
+                      key={`${copyIndex}-${partner._id}`}
+                      type="button"
+                      tabIndex={copyIndex !== 0 ? -1 : 0}
+                      onClick={() => setSelected(partner)}
+                      className="group flex h-20 w-36 shrink-0 items-center justify-center rounded-lg px-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C13229] focus-visible:ring-offset-2 sm:w-44"
+                      aria-label={isArabic ? `عرض تفاصيل ${partner.nameAr}` : `View ${partner.nameEn} details`}
+                    >
+                      <img
+                        src={partner.logo}
+                        alt=""
+                        loading="lazy"
+                        className="max-h-14 max-w-full object-contain transition duration-300 group-hover:scale-105 group-focus:scale-105"
+                      />
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p className="px-5 py-8 text-center text-sm text-[#071936]/50">{isArabic ? "سيتم عرض الشركاء هنا قريبًا." : "Partners will appear here soon."}</p>
+        )}
+      </div>
+
+      {selected && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-6" dir={dir}>
+          <button type="button" className="absolute inset-0 bg-[#071936]/80 backdrop-blur-sm" aria-label={isArabic ? "إغلاق" : "Close"} onClick={() => setSelected(null)} />
+          <article role="dialog" aria-modal="true" aria-labelledby="partner-dialog-title" className="relative max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[24px] bg-[#F4F1EC] shadow-2xl">
+            <button
+              ref={closeButtonRef}
+              type="button"
+              onClick={() => setSelected(null)}
+              className="absolute end-4 top-4 z-10 rounded-full border border-[#071936]/10 bg-white/80 p-2 text-[#071936] hover:bg-white"
+              aria-label={isArabic ? "إغلاق نافذة الشريك" : "Close partner details"}
+            >
+              <X size={19} />
+            </button>
+            <div className="grid gap-0 md:grid-cols-[.8fr_1.2fr]">
+              <div className="flex min-h-56 flex-col items-center justify-center gap-8 bg-white p-8 md:min-h-full">
+                <img src={selected.logo} alt={isArabic ? selected.nameAr : selected.nameEn} className="max-h-28 max-w-[220px] object-contain" />
+                <div className="h-px w-28 bg-[#071936]/10" />
+                <OfoqLogo className="h-16 w-28 text-[#071936]" />
+              </div>
+              <div className="p-6 pt-16 sm:p-9 sm:pt-16">
+                <p className="text-[10px] font-black uppercase tracking-[.16em] text-[#C13229]">{isArabic ? "شراكات أفق" : "OFOQ PARTNERSHIPS"}</p>
+                <h2 id="partner-dialog-title" className="mt-2 text-2xl font-black text-[#071936] sm:text-3xl">
+                  {isArabic ? selected.nameAr : selected.nameEn}
+                </h2>
+                <p className="mt-4 text-sm leading-7 text-[#071936]/65">{isArabic ? selected.descriptionAr : selected.descriptionEn}</p>
+                <div className="mt-6 space-y-5 border-t border-[#071936]/10 pt-6">
+                  <div>
+                    <h3 className="text-xs font-black text-[#071936]">{isArabic ? "طبيعة الشراكة" : "The partnership"}</h3>
+                    <p className="mt-2 text-sm leading-7 text-[#071936]/60">{isArabic ? selected.partnershipAr : selected.partnershipEn}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-black text-[#071936]">{isArabic ? "ما قدمته أفق" : "What OFOQ delivered"}</h3>
+                    <p className="mt-2 text-sm leading-7 text-[#071936]/60">{isArabic ? selected.servicesAr : selected.servicesEn}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      )}
+    </section>
   );
 }
 

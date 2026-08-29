@@ -154,6 +154,20 @@ export const cmsApi = {
     update: (id: string, data: object) => api.put(`/cms/testimonials/${id}`, data),
     delete: (id: string) => api.delete(`/cms/testimonials/${id}`),
   },
+  partners: {
+    list: () => api.get("/cms/partners"),
+    adminList: () => api.get("/cms/admin/partners"),
+    create: (data: object) => api.post("/cms/admin/partners", data),
+    update: (id: string, data: object) => api.patch(`/cms/admin/partners/${id}`, data),
+    delete: (id: string) => api.delete(`/cms/admin/partners/${id}`),
+    uploadLogo: (file: File) => {
+      const fd = new FormData();
+      fd.append("file", file);
+      return api.post("/cms/admin/partners/upload-logo", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+    },
+  },
   settings: {
     list: (group?: string) => api.get("/cms/settings", { params: { group } }),
     update: (data: object) => api.put("/cms/settings", data),

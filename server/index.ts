@@ -5,12 +5,16 @@ import { connectDB } from "./db.js";
 import { initWebSocket } from "./ws.js";
 import { generateVapidKeys } from "./push.js";
 import { startScheduler } from "./scheduler.js";
+import { ensureDefaultPartners } from "./services/partner-seed.service.js";
 
 const PORT = parseInt(process.env.PORT || "5000");
 
 async function bootstrap() {
   // Connect to MongoDB
   await connectDB();
+  await ensureDefaultPartners().catch((error) => {
+    console.error("❌ Partner initialization failed:", error?.message || error);
+  });
 
   // Generate VAPID keys if not set
   await generateVapidKeys();

@@ -212,6 +212,32 @@
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+
+@keyframes partners-marquee-right {
+  from { transform: translateX(calc(-1 * var(--partners-copy-shift))); }
+  to { transform: translateX(0); }
+}
+
+.partners-marquee-track {
+  animation: partners-marquee-right 34s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .partners-marquee-track {
+    animation: none;
+    transform: none;
+  }
+
+  .partners-marquee {
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .partners-marquee-copy[aria-hidden="true"] {
+    display: none;
+  }
+}
 .skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
