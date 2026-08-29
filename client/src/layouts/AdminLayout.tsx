@@ -183,7 +183,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-50" dir={dir}>
+    <div className="min-h-screen flex bg-[#F7F5F1] text-navy-700" dir={dir}>
       <NotificationPermissionModal />
       {/* ── Sidebar ─────────────────────── */}
       {/* Mobile overlay */}
@@ -198,7 +198,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
       </AnimatePresence>
 
       <aside
-          className={`fixed top-0 ${dir === "rtl" ? "right-0" : "left-0"} h-full z-50 flex flex-col transition-all duration-300 bg-[#101B4C]
+          className={`fixed top-0 ${dir === "rtl" ? "right-0" : "left-0"} h-full z-50 flex flex-col transition-all duration-300 bg-[#2B273F] shadow-[0_0_45px_rgba(43,39,63,.22)]
           ${collapsed ? "w-16" : "w-64"}
           ${sidebarOpen ? "translate-x-0" : dir === "rtl" ? "translate-x-full lg:translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
@@ -245,7 +245,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
           </button>
           {!collapsed && (
             <div className="flex items-center gap-3 mt-3 px-2">
-               <div className="w-8 h-8 rounded-full bg-ofoq-red flex items-center justify-center flex-shrink-0">
+               <div className="w-8 h-8 rounded-xl bg-ofoq-green flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-950/20">
                 <span className="text-white text-xs font-bold">
                   {user?.name?.charAt(0) || "م"}
                 </span>
@@ -262,7 +262,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
       {/* ── Main content ─────────────────── */}
       <div className={`flex-1 flex flex-col transition-all duration-300 ${dir === "rtl" ? (collapsed ? "lg:mr-16" : "lg:mr-64") : (collapsed ? "lg:ml-16" : "lg:ml-64")}`}>
         {/* Top bar */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center px-4 sm:px-6 gap-4 sticky top-0 z-30">
+        <header className="h-16 bg-[#FFFEFC]/90 backdrop-blur-xl border-b border-navy-100 flex items-center px-4 sm:px-6 gap-4 sticky top-0 z-30">
           <button
             className="text-navy-600 hover:text-navy-900 lg:hidden"
             onClick={() => setSidebarOpen(true)}
@@ -282,7 +282,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
             <div className="relative">
               <button
                 onClick={() => { setNotifOpen(!notifOpen); setUserMenuOpen(false); }}
-                className="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-navy-700 transition-colors"
+                className="relative p-2 rounded-xl text-navy-400 hover:bg-navy-50 hover:text-ofoq-green transition-colors"
               >
                 <Bell size={20} />
                 {unreadCount > 0 && (
@@ -298,7 +298,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 8 }}
-                    className="absolute top-12 left-0 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                    className="absolute top-12 left-0 w-80 bg-[#FFFEFC] rounded-2xl shadow-xl border border-navy-100 overflow-hidden z-50"
                   >
                     <div className="p-4 border-b flex items-center justify-between">
                       <span className="font-semibold text-sm text-navy-700">{t.admin.notifications}</span>
@@ -330,9 +330,9 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
             <div className="relative">
               <button
                 onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifOpen(false); }}
-                className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="flex items-center gap-2 p-2 rounded-xl hover:bg-navy-50 transition-colors"
               >
-                 <div className="w-8 h-8 rounded-full bg-ofoq-red flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-xl bg-ofoq-green flex items-center justify-center shadow-sm">
                   <span className="text-white text-xs font-bold">
                     {user?.name?.charAt(0) || "م"}
                   </span>
@@ -349,7 +349,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 8 }}
-                    className="absolute top-12 left-0 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                    className="absolute top-12 left-0 w-52 bg-[#FFFEFC] rounded-2xl shadow-xl border border-navy-100 overflow-hidden z-50"
                   >
                     <Link
                       to={pagePath("profile")}
@@ -382,9 +382,11 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
-          <AdminPageGuide />
-          <Outlet />
+        <main className="relative flex-1 overflow-auto p-4 sm:p-6 lg:p-8 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-44 before:bg-gradient-to-b before:from-navy-50/80 before:to-transparent">
+          <div className="relative">
+            <AdminPageGuide />
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

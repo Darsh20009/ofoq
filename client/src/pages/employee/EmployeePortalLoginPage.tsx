@@ -206,7 +206,7 @@ export default function EmployeePortalLoginPage() {
   /* ── UI ────────────────────────── */
   return (
     <div
-      className="min-h-screen bg-[#0C1338] flex flex-col items-center justify-center px-4 relative"
+       className="min-h-screen bg-[#2B273F] flex flex-col items-center justify-center px-4 relative overflow-hidden"
       dir={dir}
     >
       <div className="absolute top-4 end-4">
@@ -230,7 +230,7 @@ export default function EmployeePortalLoginPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8"
+         className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-white/15"
       >
         {error && (
           <div role="alert" className="mb-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">

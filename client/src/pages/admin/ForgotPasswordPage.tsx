@@ -31,7 +31,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ofoq-navy via-[#1a2a45] to-[#0d1b2e] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F7F3EE] flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
@@ -89,7 +89,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={loading || !email.trim()}
-                className="w-full bg-ofoq-red hover:bg-ofoq-red/90 disabled:opacity-50 text-white font-semibold rounded-xl py-3.5 text-sm transition-all flex items-center justify-center gap-2"
+                className="w-full bg-[#237A57] hover:bg-[#1c684a] disabled:opacity-50 text-white font-semibold rounded-xl py-3.5 text-sm transition-all flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>

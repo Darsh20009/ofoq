@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { LayoutDashboard, CreditCard, User, LogOut, Menu, X, Bell } from "lucide-react";
+import { LayoutDashboard, CreditCard, User, LogOut, Menu, X, ClipboardList, HeadphonesIcon, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
 import { authApi } from "../api/client";
@@ -9,19 +9,20 @@ import toast from "react-hot-toast";
 import { useLang } from "../i18n/LangContext";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 
-const NAV = [
-  { href: "/",        label: "لوحتي",    icon: LayoutDashboard },
-  { href: "/card",    label: "بطاقتي",   icon: CreditCard },
-  { href: "/profile", label: "ملفي",     icon: User },
-];
-
 export default function EmployeeLayout() {
   const { pathname } = useLocation();
   const { user, clearAuth } = useAuthStore();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const { dir, ui } = useLang();
-  const navLabels = [ui.employee.dashboard, ui.employee.card, ui.employee.profile];
+  const nav = [
+    { href: "/", label: ui.employee.dashboard, icon: LayoutDashboard },
+    { href: "/service-requests", label: ui.client.requests, icon: ClipboardList },
+    { href: "/support", label: ui.client.support, icon: HeadphonesIcon },
+    { href: "/contact", label: ui.contact.badge, icon: MessageSquare },
+    { href: "/card", label: ui.employee.card, icon: CreditCard },
+    { href: "/profile", label: ui.employee.profile, icon: User },
+  ];
 
   const handleLogout = async () => {
     try { await authApi.logout(); } catch {}
@@ -31,11 +32,11 @@ export default function EmployeeLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 font-cairo" dir={dir}>
+    <div className="min-h-screen bg-[#F7F5F1] font-cairo text-navy-700" dir={dir}>
 
       {/* ── Top Bar ─────────────────────────────── */}
-      <header className="bg-[#1C2B6E] border-b border-white/10 sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center gap-4">
+      <header className="bg-[#2B273F] border-b border-white/10 sticky top-0 z-40 shadow-xl shadow-navy-950/10">
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
@@ -47,8 +48,8 @@ export default function EmployeeLayout() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden sm:flex items-center gap-1 mr-6">
-            {NAV.map((item) => {
+          <nav className="hidden lg:flex items-center gap-1 mr-4">
+            {nav.map((item) => {
               const active = pathname === item.href;
               return (
                 <Link
@@ -56,12 +57,12 @@ export default function EmployeeLayout() {
                   to={item.href}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                     active
-                      ? "bg-white/15 text-white"
+                       ? "bg-[#237A57] text-white shadow-lg shadow-emerald-950/20"
                       : "text-white/70 hover:bg-white/10 hover:text-white"
                   }`}
                 >
                   <item.icon size={15} />
-                  {navLabels[NAV.indexOf(item)]}
+                   {item.label}
                 </Link>
               );
             })}
@@ -107,7 +108,7 @@ export default function EmployeeLayout() {
           {/* Mobile Hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="sm:hidden p-2 text-white/70 hover:text-white"
+            className="lg:hidden p-2 text-white/70 hover:text-white"
           >
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
@@ -120,7 +121,7 @@ export default function EmployeeLayout() {
               initial={{ height: 0 }}
               animate={{ height: "auto" }}
               exit={{ height: 0 }}
-              className="overflow-hidden sm:hidden border-t border-white/10"
+              className="overflow-hidden lg:hidden border-t border-white/10"
             >
               <div className="px-4 py-3 space-y-1">
                 {/* User info on mobile */}
@@ -134,7 +135,7 @@ export default function EmployeeLayout() {
                   </div>
                 </div>
                 <LanguageSwitcher dark />
-                {NAV.map((item) => {
+             {nav.map((item) => {
                   const active = pathname === item.href;
                   return (
                     <Link
@@ -143,12 +144,12 @@ export default function EmployeeLayout() {
                       onClick={() => setMenuOpen(false)}
                       className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                         active
-                          ? "bg-[#33B27C] text-white"
+                          ? "bg-[#237A57] text-white"
                           : "text-white/70 hover:bg-white/10 hover:text-white"
                       }`}
                     >
                       <item.icon size={16} />
-                      {navLabels[NAV.indexOf(item)]}
+                       {item.label}
                     </Link>
                   );
                 })}
@@ -166,12 +167,12 @@ export default function EmployeeLayout() {
       </header>
 
       {/* ── Content ─────────────────────────────── */}
-        <main className="max-w-6xl mx-auto px-4 py-6">
+         <main className="max-w-7xl mx-auto px-4 py-7 sm:py-9">
         <Outlet />
       </main>
 
       {/* ── Footer ──────────────────────────────── */}
-      <footer className="text-center py-6 text-gray-400 text-xs border-t border-gray-200 mt-10">
+       <footer className="text-center py-6 text-navy-400 text-xs border-t border-navy-100 mt-10 bg-[#FFFEFC]">
         © {new Date().getFullYear()} OFOQ Business Solutions — {ui.employee.portal}
       </footer>
     </div>

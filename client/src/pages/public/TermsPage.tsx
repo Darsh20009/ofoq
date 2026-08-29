@@ -261,7 +261,7 @@ export default function TermsPage() {
       {/* Content */}
       <section className="max-w-4xl mx-auto px-6 py-16">
         {/* Table of Contents */}
-        <div className="bg-gray-50 rounded-2xl p-6 mb-12 border border-gray-100">
+        <div className="bg-[#F7F3EE] rounded-2xl p-6 mb-12 border border-[#2B273F]/10">
           <h2 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
             <span className="w-1 h-4 bg-[#33B27C] rounded-full inline-block" />
             المحتويات
@@ -283,7 +283,7 @@ export default function TermsPage() {
           {SECTIONS.map((section, i) => (
             <article key={i} id={`section-${i}`} className="scroll-mt-24">
               <div className="flex items-center gap-3 mb-5">
-                <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-[#33B27C]/10 text-[#33B27C] font-black text-sm flex items-center justify-center">
+                <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-[#E5FE04] text-[#2B273F] font-black text-sm flex items-center justify-center">
                   {i + 1}
                 </span>
                 <h2 className="text-xl font-black text-gray-900">{section.title}</h2>
@@ -334,7 +334,7 @@ export default function TermsPage() {
 
               {/* Contact block */}
               {(section as any).contact && (
-                <div className="mt-4 bg-[#1B1E2E] rounded-2xl p-6 text-white">
+                <div className="mt-4 bg-[#2B273F] rounded-2xl p-6 text-white">
                   <p className="font-bold text-lg mb-1">أفق لحلول الأعمال</p>
                   <p className="text-white/50 text-sm mb-4">المملكة العربية السعودية – جدة</p>
                   <div className="space-y-2 text-sm">

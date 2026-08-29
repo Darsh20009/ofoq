@@ -75,13 +75,13 @@ export default function ClientRegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ofoq-navy via-[#1C1930] to-[#0f0d1f] flex items-center justify-center p-4" dir={dir}>
+    <div className="min-h-screen bg-[#F7F3EE] flex items-center justify-center p-4" dir={dir}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md">
 
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-[0_25px_80px_rgba(43,39,63,.16)] border border-[#2B273F]/10 overflow-hidden">
           {/* Header */}
-          <Link to="/" className="block bg-ofoq-navy p-7 text-center hover:bg-[#1e1b38] transition-colors group">
+          <Link to="/" className="block bg-[#2B273F] p-7 text-center hover:bg-[#342f4a] transition-colors group">
             <div className="flex justify-center mb-3">
               <OfoqLogo className="w-16 h-11" />
             </div>
@@ -194,7 +194,7 @@ export default function ClientRegisterPage() {
               </div>
 
               <button type="submit" disabled={loading}
-                className="w-full bg-ofoq-navy text-white py-3 rounded-xl font-semibold text-sm hover:bg-ofoq-red transition-all disabled:opacity-60 flex items-center justify-center gap-2 mt-2">
+                className="w-full bg-[#237A57] text-white py-3 rounded-xl font-semibold text-sm hover:bg-[#1c684a] transition-all disabled:opacity-60 flex items-center justify-center gap-2 mt-2">
                 {loading ? (
                   <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />

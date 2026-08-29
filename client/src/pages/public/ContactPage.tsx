@@ -36,7 +36,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="bg-[#2B273F] text-white min-h-screen" dir={isRtl ? "rtl" : "ltr"}>
+    <div className="min-h-screen bg-[#F7F3EE] text-[#2B273F]" dir={isRtl ? "rtl" : "ltr"}>
       <Helmet>
         <title>{C.metaTitle}</title>
         <meta name="description" content={C.heroSub} />
@@ -44,8 +44,9 @@ export default function ContactPage() {
       </Helmet>
 
       {/* ══ Hero ══════════════════════════════════════════════════ */}
-      <section className="relative min-h-[45vh] flex flex-col justify-end overflow-hidden pt-20">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1a1726] to-[#2B273F]" />
+      <section className="relative min-h-[45vh] flex flex-col justify-end overflow-hidden pt-20 text-white">
+        <img src="/images/riyadh-business-district.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#2B273F] via-[#2B273F]/78 to-[#2B273F]/35" />
         <div className="absolute top-0 right-0 w-full h-full overflow-hidden opacity-[0.04] pointer-events-none">
           <svg viewBox="0 0 800 400" fill="none" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
             <rect x="500" y="20" width="200" height="200" stroke="#33B27C" strokeWidth="1" />
@@ -86,7 +87,7 @@ export default function ContactPage() {
             <motion.p variants={fadeUp} className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-6">
               {C.infoTitle}
             </motion.p>
-            <motion.p variants={fadeUp} className="text-white/50 text-base leading-8 mb-10 max-w-md">
+            <motion.p variants={fadeUp} className="text-[#2B273F]/60 text-base leading-8 mb-10 max-w-md">
               {C.heroSub}
             </motion.p>
 
@@ -120,14 +121,14 @@ export default function ContactPage() {
                   key={label}
                   href={href}
                   variants={fadeUp}
-                  className="flex items-start gap-4 group"
+                  className="group flex items-start gap-4 rounded-2xl border border-transparent p-2 transition-colors hover:border-[#2B273F]/10 hover:bg-white"
                 >
-                  <span className="w-10 h-10 rounded-full border border-white/12 flex items-center justify-center text-white/40 group-hover:border-[#33B27C] group-hover:text-[#33B27C] transition-all flex-shrink-0">
+                  <span className="w-10 h-10 rounded-full border border-[#2B273F]/12 bg-white flex items-center justify-center text-[#2B273F]/45 group-hover:border-[#33B27C] group-hover:text-[#33B27C] transition-all flex-shrink-0">
                     {icon}
                   </span>
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[.2em] text-white/30 mb-1">{label}</p>
-                    <p className="text-white/70 text-sm group-hover:text-white transition-colors">{value}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#2B273F]/40 mb-1">{label}</p>
+                    <p className="text-[#2B273F]/75 text-sm group-hover:text-[#2B273F] transition-colors">{value}</p>
                   </div>
                 </motion.a>
               ))}
@@ -136,11 +137,11 @@ export default function ContactPage() {
             {/* استشارة مجانية */}
             <motion.div
               variants={fadeUp}
-              className="mt-10 bg-white/[0.04] border border-white/8 rounded-2xl p-7"
+              className="mt-10 rounded-2xl border border-[#2B273F]/10 bg-white p-7 shadow-[0_8px_30px_rgba(43,39,63,.05)]"
             >
               <p className="text-[10px] font-bold uppercase tracking-[.25em] text-[#33B27C] mb-3">{C.consultTitle}</p>
-              <p className="text-white/50 text-sm leading-7 mb-4">{C.consultDesc}</p>
-              <p className="text-xs font-bold text-[#E5FE04]">{C.available}</p>
+              <p className="text-[#2B273F]/55 text-sm leading-7 mb-4">{C.consultDesc}</p>
+              <p className="text-xs font-bold text-[#33B27C]">{C.available}</p>
             </motion.div>
           </motion.div>
 
@@ -149,7 +150,7 @@ export default function ContactPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center justify-center text-center bg-white/[0.03] border border-white/8 rounded-2xl p-14"
+              className="flex flex-col items-center justify-center text-center bg-white border border-[#2B273F]/10 rounded-2xl p-14"
             >
               <div className="w-16 h-16 rounded-full bg-[#33B27C]/20 border border-[#33B27C]/40 flex items-center justify-center mb-6">
                 <svg viewBox="0 0 24 24" fill="none" stroke="#33B27C" strokeWidth="2" className="w-8 h-8">
@@ -157,13 +158,13 @@ export default function ContactPage() {
                 </svg>
               </div>
               <h3 className="text-2xl font-black mb-3">{C.successTitle}</h3>
-              <p className="text-white/50 text-sm">{C.successDesc}</p>
+              <p className="text-[#2B273F]/50 text-sm">{C.successDesc}</p>
             </motion.div>
           ) : (
             <motion.form
               initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
               onSubmit={handleSubmit}
-              className="space-y-4"
+              className="space-y-4 rounded-3xl border border-[#2B273F]/10 bg-white p-6 shadow-[0_18px_50px_rgba(43,39,63,.08)] sm:p-8"
             >
               <motion.p variants={fadeUp} className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-6">
                 {C.formTitle}
@@ -175,14 +176,15 @@ export default function ContactPage() {
                   { id: "company", label: C.companyLabel, placeholder: C.companyPlaceholder, type: "text" },
                 ].map(({ id, label, placeholder, type }) => (
                   <motion.div key={id} variants={fadeUp}>
-                    <label className="block text-[10px] font-bold uppercase tracking-[.2em] text-white/40 mb-2">{label}</label>
+                    <label htmlFor={`contact-${id}`} className="block text-[10px] font-bold uppercase tracking-[.2em] text-[#2B273F]/50 mb-2">{label}</label>
                     <input
                       type={type}
+                      id={`contact-${id}`}
                       placeholder={placeholder}
                       value={form[id as keyof typeof form]}
                       onChange={(e) => setForm({ ...form, [id]: e.target.value })}
                       required
-                      className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
+                      className="input-field"
                     />
                   </motion.div>
                 ))}
@@ -190,49 +192,52 @@ export default function ContactPage() {
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <motion.div variants={fadeUp}>
-                  <label className="block text-[10px] font-bold uppercase tracking-[.2em] text-white/40 mb-2">{C.emailFormLabel}</label>
+                  <label htmlFor="contact-email" className="block text-[10px] font-bold uppercase tracking-[.2em] text-[#2B273F]/50 mb-2">{C.emailFormLabel}</label>
                   <input
                     type="email"
+                    id="contact-email"
                     placeholder="example@company.com"
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     required
-                    className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
+                    className="input-field"
                   />
                 </motion.div>
                 <motion.div variants={fadeUp}>
-                  <label className="block text-[10px] font-bold uppercase tracking-[.2em] text-white/40 mb-2">{C.phoneFormLabel}</label>
+                  <p className="block text-[10px] font-bold uppercase tracking-[.2em] text-[#2B273F]/50 mb-2">{C.phoneFormLabel}</p>
                   <PhoneInput
                     value={form.phone}
                     onChange={(phone) => setForm({ ...form, phone })}
                     required
-                    className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
+                    className="w-full"
                   />
                 </motion.div>
               </div>
 
               <motion.div variants={fadeUp}>
-                <label className="block text-[10px] font-bold uppercase tracking-[.2em] text-white/40 mb-2">{C.serviceLabel}</label>
+                <label htmlFor="contact-service" className="block text-[10px] font-bold uppercase tracking-[.2em] text-[#2B273F]/50 mb-2">{C.serviceLabel}</label>
                 <select
+                  id="contact-service"
                   value={form.service}
                   onChange={(e) => setForm({ ...form, service: e.target.value })}
-                  className="w-full bg-white/[0.04] border border-white/10 text-white text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
+                  className="input-field"
                 >
-                  <option value="" className="bg-[#2B273F]">{C.serviceDefault}</option>
+                  <option value="">{C.serviceDefault}</option>
                   {C.services.map((s) => (
-                    <option key={s} value={s} className="bg-[#2B273F]">{s}</option>
+                    <option key={s} value={s}>{s}</option>
                   ))}
                 </select>
               </motion.div>
 
               <motion.div variants={fadeUp}>
-                <label className="block text-[10px] font-bold uppercase tracking-[.2em] text-white/40 mb-2">{C.messageLabel}</label>
+                <label htmlFor="contact-message" className="block text-[10px] font-bold uppercase tracking-[.2em] text-[#2B273F]/50 mb-2">{C.messageLabel}</label>
                 <textarea
+                  id="contact-message"
                   rows={5}
                   placeholder={C.messagePlaceholder}
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors resize-none"
+                  className="input-field resize-none"
                 />
               </motion.div>
 

@@ -10,6 +10,7 @@ import { useAuthStore } from "../store/authStore";
 import OfoqLogo from "../components/OfoqLogo";
 import { clientApi } from "../api/clientApi";
 import { useLang } from "../i18n/LangContext";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 const NAV = [
   { href: "/client/dashboard", icon: LayoutDashboard },
@@ -47,10 +48,10 @@ export default function ClientLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex" dir={dir}>
+    <div className="min-h-screen bg-[#F7F5F1] flex text-navy-700" dir={dir}>
 
       {/* ── Sidebar (desktop) ──────────────────────────────── */}
-      <aside className={`hidden lg:flex flex-col w-[280px] bg-[#211d36] text-white fixed inset-y-0 border-white/10 z-30 ${dir === "rtl" ? "right-0 border-l" : "left-0 border-r"}`}>
+      <aside className={`hidden lg:flex flex-col w-[280px] bg-[#2B273F] text-white fixed inset-y-0 border-white/10 z-30 shadow-[0_0_45px_rgba(43,39,63,.22)] ${dir === "rtl" ? "right-0 border-l" : "left-0 border-r"}`}>
         {/* Logo */}
         <div className="border-b border-white/10 p-6">
           <Link to="/client/dashboard" className="flex items-center gap-3">
@@ -70,13 +71,13 @@ export default function ClientLayout() {
               <Link key={href} to={href}
                 className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
                   active
-                    ? "bg-white text-[#211d36]"
+                    ? "bg-[#237A57] text-white shadow-lg shadow-emerald-950/20"
                     : "text-white/65 hover:bg-white/10 hover:text-white"
                 }`}>
                 <Icon size={18} />
                 <span>{navLabels[index]}</span>
                 {href === "/client/support" && unread > 0 && (
-                  <span className="ms-auto flex h-5 w-5 items-center justify-center rounded-full bg-[#E5FE04] text-xs font-bold text-[#211d36]">
+                    <span className="ms-auto flex h-5 w-5 items-center justify-center rounded-full bg-[#E5FE04] text-xs font-bold text-[#2B273F]">
                     {unread}
                   </span>
                 )}
@@ -107,7 +108,7 @@ export default function ClientLayout() {
           </div>
           <Link
             to="/client/requests/new"
-            className="mt-5 flex items-center justify-between rounded-xl border border-[#E5FE04]/35 px-3 py-3 text-xs font-bold text-[#E5FE04] transition-colors hover:bg-[#E5FE04] hover:text-[#211d36]"
+            className="mt-5 flex items-center justify-between rounded-xl border border-[#33B27C]/45 bg-[#33B27C]/10 px-3 py-3 text-xs font-bold text-[#7DE0B6] transition-colors hover:bg-[#33B27C] hover:text-white"
           >
             <span>{ui.client.newRequest}</span>
             <ArrowUpRight size={14} />
@@ -117,7 +118,7 @@ export default function ClientLayout() {
         {/* User footer */}
         <div className="border-t border-white/10 p-4">
           <div className="flex items-center gap-3 mb-3 px-2">
-            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#E5FE04] font-bold text-[#211d36]">
+            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#33B27C] font-bold text-white">
               {user?.name?.charAt(0) || "ع"}
             </div>
             <div className="min-w-0">
@@ -133,7 +134,7 @@ export default function ClientLayout() {
       </aside>
 
       {/* ── Mobile header ──────────────────────────────────── */}
-      <header className="lg:hidden fixed top-0 inset-x-0 z-40 bg-ofoq-navy text-white shadow-lg">
+      <header className="lg:hidden fixed top-0 inset-x-0 z-40 bg-[#2B273F] text-white shadow-lg">
         <div className="flex items-center justify-between px-4 h-14">
           <Link to="/client/dashboard" className="flex items-center gap-2">
             <OfoqLogo className="w-10 h-7" />
@@ -145,6 +146,7 @@ export default function ClientLayout() {
                 {unread}
               </span>
             )}
+            <LanguageSwitcher dark compact />
             <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2">
               {mobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -153,12 +155,12 @@ export default function ClientLayout() {
         <AnimatePresence>
           {mobileOpen && (
             <motion.nav initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }}
-              className="overflow-hidden border-t border-white/10 bg-ofoq-navy">
+              className="overflow-hidden border-t border-white/10 bg-[#2B273F]">
               <div className="p-3 space-y-1">
                 {NAV.map(({ href, icon: Icon }, index) => (
                   <Link key={href} to={href} onClick={() => setMobileOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                      pathname === href ? "bg-ofoq-red text-white" : "text-white/65 hover:bg-white/10 hover:text-white"
+                       pathname === href ? "bg-ofoq-green text-white" : "text-white/65 hover:bg-white/10 hover:text-white"
                     }`}>
                     <Icon size={16} /> {navLabels[index]}
                   </Link>
@@ -176,9 +178,10 @@ export default function ClientLayout() {
       {/* ── Main content ───────────────────────────────────── */}
       <main className={`mt-14 min-h-screen flex-1 lg:mt-0 ${dir === "rtl" ? "lg:mr-[280px]" : "lg:ml-[280px]"}`}>
         {/* Top bar (desktop) */}
-        <div className="sticky top-0 z-20 hidden h-16 items-center justify-between border-b border-gray-100 bg-white px-8 lg:flex">
-          <div />
+         <div className="sticky top-0 z-20 hidden h-16 items-center justify-between border-b border-navy-100 bg-[#FFFEFC]/90 px-8 backdrop-blur-xl lg:flex">
+           <p className="text-xs font-bold text-navy-400">{ui.client.dashboardSub}</p>
           <div className="flex items-center gap-3">
+             <LanguageSwitcher compact />
             <Link to="/client/support" className="relative p-2 rounded-lg text-gray-400 hover:text-ofoq-navy hover:bg-gray-50 transition-all">
               <Bell size={18} />
               {unread > 0 && (
@@ -188,7 +191,7 @@ export default function ClientLayout() {
             <div className="relative">
               <button onClick={() => setProfileOpen(!profileOpen)}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all">
-                <div className="w-8 h-8 rounded-lg bg-ofoq-navy flex items-center justify-center text-white text-sm font-bold">
+                 <div className="w-8 h-8 rounded-lg bg-ofoq-green flex items-center justify-center text-white text-sm font-bold">
                   {user?.name?.charAt(0) || "ع"}
                 </div>
                 <span className="text-sm font-medium text-gray-700">{user?.name}</span>
