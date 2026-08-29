@@ -5,183 +5,201 @@ import { useLang } from "../../i18n/LangContext";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const fadeUp = {
-  hidden: { opacity: 0, y: 35 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease } },
+  hidden: { opacity: 0, y: 28 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease } },
 };
-const stagger = { show: { transition: { staggerChildren: 0.12 } } };
+const stagger = { show: { transition: { staggerChildren: 0.1 } } };
 
-const VALUES_ICONS = [
-  <svg key="0" viewBox="0 0 48 48" fill="none" className="w-7 h-7"><circle cx="24" cy="24" r="10" stroke="currentColor" strokeWidth="2"/><circle cx="24" cy="24" r="18" stroke="currentColor" strokeWidth="1.5" opacity=".4"/><circle cx="24" cy="24" r="24" stroke="currentColor" strokeWidth="1" opacity=".2"/></svg>,
-  <svg key="1" viewBox="0 0 48 48" fill="none" className="w-7 h-7"><path d="M8 24 L24 8 L40 24 L24 40 Z" stroke="currentColor" strokeWidth="2"/><circle cx="24" cy="24" r="4" fill="currentColor" opacity=".6"/></svg>,
-  <svg key="2" viewBox="0 0 48 48" fill="none" className="w-7 h-7"><circle cx="16" cy="24" r="8" stroke="currentColor" strokeWidth="2"/><circle cx="32" cy="24" r="8" stroke="currentColor" strokeWidth="2"/><circle cx="24" cy="13" r="8" stroke="currentColor" strokeWidth="2"/></svg>,
-  <svg key="3" viewBox="0 0 48 48" fill="none" className="w-7 h-7"><rect x="8" y="8" width="13" height="13" stroke="currentColor" strokeWidth="2"/><rect x="27" y="8" width="13" height="13" stroke="currentColor" strokeWidth="2"/><rect x="8" y="27" width="13" height="13" stroke="currentColor" strokeWidth="2"/><rect x="27" y="27" width="13" height="13" stroke="currentColor" strokeWidth="2"/></svg>,
+const STATS = [
+  { value: "2018", ar: "نحو أفق المستقبل", en: "Toward the future" },
+  { value: "98%", ar: "نسبة رضا العملاء", en: "Client satisfaction" },
+  { value: "+25,000", ar: "معاملة مكتملة", en: "Completed transactions" },
+  { value: "+1,250", ar: "عميل وثق بنا", en: "Clients served" },
+  { value: "+8", ar: "سنوات من الخبرة", en: "Years of experience" },
 ];
+
+const MILESTONES = [
+  { year: "2018", ar: "الانطلاقة", en: "The beginning", arDesc: "بدأت أفق برؤية لصناعة تجربة أعمال أكثر سهولة.", enDesc: "OFOQ began with a vision for simpler business services." },
+  { year: "2019", ar: "بناء الخدمات", en: "Building services", arDesc: "توسعت خدماتنا لتغطي احتياجات الشركات الأساسية.", enDesc: "Our offering expanded to cover core company needs." },
+  { year: "2020", ar: "التحول الرقمي", en: "Digital shift", arDesc: "أطلقنا تجربة رقمية أسرع لمتابعة الطلبات.", enDesc: "We launched a faster digital request experience." },
+  { year: "2021", ar: "شراكات استراتيجية", en: "Strategic partnerships", arDesc: "وسعنا شبكة شركائنا وخبراتنا في السوق السعودي.", enDesc: "We grew our partner network and local expertise." },
+  { year: "2023", ar: "تجربة متكاملة", en: "Integrated experience", arDesc: "جمعنا خدمات الأعمال تحت مسار واحد واضح.", enDesc: "We brought business services into one clear journey." },
+  { year: "2024", ar: "نمو مستمر", en: "Continued growth", arDesc: "واصلنا النمو بثقة مع عملائنا وشركائنا.", enDesc: "We continued growing with our clients and partners." },
+  { year: "الآن", enYear: "Now", ar: "أفق أبعد", en: "A wider horizon", arDesc: "نعمل اليوم على مستقبل أكثر كفاءة واستدامة.", enDesc: "Today we build a more efficient, sustainable future." },
+];
+
+const VALUE_ICONS = [
+  <svg key="integration" viewBox="0 0 48 48" fill="none" className="h-9 w-9"><rect x="7" y="7" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2"/><rect x="28" y="7" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2"/><rect x="7" y="28" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2"/><rect x="28" y="28" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2"/></svg>,
+  <svg key="reliability" viewBox="0 0 48 48" fill="none" className="h-9 w-9"><circle cx="24" cy="24" r="16" stroke="currentColor" strokeWidth="2"/><path d="m16 24 5 5 11-12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  <svg key="value" viewBox="0 0 48 48" fill="none" className="h-9 w-9"><path d="m24 6 15 18-15 18L9 24 24 6Z" stroke="currentColor" strokeWidth="2"/><circle cx="24" cy="24" r="5" fill="currentColor" opacity=".25"/></svg>,
+  <svg key="excellence" viewBox="0 0 48 48" fill="none" className="h-9 w-9"><circle cx="17" cy="18" r="7" stroke="currentColor" strokeWidth="2"/><circle cx="31" cy="18" r="7" stroke="currentColor" strokeWidth="2"/><path d="M6 39c1-8 5-12 11-12s10 4 11 12M20 39c1-8 5-12 11-12s10 4 11 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>,
+];
+
+function Arrow({ rtl }: { rtl: boolean }) {
+  return (
+    <svg viewBox="0 0 18 18" fill="none" className={`h-4 w-4 ${rtl ? "rotate-180" : ""}`}>
+      <path d="M3 9h12M11 5l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 export default function AboutPage() {
   const { ui, lang } = useLang();
   const isRtl = lang === "ar" || lang === "ur";
+  const isArabic = lang === "ar";
   const values = ui.about.values;
 
   return (
-    <div className="bg-[#2B273F] text-white min-h-screen" dir={isRtl ? "rtl" : "ltr"}>
+    <div className="min-h-screen overflow-hidden bg-[#F5F0E8] text-[#071936]" dir={isRtl ? "rtl" : "ltr"}>
       <Helmet>
         <title>{ui.about.metaTitle}</title>
         <meta name="description" content={ui.about.heroSub} />
         <link rel="canonical" href="https://ofoqhc.com/about" />
+        <link rel="preload" as="image" href="/images/about-hero-riyadh.webp" />
       </Helmet>
 
-      {/* ══ Hero ══════════════════════════════════════════════════ */}
-      <section className="relative min-h-[60vh] flex flex-col justify-end overflow-hidden pt-20">
-        <img
-          src="/images/riyadh-towers-palms.jpg"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover opacity-30"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#2B273F]/30 via-[#2B273F]/50 to-[#2B273F]" />
-
-        {/* زخرفة */}
-        <div className="absolute right-8 top-28 opacity-[0.06] pointer-events-none">
-          <svg viewBox="0 0 400 400" fill="none" className="w-96 h-96">
-            <rect x="40" y="40" width="160" height="160" stroke="#33B27C" strokeWidth="1.5" />
-            <rect x="100" y="100" width="160" height="160" stroke="#E5FE04" strokeWidth="1.5" />
-            <rect x="160" y="160" width="160" height="160" stroke="#33B27C" strokeWidth="1.5" />
-          </svg>
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 pb-16 w-full">
-          <div className="flex items-center gap-2 text-white/30 text-xs mb-8">
-            <Link to="/" className="hover:text-white transition-colors">{ui.category.home}</Link>
+      <section className="relative px-5 pb-12 pt-[98px] sm:px-10 sm:pb-16 sm:pt-[118px] lg:px-14">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-6 flex items-center gap-2 text-[10px] font-bold text-[#071936]/45">
+            <Link to="/" className="transition-colors hover:text-[#C13229]">{ui.category.home}</Link>
             <span>/</span>
-            <span className="text-white/60">{ui.about.badge}</span>
+            <span>{ui.about.badge}</span>
           </div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}
-            className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-5"
-          >
-            {ui.about.badge}
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1, ease }}
-            className="text-5xl sm:text-7xl font-black leading-tight max-w-3xl"
-          >
-            {ui.about.heroTitle1}
-            <br />
-            <span className="text-[#33B27C]">{ui.about.heroTitle2}</span>
-          </motion.h1>
+          <div className="grid items-center gap-9 lg:grid-cols-[0.92fr_1.08fr] lg:gap-16">
+            <motion.div initial="hidden" animate="show" variants={stagger} className="relative z-10">
+              <motion.p variants={fadeUp} className="mb-3 text-[11px] font-black text-[#C13229]">
+                {ui.about.badge}
+              </motion.p>
+              <motion.h1 variants={fadeUp} className="max-w-xl text-[42px] font-black leading-[1.12] sm:text-6xl lg:text-[72px]">
+                {ui.about.heroTitle1}
+                <br />
+                <span className="text-[#C13229]">{ui.about.heroTitle2}</span>
+              </motion.h1>
+              <motion.p variants={fadeUp} className="mt-5 max-w-lg text-sm font-semibold leading-7 text-[#071936]/65 sm:text-base sm:leading-8">
+                {ui.about.heroSub}
+              </motion.p>
+              <motion.div variants={fadeUp}>
+                <Link to="/contact" className="mt-7 inline-flex items-center gap-3 rounded-lg bg-[#071936] px-6 py-3.5 text-xs font-black text-white shadow-[0_12px_30px_rgba(7,25,54,.18)] transition-transform hover:-translate-y-0.5">
+                  {isArabic ? "تواصل معنا" : "Contact us"}
+                  <Arrow rtl={isRtl} />
+                </Link>
+              </motion.div>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.9, ease }} className="relative order-first lg:order-none">
+              <div className="absolute -inset-3 rounded-[36px_10px_36px_10px] border border-[#C13229]/35 sm:-inset-4" />
+              <div className="relative aspect-[1.28/1] overflow-hidden rounded-[30px_8px_30px_8px] bg-[#E8E1D7]">
+                <img src="/images/about-hero-riyadh.webp" alt={isArabic ? "أفق مدينة الرياض" : "Riyadh skyline"} loading="eager" decoding="async" className="h-full w-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#071936]/15 via-transparent to-white/10" />
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* ══ قصتنا ══════════════════════════════════════════════════ */}
-      <section className="max-w-7xl mx-auto px-6 sm:px-10 py-24">
-        <div className="grid lg:grid-cols-2 gap-16 items-start">
-          <motion.div
-            initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
-          >
-            <motion.p variants={fadeUp} className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-6">
-              {ui.about.storyTitle}
-            </motion.p>
-            <motion.div variants={fadeUp} className="space-y-5 text-white/55 text-base leading-8">
-              <p>{ui.about.storyP1}</p>
+      <section className="relative z-10 px-5 sm:px-10 lg:px-14">
+        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.35 }} variants={stagger} className="mx-auto grid max-w-7xl grid-cols-2 overflow-hidden rounded-2xl bg-[#071936] px-3 py-5 text-white shadow-[0_22px_45px_rgba(7,25,54,.18)] sm:grid-cols-5 sm:px-5">
+          {STATS.map((stat, index) => (
+            <motion.div key={stat.value} variants={fadeUp} className={`flex min-h-20 flex-col items-center justify-center px-2 text-center ${index > 0 ? "border-s border-white/10" : ""} ${index === 4 ? "col-span-2 border-t border-white/10 pt-4 sm:col-span-1 sm:border-t-0 sm:pt-0" : ""}`}>
+              <strong className="text-xl font-black sm:text-2xl">{stat.value}</strong>
+              <span className="mt-1 text-[9px] text-white/55 sm:text-[10px]">{isArabic ? stat.ar : stat.en}</span>
+            </motion.div>
+          ))}
+        </motion.div>
+      </section>
+
+      <section className="px-5 py-16 sm:px-10 sm:py-24 lg:px-14">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={stagger}>
+            <motion.p variants={fadeUp} className="mb-3 text-[10px] font-black text-[#C13229]">{ui.about.storyTitle}</motion.p>
+            <motion.h2 variants={fadeUp} className="text-3xl font-black leading-tight sm:text-4xl">
+              {isArabic ? "بدأت أفق من إيمان بسيط:" : "OFOQ began with a simple belief:"}
+            </motion.h2>
+            <motion.p variants={fadeUp} className="mt-4 text-base font-bold leading-8 text-[#071936]/80">{ui.about.storyVision}</motion.p>
+            <motion.div variants={fadeUp} className="mt-4 space-y-3 text-sm leading-7 text-[#071936]/60">
               <p>{ui.about.storyP2}</p>
               <p>{ui.about.storyP3}</p>
+              <p>{ui.about.storyP4}</p>
             </motion.div>
-            <motion.div variants={fadeUp} className="mt-8">
-              <Link
-                to="/contact"
-                className="inline-flex items-center gap-3 border border-white/20 text-white font-bold text-sm px-7 py-3.5 rounded-full hover:border-[#33B27C] hover:bg-[#33B27C] transition-all duration-300"
-              >
-                {ui.home.contact}
-                <svg viewBox="0 0 16 16" fill="none" className={`w-4 h-4 ${isRtl ? "rotate-180" : ""}`}>
-                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+            <motion.div variants={fadeUp}>
+              <Link to="/contact" className="mt-7 inline-flex items-center gap-3 rounded-lg border border-[#071936]/20 bg-white/40 px-6 py-3 text-xs font-black transition-colors hover:border-[#C13229] hover:text-[#C13229]">
+                {isArabic ? "تواصل معنا" : "Contact us"}
+                <Arrow rtl={isRtl} />
               </Link>
             </motion.div>
           </motion.div>
 
-          {/* صورة + رؤية + رسالة */}
-          <div className="space-y-4">
-            <div className="relative rounded-2xl overflow-hidden aspect-[16/9]">
-              <img
-                src="/images/riyadh-business-district.jpg"
-                alt=""
-                className="w-full h-full object-cover opacity-50"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#2B273F]/80 to-transparent" />
-              <div className="absolute bottom-6 left-6">
-                <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-1">OFOQ · 2019</p>
-                <p className="text-white font-black text-lg">
-                  {ui.about.storyGrowth}
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white/[0.04] border border-white/8 rounded-xl p-6">
-                <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#33B27C] mb-3">
-                  {ui.about.storyVision}
-                </p>
-                <p className="text-white/50 text-sm leading-6">{ui.about.visionText}</p>
-              </div>
-              <div className="bg-white/[0.04] border border-white/8 rounded-xl p-6">
-                <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#33B27C] mb-3">
-                  {ui.about.missionTitle}
-                </p>
-                <p className="text-white/50 text-sm leading-6">{ui.about.missionText}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══ قيمنا ══════════════════════════════════════════════════ */}
-      <section className="border-t border-white/8">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 py-24">
-          <motion.div
-            initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
-          >
-            <motion.p variants={fadeUp} className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-4">
-              {ui.about.valuesTitle}
-            </motion.p>
-            <motion.h2 variants={fadeUp} className="text-4xl sm:text-5xl font-black mb-14 max-w-xl">
-              {ui.about.valuesSub}
-            </motion.h2>
-
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {values.map(({ title, desc }, i) => (
-                <motion.div
-                  key={i}
-                  variants={fadeUp}
-                  className="group bg-white/[0.03] border border-white/8 rounded-2xl p-7 hover:border-[#33B27C]/40 transition-all duration-300"
-                >
-                  <div className="text-[#33B27C] mb-5 transition-transform duration-300 group-hover:scale-110 origin-left">
-                    {VALUES_ICONS[i % VALUES_ICONS.length]}
-                  </div>
-                  <h3 className="font-black text-base mb-3 text-white">{title}</h3>
-                  <p className="text-white/40 text-sm leading-6">{desc}</p>
-                </motion.div>
-              ))}
+          <motion.div initial={{ opacity: 0, y: 35 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 0.8, ease }} className="relative aspect-[16/10] overflow-hidden rounded-2xl">
+            <img src="/images/about-story-riyadh.webp" alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#071936]/80 via-[#071936]/5 to-transparent" />
+            <div className="absolute bottom-5 start-5 text-white sm:bottom-7 sm:start-7">
+              <p className="text-3xl font-black">OFOQ</p>
+              <p className="text-sm font-bold text-[#C5B278]">2018 {isArabic ? "منذ" : "Since"}</p>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* ══ CTA ════════════════════════════════════════════════════ */}
-      <section className="border-t border-white/8">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 py-20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-3">
-              {ui.about.ctaBadge}
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-black">{ui.about.ctaTitle}</h2>
+      <section className="border-y border-[#071936]/8 bg-white/35 px-5 py-16 sm:px-10 sm:py-20 lg:px-14">
+        <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={stagger} className="mx-auto max-w-7xl text-center">
+          <motion.p variants={fadeUp} className="text-[10px] font-black text-[#C13229]">{ui.about.valuesTitle}</motion.p>
+          <motion.h2 variants={fadeUp} className="mx-auto mt-3 max-w-2xl text-2xl font-black sm:text-3xl">{ui.about.valuesSub}</motion.h2>
+          <div className="mt-9 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {values.map((value, index) => (
+              <motion.article key={value.title} variants={fadeUp} className="rounded-xl border border-[#071936]/10 bg-[#F9F6F0] px-5 py-7 text-center transition-transform hover:-translate-y-1">
+                <div className={`mx-auto mb-4 flex h-12 w-12 items-center justify-center ${index % 2 ? "text-[#C5A86B]" : "text-[#071936]"}`}>{VALUE_ICONS[index % VALUE_ICONS.length]}</div>
+                <h3 className="text-sm font-black">{value.title}</h3>
+                <p className="mt-2 text-[11px] leading-6 text-[#071936]/55">{value.desc}</p>
+              </motion.article>
+            ))}
           </div>
-          <Link
-            to="/client/requests/new"
-            className="flex-shrink-0 inline-flex items-center gap-3 bg-[#E5FE04] text-[#2B273F] font-black text-sm px-8 py-4 rounded-full hover:bg-white transition-all duration-300"
-          >
+        </motion.div>
+      </section>
+
+      <section className="px-5 py-16 sm:px-10 sm:py-20 lg:px-14">
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center">
+            <p className="text-[10px] font-black text-[#C13229]">{isArabic ? "مسيرتنا" : "Our journey"}</p>
+            <h2 className="mt-2 text-2xl font-black sm:text-3xl">{isArabic ? "رحلتنا منذ البداية" : "Our journey from the beginning"}</h2>
+          </div>
+
+          <div className="mt-10 hidden grid-cols-7 lg:grid">
+            {MILESTONES.map((item, index) => (
+              <div key={`${item.year}-${item.ar}`} className="relative px-2 pt-7 text-center">
+                <div className={`absolute inset-x-0 top-2 h-px ${index === 0 ? "start-1/2" : ""} ${index === MILESTONES.length - 1 ? "end-1/2" : ""} bg-[#071936]/25`} />
+                <span className={`absolute start-1/2 top-0 h-4 w-4 -translate-x-1/2 rounded-full border-[5px] border-[#F5F0E8] ${index === MILESTONES.length - 1 ? "bg-[#33B27C]" : index === 0 ? "bg-[#C13229]" : "bg-[#071936]"}`} />
+                <strong className="text-sm font-black text-[#071936]">{isArabic ? item.year : item.enYear ?? item.year}</strong>
+                <h3 className="mt-2 text-[11px] font-black">{isArabic ? item.ar : item.en}</h3>
+                <p className="mt-1 text-[9px] leading-5 text-[#071936]/50">{isArabic ? item.arDesc : item.enDesc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="relative mt-9 space-y-5 ps-7 lg:hidden">
+            <div className="absolute bottom-4 start-[7px] top-4 w-px bg-[#071936]/20" />
+            {MILESTONES.map((item, index) => (
+              <motion.article key={`${item.year}-${item.en}`} initial={{ opacity: 0, x: isRtl ? 18 : -18 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="relative rounded-xl border border-[#071936]/8 bg-white/40 p-4">
+                <span className={`absolute -start-[27px] top-5 h-3.5 w-3.5 rounded-full border-4 border-[#F5F0E8] ${index === MILESTONES.length - 1 ? "bg-[#33B27C]" : index === 0 ? "bg-[#C13229]" : "bg-[#071936]"}`} />
+                <strong className="text-sm font-black text-[#C13229]">{isArabic ? item.year : item.enYear ?? item.year}</strong>
+                <h3 className="mt-1 text-sm font-black">{isArabic ? item.ar : item.en}</h3>
+                <p className="mt-1 text-xs leading-6 text-[#071936]/55">{isArabic ? item.arDesc : item.enDesc}</p>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-5 pb-8 sm:px-10 sm:pb-12 lg:px-14">
+        <div className="relative mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 overflow-hidden rounded-2xl bg-[#071936] px-6 py-8 text-white sm:flex-row sm:items-center sm:px-10 sm:py-10">
+          <div className="absolute -bottom-20 -end-12 h-44 w-44 rounded-full border border-[#C13229]/30" />
+          <div className="relative">
+            <p className="text-[10px] font-bold text-[#C5B278]">{ui.about.ctaBadge}</p>
+            <h2 className="mt-2 text-2xl font-black sm:text-3xl">{ui.about.ctaTitle}</h2>
+          </div>
+          <Link to="/client/requests/new" className="relative inline-flex shrink-0 items-center gap-3 rounded-lg bg-[#C13229] px-6 py-3.5 text-xs font-black text-white transition-colors hover:bg-[#A82922]">
             {ui.about.requestService}
-            <svg viewBox="0 0 16 16" fill="none" className={`w-4 h-4 ${isRtl ? "rotate-180" : ""}`}>
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <Arrow rtl={isRtl} />
           </Link>
         </div>
       </section>

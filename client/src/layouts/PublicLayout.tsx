@@ -71,6 +71,9 @@ export default function PublicLayout() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterState, setNewsletterState] = useState<"idle" | "loading" | "success" | "already" | "error">("idle");
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const { pathname } = useLocation();
   const { lang, setLang, langs, ui } = useLang();
   const isRtl = lang === "ar" || lang === "ur";
@@ -146,6 +149,45 @@ export default function PublicLayout() {
     return () => { document.body.style.overflow = ""; };
   }, [drawerOpen]);
 
+  useEffect(() => {
+    if (!drawerOpen) return;
+
+    closeButtonRef.current?.focus();
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const closeAtDesktop = (event: MediaQueryListEvent | MediaQueryList) => {
+      if (event.matches) setDrawerOpen(false);
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setDrawerOpen(false);
+        return;
+      }
+      if (event.key !== "Tab" || !drawerRef.current) return;
+      const focusable = Array.from(
+        drawerRef.current.querySelectorAll<HTMLElement>("a[href], button:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex='-1'])"),
+      );
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    closeAtDesktop(desktop);
+    desktop.addEventListener("change", closeAtDesktop);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      desktop.removeEventListener("change", closeAtDesktop);
+      document.removeEventListener("keydown", handleKeyDown);
+      menuButtonRef.current?.focus();
+    };
+  }, [drawerOpen]);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#2B273F]" dir={isRtl ? "rtl" : "ltr"}>
       {isHomePage && (
@@ -159,7 +201,7 @@ export default function PublicLayout() {
             ? isScrolled
               ? "border-white/10 bg-[#071936]/80 text-white shadow-[0_10px_30px_rgba(7,25,54,.18)] backdrop-blur-xl"
               : "border-transparent bg-transparent text-[#071936]"
-            : "border-white/10 bg-[#071936]/90 text-white backdrop-blur-xl"
+            : "border-white/10 bg-[#071936] text-white shadow-[0_8px_24px_rgba(7,25,54,.16)]"
         }`}
       >
         {/* الشعار */}
@@ -180,8 +222,12 @@ export default function PublicLayout() {
               key={link.href}
               to={link.href}
               className={`relative whitespace-nowrap py-7 text-[13px] font-bold transition-colors ${
-                isHomePage && !isScrolled ? "text-[#071936]/75 hover:text-[#071936]" : "text-white/70 hover:text-white"
-              } ${isHomePage && index === 0 ? "after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-[#C13229]" : ""}`}
+                pathname === link.href
+                  ? `${isHomePage && !isScrolled ? "text-[#071936]" : "text-white"} after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-[#C13229]`
+                  : isHomePage && !isScrolled
+                    ? "text-[#071936]/75 hover:text-[#071936]"
+                    : "text-white/70 hover:text-white"
+              }`}
             >
               {link.label}
             </Link>
@@ -192,15 +238,15 @@ export default function PublicLayout() {
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
             to="/client/login"
-            className={`hidden rounded-lg border px-4 py-2.5 text-xs font-bold transition-colors sm:inline-flex ${
-              isHomePage && !isScrolled ? "border-[#071936] bg-[#071936] text-white hover:bg-[#102b57]" : "border-white/30 text-white"
+            className={`hidden rounded-lg px-4 py-2.5 text-xs font-bold transition-colors sm:inline-flex ${
+              isHomePage && !isScrolled ? "bg-[#071936] text-white hover:bg-[#102b57]" : "text-white/90 hover:bg-white/10"
             }`}
           >
             {isRtl ? "تسجيل الدخول" : "Sign in"}
           </Link>
           <Link
-            to="/request"
-            className="hidden rounded-lg bg-[#C13229] px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#a82922] sm:inline-flex"
+            to="/client/requests/new"
+            className={`${isHomePage ? "hidden sm:inline-flex" : "hidden xl:inline-flex"} rounded-lg bg-[#C13229] px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#a82922]`}
           >
             + {isRtl ? "طلب خدمة" : "Request service"}
           </Link>
@@ -237,14 +283,18 @@ export default function PublicLayout() {
 
           {/* القائمة على الجوال */}
           <button
+            ref={menuButtonRef}
             onClick={() => setDrawerOpen(true)}
             aria-label={isRtl ? "فتح القائمة" : "Open menu"}
+            aria-expanded={drawerOpen}
+            aria-controls="public-mobile-menu"
             className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-colors lg:hidden ${isHomePage && !isScrolled ? "text-[#071936]/80" : "text-white/70"}`}
           >
             <span className="flex flex-col gap-[5px]">
               <span className="block w-5 h-[1.5px] bg-current" />
               <span className="block w-3 h-[1.5px] bg-current" />
             </span>
+            <span className="hidden sm:inline">{ui.header.menu}</span>
           </button>
         </div>
       </header>
@@ -255,21 +305,27 @@ export default function PublicLayout() {
           <>
             {/* خلفية شفافة */}
             <motion.div
+              aria-hidden="true"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm"
+              className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm lg:hidden"
               onClick={() => setDrawerOpen(false)}
             />
 
             {/* الـ Drawer نفسه */}
             <motion.div
-              initial={isHomePage ? { y: -28, opacity: 0 } : { x: isRtl ? -420 : 420 }}
-              animate={isHomePage ? { y: 0, opacity: 1 } : { x: 0 }}
-              exit={isHomePage ? { y: -28, opacity: 0 } : { x: isRtl ? -420 : 420 }}
+              ref={drawerRef}
+              id="public-mobile-menu"
+              role="dialog"
+              aria-modal="true"
+              aria-label={isRtl ? "قائمة التنقل" : "Navigation menu"}
+              initial={{ y: -28, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -28, opacity: 0 }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className={`fixed ${isHomePage ? "inset-x-0 top-[66px] h-[calc(100%-66px)] w-full rounded-b-[24px] bg-[#071936]/95 shadow-[0_18px_50px_rgba(0,0,0,.35)] backdrop-blur-2xl sm:top-[78px] sm:h-[calc(100%-78px)]" : "top-0 h-full bg-[#1a1726]"} ${isHomePage ? "" : isRtl ? "left-0" : "right-0"} z-[80] flex flex-col overflow-y-auto border-white/10 sm:w-96 ${isHomePage ? "border-t" : ""}`}
+              className="fixed inset-x-0 top-[66px] z-[80] flex h-[calc(100%-66px)] w-full flex-col overflow-y-auto rounded-b-[24px] border-t border-white/10 bg-[#071936]/98 shadow-[0_18px_50px_rgba(0,0,0,.35)] backdrop-blur-2xl sm:top-[78px] sm:h-[calc(100%-78px)] lg:hidden"
             >
               {/* رأس الـ Drawer */}
               <div className="flex items-center justify-between border-b border-white/8 px-6 py-5 sm:px-8">
@@ -281,7 +337,9 @@ export default function PublicLayout() {
                   </div>
                 </Link>
                 <button
+                  ref={closeButtonRef}
                   onClick={() => setDrawerOpen(false)}
+                  aria-label={isRtl ? "إغلاق القائمة" : "Close menu"}
                   className="w-8 h-8 flex items-center justify-center text-white/50 hover:text-white transition-colors"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
@@ -291,7 +349,7 @@ export default function PublicLayout() {
               </div>
 
               {/* الموقع — تسامي style */}
-              <div className={`px-8 py-8 border-b border-white/8 flex items-start gap-5 ${isHomePage ? "hidden" : ""}`}>
+              <div className="hidden">
                 <OfoqDecoration className="w-14 h-16 flex-shrink-0 opacity-70 mt-1" />
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-[.25em] text-[#33B27C] mb-1.5">
@@ -307,7 +365,7 @@ export default function PublicLayout() {
               </div>
 
               {/* روابط التنقل */}
-              <nav className={`flex-1 px-6 sm:px-8 ${isHomePage ? "py-5 sm:py-7" : "py-6"}`}>
+              <nav className="flex-1 px-6 py-5 sm:px-8 sm:py-7">
                 <p className="text-[10px] font-bold uppercase tracking-[.2em] text-white/30 mb-5">
                   {isRtl ? "الصفحات" : "Navigation"}
                 </p>
@@ -349,6 +407,13 @@ export default function PublicLayout() {
                   </span>
                   {ui.header.clientLogin}
                 </Link>
+                <Link
+                  to="/client/requests/new"
+                  onClick={() => setDrawerOpen(false)}
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-white/20 px-5 py-3 text-sm font-bold text-white transition-colors hover:border-[#C13229] hover:bg-[#C13229]"
+                >
+                  {isRtl ? "طلب خدمة" : "Request service"}
+                </Link>
               </nav>
 
               {/* تابعنا */}
@@ -384,7 +449,7 @@ export default function PublicLayout() {
       <footer className="bg-[#071936] text-white border-t border-white/8">
 
         {/* النشرة البريدية */}
-        <div className="border-b border-[#071936]/10 bg-[#071936] px-5 py-2 sm:px-10 sm:py-4">
+        {pathname !== "/about" && <div className="border-b border-[#071936]/10 bg-[#071936] px-5 py-2 sm:px-10 sm:py-4">
           <div className="mx-auto max-w-7xl rounded-2xl bg-[#F4F1EC] px-5 py-8 sm:px-10 sm:py-9">
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
               <div className="max-w-md">
@@ -442,7 +507,7 @@ export default function PublicLayout() {
               </div>
             </div>
           </div>
-        </div>
+        </div>}
 
         {/* محتوى الفوتر */}
         <div className="max-w-7xl mx-auto px-6 sm:px-10 py-14">
