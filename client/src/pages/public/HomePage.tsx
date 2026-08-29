@@ -56,6 +56,7 @@ export default function HomePage() {
     servicesDescription: isArabic ? "من التأسيس إلى التشغيل، نوفر لك كل ما تحتاجه لنمو أعمالك بثقة ووضوح." : "From formation to operations, everything you need to grow with confidence and clarity.",
   };
   const allServices = [...services, ...catalogServices];
+  const featuredServices = allServices.slice(0, 4);
 
   return (
     <>
@@ -64,10 +65,10 @@ export default function HomePage() {
         <meta name="description" content={copy.description} />
       </Helmet>
       <main dir={dir} className="relative overflow-hidden bg-[#F4F1EC] text-[#071936]">
-        <section className="relative min-h-[625px] overflow-hidden bg-[#F4F1EC] pt-16 sm:min-h-[690px] sm:pt-[78px] lg:min-h-[735px]">
+        <section className="relative min-h-[620px] overflow-hidden bg-[#F4F1EC] pt-16 sm:min-h-[625px] sm:pt-[78px] lg:min-h-[535px]">
           <div className="absolute inset-0 bg-[#F4F1EC]" />
-          <div className="pointer-events-none absolute left-[-12%] top-[12%] h-[430px] w-[430px] rounded-full border border-[#071936]/[.035] sm:h-[620px] sm:w-[620px]" />
-          <div className="pointer-events-none absolute left-[4%] top-[30%] h-[260px] w-[260px] rounded-full border border-[#C13229]/[.07]" />
+          <div className="pointer-events-none absolute left-[-14%] top-[7%] h-[430px] w-[430px] rounded-full border border-[#071936]/[.035] sm:h-[620px] sm:w-[620px]" />
+          <div className="pointer-events-none absolute left-[4%] top-[26%] h-[260px] w-[260px] rounded-full border border-[#C13229]/[.07]" />
           <img
             src="/images/ofoq-hero-reference.png"
             alt=""
@@ -81,67 +82,67 @@ export default function HomePage() {
             className="pointer-events-none absolute inset-0 block h-full w-full object-cover object-center sm:hidden"
           />
 
-          <div className="relative z-10 mx-auto grid min-h-[520px] max-w-[1480px] items-center gap-3 px-5 pb-24 pt-10 [direction:ltr] sm:min-h-[610px] sm:grid-cols-[1.05fr_.95fr] sm:px-10 sm:pb-44 sm:pt-0 lg:px-16">
-            <div dir={dir} className="order-1 z-10 text-right sm:col-start-2 sm:order-2 sm:pr-8 sm:pt-0 lg:pr-20">
-              <p className="mb-5 flex items-center justify-end gap-3 text-[11px] font-bold text-[#C13229] sm:text-sm">
+          <div className="relative z-10 mx-auto grid min-h-[510px] max-w-[1480px] items-center gap-3 px-5 pb-24 pt-10 [direction:ltr] sm:min-h-[470px] sm:grid-cols-[1.02fr_.98fr] sm:px-10 sm:pb-24 sm:pt-0 lg:min-h-[440px] lg:px-16">
+            <div dir={dir} className="order-1 z-10 text-right sm:col-start-2 sm:order-2 sm:pr-8 lg:pr-16 xl:pr-24">
+              <p className="mb-4 flex items-center justify-end gap-3 text-[10px] font-bold text-[#C13229] sm:mb-5 sm:text-sm">
                 {copy.eyebrow}<span className="h-px w-8 bg-[#C13229]" />
               </p>
-              <h1 className="max-w-[580px] text-[2.35rem] font-black leading-[1.14] tracking-[-.045em] sm:text-[clamp(2.35rem,5vw,4.8rem)]">
+              <h1 className="max-w-[540px] text-[2.15rem] font-black leading-[1.12] tracking-[-.045em] sm:text-[clamp(2.5rem,5vw,4.55rem)]">
                 <span className="block whitespace-nowrap">{copy.titleOne}</span>
                 <span className="block whitespace-nowrap">{copy.titleTwo}</span>
               </h1>
-              <p className="mt-6 max-w-[345px] text-sm font-semibold leading-8 sm:max-w-[470px] sm:text-lg text-[#061a36]">{copy.description}</p>
-              <div className="mt-8 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-end">
-                <Link to="/services" className="inline-flex items-center gap-3 rounded-lg bg-[#071936] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#102b57]">
+              <p className="mt-4 max-w-[345px] text-xs font-semibold leading-7 text-[#061a36] sm:mt-5 sm:max-w-[430px] sm:text-base sm:leading-8">{copy.description}</p>
+              <div className="mt-6 flex flex-col items-start gap-4 sm:mt-7 sm:flex-row sm:items-center sm:justify-end sm:gap-5 sm:[direction:ltr]">
+                <Link to="/services" className="inline-flex items-center gap-3 rounded-md bg-[#071936] px-5 py-3 text-xs font-bold text-white shadow-[0_12px_24px_rgba(7,25,54,.16)] transition-colors hover:bg-[#102b57] sm:text-sm">
                   {copy.explore}<span className="text-lg text-[#C5B278]">←</span>
                 </Link>
-                <Link to="/about" className="inline-flex items-center gap-3 text-sm font-bold text-[#071936]/75">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#C13229] text-[#C13229]">▶</span>{copy.watch}
+                <Link to="/about" className="inline-flex items-center gap-3 text-xs font-bold text-[#071936]/75 sm:text-sm">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[#C13229] text-[10px] text-[#C13229] sm:h-9 sm:w-9 sm:text-xs">▶</span>{copy.watch}
                 </Link>
               </div>
             </div>
           </div>
-          <div className="relative z-20 mx-auto grid w-[calc(100%-2rem)] max-w-[1050px] grid-cols-2 overflow-hidden rounded-t-[22px] bg-[#071936] text-white sm:absolute sm:bottom-[-1px] sm:left-1/2 sm:mx-0 sm:-translate-x-1/2 sm:grid-cols-4">
+          <div dir="rtl" className="absolute bottom-0 left-1/2 z-20 grid w-[calc(100%-2rem)] max-w-[1050px] -translate-x-1/2 grid-cols-2 overflow-hidden rounded-t-[18px] bg-[#071936] text-white shadow-[0_-8px_30px_rgba(7,25,54,.1)] sm:grid-cols-4 sm:rounded-t-[20px]">
             {[
               { value: "98%", label: isArabic ? "نسبة رضا العملاء" : "Client satisfaction", icon: "★" },
               { value: "25,000+", label: isArabic ? "معاملة مكتملة" : "Completed transactions", icon: "✓" },
               { value: "1,250+", label: isArabic ? "عميل وثق بنا" : "Trusted clients", icon: "♧" },
               { value: "8+", label: isArabic ? "سنوات من الخبرة" : "Years of experience", icon: "◉" },
             ].map((stat, index) => (
-              <div key={stat.value} className={`flex items-center justify-center gap-3 px-3 py-5 sm:px-5 sm:py-7 ${index > 0 ? "border-t border-white/10 sm:border-l sm:border-t-0" : ""}`}>
-                <span className="text-2xl text-[#C5B278]">{stat.icon}</span>
-                <div><strong className="block text-xl font-black sm:text-2xl">{stat.value}</strong><span className="block text-[10px] text-white/60">{stat.label}</span></div>
+              <div key={stat.value} className={`flex items-center justify-center gap-2 px-2 py-3.5 sm:gap-3 sm:px-5 sm:py-4 ${index > 0 ? "border-r border-white/10" : ""} ${index === 2 ? "border-t border-white/10 sm:border-t-0" : ""} ${index === 3 ? "border-t border-white/10 sm:border-t-0" : ""}`}>
+                <span className="text-lg text-[#C5B278] sm:text-2xl">{stat.icon}</span>
+                <div><strong className="block text-base font-black sm:text-xl">{stat.value}</strong><span className="block text-[8px] text-white/60 sm:text-[10px]">{stat.label}</span></div>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="relative bg-[#071936] pb-10 pt-14 text-white sm:pb-20 sm:pt-24">
-          <div className="pointer-events-none absolute -top-16 left-[-5%] hidden h-32 w-[110%] rounded-[50%] bg-[#071936] sm:block" />
-          <div className="relative mx-auto grid max-w-[1480px] gap-9 px-5 [direction:ltr] sm:gap-10 sm:px-10 lg:grid-cols-[.72fr_1.8fr] lg:items-center lg:px-16">
+        <section className="relative bg-[#071936] pb-10 pt-14 text-white sm:pb-16 sm:pt-14">
+          <div className="pointer-events-none absolute -top-9 left-[-5%] h-16 w-[110%] rounded-[50%] bg-[#071936]" />
+          <div className="relative mx-auto grid max-w-[1480px] gap-8 px-5 [direction:ltr] sm:gap-10 sm:px-10 lg:grid-cols-[.62fr_1.85fr] lg:items-start lg:px-16">
             <div dir={dir} className={isArabic ? "text-right" : "text-left"}>
-              <p className="mb-4 text-xs font-bold uppercase tracking-[.16em] text-[#C5B278]">{isArabic ? "خدمات أفق" : "OFOQ SERVICES"}</p>
-              <h2 className="text-[2.7rem] font-black leading-[1.2] tracking-[-.03em] sm:text-5xl"><span className="block">{copy.servicesTitleOne}</span><span className="block text-[#C5B278]">{copy.servicesTitleTwo}</span></h2>
-              <p className="mt-5 max-w-xs text-sm leading-7 text-white/60">{copy.servicesDescription}</p>
-              <Link to="/services" className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-[#C13229]">{copy.allServices}<span>←</span></Link>
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-[.16em] text-[#C5B278] sm:mb-4 sm:text-xs">{isArabic ? "خدمات أفق" : "OFOQ SERVICES"}</p>
+              <h2 className="text-[2.25rem] font-black leading-[1.15] tracking-[-.03em] sm:text-[3.25rem]"><span className="block">{copy.servicesTitleOne}</span><span className="block text-[#C5B278]">{copy.servicesTitleTwo}</span></h2>
+              <p className="mt-4 max-w-xs text-xs leading-6 text-white/60 sm:mt-5 sm:text-sm sm:leading-7">{copy.servicesDescription}</p>
+              <Link to="/services" className="mt-5 inline-flex items-center gap-2 text-xs font-bold text-[#C13229] sm:mt-7 sm:text-sm">{copy.allServices}<span>←</span></Link>
             </div>
 
-            <div dir={dir} className="flex snap-x gap-3 overflow-x-auto px-1 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {allServices.map((service, index) => {
+            <div dir={dir} className="flex snap-x gap-2 overflow-x-auto px-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-3">
+              {featuredServices.map((service, index) => {
                 const title = isArabic ? service.ar : service.en;
                 const description = isArabic ? service.descriptionAr : service.descriptionEn;
                 const active = index === 3;
                 return (
-                  <Link to={service.href} key={service.href} className={`group relative h-[380px] min-w-[220px] snap-start rounded-xl border p-5 transition-transform hover:-translate-y-1 sm:min-w-[235px] sm:p-6 ${active ? "border-[#C5B278] bg-[#F4F1EC] text-[#071936]" : "border-white/10 bg-[#102d56] text-white"}`}>
-                    <span className={`text-sm font-bold ${active ? "text-[#C13229]" : "text-[#C5B278]"}`}>{String(index + 1).padStart(2, "0")}</span>
-                    <LineIcon type={service.icon} className={`mb-12 mt-12 h-12 w-12 ${active ? "text-[#C13229]" : "text-[#C5B278]"}`} />
-                    <h3 className="text-lg font-black">{title}</h3>
-                    <p className={`mt-3 min-h-12 text-xs leading-6 ${active ? "text-[#071936]/60" : "text-white/55"}`}>{description}</p>
-                    <span className={`mt-5 block text-xs font-bold ${active ? "text-[#C13229]" : "text-white/70"}`}>{isArabic ? "اعرف أكثر ←" : "Learn more →"}</span>
+                  <Link to={service.href} key={service.href} className={`group relative h-[188px] min-w-[170px] snap-start rounded-lg border p-3.5 transition-transform hover:-translate-y-1 sm:h-[204px] sm:min-w-[205px] sm:rounded-xl sm:p-5 ${active ? "border-[#C5B278] bg-[#F4F1EC] text-[#071936] shadow-[0_12px_25px_rgba(0,0,0,.12)]" : "border-white/10 bg-[#102d56] text-white"}`}>
+                    <span className={`text-[10px] font-bold sm:text-xs ${active ? "text-[#C13229]" : "text-[#C5B278]"}`}>{String(index + 1).padStart(2, "0")}</span>
+                    <LineIcon type={service.icon} className={`mb-3 mt-4 h-8 w-8 sm:mb-3 sm:mt-5 sm:h-9 sm:w-9 ${active ? "text-[#C13229]" : "text-[#C5B278]"}`} />
+                    <h3 className="text-sm font-black sm:text-base">{title}</h3>
+                    <p className={`mt-2 min-h-10 text-[10px] leading-5 sm:text-[11px] sm:leading-5 ${active ? "text-[#071936]/60" : "text-white/55"}`}>{description}</p>
+                    <span className={`absolute bottom-3.5 right-3.5 text-[9px] font-bold sm:bottom-5 sm:right-5 sm:text-[10px] ${active ? "text-[#C13229]" : "text-white/70"}`}>{isArabic ? "اعرف أكثر ←" : "Learn more →"}</span>
                   </Link>
                 );
               })}
-              <button aria-label={isArabic ? "الخدمات التالية" : "Next services"} className="my-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 text-xl text-white/80">‹</button>
+              <button aria-label={isArabic ? "الخدمات التالية" : "Next services"} className="my-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 text-lg text-white/80 transition-colors hover:border-[#C5B278] hover:text-[#C5B278] sm:h-10 sm:w-10">‹</button>
             </div>
           </div>
         </section>
