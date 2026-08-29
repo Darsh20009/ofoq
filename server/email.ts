@@ -20,20 +20,64 @@ export function getSiteUrl(): string {
 }
 
 function getConfig(): EmailConfig {
+  const smtpPort = Number.parseInt(
+    process.env.CPANEL_SMTP_PORT || process.env.SMTP_PORT || "465",
+    10,
+  );
   return {
     senderName: process.env.EMAIL_SENDER_NAME || "أفق لحلول الأعمال",
     siteUrl: getSiteUrl(),
-    smtpHost: process.env.CPANEL_SMTP_HOST || "",
-    smtpPort: parseInt(process.env.CPANEL_SMTP_PORT || "465"),
-    smtpUser: process.env.CPANEL_SMTP_USER || "",
-    smtpPass: process.env.CPANEL_SMTP_PASS || "",
-    smtpSecure: (process.env.CPANEL_SMTP_PORT || "465") !== "587",
+    smtpHost: process.env.CPANEL_SMTP_HOST || process.env.SMTP_HOST || "",
+    smtpPort: Number.isFinite(smtpPort) ? smtpPort : 465,
+    smtpUser: process.env.CPANEL_SMTP_USER || process.env.SMTP_USER || "",
+    smtpPass: process.env.CPANEL_SMTP_PASS || process.env.SMTP_PASS || "",
+    smtpSecure: smtpPort === 465,
   };
 }
 
 export function isEmailConfigured(): boolean {
   const cfg = getConfig();
   return Boolean(cfg.smtpHost && cfg.smtpUser && cfg.smtpPass);
+}
+
+function createTransporter(cfg: EmailConfig) {
+  return nodemailer.createTransport({
+    host: cfg.smtpHost,
+    port: cfg.smtpPort,
+    secure: cfg.smtpSecure,
+    auth: { user: cfg.smtpUser, pass: cfg.smtpPass },
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 20_000,
+  });
+}
+
+/**
+ * Check SMTP connectivity on startup without sending a message.
+ * The error is intentionally logged without credentials so Render logs
+ * show whether the issue is configuration, DNS, connectivity, or auth.
+ */
+export async function verifyEmailTransport(): Promise<boolean> {
+  const cfg = getConfig();
+  const missing = [
+    !cfg.smtpHost ? "CPANEL_SMTP_HOST/SMTP_HOST" : "",
+    !cfg.smtpUser ? "CPANEL_SMTP_USER/SMTP_USER" : "",
+    !cfg.smtpPass ? "CPANEL_SMTP_PASS/SMTP_PASS" : "",
+  ].filter(Boolean);
+
+  if (missing.length > 0) {
+    console.warn(`[Email] SMTP not configured — missing ${missing.join(", ")}`);
+    return false;
+  }
+
+  try {
+    await createTransporter(cfg).verify();
+    console.log(`[Email] ✅ SMTP connection verified (${cfg.smtpHost}:${cfg.smtpPort})`);
+    return true;
+  } catch (err: any) {
+    console.error(`[Email] ❌ SMTP verification failed (${cfg.smtpHost}:${cfg.smtpPort}):`, err?.message || err);
+    return false;
+  }
 }
 
 // ── Logo (CID attachment for reliable display in email clients) ──────────────
@@ -90,12 +134,7 @@ async function sendMail(
   }
 
   try {
-    const transporter = nodemailer.createTransport({
-      host: cfg.smtpHost,
-      port: cfg.smtpPort,
-      secure: cfg.smtpSecure,
-      auth: { user: cfg.smtpUser, pass: cfg.smtpPass },
-    });
+    const transporter = createTransporter(cfg);
 
     const logo = getLogoBuffer();
     const mailAttachments: any[] = attachments.map((a) => ({
@@ -484,7 +523,7 @@ export async function sendDirectEmail(
 
 // ── Service Request Emails ───────────────────────────────────────
 
-/** Notify admin at Info@ofooq.com about a new service request */
+/** Notify admin at info@ofoqhc.com about a new service request */
 export async function sendServiceRequestAdminNotify(opts: {
   requestId: string;
   companyName: string;
@@ -511,7 +550,7 @@ export async function sendServiceRequestAdminNotify(opts: {
       ${button("عرض الطلب في لوحة الإدارة", `${cfg.siteUrl}/admin/service-requests/${opts.requestId}`)}
     `,
   });
-  return sendMail("Info@ofooq.com", "فريق أفق", "طلب خدمة جديد - أفق لحلول الأعمال", html);
+  return sendMail("info@ofoqhc.com", "فريق أفق", "طلب خدمة جديد - أفق لحلول الأعمال", html);
 }
 
 /** Confirm to client that their request was received */
@@ -537,7 +576,7 @@ export async function sendServiceRequestClientConfirm(opts: {
       ])}
       ${p(`يمكنك متابعة حالة طلبك في أي وقت من خلال بوابة العملاء.`)}
       ${button("متابعة طلبي", `${cfg.siteUrl}/client/requests/${opts.requestId}`)}
-      ${p(`للاستفسار يمكنك التواصل معنا عبر: <a href="mailto:Info@ofooq.com" style="color:${COLORS.green}">Info@ofooq.com</a>`)}
+      ${p(`للاستفسار يمكنك التواصل معنا عبر: <a href="mailto:info@ofoqhc.com" style="color:${COLORS.green}">info@ofoqhc.com</a>`)}
     `,
   });
   return sendMail(opts.toEmail, opts.clientName, "تأكيد استلام طلبك - أفق لحلول الأعمال", html);
