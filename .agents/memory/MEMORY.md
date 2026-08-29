@@ -13,4 +13,5 @@
 - [OFOQ visual palette](ofoq-visual-palette.md) — primary UI palette is deep violet, green, and lime across future public-facing work.
 - [Mockup sandbox dependencies](mockup-sandbox-dependencies.md) — nested previews resolve Vite plugins from the workspace root when their local install is absent.
 - [International phone input](international-phone-input.md) — keep country selection and E.164 formatting centralized with wrapper-specific styling.
+- [Post-merge setup](post-merge-setup.md) — task merges require an explicitly configured, non-interactive setup hook.
 - [Partner legacy records](partner-legacy-records.md) — preserve incomplete old records in CMS, but require complete bilingual data before public display.
