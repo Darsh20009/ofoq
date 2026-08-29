@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   LayoutDashboard, FolderOpen, MessageCircle, LogOut, Menu, X,
-  Bell, ChevronDown, ArrowUpRight, Building2, Landmark, Scale, UsersRound,
+  Bell, ChevronDown, ArrowUpRight, Building2, Landmark, Scale, UsersRound, Plus,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
@@ -48,17 +48,17 @@ export default function ClientLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F5F1] flex text-navy-700" dir={dir}>
+    <div className="min-h-screen bg-[#f8f5f0] flex text-[#071a32]" dir={dir}>
 
       {/* ── Sidebar (desktop) ──────────────────────────────── */}
-      <aside className={`hidden lg:flex flex-col w-[280px] bg-[#2B273F] text-white fixed inset-y-0 border-white/10 z-30 shadow-[0_0_45px_rgba(43,39,63,.22)] ${dir === "rtl" ? "right-0 border-l" : "left-0 border-r"}`}>
+      <aside className={`hidden lg:flex flex-col w-[256px] bg-[#071a32] text-white fixed inset-y-0 border-white/10 z-30 shadow-[0_0_45px_rgba(7,26,50,.24)] ${dir === "rtl" ? "right-0 border-l" : "left-0 border-r"}`}>
         {/* Logo */}
-        <div className="border-b border-white/10 p-6">
+        <div className="border-b border-white/10 px-6 py-5">
           <Link to="/client/dashboard" className="flex items-center gap-3">
             <OfoqLogo className="w-14 h-10" />
             <div>
-              <p className="font-bold text-sm leading-none">أفق</p>
-              <p className="text-white/40 text-xs">{ui.client.portal}</p>
+              <p className="font-bold text-sm leading-none">{ui.client.portal}</p>
+              <p className="text-white/40 text-[10px] mt-1">OFOQ Business Solutions</p>
             </div>
           </Link>
         </div>
@@ -71,7 +71,7 @@ export default function ClientLayout() {
               <Link key={href} to={href}
                 className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
                   active
-                    ? "bg-[#237A57] text-white shadow-lg shadow-emerald-950/20"
+                    ? "bg-[#c59650] text-[#071a32] shadow-lg shadow-black/20"
                     : "text-white/65 hover:bg-white/10 hover:text-white"
                 }`}>
                 <Icon size={18} />
@@ -87,12 +87,12 @@ export default function ClientLayout() {
         </nav>
 
         {/* Service shortcuts */}
-        <div className="flex-1 border-t border-white/10 px-4 py-6">
+        <div className="flex-1 border-t border-white/10 px-4 py-5">
           <div className="mb-3 flex items-center justify-between px-2">
-            <p className="text-[10px] font-bold uppercase tracking-[.18em] text-white/40">
+              <p className="text-xs font-bold text-white/55">
               {ui.footer.services}
             </p>
-            <ArrowUpRight size={14} className="text-[#E5FE04]" />
+              <ArrowUpRight size={14} className="text-[#c59650]" />
           </div>
           <div className="space-y-1">
             {SERVICE_NAV.map(({ href, key, icon: Icon }) => (
@@ -101,24 +101,24 @@ export default function ClientLayout() {
                 to={href}
                 className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/60 transition-colors hover:bg-white/10 hover:text-white"
               >
-                <Icon size={16} className="text-white/40 transition-colors group-hover:text-[#E5FE04]" />
+                <Icon size={16} className="text-white/40 transition-colors group-hover:text-[#c59650]" />
                 <span>{(ui.client.services as Record<string, string>)[key] || key}</span>
               </Link>
             ))}
           </div>
           <Link
             to="/client/requests/new"
-            className="mt-5 flex items-center justify-between rounded-xl border border-[#33B27C]/45 bg-[#33B27C]/10 px-3 py-3 text-xs font-bold text-[#7DE0B6] transition-colors hover:bg-[#33B27C] hover:text-white"
+            className="mt-5 flex items-center justify-between rounded-xl border border-[#c59650]/80 bg-transparent px-3 py-3 text-xs font-bold text-[#e0b875] transition-colors hover:bg-[#c59650] hover:text-[#071a32]"
           >
             <span>{ui.client.newRequest}</span>
-            <ArrowUpRight size={14} />
+            <Plus size={14} />
           </Link>
         </div>
 
         {/* User footer */}
         <div className="border-t border-white/10 p-4">
           <div className="flex items-center gap-3 mb-3 px-2">
-            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#33B27C] font-bold text-white">
+            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-[#c59650] bg-white/5 font-bold text-[#e0b875]">
               {user?.name?.charAt(0) || "ع"}
             </div>
             <div className="min-w-0">
@@ -134,7 +134,7 @@ export default function ClientLayout() {
       </aside>
 
       {/* ── Mobile header ──────────────────────────────────── */}
-      <header className="lg:hidden fixed top-0 inset-x-0 z-40 bg-[#2B273F] text-white shadow-lg">
+      <header className="lg:hidden fixed top-0 inset-x-0 z-40 bg-[#071a32] text-white shadow-lg">
         <div className="flex items-center justify-between px-4 h-14">
           <Link to="/client/dashboard" className="flex items-center gap-2">
             <OfoqLogo className="w-10 h-7" />
@@ -147,7 +147,13 @@ export default function ClientLayout() {
               </span>
             )}
             <LanguageSwitcher dark compact />
-            <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2">
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="p-2"
+              aria-label={ui.header.menu}
+              aria-expanded={mobileOpen}
+              aria-controls="client-mobile-navigation"
+            >
               {mobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
@@ -155,12 +161,13 @@ export default function ClientLayout() {
         <AnimatePresence>
           {mobileOpen && (
             <motion.nav initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }}
-              className="overflow-hidden border-t border-white/10 bg-[#2B273F]">
+              id="client-mobile-navigation"
+              className="overflow-hidden border-t border-white/10 bg-[#071a32]">
               <div className="p-3 space-y-1">
                 {NAV.map(({ href, icon: Icon }, index) => (
                   <Link key={href} to={href} onClick={() => setMobileOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                       pathname === href ? "bg-ofoq-green text-white" : "text-white/65 hover:bg-white/10 hover:text-white"
+                        pathname === href || pathname.startsWith(href + "/") ? "bg-[#c59650] text-[#071a32]" : "text-white/65 hover:bg-white/10 hover:text-white"
                     }`}>
                     <Icon size={16} /> {navLabels[index]}
                   </Link>
@@ -176,13 +183,17 @@ export default function ClientLayout() {
       </header>
 
       {/* ── Main content ───────────────────────────────────── */}
-      <main className={`mt-14 min-h-screen flex-1 lg:mt-0 ${dir === "rtl" ? "lg:mr-[280px]" : "lg:ml-[280px]"}`}>
+      <main className={`mt-14 min-h-screen flex-1 lg:mt-0 ${dir === "rtl" ? "lg:mr-[256px]" : "lg:ml-[256px]"}`}>
         {/* Top bar (desktop) */}
-         <div className="sticky top-0 z-20 hidden h-16 items-center justify-between border-b border-navy-100 bg-[#FFFEFC]/90 px-8 backdrop-blur-xl lg:flex">
-           <p className="text-xs font-bold text-navy-400">{ui.client.dashboardSub}</p>
+         <div className="sticky top-0 z-20 hidden h-16 items-center justify-between border-b border-[#e7dfd4] bg-[#fffdfa]/95 px-8 backdrop-blur-xl lg:flex">
+           <p className="text-xs font-bold text-[#7f786d]">{ui.client.dashboardSub}</p>
           <div className="flex items-center gap-3">
              <LanguageSwitcher compact />
-            <Link to="/client/support" className="relative p-2 rounded-lg text-gray-400 hover:text-ofoq-navy hover:bg-gray-50 transition-all">
+             <Link
+               to="/client/support"
+               aria-label={ui.client.support}
+               className="relative rounded-lg p-2 text-[#7f786d] transition-all hover:bg-[#f4efe8] hover:text-[#071a32]"
+             >
               <Bell size={18} />
               {unread > 0 && (
                 <span className="absolute top-1 right-1 w-2 h-2 bg-ofoq-red rounded-full" />
@@ -198,9 +209,9 @@ export default function ClientLayout() {
                 <ChevronDown size={14} className="text-gray-400" />
               </button>
               <AnimatePresence>
-                {profileOpen && (
+                 {profileOpen && (
                   <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }}
-                    className="absolute left-0 top-full mt-1 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+                     className={`absolute top-full z-50 mt-1 w-48 overflow-hidden rounded-xl border border-[#e7dfd4] bg-white shadow-xl ${dir === "rtl" ? "right-0" : "left-0"}`}>
                     <button onClick={handleLogout}
                       className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors">
                        <LogOut size={14} /> {ui.client.logout}
