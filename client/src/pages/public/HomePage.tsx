@@ -64,7 +64,7 @@ export default function HomePage() {
         <meta name="description" content={copy.description} />
       </Helmet>
       <main dir={dir} className="relative overflow-hidden bg-[#F4F1EC] text-[#071936]">
-        <section className="relative min-h-[620px] overflow-hidden bg-[#F4F1EC] pt-16 sm:min-h-[625px] sm:pt-[78px] lg:min-h-[535px]">
+        <section className="relative min-h-[620px] overflow-visible bg-[#F4F1EC] pt-16 sm:min-h-[625px] sm:pt-[78px] lg:min-h-[535px]">
           <div className="absolute inset-0 bg-[#F4F1EC]" />
           <div className="pointer-events-none absolute left-[-14%] top-[7%] h-[430px] w-[430px] rounded-full border border-[#071936]/[.035] sm:h-[620px] sm:w-[620px]" />
           <div className="pointer-events-none absolute left-[4%] top-[26%] h-[260px] w-[260px] rounded-full border border-[#C13229]/[.07]" />
@@ -98,16 +98,16 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          <div dir="rtl" className="absolute bottom-0 left-1/2 z-20 grid w-[calc(100%-2rem)] max-w-[1050px] -translate-x-1/2 grid-cols-2 overflow-hidden rounded-t-[18px] bg-[#071936] text-white shadow-[0_-8px_30px_rgba(7,25,54,.1)] sm:grid-cols-4 sm:rounded-t-[20px]">
+          <div dir="rtl" className="absolute bottom-[-14px] left-1/2 z-20 grid w-[calc(100%-2rem)] max-w-[1120px] -translate-x-1/2 grid-cols-2 overflow-hidden rounded-[16px] bg-[#071936] text-white shadow-[0_-8px_30px_rgba(7,25,54,.16)] sm:grid-cols-4 sm:rounded-[20px]">
             {[
               { value: "98%", label: isArabic ? "نسبة رضا العملاء" : "Client satisfaction", icon: "★" },
               { value: "25,000+", label: isArabic ? "معاملة مكتملة" : "Completed transactions", icon: "✓" },
               { value: "1,250+", label: isArabic ? "عميل وثق بنا" : "Trusted clients", icon: "♧" },
               { value: "8+", label: isArabic ? "سنوات من الخبرة" : "Years of experience", icon: "◉" },
             ].map((stat, index) => (
-              <div key={stat.value} className={`flex min-w-0 items-center justify-center gap-1 px-1 py-2 sm:gap-3 sm:px-5 sm:py-4 ${index > 0 ? "border-r border-white/10" : ""} ${index === 2 ? "border-t border-white/10 sm:border-t-0" : ""} ${index === 3 ? "border-t border-white/10 sm:border-t-0" : ""}`}>
+              <div key={stat.value} className={`flex min-w-0 items-center justify-center gap-1.5 px-2 py-2 sm:gap-3 sm:px-5 sm:py-4 ${index > 0 ? "border-r border-white/10" : ""} ${index === 2 ? "border-t border-white/10 sm:border-t-0" : ""} ${index === 3 ? "border-t border-white/10 sm:border-t-0" : ""}`}>
                 <span className="text-sm text-[#C5B278] sm:text-2xl">{stat.icon}</span>
-                <div className="min-w-0"><strong className="block text-xs font-black sm:text-xl">{stat.value}</strong><span className="block truncate text-[6px] text-white/60 sm:text-[10px]">{stat.label}</span></div>
+                <div className="min-w-0"><strong className="block text-xs font-black sm:text-xl">{stat.value}</strong><span className="block truncate text-[7px] text-white/60 sm:text-[10px]">{stat.label}</span></div>
               </div>
             ))}
           </div>
