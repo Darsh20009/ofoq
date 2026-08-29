@@ -135,12 +135,6 @@ cmsRouter.get("/partners", async (_req, res) => {
       nameAr: completeString,
       nameEn: completeString,
       logo: completeString,
-      descriptionAr: completeString,
-      descriptionEn: completeString,
-      partnershipAr: completeString,
-      partnershipEn: completeString,
-      servicesAr: completeString,
-      servicesEn: completeString,
     })
       .sort({ order: 1, createdAt: -1 }).lean();
     res.json({ partners });

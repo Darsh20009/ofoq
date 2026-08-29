@@ -332,6 +332,14 @@ function PartnersSection({ dir, useArabicContent, copy }: { dir: "rtl" | "ltr"; 
     : Array.isArray(data?.partners)
       ? data.partners
       : fallbackPartners;
+  const partnerName = (partner: Partner) =>
+    useArabicContent ? (partner.nameAr || partner.nameEn) : (partner.nameEn || partner.nameAr);
+  const partnerDescription = (partner: Partner) =>
+    useArabicContent ? (partner.descriptionAr || partner.descriptionEn) : (partner.descriptionEn || partner.descriptionAr);
+  const partnerPartnership = (partner: Partner) =>
+    useArabicContent ? (partner.partnershipAr || partner.partnershipEn) : (partner.partnershipEn || partner.partnershipAr);
+  const partnerServices = (partner: Partner) =>
+    useArabicContent ? (partner.servicesAr || partner.servicesEn) : (partner.servicesEn || partner.servicesAr);
   const copyCount = Math.max(2, Math.ceil(1600 / Math.max(144, partners.length * 144)) + 1);
 
   useEffect(() => {
@@ -397,7 +405,7 @@ function PartnersSection({ dir, useArabicContent, copy }: { dir: "rtl" | "ltr"; 
                       tabIndex={copyIndex !== 0 ? -1 : 0}
                       onClick={() => setSelected(partner)}
                       className="group flex h-20 w-36 shrink-0 items-center justify-center rounded-lg px-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C13229] focus-visible:ring-offset-2 sm:w-44"
-                      aria-label={copy.viewPartnerDetails(useArabicContent ? partner.nameAr : partner.nameEn)}
+                       aria-label={copy.viewPartnerDetails(partnerName(partner))}
                     >
                       <img
                         src={partner.logo}
@@ -431,24 +439,24 @@ function PartnersSection({ dir, useArabicContent, copy }: { dir: "rtl" | "ltr"; 
             </button>
             <div className="grid gap-0 md:grid-cols-[.8fr_1.2fr]">
               <div className="flex min-h-56 flex-col items-center justify-center gap-8 bg-white p-8 md:min-h-full">
-                <img src={selected.logo} alt={useArabicContent ? selected.nameAr : selected.nameEn} className="max-h-28 max-w-[220px] object-contain" />
+                <img src={selected.logo} alt={partnerName(selected)} className="max-h-28 max-w-[220px] object-contain" />
                 <div className="h-px w-28 bg-[#071936]/10" />
                 <OfoqLogo className="h-16 w-28 text-[#071936]" />
               </div>
               <div className="p-6 pt-16 sm:p-9 sm:pt-16">
                 <p className="text-[10px] font-black uppercase tracking-[.16em] text-[#C13229]">{copy.partnershipsEyebrow}</p>
                 <h2 id="partner-dialog-title" className="mt-2 text-2xl font-black text-[#071936] sm:text-3xl">
-                  {useArabicContent ? selected.nameAr : selected.nameEn}
+                  {partnerName(selected)}
                 </h2>
-                <p className="mt-4 text-sm leading-7 text-[#071936]/65">{useArabicContent ? selected.descriptionAr : selected.descriptionEn}</p>
+                <p className="mt-4 text-sm leading-7 text-[#071936]/65">{partnerDescription(selected)}</p>
                 <div className="mt-6 space-y-5 border-t border-[#071936]/10 pt-6">
                   <div>
                     <h3 className="text-xs font-black text-[#071936]">{copy.partnership}</h3>
-                    <p className="mt-2 text-sm leading-7 text-[#071936]/60">{useArabicContent ? selected.partnershipAr : selected.partnershipEn}</p>
+                    <p className="mt-2 text-sm leading-7 text-[#071936]/60">{partnerPartnership(selected)}</p>
                   </div>
                   <div>
                     <h3 className="text-xs font-black text-[#071936]">{copy.delivered}</h3>
-                    <p className="mt-2 text-sm leading-7 text-[#071936]/60">{useArabicContent ? selected.servicesAr : selected.servicesEn}</p>
+                    <p className="mt-2 text-sm leading-7 text-[#071936]/60">{partnerServices(selected)}</p>
                   </div>
                 </div>
               </div>
