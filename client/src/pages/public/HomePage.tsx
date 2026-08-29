@@ -98,16 +98,16 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          <div dir="rtl" className="absolute bottom-[-14px] left-1/2 z-20 grid w-[calc(100%-2rem)] max-w-[1120px] -translate-x-1/2 grid-cols-4 overflow-hidden rounded-[16px] bg-[#071936] text-white shadow-[0_-8px_30px_rgba(7,25,54,.16)] sm:rounded-[20px]">
+          <div dir="rtl" className="absolute bottom-6 left-1/2 z-20 grid w-[calc(100%-3rem)] max-w-[900px] -translate-x-1/2 grid-cols-4 overflow-hidden rounded-[14px] bg-[#071936] text-white shadow-[0_-8px_30px_rgba(7,25,54,.16)] sm:bottom-8 sm:rounded-[18px]">
             {[
               { value: "98%", label: isArabic ? "نسبة رضا العملاء" : "Client satisfaction", icon: "★" },
               { value: "25,000+", label: isArabic ? "معاملة مكتملة" : "Completed transactions", icon: "✓" },
               { value: "1,250+", label: isArabic ? "عميل وثق بنا" : "Trusted clients", icon: "♧" },
               { value: "8+", label: isArabic ? "سنوات من الخبرة" : "Years of experience", icon: "◉" },
             ].map((stat, index) => (
-              <div key={stat.value} className={`flex min-w-0 items-center justify-center gap-1.5 px-1 py-2 sm:gap-3 sm:px-5 sm:py-4 ${index > 0 ? "border-r border-white/10" : ""}`}>
-                <span className="text-sm text-[#C5B278] sm:text-2xl">{stat.icon}</span>
-                <div className="min-w-0"><strong className="block text-xs font-black sm:text-xl">{stat.value}</strong><span className="block truncate text-[7px] text-white/60 sm:text-[10px]">{stat.label}</span></div>
+              <div key={stat.value} className={`flex min-w-0 items-center justify-center gap-1 px-0.5 py-1.5 sm:gap-2 sm:px-3 sm:py-3 ${index > 0 ? "border-r border-white/10" : ""}`}>
+                <span className="text-[10px] text-[#C5B278] sm:text-xl">{stat.icon}</span>
+                <div className="min-w-0"><strong className="block text-[10px] font-black sm:text-lg">{stat.value}</strong><span className="block truncate text-[5px] text-white/60 sm:text-[9px]">{stat.label}</span></div>
               </div>
             ))}
           </div>
