@@ -27,6 +27,7 @@ CPANEL_USERNAME = "rfpeddku"
 EMAIL_SENDER_NAME = "أفق لحلول الأعمال"
 EMPLOYEE_URL = "https://employee.ofoqhc.com"
 GOOGLE_CLIENT_ID = "722115647290-f6dl35qs3611p4ohi24ljuku26ndnf9l.apps.googleusercontent.com"
+ADMIN_INITIAL_PASSWORD = "OFOQ@2026#"
 
 [workflows]
 runButton = "Project"
