@@ -308,7 +308,6 @@ const fallbackPartners: Partner[] = [
 
 function PartnersSection({ dir, useArabicContent, copy }: { dir: "rtl" | "ltr"; useArabicContent: boolean; copy: HomePageCopy }) {
   const [selected, setSelected] = useState<Partner | null>(null);
-  const [paused, setPaused] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const { data, isError, isLoading } = useQuery({
     queryKey: ["public-partners"],
@@ -329,8 +328,6 @@ function PartnersSection({ dir, useArabicContent, copy }: { dir: "rtl" | "ltr"; 
     useArabicContent ? (partner.partnershipAr || partner.partnershipEn) : (partner.partnershipEn || partner.partnershipAr);
   const partnerServices = (partner: Partner) =>
     useArabicContent ? (partner.servicesAr || partner.servicesEn) : (partner.servicesEn || partner.servicesAr);
-  const copyCount = Math.max(2, Math.ceil(1600 / Math.max(144, partners.length * 144)) + 1);
-
   useEffect(() => {
     if (!selected) return;
     const previousOverflow = document.body.style.overflow;
@@ -368,45 +365,23 @@ function PartnersSection({ dir, useArabicContent, copy }: { dir: "rtl" | "ltr"; 
           )}
         </div>
         {partners.length > 0 ? (
-          <div
-            className="partners-marquee overflow-x-auto touch-pan-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
-            onFocusCapture={() => setPaused(true)}
-            onBlurCapture={() => setPaused(false)}
-            onPointerDown={() => setPaused(true)}
-            onPointerUp={() => setPaused(false)}
-          >
-            <div
-              className={`partners-marquee-track flex w-max items-center ${paused ? "[animation-play-state:paused]" : ""}`}
-              dir="ltr"
-              style={{
-                "--partners-copy-shift": `${100 / copyCount}%`,
-                animationDuration: `${Math.max(12, partners.length * 2.5)}s`,
-              } as React.CSSProperties}
-            >
-              {Array.from({ length: copyCount }, (_, copyIndex) => (
-                <div key={copyIndex} className="partners-marquee-copy flex shrink-0 items-center gap-6 sm:gap-10" aria-hidden={copyIndex !== 0}>
-                  {partners.map((partner) => (
-                    <button
-                      key={`${copyIndex}-${partner._id}`}
-                      type="button"
-                      tabIndex={copyIndex !== 0 ? -1 : 0}
-                      onClick={() => setSelected(partner)}
-                      className="group flex h-20 w-36 shrink-0 items-center justify-center rounded-lg px-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C13229] focus-visible:ring-offset-2 sm:w-44"
-                       aria-label={copy.viewPartnerDetails(partnerName(partner))}
-                    >
-                      <img
-                        src={partner.logo}
-                        alt=""
-                        loading="lazy"
-                        className="max-h-14 max-w-full object-contain transition duration-300 group-hover:scale-105 group-focus:scale-105"
-                      />
-                    </button>
-                  ))}
-                </div>
-              ))}
-            </div>
+          <div className="grid grid-cols-2 gap-3 px-5 sm:grid-cols-3 sm:gap-4 sm:px-10 lg:grid-cols-5">
+            {partners.map((partner) => (
+              <button
+                key={partner._id}
+                type="button"
+                onClick={() => setSelected(partner)}
+                className="group flex min-h-[84px] w-full items-center justify-center rounded-lg border border-[#071936]/[.08] bg-white/70 px-3 py-3 transition-colors hover:border-[#C5B278] hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C13229] focus-visible:ring-offset-2 sm:min-h-[96px] sm:px-4"
+                aria-label={copy.viewPartnerDetails(partnerName(partner))}
+              >
+                <img
+                  src={partner.logo}
+                  alt=""
+                  loading="lazy"
+                  className="h-12 w-full max-w-[120px] object-contain sm:h-14 sm:max-w-[150px]"
+                />
+              </button>
+            ))}
           </div>
         ) : (
           <p className="px-5 py-8 text-center text-sm text-[#071936]/50">{copy.partnersEmpty}</p>
