@@ -7,38 +7,47 @@ import { useLang } from "../i18n/LangContext";
 /* ══ ثوابت ══════════════════════════════════════════════════════ */
 const SOCIAL = [
   {
-    label: "X",
-    href: "https://x.com/ofoqhc",
+    label: "WhatsApp",
+    href: "https://wa.me/966500851177",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.23H2.748l7.73-8.835L1.254 2.25H8.08l4.264 5.634 5.9-5.634zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-      </svg>
-    ),
-  },
-  {
-    label: "LinkedIn",
-    href: "https://linkedin.com/company/ofoqhc",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-        <path d="M20.5 2h-17A1.5 1.5 0 0 0 2 3.5v17A1.5 1.5 0 0 0 3.5 22h17a1.5 1.5 0 0 0 1.5-1.5v-17A1.5 1.5 0 0 0 20.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 1 1 8.3 6.5a1.78 1.78 0 0 1-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0 0 13 14.19v4.81h-3v-9h2.9v1.3a3.11 3.11 0 0 1 2.7-1.4c1.55 0 3.36.86 3.36 3.66z" />
+        <path d="M20.5 3.5A11.8 11.8 0 0 0 12.1 0C5.5 0 .1 5.4.1 12c0 2.1.5 4.1 1.6 5.9L0 24l6.3-1.6a12 12 0 0 0 5.8 1.5h.1c6.6 0 11.9-5.4 11.9-12a12 12 0 0 0-3.6-8.4ZM12.2 21.8h-.1a9.8 9.8 0 0 1-5-1.4l-.4-.2-3.7.9 1-3.6-.2-.4A9.8 9.8 0 0 1 2.2 12c0-5.4 4.5-9.8 9.9-9.8 2.6 0 5.1 1 7 2.9 1.9 1.9 2.9 4.4 2.9 7 0 5.4-4.4 9.7-9.8 9.7Zm5.4-7.3c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-1.5-.8-2.5-1.4-3.5-3.1-.3-.5.3-.5.8-1.6.1-.2.1-.4 0-.6-.1-.2-.7-1.7-.9-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1.1-1.1 2.6s1.1 3 1.3 3.2c.2.2 2.1 3.3 5.1 4.5 1.9.8 2.6.8 3.5.7.6-.1 1.8-.7 2.1-1.3.3-.6.3-1.1.2-1.3-.2-.1-.4-.2-.7-.3Z" />
       </svg>
     ),
   },
   {
     label: "Instagram",
-    href: "https://instagram.com/ofoqhc",
+    href: "https://www.instagram.com/ofoqhc_",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-        <path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8 0 3.2 0 3.6-.1 4.8-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.9.1-3.2 0-3.6 0-4.8-.1-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12c0-3.2 0-3.6.1-4.8C2.4 3.9 4 2.3 7.2 2.3 8.4 2.2 8.8 2.2 12 2.2zm0-2.2C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12c0 3.3 0 3.7.1 4.9.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24c3.3 0 3.7 0 4.9-.1 4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9 0-3.3 0-3.7-.1-4.9C23.7 2.7 21.3.3 16.9.1 15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4A6.2 6.2 0 0 0 12 5.8zm0 10.2a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-11.8a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8z" />
+        <path d="M7.2 2.2h9.6a5 5 0 0 1 5 5v9.6a5 5 0 0 1-5 5H7.2a5 5 0 0 1-5-5V7.2a5 5 0 0 1 5-5Zm4.8 5a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Zm6.1-1.1a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2Z" />
       </svg>
     ),
   },
   {
-    label: "YouTube",
-    href: "https://youtube.com/@ofoqhc",
+    label: "TikTok",
+    href: "https://www.tiktok.com/@ofoqhc_",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-        <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z" />
+        <path d="M15.7 2h3.1c.2 1.8 1.2 3.1 3.2 3.8v3.2c-1.3 0-2.6-.4-3.7-1.1v6.4a5.7 5.7 0 1 1-5.7-5.7c.4 0 .8 0 1.2.1v3.2a2.5 2.5 0 1 0 1.3 2.4V2Z" />
+      </svg>
+    ),
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/share/16gdgYdz6k/",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+        <path d="M13.7 22v-8h2.7l.4-3h-3.1V9.1c0-.9.3-1.5 1.6-1.5h1.7V4.9c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1V11H8v3h2.6v8h3.1Z" />
+      </svg>
+    ),
+  },
+  {
+    label: "X",
+    href: "https://x.com/ofoqhc_",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.23H2.748l7.73-8.835L1.254 2.25H8.08l4.264 5.634 5.9-5.634zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
       </svg>
     ),
   },
@@ -51,7 +60,7 @@ function OfoqDecoration({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 80 90" fill="none" className={className} aria-hidden="true">
       {/* الـ O الكبيرة — مستطيل عمودي بزوايا دائرية */}
-      <rect x="3"  y="3"  width="33" height="52" rx="7" stroke="#33B27C" strokeWidth="2.5" strokeOpacity="0.75" />
+      <rect x="3"  y="3"  width="33" height="52" rx="7" stroke="#E5FE04" strokeWidth="2.5" strokeOpacity="0.75" />
       {/* الـ F — خطوط حمراء خفيفة */}
       <line x1="42" y1="6"  x2="42" y2="50" stroke="#C13229" strokeWidth="2.5" strokeOpacity="0.55" strokeLinecap="square" />
       <line x1="42" y1="6"  x2="66" y2="6"  stroke="#C13229" strokeWidth="2.5" strokeOpacity="0.55" strokeLinecap="square" />
@@ -570,7 +579,7 @@ export default function PublicLayout() {
                 </h4>
                 <ul className="space-y-3 text-xs text-white/35">
                   <li><a href="mailto:info@ofoqhc.com" className="hover:text-white transition-colors">info@ofoqhc.com</a></li>
-                  <li><a href="tel:+966500851177" className="hover:text-white transition-colors" dir="ltr">+966 500 851 177</a></li>
+                  <li><a href="https://wa.me/966500851177" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" dir="ltr">+966 500 851 177</a></li>
                   <li className="leading-relaxed">
                     {ui.footer.location}
                   </li>
