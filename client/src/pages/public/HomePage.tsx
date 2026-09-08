@@ -145,7 +145,7 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-[#F4F1EC]" />
           <div className="pointer-events-none absolute left-[-14%] top-[7%] h-[430px] w-[430px] rounded-full border border-[#071936]/[.035] sm:h-[620px] sm:w-[620px]" />
           <div className="pointer-events-none absolute left-[4%] top-[26%] h-[260px] w-[260px] rounded-full border border-[#C13229]/[.07]" />
-          <picture className="pointer-events-none absolute inset-0">
+          <picture className="pointer-events-none absolute inset-x-0 bottom-0 top-3 sm:top-5">
             <source media="(max-width: 639px)" srcSet="/images/ofoq-hero-reference-mobile.webp" />
             <img
               src="/images/ofoq-hero-reference.webp"
