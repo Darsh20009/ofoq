@@ -34,11 +34,11 @@ export default function ClientForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ofoq-navy via-[#1C1930] to-[#0f0d1f] flex items-center justify-center p-4" dir={dir}>
+    <div className="min-h-screen bg-[#F7F3EE] flex items-center justify-center p-4" dir={dir}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-[0_25px_80px_rgba(43,39,63,.16)] border border-[#2B273F]/10 overflow-hidden">
           {/* Header */}
-          <div className="bg-ofoq-navy p-8 text-center">
+          <div className="bg-[#2B273F] p-8 text-center">
             <div className="flex justify-center mb-4">
               <OfoqLogo className="w-20 h-14" />
             </div>
@@ -89,7 +89,7 @@ export default function ClientForgotPasswordPage() {
                 <button
                   type="submit"
                   disabled={loading || !email.trim()}
-                  className="w-full bg-ofoq-navy hover:bg-ofoq-red disabled:opacity-50 text-white font-semibold rounded-xl py-3 text-sm transition-all flex items-center justify-center gap-2"
+                  className="w-full bg-[#237A57] hover:bg-[#1c684a] disabled:opacity-50 text-white font-semibold rounded-xl py-3 text-sm transition-all flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> {ui.auth.sending}</>

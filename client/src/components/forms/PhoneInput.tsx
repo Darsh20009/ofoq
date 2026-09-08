@@ -1,5 +1,6 @@
 import PhoneInputLibrary from "react-phone-number-input";
 import type { Country, Labels } from "react-phone-number-input";
+import flags from "react-phone-number-input/flags";
 import enLabels from "react-phone-number-input/locale/en.json";
 import { useLang } from "../../i18n/LangContext";
 import "react-phone-number-input/style.css";
@@ -59,6 +60,7 @@ export default function PhoneInput({
       international
       defaultCountry="SA"
       countryCallingCodeEditable={false}
+      flags={flags}
       value={value || undefined}
       onChange={(next) => onChange(next || "")}
       onBlur={onBlur}

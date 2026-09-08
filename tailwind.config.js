@@ -5,25 +5,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        /* ── OFOQ Royal Navy Blue (corrected from purple) ── */
+        /* ── OFOQ deep violet ────────────────────────────── */
         navy: {
-          DEFAULT: "#1C2B6E",
-          50:  "#F0F2FA",
-          100: "#D5DCF4",
-          200: "#ABBAE9",
-          300: "#8197DE",
-          400: "#5774C8",
-          500: "#3A57B4",
-          600: "#2D4499",
-          700: "#1C2B6E",
-          800: "#141F52",
-          900: "#0C1338",
-          950: "#060919",
+          DEFAULT: "#2B273F",
+          50:  "#F6F4F8",
+          100: "#ECE8F1",
+          200: "#D8D0E3",
+          300: "#BAAEC9",
+          400: "#9383A8",
+          500: "#716284",
+          600: "#554863",
+          700: "#2B273F",
+          800: "#231F35",
+          900: "#1A1728",
+          950: "#0E0C16",
         },
         /* ── Brand tokens ─────────────────────────────────── */
         ofoq: {
           navy:        "#2B273F",   /* primary brand deep navy-purple */
-          "navy-alt":  "#1C2B6E",
+          "navy-alt":  "#3B3555",
           red:         "#C13229",   /* brand red from "F" in logo */
           "red-dark":  "#9B2820",
           "red-light": "#FDECEA",
@@ -51,15 +51,15 @@ export default {
         slideInRight: { "0%": { transform:"translateX(100%)", opacity:"0" }, "100%": { transform:"translateX(0)", opacity:"1" } },
       },
       backgroundImage: {
-        "navy-gradient": "linear-gradient(135deg, #1C2B6E 0%, #0C1338 100%)",
+        "navy-gradient": "linear-gradient(135deg, #2B273F 0%, #1A1728 100%)",
         "red-gradient":  "linear-gradient(135deg, #C13229 0%, #9B2820 100%)",
-        "hero-gradient": "linear-gradient(135deg, #1C2B6E 0%, #2A3F8A 45%, #1C2B6E 100%)",
+        "hero-gradient": "linear-gradient(135deg, #2B273F 0%, #3A3558 45%, #1A1728 100%)",
       },
       boxShadow: {
-        "ofoq":        "0 4px 24px rgba(28,43,110,0.18)",
+        "ofoq":        "0 12px 36px rgba(43,39,63,0.14)",
         "ofoq-red":    "0 4px 24px rgba(193,50,41,0.30)",
         "ofoq-yellow": "0 4px 24px rgba(229,254,4,0.35)",
-        "card":        "0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06)",
+        "card":        "0 1px 2px rgba(43,39,63,0.04), 0 12px 30px rgba(43,39,63,0.07)",
       },
     },
   },

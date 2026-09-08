@@ -27,9 +27,10 @@ passport.deserializeUser((user: any, done) => done(null, user));
 
 // OAuth callbacks must point to the running API service. Keep this separate
 // from APP_URL because the public marketing domain may be hosted elsewhere.
+// The production API is served from www.ofoqhc.com; do not fall back to
+// APP_URL here because the apex domain currently points to a different host.
 const BASE_URL = (
   process.env.OAUTH_BASE_URL ||
-  process.env.APP_URL ||
   "https://www.ofoqhc.com"
 ).replace(/\/$/, "");
 

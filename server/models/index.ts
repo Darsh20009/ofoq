@@ -21,3 +21,4 @@ export { ServiceRequestModel } from "./ServiceRequest.js";
 export { RecruitmentCandidateModel } from "./RecruitmentCandidate.js";
 export { SupportMessageModel } from "./SupportMessage.js";
 export { NewsletterSubscriberModel } from "./NewsletterSubscriber.js";
+export { PartnerModel } from "./Partner.js";

@@ -5,10 +5,10 @@ import { signToken, logAction } from "../auth.js";
 export const oauthRouter = Router();
 
 // OAuth callbacks and their final redirects must stay on the deployed API
-// service. APP_URL may point to a separate marketing domain.
+// service. APP_URL may point to a separate marketing domain. The production
+// API is currently served from www.ofoqhc.com.
 const OAUTH_BASE_URL = (
   process.env.OAUTH_BASE_URL ||
-  process.env.APP_URL ||
   "https://www.ofoqhc.com"
 ).replace(/\/$/, "");
 

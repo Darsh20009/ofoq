@@ -125,14 +125,14 @@ export default function ClientLoginPage() {
   const hasOAuth = oauthStatus.google || oauthStatus.apple;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ofoq-navy via-[#1C1930] to-[#0f0d1f] flex items-center justify-center p-4" dir={dir}>
+    <div className="min-h-screen bg-[#F7F3EE] flex items-center justify-center p-4 relative overflow-hidden" dir={dir}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md">
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-[0_25px_80px_rgba(43,39,63,.16)] overflow-hidden border border-[#2B273F]/10">
           {/* Header */}
-              <Link to="/" className="block bg-ofoq-navy p-8 text-center hover:bg-[#1e1b38] transition-colors">
+               <Link to="/" className="block bg-[#2B273F] p-8 text-center hover:bg-[#342f4a] transition-colors">
             <div className="flex justify-center mb-4">
               <OfoqLogo className="w-20 h-14" />
             </div>
@@ -212,7 +212,7 @@ export default function ClientLoginPage() {
               </div>
 
               <button type="submit" disabled={loading}
-                className="w-full bg-ofoq-navy text-white py-3 rounded-xl font-semibold text-sm hover:bg-ofoq-red transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+                 className="w-full bg-[#237A57] text-white py-3 rounded-xl font-semibold text-sm hover:bg-[#1c684a] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
                 {loading ? (
                   <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -250,7 +250,7 @@ export default function ClientLoginPage() {
                   type="button"
                   onClick={handle2FA}
                   disabled={loading || otpCode.length < 6}
-                  className="w-full bg-ofoq-navy text-white py-3 rounded-xl font-semibold text-sm hover:bg-ofoq-red transition-all disabled:opacity-60"
+                   className="w-full bg-[#237A57] text-white py-3 rounded-xl font-semibold text-sm hover:bg-[#1c684a] transition-all disabled:opacity-60"
                 >
                   {loading ? ui.adminLogin.verifying : ui.adminLogin.verify}
                 </button>
@@ -273,7 +273,7 @@ export default function ClientLoginPage() {
           </div>
         </div>
 
-        <p className="mt-6 text-center text-white/30 text-xs">
+        <p className="mt-6 text-center text-[#2B273F]/35 text-xs">
           © {new Date().getFullYear()} OFOQ Business Solutions
         </p>
       </motion.div>

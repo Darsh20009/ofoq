@@ -1,4 +1,9 @@
 import type { Lang } from "./extraLangs";
+import { ur as urLocale } from "./locales/ur";
+import { hi as hiLocale } from "./locales/hi";
+import { id as idLocale } from "./locales/id";
+import { de as deLocale } from "./locales/de";
+import { es as esLocale } from "./locales/es";
 
 export type UiCopy = {
   header: { clientLogin: string; menu: string; language: string; nav: string[] };
@@ -215,7 +220,7 @@ const en: UiCopy = {
     stats: ["Clients served", "Client satisfaction", "Specialists", "Service categories"],
     reasons: [{ title: "Expert team", desc: "Specialists across every area of our services in the Saudi market." }, { title: "Full follow-up", desc: "We follow your file through to closure with regular updates." }, { title: "Digital experience", desc: "A full client portal to track your requests from anywhere." }, { title: "Local expertise", desc: "Deep knowledge of Saudi regulations and government bodies." }],
   },
-  services: { title: "Services | OFOQ", badge: "THE OFOQ CATALOG", hero1: "Services designed", hero2: "for your business.", heroSub: "From entity formation to daily operations, we coordinate details through one team and a clear path.", view: "View services", more: "more", areaBadge: "Our area of expertise", choose: "Choose", yourService: "your service", learnMore: "Learn more", ctaBadge: "Let's create sustainable impact", ctaTitle: "Contact us today" },
+  services: { title: "Services | OFOQ", badge: "THE OFOQ CATALOG", hero1: "Services designed", hero2: "for your business.", heroSub: "From entity formation to daily operations, we coordinate details through one team and a clear path.", view: "View services", more: "more", areaBadge: "Our services", choose: "Comprehensive solutions", yourService: "for your business growth", learnMore: "Learn more", ctaBadge: "Let's create sustainable impact", ctaTitle: "Contact us today" },
   category: { home: "Home", services: "Services", badge: "Service category", available: "services available", service: "services", grid: "Grid", list: "List", details: "Details", need: "Need these services?", needDesc: "Contact us and we'll help you identify the right service for your needs.", request: "Request service" },
   detail: { home: "Home", services: "Services", badge: "Service details", request: "Request service", how: "How we work", faq: "Frequently asked questions", window: "Service window", suitable: "Who is it for?", requirements: "Requirements", related: "Other services in this category", details: "Details" },
   about: {
@@ -458,7 +463,7 @@ const ar: UiCopy = {
   header: { clientLogin: "دخول العميل", menu: "القائمة", language: "اللغة", nav: ["الرئيسية", "من نحن", "خدماتنا", "الباقات", "الدول", "المدونة", "تواصل معنا"] },
   common: { sending: "جاري الإرسال...", send: "إرسال الرسالة", error: "حدث خطأ، حاول مجدداً" },
   home: { ...en.home, splash: ["خدمات", "ترتقي", "بالشركات"], badge: "أفق / خدمات الأعمال السعودية", hero1: "خدمات ترتقي", hero2: "بالشركات", hero3: "", metaTitle: "أفق لحلول الأعمال — شريك الأعمال السعودي", heroSub: "تسعى أفق لأن تكون الشريك الأمثل لتمكين الجهات من تحقيق مساهمتها الفعّالة في رؤية السعودية.", request: "اطلب خدمة", explore: "تعرّفوا على خدماتنا", aboutBadge: "عن أفق", aboutTitle1: "شريك عملك في", aboutTitle2: "المملكة العربية السعودية", aboutDesc: "نحمل عنك الإجراءات الحكومية وإدارة الموارد البشرية ومتطلبات التأسيس — حتى تتفرغ تماماً لنمو أعمالك.", aboutCta: "اعرف المزيد", servicesBadge: "خدماتنا", servicesTitle1: "خدمات متكاملة", servicesTitle2: "وشاملة", servicesAll: "عرض جميع الخدمات", more: "خدمات أخرى", whyBadge: "لماذا أفق؟", whyTitle: "نبني معك خطوة بخطوة", ctaTitle1: "لنعزز نموكم", ctaTitle2: "المستدام", ctaDesc: "تواصل معنا اليوم وابدأ رحلة شراكة حقيقية.", contact: "تواصل معنا", clientsBadge: "قطاعات متنوعة", clientsTitle1: "عملاء", clientsTitle2: "متنوعون", clientsDesc: "محفظة متكاملة من الخدمات لعملاء متنوعين عبر قطاعات متعددة.", stats: ["عميل تخدمهم أفق", "نسبة رضا العملاء", "خبير متخصص", "تصنيفات خدمية"], reasons: [{ title: "فريق متخصص", desc: "مختصون في كل مجال من مجالات خدماتنا في السوق السعودي." }, { title: "متابعة كاملة", desc: "نتابع ملفك حتى الإغلاق مع تحديثات دورية لك." }, { title: "تجربة رقمية", desc: "بوابة عميل متكاملة لمتابعة طلباتك أينما كنت." }, { title: "خبرة محلية", desc: "نفهم الأنظمة والجهات الحكومية السعودية عن قرب." }] },
-  services: { title: "الخدمات | أفق", badge: "دليل خدمات أفق", hero1: "خدمات مصممة", hero2: "لعملك بالكامل.", heroSub: "من تأسيس الكيان إلى تشغيله يومياً، ننسّق التفاصيل عبر فريق واحد ومسار واضح.", view: "عرض الخدمات", more: "خدمات أخرى", areaBadge: "منطقة خبرتنا", choose: "اختر", yourService: "خدمتك", learnMore: "اعرف أكثر", ctaBadge: "لنصنع أثراً مستداماً", ctaTitle: "تواصل معنا اليوم" },
+  services: { title: "الخدمات | أفق", badge: "دليل خدمات أفق", hero1: "خدمات مصممة", hero2: "لعملك بالكامل.", heroSub: "من تأسيس الكيان إلى تشغيله يومياً، ننسّق التفاصيل عبر فريق واحد ومسار واضح.", view: "عرض الخدمات", more: "خدمات أخرى", areaBadge: "خدماتنا", choose: "حلول متكاملة", yourService: "لنمو أعمالك", learnMore: "اعرف أكثر", ctaBadge: "لنصنع أثراً مستداماً", ctaTitle: "تواصل معنا اليوم" },
   category: { home: "الرئيسية", services: "الخدمات", badge: "تصنيف الخدمة", available: "خدمة متاحة", service: "خدمة", grid: "شبكة", list: "قائمة", details: "التفاصيل", need: "هل تحتاج هذه الخدمات؟", needDesc: "تواصل معنا وسنساعدك في تحديد الخدمة المناسبة لاحتياجاتك.", request: "اطلب خدمة" },
   detail: { home: "الرئيسية", services: "الخدمات", badge: "تفاصيل الخدمة", request: "اطلب الخدمة", how: "كيف نعمل", faq: "الأسئلة الشائعة", window: "مدة التنفيذ", suitable: "لمن تناسب؟", requirements: "المتطلبات", related: "خدمات أخرى من نفس التصنيف", details: "التفاصيل" },
   about: {
@@ -544,6 +549,9 @@ const ar: UiCopy = {
   adminLogin: { ...en.adminLogin, title: "أفق لحلول الأعمال", subtitle: "سجّل دخولك إلى لوحة تحكم أفق", email: "البريد الإلكتروني", password: "كلمة المرور", forgot: "نسيت كلمة المرور؟", login: "تسجيل الدخول", loggingIn: "جارٍ تسجيل الدخول...", emailRequired: "البريد الإلكتروني مطلوب", passwordRequired: "كلمة المرور مطلوبة", invalid: "تعذر تسجيل الدخول. تحقق من البيانات وحاول مرة أخرى.", twoFactor: "أدخل رمز التحقق الثنائي", code: "رمز التحقق", verify: "تأكيد", verifying: "جارٍ التحقق...", back: "العودة لتسجيل الدخول", employeeBarcode: "تسجيل الدخول بباركود الموظف", employeeLogin: "تسجيل دخول الموظف", passkeyLogin: "تسجيل الدخول بمفتاح المرور", or: "أو", twoFactorInvalid: "رمز التحقق غير صحيح.", oauthCompleting: "جاري إتمام تسجيل الدخول...", welcome: "مرحباً", successfulProjects: "مشروع ناجح", customerSatisfaction: "رضا العملاء" },
   footer: { ...en.footer, newsletter: "للتسجيل في نشرتنا", newsletterSub: "لمعرفة المزيد حول خدمات الأعمال المتقدمة", email: "بريدك الإلكتروني", join: "انضم", about: "من نحن", services: "الخدمات", packages: "الباقات", contact: "التواصل", story: "قصتنا", vision: "رؤيتنا ومهمتنا", why: "لماذا أفق؟", formation: "تأسيس الشركات", legal: "الخدمات القانونية", hr: "الموارد البشرية", government: "المنصات الحكومية", investors: "خدمات المستثمرين", silver: "الباقة الفضية", gold: "الباقة الذهبية", platinum: "الباقة البلاتينية", compare: "مقارنة الباقات", form: "نموذج التواصل", rights: "جميع الحقوق محفوظة.", privacy: "سياسة الخصوصية", terms: "الشروط والأحكام", madeBy: "صُنع بواسطة", location: "جدة — طريق الملك عبدالله", description: "شريكك الموثوق لأعمالك في السعودية — نقدم حلولاً شاملة لتسهيل أعمالك ودعم نموك المستدام." },
 };
+
+ar.home.hero3 = "حلول أعمال متكاملة.";
+ar.home.splash = ["نرتب", "التفاصيل،", "لتتمكنوا من", "النمو."];
 
 type DeepPartial<T> = {
   [K in keyof T]?: T[K] extends Array<any> ? T[K] : T[K] extends object ? DeepPartial<T[K]> : T[K];
@@ -1141,8 +1149,20 @@ export function getUiCopy(lang: Lang): UiCopy {
     for (const key of Object.keys(next)) output[key] = merge(base?.[key], next[key]);
     return output;
   };
-  if (lang === "ar") return merge(merge(ar, { client: clientDetailOverrides.ar }), { adminPages: adminContentOverrides.ar }) as UiCopy;
+  if (lang === "ar") {
+    const arabic = merge(merge(ar, { client: clientDetailOverrides.ar }), { adminPages: adminContentOverrides.ar });
+    return merge(en, arabic) as UiCopy;
+  }
   if (lang === "en") return en;
+  const completeLocales: Partial<Record<Lang, UiCopy>> = {
+    ur: urLocale,
+    hi: hiLocale,
+    id: idLocale,
+    de: deLocale,
+    es: esLocale,
+  };
+  const completeLocale = completeLocales[lang];
+  if (completeLocale) return completeLocale;
   const patch = overrides[lang] || {};
   // The admin area must not combine partial language packs with English
   // labels. Until a language has a complete admin pack, keep its admin UI

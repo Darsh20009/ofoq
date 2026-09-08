@@ -232,12 +232,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-stretch" dir={dir}>
+     <div className="min-h-screen bg-[#F7F3EE] flex items-stretch" dir={dir}>
 
       {/* ── الجانب الأيسر — صورة خلفية + بطاقات ── */}
       <div
         className="hidden lg:flex lg:w-[58%] relative bg-cover bg-center items-center justify-center p-16"
-        style={{ backgroundImage: "linear-gradient(rgba(12,19,56,.45),rgba(28,43,110,.70)), url('/images/hero-aramco-hq.jpg')" }}
+         style={{ backgroundImage: "linear-gradient(rgba(43,39,63,.48),rgba(43,39,63,.88)), url('/images/hero-aramco-hq.jpg')" }}
       >
         <div className="text-center text-white">
           <OfoqLogo className="w-40 h-28 mx-auto mb-8 text-white" />
@@ -249,7 +249,7 @@ export default function LoginPage() {
               <span className="text-xs text-white/60">{ui.adminLogin.successfulProjects}</span>
             </div>
             <div className="glass rounded-2xl px-6 py-4">
-              <b className="text-2xl block text-ofoq-red">98%</b>
+               <b className="text-2xl block text-ofoq-green">98%</b>
               <span className="text-xs text-white/60">{ui.adminLogin.customerSatisfaction}</span>
             </div>
           </div>
@@ -257,7 +257,7 @@ export default function LoginPage() {
       </div>
 
       {/* ── الجانب الأيمن — نموذج الدخول ── */}
-      <div className="w-full lg:w-[42%] flex items-center justify-center p-5 sm:p-10 bg-gray-50 relative">
+       <div className="w-full lg:w-[42%] flex items-center justify-center p-5 sm:p-10 bg-[#F7F3EE] relative">
         {/* خلفية نقاط ديكورية */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
           {[...Array(16)].map((_, i) => (
@@ -281,7 +281,7 @@ export default function LoginPage() {
           className="w-full max-w-md relative z-10"
         >
           {/* البطاقة الرئيسية */}
-          <div className="w-full max-w-md rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-xl bg-white">
+           <div className="w-full max-w-md rounded-3xl p-8 sm:p-10 border border-[#2B273F]/10 shadow-[0_25px_80px_rgba(43,39,63,.14)] bg-white">
             {/* اللوجو والعنوان */}
             <div className="text-center mb-8">
               <OfoqLogo className="w-24 h-16 mx-auto mb-4" dark />
@@ -334,7 +334,7 @@ export default function LoginPage() {
                     <button
                       type="button"
                       onClick={() => setShowPass(!showPass)}
-                      className="absolute top-1/2 -translate-y-1/2 left-3.5 text-gray-400 hover:text-ofoq-red transition-colors"
+                       className="absolute top-1/2 -translate-y-1/2 left-3.5 text-gray-400 hover:text-ofoq-green transition-colors"
                     >
                       {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -345,7 +345,7 @@ export default function LoginPage() {
                 </div>
 
                 <div className="flex justify-end">
-                  <Link to="/admin/forgot-password" className="text-ofoq-red text-xs hover:underline">
+                   <Link to="/admin/forgot-password" className="text-ofoq-green text-xs hover:underline">
                     {ui.adminLogin.forgot}
                   </Link>
                 </div>

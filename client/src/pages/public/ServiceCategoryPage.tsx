@@ -40,7 +40,7 @@ export default function ServiceCategoryPage() {
   const rtl = lang === "ar" || lang === "ur";
 
   return (
-    <div className="bg-[#2B273F] text-white">
+    <div className="bg-[#F7F3EE] text-[#2B273F]">
       <Helmet>
         <title>{pick(category.title, lang)} | OFOQ</title>
       </Helmet>
@@ -120,20 +120,20 @@ export default function ServiceCategoryPage() {
       <main className="mx-auto max-w-7xl px-6 py-16 sm:px-10 lg:py-24">
         {/* View toggle */}
         <div className="mb-10 flex items-center justify-between">
-          <p className="text-sm text-white/40">
+           <p className="text-sm text-[#2B273F]/50">
             {category.services.length}&nbsp;
             {ui.category.service}
           </p>
-          <div className="flex rounded-full border border-white/15 p-1 text-xs font-black">
+           <div className="flex rounded-full border border-[#2B273F]/15 bg-white p-1 text-xs font-black">
             <button
               onClick={() => setView("grid")}
-              className={`rounded-full px-4 py-2 transition-colors ${view === "grid" ? "bg-white text-[#2B273F]" : "text-white/45 hover:text-white"}`}
+               className={`rounded-full px-4 py-2 transition-colors ${view === "grid" ? "bg-[#2B273F] text-white" : "text-[#2B273F]/45 hover:text-[#2B273F]"}`}
             >
               {ui.category.grid}
             </button>
             <button
               onClick={() => setView("list")}
-              className={`rounded-full px-4 py-2 transition-colors ${view === "list" ? "bg-white text-[#2B273F]" : "text-white/45 hover:text-white"}`}
+               className={`rounded-full px-4 py-2 transition-colors ${view === "list" ? "bg-[#2B273F] text-white" : "text-[#2B273F]/45 hover:text-[#2B273F]"}`}
             >
               {ui.category.list}
             </button>
@@ -158,18 +158,18 @@ export default function ServiceCategoryPage() {
                 >
                   <Link
                     to={`/services/${category.slug}/${service.slug}`}
-                    className="group flex h-full flex-col rounded-2xl border border-white/8 bg-white/[0.03] p-7 transition-all duration-400 hover:border-[#33B27C]/40 hover:bg-white/[0.06]"
+                     className="group flex h-full flex-col rounded-2xl border border-[#2B273F]/10 bg-white p-7 shadow-[0_8px_30px_rgba(43,39,63,.06)] transition-all duration-400 hover:-translate-y-1 hover:border-[#33B27C]/50"
                   >
-                    <span className="mb-auto text-[11px] font-black text-[#E5FE04]">
+                     <span className="mb-auto text-[11px] font-black text-[#33B27C]">
                       0{i + 1}
                     </span>
                     <div className="mt-8">
-                      <h2 className="text-xl font-black text-white">{pick(service.title, lang)}</h2>
-                      <p className="mt-3 text-sm leading-7 text-white/40">
+                       <h2 className="text-xl font-black text-[#2B273F]">{pick(service.title, lang)}</h2>
+                       <p className="mt-3 text-sm leading-7 text-[#2B273F]/55">
                         {pick(service.desc, lang).split(".")[0]}.
                       </p>
                     </div>
-                    <div className="mt-6 flex items-center gap-2 text-xs font-black text-[#33B27C] transition-colors group-hover:text-white">
+                     <div className="mt-6 flex items-center gap-2 text-xs font-black text-[#33B27C] transition-colors group-hover:text-[#2B273F]">
                       <span className="grid h-7 w-7 place-items-center rounded-full border border-[#33B27C]/30 transition-colors group-hover:bg-[#33B27C] group-hover:border-[#33B27C]">
                         <ArrowIcon className="h-3 w-3" />
                       </span>
@@ -196,20 +196,20 @@ export default function ServiceCategoryPage() {
                 >
                   <Link
                     to={`/services/${category.slug}/${service.slug}`}
-                    className="group flex items-center justify-between gap-6 py-6 border-b border-white/8 transition-colors hover:text-[#33B27C]"
+                     className="group flex items-center justify-between gap-6 py-6 border-b border-[#2B273F]/8 transition-colors hover:text-[#33B27C]"
                   >
                     <div className="flex items-center gap-6">
                       <span className="w-8 shrink-0 text-sm font-black text-[#33B27C]/40 transition-colors group-hover:text-[#33B27C]">
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       <div>
-                        <h2 className="text-lg font-black text-white group-hover:text-[#33B27C] transition-colors">{pick(service.title, lang)}</h2>
-                        <p className="mt-1 text-sm text-white/35">
+                         <h2 className="text-lg font-black text-[#2B273F] group-hover:text-[#33B27C] transition-colors">{pick(service.title, lang)}</h2>
+                         <p className="mt-1 text-sm text-[#2B273F]/45">
                           {pick(service.desc, lang).split(".")[0]}.
                         </p>
                       </div>
                     </div>
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/12 text-white/30 transition-all group-hover:border-[#33B27C] group-hover:bg-[#33B27C] group-hover:text-white">
+                     <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#2B273F]/12 text-[#2B273F]/35 transition-all group-hover:border-[#33B27C] group-hover:bg-[#33B27C] group-hover:text-white">
                       <ArrowIcon />
                     </span>
                   </Link>
@@ -221,7 +221,7 @@ export default function ServiceCategoryPage() {
       </main>
 
       {/* ── CTA strip ─────────────────────────────────── */}
-      <div className="border-t border-white/8 px-6 py-14 sm:px-10">
+       <div className="border-t border-white/8 bg-[#2B273F] px-6 py-14 text-white sm:px-10">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-6">
           <div>
             <p className="text-xl font-black text-white">{ui.category.need}</p>

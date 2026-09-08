@@ -14,7 +14,7 @@ export default function CountriesPage() {
   const { ui, dir } = useLang();
   const countries = ui.countries.items.map((country, i) => ({ ...country, flag: FLAGS[i] }));
   return (
-    <div dir={dir} className="bg-[#2B273F] text-white min-h-screen">
+    <div dir={dir} className="min-h-screen bg-[#F7F3EE] text-[#2B273F]">
       <Helmet>
         <title>{ui.countries.metaTitle}</title>
         <meta name="description" content={ui.countries.metaDescription} />
@@ -59,11 +59,11 @@ export default function CountriesPage() {
       </section>
 
       {/* ══ الدول ═══════════════════════════════════════════ */}
-      <section className="py-16 sm:py-20 border-t border-white/8">
+       <section className="py-16 sm:py-20 border-t border-[#2B273F]/10">
         <div className="max-w-7xl mx-auto px-6 sm:px-10">
           <div className="mb-12">
             <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-4">{ui.countries.sectionEyebrow}</p>
-            <h2 className="text-4xl font-black">
+            <h2 className="text-4xl font-black text-[#2B273F]">
               {ui.countries.sectionTitle}{" "}
               <span className="text-[#33B27C]">{ui.countries.sectionHighlight}</span>
             </h2>
@@ -77,14 +77,14 @@ export default function CountriesPage() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
-                className="bg-white/[0.03] border border-white/8 rounded-2xl p-7 hover:border-[#33B27C]/40 transition-all group"
+                className="group rounded-2xl border border-[#2B273F]/10 bg-white p-7 shadow-[0_8px_30px_rgba(43,39,63,.06)] transition-all hover:-translate-y-1 hover:border-[#33B27C]/50"
               >
                 <div className="flex items-center gap-4 mb-5">
                   <span className="text-3xl group-hover:scale-110 transition-transform">{c.flag}</span>
-                  <h3 className="font-black text-white text-lg">{c.name}</h3>
+                  <h3 className="font-black text-[#2B273F] text-lg">{c.name}</h3>
                 </div>
-                <p className="text-white/40 text-sm leading-relaxed mb-5">{c.desc}</p>
-                <Link to="/client/register" className="flex items-center gap-2 text-xs font-bold text-[#33B27C] hover:text-white transition-colors">
+                <p className="text-[#2B273F]/55 text-sm leading-relaxed mb-5">{c.desc}</p>
+                <Link to="/client/register" className="flex items-center gap-2 text-xs font-bold text-[#33B27C] hover:text-[#2B273F] transition-colors">
                   {ui.countries.request}
                   <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5">
                     <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -97,7 +97,7 @@ export default function CountriesPage() {
       </section>
 
       {/* ══ قسم العملية ══════════════════════════════════════ */}
-      <section className="py-20 border-t border-white/8 bg-[#1a1726]">
+      <section className="py-20 border-t border-white/8 bg-[#2B273F] text-white">
         <div className="max-w-7xl mx-auto px-6 sm:px-10">
           <div className="text-center mb-14">
             <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-4">{ui.countries.processEyebrow}</p>
@@ -121,11 +121,11 @@ export default function CountriesPage() {
       </section>
 
       {/* ══ CTA ════════════════════════════════════════════════ */}
-      <section className="border-t border-white/8">
+      <section className="border-t border-[#2B273F]/10">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 py-20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-3">{ui.countries.ctaEyebrow}</p>
-            <h2 className="text-3xl sm:text-4xl font-black">
+            <h2 className="text-3xl sm:text-4xl font-black text-[#2B273F]">
               {ui.countries.ctaTitle}{" "}
               <span className="text-[#33B27C]">{ui.countries.ctaHighlight}</span>
             </h2>

@@ -17,6 +17,7 @@ import { useLang } from "../i18n/LangContext";
 import NotificationPermissionModal from "../components/NotificationPermissionModal";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import AdminPageGuide from "../components/admin/AdminPageGuide";
+import type { LangCode } from "../i18n/extraLangs";
 
 interface NavItem {
   href?: string;
@@ -25,6 +26,80 @@ interface NavItem {
   badge?: number;
   children?: { href: string; label: string }[];
 }
+
+const adminLayoutLabels: Record<LangCode, {
+  quotations: string;
+  services: string;
+  blogTestimonials: string;
+  siteContentEditor: string;
+  serviceRequests: string;
+  support: string;
+  operations: string;
+}> = {
+  ar: {
+    quotations: "عروض الأسعار",
+    services: "إدارة الخدمات",
+    blogTestimonials: "المدونة والشهادات",
+    siteContentEditor: "محرر المحتوى",
+    serviceRequests: "طلبات الخدمات",
+    support: "الدعم",
+    operations: "منصة إدارة أفق",
+  },
+  en: {
+    quotations: "Quotations",
+    services: "Services",
+    blogTestimonials: "Blog & Testimonials",
+    siteContentEditor: "Site Content Editor",
+    serviceRequests: "Service requests",
+    support: "Support",
+    operations: "OFOQ Operations",
+  },
+  ur: {
+    quotations: "قیمت کی پیشکشیں",
+    services: "سروسز کا انتظام",
+    blogTestimonials: "بلاگ اور تعریفی اسناد",
+    siteContentEditor: "ویب سائٹ مواد کا مدیر",
+    serviceRequests: "سروس کی درخواستیں",
+    support: "سپورٹ",
+    operations: "اُفق آپریشنز پلیٹ فارم",
+  },
+  hi: {
+    quotations: "मूल्य उद्धरण",
+    services: "सेवा प्रबंधन",
+    blogTestimonials: "ब्लॉग और प्रशंसापत्र",
+    siteContentEditor: "साइट सामग्री संपादक",
+    serviceRequests: "सेवा अनुरोध",
+    support: "सहायता",
+    operations: "OFOQ संचालन मंच",
+  },
+  id: {
+    quotations: "Penawaran",
+    services: "Manajemen layanan",
+    blogTestimonials: "Blog & Testimoni",
+    siteContentEditor: "Editor Konten Situs",
+    serviceRequests: "Permintaan layanan",
+    support: "Dukungan",
+    operations: "Operasional OFOQ",
+  },
+  de: {
+    quotations: "Angebote",
+    services: "Leistungsverwaltung",
+    blogTestimonials: "Blog & Erfahrungsberichte",
+    siteContentEditor: "Website-Inhaltseditor",
+    serviceRequests: "Serviceanfragen",
+    support: "Support",
+    operations: "OFOQ-Betrieb",
+  },
+  es: {
+    quotations: "Cotizaciones",
+    services: "Gestión de servicios",
+    blogTestimonials: "Blog y testimonios",
+    siteContentEditor: "Editor de contenido del sitio",
+    serviceRequests: "Solicitudes de servicio",
+    support: "Soporte",
+    operations: "Operaciones de OFOQ",
+  },
+};
 
 // navItems built dynamically in the component using useLang — see buildNavItems()
 
@@ -106,6 +181,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
   const notifRef = useRef<HTMLDivElement>(null);
   const { t, dir, ui, lang } = useLang();
   const isRtl = dir === "rtl";
+  const labels = adminLayoutLabels[lang];
   const pagePath = (path: string) => `${basePath}${path ? `/${path}` : ""}` || "/";
 
   const { data: sidebarCountsData } = useQuery({
@@ -130,24 +206,22 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
       ],
     },
     { href: pagePath("projects"),      label: t.admin.projects,   icon: FolderKanban },
-    { href: pagePath("quotations"),    label: lang === "ar" ? "عروض الأسعار" : "Quotations", icon: FileText },
+    { href: pagePath("quotations"),    label: labels.quotations, icon: FileText },
     { href: pagePath("invoices"),      label: t.admin.invoices,   icon: FileText },
     { href: pagePath("contracts"),     label: t.admin.contracts,  icon: FileSignature },
-    { href: pagePath("services"),      label: lang === "ar" ? "إدارة الخدمات" : "Services", icon: Layers3 },
+    { href: pagePath("services"),      label: labels.services, icon: Layers3 },
     { href: pagePath("users"),         label: t.admin.users,      icon: Users },
     {
       label: t.admin.cms,
       icon: FileEdit,
       children: [
-        { href: pagePath("cms"),              label: lang === "ar" ? "المدونة والشهادات" : "Blog & Testimonials" },
-        { href: pagePath("cms/site-content"), label: lang === "ar" ? "محرر المحتوى" : "Site Content Editor" },
+         { href: pagePath("cms"),              label: labels.blogTestimonials },
+         { href: pagePath("cms/site-content"), label: labels.siteContentEditor },
       ],
     },
     { href: pagePath("settings"),      label: t.admin.settings,   icon: Settings },
-    // Client copy lives in the shared UI translations; the legacy `t` pack
-    // does not include a `client` section for the Arabic admin layout.
-    { href: pagePath("service-requests"), label: lang === "ar" ? "طلبات الخدمات" : "Service requests", icon: ClipboardList, badge: sidebarCounts.requests },
-    { href: pagePath("support"),          label: lang === "ar" ? "الدعم" : "Support", icon: HeadphonesIcon },
+    { href: pagePath("service-requests"), label: labels.serviceRequests, icon: ClipboardList, badge: sidebarCounts.requests },
+    { href: pagePath("support"),          label: labels.support, icon: HeadphonesIcon },
     { href: pagePath("contact"),          label: t.contact.consultTitle, icon: MessageSquare },
     { href: pagePath("employee/card"),    label: t.admin.myCard,   icon: CreditCard },
   ];
@@ -183,7 +257,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-50" dir={dir}>
+    <div className="ofoq-shell min-h-screen flex bg-[#f5f1eb] text-navy-700" dir={dir}>
       <NotificationPermissionModal />
       {/* ── Sidebar ─────────────────────── */}
       {/* Mobile overlay */}
@@ -198,14 +272,14 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
       </AnimatePresence>
 
       <aside
-          className={`fixed top-0 ${dir === "rtl" ? "right-0" : "left-0"} h-full z-50 flex flex-col transition-all duration-300 bg-[#101B4C]
+          className={`fixed top-0 ${dir === "rtl" ? "right-0" : "left-0"} h-full z-50 flex flex-col transition-all duration-300 bg-[#071a30] shadow-[0_0_45px_rgba(7,26,48,.28)]
           ${collapsed ? "w-16" : "w-64"}
           ${sidebarOpen ? "translate-x-0" : dir === "rtl" ? "translate-x-full lg:translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
         {/* Logo */}
         <div className="flex items-center gap-3 p-4 h-16 border-b border-white/10">
-           <OfoqLogo className="w-16 h-12 text-white flex-shrink-0" />
+             <OfoqLogo className="w-16 h-12 text-white flex-shrink-0" />
           {!collapsed && (
             <div className="overflow-hidden">
               <p className="text-white font-bold text-sm leading-none whitespace-nowrap">{t.admin.brand}</p>
@@ -245,7 +319,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
           </button>
           {!collapsed && (
             <div className="flex items-center gap-3 mt-3 px-2">
-               <div className="w-8 h-8 rounded-full bg-ofoq-red flex items-center justify-center flex-shrink-0">
+               <div className="w-8 h-8 rounded-xl bg-ofoq-green flex items-center justify-center flex-shrink-0 shadow-lg shadow-emerald-950/20">
                 <span className="text-white text-xs font-bold">
                   {user?.name?.charAt(0) || "م"}
                 </span>
@@ -262,7 +336,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
       {/* ── Main content ─────────────────── */}
       <div className={`flex-1 flex flex-col transition-all duration-300 ${dir === "rtl" ? (collapsed ? "lg:mr-16" : "lg:mr-64") : (collapsed ? "lg:ml-16" : "lg:ml-64")}`}>
         {/* Top bar */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center px-4 sm:px-6 gap-4 sticky top-0 z-30">
+        <header className="h-[72px] bg-[#fffdfa]/92 backdrop-blur-xl border-b border-[#e8e1d7] flex items-center px-4 sm:px-7 gap-4 sticky top-0 z-30">
           <button
             className="text-navy-600 hover:text-navy-900 lg:hidden"
             onClick={() => setSidebarOpen(true)}
@@ -272,7 +346,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
 
           <div className="flex-1 min-w-0">
             <p className="hidden sm:block text-xs font-semibold text-gray-400">
-              {lang === "ar" ? "منصة إدارة أفق" : "OFOQ Operations"}
+               {labels.operations}
             </p>
           </div>
 
@@ -282,7 +356,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
             <div className="relative">
               <button
                 onClick={() => { setNotifOpen(!notifOpen); setUserMenuOpen(false); }}
-                className="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-navy-700 transition-colors"
+                className="relative p-2 rounded-xl text-navy-400 hover:bg-navy-50 hover:text-ofoq-green transition-colors"
               >
                 <Bell size={20} />
                 {unreadCount > 0 && (
@@ -298,7 +372,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 8 }}
-                    className="absolute top-12 left-0 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                    className="absolute top-12 left-0 w-80 bg-[#FFFEFC] rounded-2xl shadow-xl border border-navy-100 overflow-hidden z-50"
                   >
                     <div className="p-4 border-b flex items-center justify-between">
                       <span className="font-semibold text-sm text-navy-700">{t.admin.notifications}</span>
@@ -330,9 +404,9 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
             <div className="relative">
               <button
                 onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifOpen(false); }}
-                className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="flex items-center gap-2 p-2 rounded-xl hover:bg-navy-50 transition-colors"
               >
-                 <div className="w-8 h-8 rounded-full bg-ofoq-red flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-xl bg-ofoq-green flex items-center justify-center shadow-sm">
                   <span className="text-white text-xs font-bold">
                     {user?.name?.charAt(0) || "م"}
                   </span>
@@ -349,7 +423,7 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 8 }}
-                    className="absolute top-12 left-0 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                    className="absolute top-12 left-0 w-52 bg-[#FFFEFC] rounded-2xl shadow-xl border border-navy-100 overflow-hidden z-50"
                   >
                     <Link
                       to={pagePath("profile")}
@@ -382,9 +456,11 @@ export default function AdminLayout({ basePath = "/admin" }: { basePath?: string
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
-          <AdminPageGuide />
-          <Outlet />
+         <main className="relative flex-1 overflow-auto p-4 sm:p-6 lg:p-8 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-44 before:bg-gradient-to-b before:from-[#eee7dd]/70 before:to-transparent">
+          <div className="relative">
+            <AdminPageGuide />
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

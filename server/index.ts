@@ -5,12 +5,17 @@ import { connectDB } from "./db.js";
 import { initWebSocket } from "./ws.js";
 import { generateVapidKeys } from "./push.js";
 import { startScheduler } from "./scheduler.js";
+import { ensureDefaultPartners } from "./services/partner-seed.service.js";
+import { verifyEmailTransport } from "./email.js";
 
 const PORT = parseInt(process.env.PORT || "5000");
 
 async function bootstrap() {
   // Connect to MongoDB
   await connectDB();
+  await ensureDefaultPartners().catch((error) => {
+    console.error("❌ Partner initialization failed:", error?.message || error);
+  });
 
   // Generate VAPID keys if not set
   await generateVapidKeys();
@@ -28,6 +33,7 @@ async function bootstrap() {
     console.log(`🚀 OFOQ Server running on port ${PORT}`);
     console.log(`🌐 Environment: ${process.env.NODE_ENV}`);
     console.log(`📡 WebSocket: ready`);
+    void verifyEmailTransport();
   });
 
   // Graceful shutdown
