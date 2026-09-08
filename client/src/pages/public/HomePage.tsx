@@ -190,7 +190,7 @@ export default function HomePage() {
         </section>
 
         <section className="relative isolate overflow-hidden pb-10 pt-14 text-white sm:pb-16 sm:pt-14">
-          <picture className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[150px] sm:h-[190px]">
+          <picture className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[230px] sm:h-[280px]">
             <source media="(max-width: 639px)" srcSet="/images/ofoq-hero-reference-mobile.webp" />
             <img
               src="/images/ofoq-hero-reference.webp"
