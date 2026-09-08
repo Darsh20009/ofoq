@@ -259,6 +259,114 @@
   100% { background-position: 200% 0; }
 }
 
+@keyframes partners-tide-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes partners-tide-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes partners-tide-reveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.partners-tides {
+  position: relative;
+  overflow: hidden;
+}
+
+.partners-tide-lane {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  direction: ltr;
+  animation: partners-tide-reveal 1.1s ease-out both;
+}
+
+.partners-tide-lane + .partners-tide-lane {
+  animation-delay: .18s;
+}
+
+.partners-tide-lane::before,
+.partners-tide-lane::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 11%;
+  pointer-events: none;
+}
+
+.partners-tide-lane::before {
+  left: 0;
+  background: linear-gradient(90deg, #071936 5%, rgba(7, 25, 54, .82) 42%, transparent);
+}
+
+.partners-tide-lane::after {
+  right: 0;
+  background: linear-gradient(270deg, #071936 5%, rgba(7, 25, 54, .82) 42%, transparent);
+}
+
+.partners-tide-track {
+  display: flex;
+  width: max-content;
+  max-width: none;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+  will-change: transform;
+}
+
+.partners-tide-track--left {
+  animation: partners-tide-left 52s .65s infinite linear both;
+}
+
+.partners-tide-track--right {
+  animation: partners-tide-right 60s 2s infinite linear both;
+}
+
+.partners-tide-copy {
+  max-width: none;
+}
+
+.partners-tides--paused .partners-tide-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .partners-tide-lane {
+    animation: none;
+  }
+
+  .partners-tide-lane::before,
+  .partners-tide-lane::after {
+    display: none;
+  }
+
+  .partners-tide-track {
+    width: 100%;
+    flex-wrap: wrap;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  .partners-tide-copy {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .25rem;
+  }
+
+  .partners-tide-copy[aria-hidden="true"] {
+    display: none;
+  }
+}
+
 .skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;

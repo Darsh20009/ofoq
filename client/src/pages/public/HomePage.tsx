@@ -308,6 +308,7 @@ const fallbackPartners: Partner[] = [
 
 function PartnersSection({ dir, useArabicContent, copy }: { dir: "rtl" | "ltr"; useArabicContent: boolean; copy: HomePageCopy }) {
   const [selected, setSelected] = useState<Partner | null>(null);
+  const [motionPaused, setMotionPaused] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const { data, isError, isLoading } = useQuery({
     queryKey: ["public-partners"],
@@ -344,47 +345,64 @@ function PartnersSection({ dir, useArabicContent, copy }: { dir: "rtl" | "ltr"; 
   }, [selected]);
 
   return (
-    <section className="bg-[#071936] px-5 pb-10 sm:px-10 sm:pb-14 lg:px-16">
-      <div className="mx-auto max-w-[1380px] overflow-hidden rounded-2xl bg-[#F4F1EC] py-6 text-[#071936] sm:py-7" dir={dir}>
-        <div className="mb-5 flex items-center justify-between gap-4 px-5 sm:px-10">
+    <section className="bg-[#071936] px-5 pb-12 pt-3 sm:px-10 sm:pb-16 sm:pt-5 lg:px-16" dir={dir}>
+      <div className="mx-auto max-w-[1380px] text-white">
+        <div className="mb-7 flex items-end justify-between gap-5 border-b border-white/10 pb-4 sm:mb-9 sm:pb-5">
           <div>
-            <p className="text-xs font-black text-[#071936]">{copy.partnersTitle}</p>
-            <p className="mt-1 text-[10px] text-[#071936]/50">
-              {copy.partnersHint}
-            </p>
+            <p className="text-xs font-black text-[#C5B278]">{copy.partnersTitle}</p>
+            <p className="mt-1 text-[10px] text-white/45">{copy.partnersHint}</p>
           </div>
-          {isLoading && (
-            <span className="rounded-full bg-[#071936]/5 px-3 py-1 text-[10px] font-bold text-[#071936]/55">
-              {copy.partnersLoading}
-            </span>
-          )}
-          {isError && (
-            <span className="rounded-full bg-[#C5B278]/15 px-3 py-1 text-[10px] font-bold text-[#7b6a37]">
-              {copy.partnersFallback}
-            </span>
-          )}
+          <div className="flex items-center gap-3 text-[10px] font-bold text-white/40">
+            <span className="hidden h-px w-12 bg-[#C5B278]/50 sm:block" />
+            {isLoading && <span>{copy.partnersLoading}</span>}
+            {isError && <span className="text-[#C5B278]">{copy.partnersFallback}</span>}
+          </div>
         </div>
         {partners.length > 0 ? (
-          <div className="grid grid-cols-2 gap-3 px-5 sm:grid-cols-3 sm:gap-4 sm:px-10 lg:grid-cols-5">
-            {partners.map((partner) => (
-              <button
-                key={partner._id}
-                type="button"
-                onClick={() => setSelected(partner)}
-                className="group flex min-h-[84px] w-full items-center justify-center rounded-lg border border-[#071936]/[.08] bg-white/70 px-3 py-3 transition-colors hover:border-[#C5B278] hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C13229] focus-visible:ring-offset-2 sm:min-h-[96px] sm:px-4"
-                aria-label={copy.viewPartnerDetails(partnerName(partner))}
-              >
-                <img
-                  src={partner.logo}
-                  alt=""
-                  loading="lazy"
-                  className="h-12 w-full max-w-[120px] object-contain sm:h-14 sm:max-w-[150px]"
-                />
-              </button>
+          <div
+            className={`partners-tides ${motionPaused ? "partners-tides--paused" : ""}`}
+            onMouseEnter={() => setMotionPaused(true)}
+            onMouseLeave={() => setMotionPaused(false)}
+            onFocusCapture={() => setMotionPaused(true)}
+            onBlurCapture={() => setMotionPaused(false)}
+            onPointerDown={() => setMotionPaused(true)}
+            onPointerUp={(event) => {
+              if (event.pointerType !== "mouse") setMotionPaused(false);
+            }}
+          >
+            {[
+              { items: partners, direction: "left" },
+              { items: [...partners].reverse(), direction: "right" },
+            ].map((lane, laneIndex) => (
+              <div key={lane.direction} className={`partners-tide-lane ${laneIndex === 1 ? "mt-5 border-t border-white/[.08] pt-5 sm:mt-7 sm:pt-7" : ""}`}>
+                <div className={`partners-tide-track partners-tide-track--${lane.direction} ${motionPaused ? "[animation-play-state:paused]" : ""}`} dir="ltr">
+                  {[0, 1].map((copyIndex) => (
+                    <div key={copyIndex} className="partners-tide-copy flex shrink-0 items-center gap-3 px-5 sm:gap-8 sm:px-10" aria-hidden={copyIndex === 1}>
+                      {lane.items.map((partner) => (
+                        <button
+                          key={`${lane.direction}-${copyIndex}-${partner._id}`}
+                          type="button"
+                          tabIndex={copyIndex === 1 ? -1 : 0}
+                          onClick={() => setSelected(partner)}
+                          className="group relative flex h-16 w-28 shrink-0 items-center justify-center rounded-md focus:outline-none focus-visible:z-10 focus-visible:ring-1 focus-visible:ring-[#C5B278] sm:h-20 sm:w-40"
+                          aria-label={copy.viewPartnerDetails(partnerName(partner))}
+                        >
+                          <img
+                            src={partner.logo}
+                            alt=""
+                            loading="lazy"
+                            className="h-10 w-full max-w-[104px] object-contain grayscale brightness-0 invert opacity-60 transition-opacity duration-300 group-hover:opacity-95 group-focus-visible:opacity-95 sm:h-12 sm:max-w-[138px]"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         ) : (
-          <p className="px-5 py-8 text-center text-sm text-[#071936]/50">{copy.partnersEmpty}</p>
+          <p className="py-8 text-center text-sm text-white/50">{copy.partnersEmpty}</p>
         )}
       </div>
 
