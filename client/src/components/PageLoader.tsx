@@ -77,7 +77,7 @@ export default function PageLoader({ onDone }: { onDone: () => void }) {
       {/* خط أفقي ديكوري */}
       <motion.div
         className="absolute bottom-0 left-0 h-0.5"
-        style={{ background: "linear-gradient(to right, transparent, #C13229, rgba(229,254,4,0.6), transparent)" }}
+        style={{ background: "linear-gradient(to right, transparent, #C13229, rgba(244,241,236,0.7), transparent)" }}
         initial={{ width: "0%" }}
         animate={{ width: "100%" }}
         transition={{ duration: 1.0, ease: "easeInOut" }}

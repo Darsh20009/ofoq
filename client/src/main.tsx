@@ -87,7 +87,7 @@ Object.assign(bar.style, {
   left: "0",
   height: "2px",
   width: "0%",
-  background: "linear-gradient(to right, transparent, #C13229, rgba(229,254,4,0.6), transparent)",
+  background: "linear-gradient(to right, transparent, #C13229, rgba(244,241,236,0.7), transparent)",
   transition: "width 1.1s ease-in-out",
 });
 
@@ -136,7 +136,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 fontSize: "14px",
                 direction: "rtl",
               },
-              success: { style: { background: "#33B27C", color: "#fff" } },
+              success: { style: { background: "#C13229", color: "#fff" } },
               error:   { style: { background: "#EF4444", color: "#fff" } },
             }}
             />

@@ -27,10 +27,10 @@ export default {
           red:         "#C13229",   /* brand red from "F" in logo */
           "red-dark":  "#9B2820",
           "red-light": "#FDECEA",
-          yellow:      "#E5FE04",   /* accent neon yellow */
-          green:       "#33B27C",   /* brand green */
-          "green-dark":"#267A57",
-          "green-light":"#E6F7F1",
+          yellow:      "#C13229",   /* red accent */
+          green:       "#1C2B6E",   /* brand blue */
+          "green-dark":"#071936",
+          "green-light":"#F4F1EC",
           "navy-light":"#3A3558",
           "navy-dark": "#1A1730",
         },
@@ -58,7 +58,7 @@ export default {
       boxShadow: {
         "ofoq":        "0 12px 36px rgba(43,39,63,0.14)",
         "ofoq-red":    "0 4px 24px rgba(193,50,41,0.30)",
-        "ofoq-yellow": "0 4px 24px rgba(229,254,4,0.35)",
+        "ofoq-yellow": "0 4px 24px rgba(193,50,41,0.25)",
         "card":        "0 1px 2px rgba(43,39,63,0.04), 0 12px 30px rgba(43,39,63,0.07)",
       },
     },

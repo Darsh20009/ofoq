@@ -10,7 +10,7 @@ async function makeIcon(size: number): Promise<Buffer> {
   const svg = `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
     <rect width="${size}" height="${size}" rx="${r}" fill="#1C2B6E"/>
     <text x="50%" y="53%" font-family="Arial,sans-serif" font-weight="bold"
-      font-size="${fs}" fill="#33B27C"
+      font-size="${fs}" fill="#1C2B6E"
       text-anchor="middle" dominant-baseline="middle">O</text>
   </svg>`;
   return sharp(Buffer.from(svg)).png().toBuffer();
@@ -22,7 +22,7 @@ async function makeLogo(w: number, h: number): Promise<Buffer> {
     <rect width="${w}" height="${h}" fill="#1C2B6E"/>
     <text x="${w / 2}" y="53%" font-family="Arial,sans-serif" font-weight="800"
       font-size="${fs}" letter-spacing="4"
-      fill="#33B27C" text-anchor="middle" dominant-baseline="middle">OFOQ</text>
+      fill="#1C2B6E" text-anchor="middle" dominant-baseline="middle">OFOQ</text>
   </svg>`;
   return sharp(Buffer.from(svg)).png().toBuffer();
 }
@@ -31,7 +31,7 @@ async function makeThumbnail(initial: string, size: number): Promise<Buffer> {
   const fs = Math.round(size * 0.5);
   const cx = size / 2;
   const svg = `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="${cx}" cy="${cx}" r="${cx}" fill="#33B27C"/>
+    <circle cx="${cx}" cy="${cx}" r="${cx}" fill="#1C2B6E"/>
     <text x="50%" y="53%" font-family="Arial,sans-serif" font-weight="bold"
       font-size="${fs}" fill="#fff"
       text-anchor="middle" dominant-baseline="middle">${initial}</text>

@@ -48,7 +48,7 @@
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #F1EEE8; }
 ::-webkit-scrollbar-thumb { background: #BDB4C9; border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: #33B27C; }
+::-webkit-scrollbar-thumb:hover { background: #C13229; }
 
 /* ── Components ─────────────────────────────── */
 @layer components {
@@ -201,7 +201,7 @@
 /* ── Utilities ───────────────────────────────── */
 @layer utilities {
   .text-gradient-green {
-    background: linear-gradient(135deg, #E5FE04, #E5FE04);
+    background: linear-gradient(135deg, #C13229, #1C2B6E);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -227,17 +227,27 @@
   }
 }
 
-/* OFOQ phosphor accent: keep legacy utility classes on the new brand color. */
-[class*="text-[#33B27C]"] { color: #E5FE04 !important; }
-[class*="bg-[#33B27C]"] { background-color: #E5FE04 !important; }
-[class*="border-[#33B27C]"] { border-color: #E5FE04 !important; }
-[class*="hover\:text-[#33B27C]"]:hover { color: #E5FE04 !important; }
-[class*="hover\:border-[#33B27C]"]:hover { border-color: #E5FE04 !important; }
-[class*="focus\:border-[#33B27C]"]:focus { border-color: #E5FE04 !important; }
-[class*="from-[#33B27C]"] { --tw-gradient-from: #E5FE04 var(--tw-gradient-from-position); --tw-gradient-to: rgb(229 254 4 / 0) var(--tw-gradient-to-position); }
-[class*="to-[#33B27C]"] { --tw-gradient-to: #E5FE04 var(--tw-gradient-to-position); }
-[class*="ring-[#33B27C]"] { --tw-ring-color: #E5FE04 !important; }
-[stroke="#33B27C"] { stroke: #E5FE04 !important; }
+/* Brand migration: legacy green and phosphor utilities now use OFOQ blue/red. */
+[class*="text-[#33B27C]"] { color: #1C2B6E !important; }
+[class*="bg-[#33B27C]"] { background-color: rgb(28 43 110 / var(--tw-bg-opacity, 1)) !important; }
+[class*="border-[#33B27C]"] { border-color: #1C2B6E !important; }
+[class*="hover\:text-[#33B27C]"]:hover { color: #1C2B6E !important; }
+[class*="hover\:border-[#33B27C]"]:hover { border-color: #1C2B6E !important; }
+[class*="focus\:border-[#33B27C]"]:focus { border-color: #1C2B6E !important; }
+[class*="from-[#33B27C]"] { --tw-gradient-from: #1C2B6E var(--tw-gradient-from-position); --tw-gradient-to: rgb(28 43 110 / 0) var(--tw-gradient-to-position); }
+[class*="to-[#33B27C]"] { --tw-gradient-to: #1C2B6E var(--tw-gradient-to-position); }
+[class*="ring-[#33B27C]"] { --tw-ring-color: #1C2B6E !important; }
+[stroke="#33B27C"] { stroke: #1C2B6E !important; }
+[class*="text-[#E5FE04]"] { color: #C13229 !important; }
+[class*="bg-[#E5FE04]"] { background-color: rgb(193 50 41 / var(--tw-bg-opacity, 1)) !important; }
+[class*="border-[#E5FE04]"] { border-color: #C13229 !important; }
+[class*="hover\:text-[#E5FE04]"]:hover { color: #C13229 !important; }
+[class*="hover\:border-[#E5FE04]"]:hover { border-color: #C13229 !important; }
+[class*="focus\:border-[#E5FE04]"]:focus { border-color: #C13229 !important; }
+[class*="from-[#E5FE04]"] { --tw-gradient-from: #C13229 var(--tw-gradient-from-position); --tw-gradient-to: rgb(193 50 41 / 0) var(--tw-gradient-to-position); }
+[class*="to-[#E5FE04]"] { --tw-gradient-to: #C13229 var(--tw-gradient-to-position); }
+[class*="ring-[#E5FE04]"] { --tw-ring-color: #C13229 !important; }
+[stroke="#E5FE04"] { stroke: #C13229 !important; }
 /* PWA Splash */
 #splash-screen { position: fixed; inset: 0; z-index: 9999; background: #2B273F; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity .5s ease; }
 #splash-screen.hidden { opacity:0; pointer-events:none; }

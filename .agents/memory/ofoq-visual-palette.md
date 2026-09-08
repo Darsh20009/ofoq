@@ -3,8 +3,8 @@ name: OFOQ visual palette
 description: Approved public-facing color palette for OFOQ visual work.
 ---
 
-Use `#2B273F` as the deep violet foundation, `#33B27C` for green interactive accents, and `#E5FE04` for lime emphasis. Prefer a clean, unframed OFOQ mark over decorative geometric background elements.
+Use `#071936` and `#1C2B6E` as the blue foundation, `#C13229` for red interactive accents, and `#F4F1EC` / `#D8CDBD` for beige surfaces and details. Avoid fluorescent green and neon yellow. Prefer a clean, unframed OFOQ mark over decorative geometric background elements.
 
-**Why:** The user supplied this palette and asked that the hero, splash, and visual system align to it.
+**Why:** The user requested replacing all fluorescent colors with OFOQ's blue, red, and beige identity colors across the app.
 
-**How to apply:** Use these as the primary visual colors in new or redesigned public pages; retain white and neutral shades where needed for readability and layout.
+**How to apply:** Use blue for foundations and primary structure, red for actions and emphasis, and beige for surfaces and secondary details; retain white and neutral shades where needed for readability and layout.

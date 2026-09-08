@@ -171,8 +171,8 @@ async function sendMail(
 const COLORS = {
   navy: "#2B273F",
   navyDark: "#1C1930",
-  green: "#33B27C",
-  greenDark: "#259964",
+  green: "#C13229",
+  greenDark: "#9B2820",
   text: "#3A3750",
   muted: "#8B879C",
   bgSoft: "#F7F7F8",

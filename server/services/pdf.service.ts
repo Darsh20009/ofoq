@@ -186,7 +186,7 @@ function docShell(title: string, bodyHtml: string): string {
     direction: rtl;
   }
   .page { width: 210mm; min-height: 297mm; padding: 14mm 16mm; position: relative; }
-  .brand-bar { height: 6px; background: linear-gradient(90deg, #33B27C 0%, #E5FE04 100%); }
+  .brand-bar { height: 6px; background: linear-gradient(90deg, #1C2B6E 0%, #C13229 100%); }
   .header { display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 0 18px; border-bottom: 2px solid #f0f1f5; }
   .brand { display: flex; align-items: center; gap: 12px; }
   .brand img { width: 52px; height: 52px; border-radius: 12px; }
@@ -194,13 +194,13 @@ function docShell(title: string, bodyHtml: string): string {
   .brand .names p { font-size: 11px; color: #8b879c; margin-top: 2px; }
   .doc-title { text-align: left; }
   .doc-title h2 { font-size: 24px; color: #2B273F; font-weight: 800; letter-spacing: 0.5px; }
-  .doc-title .num { font-size: 13px; color: #33B27C; font-weight: 700; margin-top: 4px; direction: ltr; text-align: left; }
+  .doc-title .num { font-size: 13px; color: #1C2B6E; font-weight: 700; margin-top: 4px; direction: ltr; text-align: left; }
   .status-badge { display: inline-block; margin-top: 8px; padding: 4px 14px; border-radius: 999px; font-size: 11px; font-weight: 700; }
   .meta-grid { display: flex; justify-content: space-between; gap: 24px; margin: 22px 0; }
   .meta-box { flex: 1; background: #f8f9fb; border-radius: 10px; padding: 14px 16px; }
   .meta-box h3 { font-size: 11px; color: #9691a8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px; }
   .meta-box p { font-size: 13px; color: #2B273F; line-height: 1.9; }
-  .meta-box p strong { color: #33B27C; }
+  .meta-box p strong { color: #1C2B6E; }
   table.items { width: 100%; border-collapse: collapse; margin-top: 10px; }
   table.items thead th { background: #2B273F; color: #fff; font-size: 11.5px; padding: 10px 12px; text-align: right; }
   table.items thead th:first-child { border-radius: 8px 0 0 0; }
@@ -211,18 +211,18 @@ function docShell(title: string, bodyHtml: string): string {
   .totals { margin-top: 16px; margin-inline-start: auto; width: 280px; }
   .totals .row { display: flex; justify-content: space-between; padding: 7px 4px; font-size: 12.5px; color: #4d4a5e; }
   .totals .row.grand { border-top: 2px solid #2B273F; margin-top: 6px; padding-top: 12px; font-size: 16px; font-weight: 800; color: #2B273F; }
-  .totals .row.grand .amt { color: #33B27C; }
-  .notes { margin-top: 26px; background: #fbfaf0; border-inline-start: 4px solid #E5FE04; padding: 12px 16px; border-radius: 6px; font-size: 12px; line-height: 1.8; color: #5c5870; }
+  .totals .row.grand .amt { color: #1C2B6E; }
+  .notes { margin-top: 26px; background: #F4F1EC; border-inline-start: 4px solid #C13229; padding: 12px 16px; border-radius: 6px; font-size: 12px; line-height: 1.8; color: #5c5870; }
   .footer { position: absolute; bottom: 12mm; left: 16mm; right: 16mm; text-align: center; border-top: 1px solid #eee; padding-top: 10px; }
   .footer p { font-size: 10.5px; color: #a19dae; line-height: 1.7; }
-  .footer .brand-name { color: #33B27C; font-weight: 700; }
+  .footer .brand-name { color: #1C2B6E; font-weight: 700; }
   .parties { display: flex; gap: 20px; margin: 22px 0; }
   .party { flex: 1; border: 1px solid #eef0f4; border-radius: 10px; padding: 16px; }
-  .party h4 { font-size: 11px; color: #33B27C; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
+  .party h4 { font-size: 11px; color: #1C2B6E; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
   .party p { font-size: 13px; line-height: 1.9; color: #2B273F; }
   .contract-body { margin-top: 20px; font-size: 13px; line-height: 2.1; color: #3a3750; white-space: pre-wrap; }
    .contract-section { margin-top: 20px; page-break-inside: avoid; }
-   .contract-section h3 { color: #2B273F; font-size: 14px; padding-bottom: 7px; margin-bottom: 9px; border-bottom: 2px solid #33B27C; }
+   .contract-section h3 { color: #2B273F; font-size: 14px; padding-bottom: 7px; margin-bottom: 9px; border-bottom: 2px solid #1C2B6E; }
    .contract-section .section-content { white-space: pre-wrap; font-size: 13px; line-height: 2.1; color: #3a3750; }
   .sig-grid { display: flex; justify-content: space-between; margin-top: 50px; gap: 30px; }
   .sig-box { flex: 1; text-align: center; }
@@ -462,7 +462,7 @@ export function buildContractHtml(contract: any, customer: any, company: Company
       </div>
       <div class="meta-box">
         <h3>القيمة المالية</h3>
-        <p style="font-size:20px;color:#33B27C;font-weight:800" class="num-cell">${formatMoney(contract.value)} ${contract.currency}</p>
+        <p style="font-size:20px;color:#1C2B6E;font-weight:800" class="num-cell">${formatMoney(contract.value)} ${contract.currency}</p>
       </div>
     </div>
 
