@@ -48,9 +48,9 @@ export default function ContactPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#1a1726] to-[#2B273F]" />
         <div className="absolute top-0 right-0 w-full h-full overflow-hidden opacity-[0.04] pointer-events-none">
           <svg viewBox="0 0 800 400" fill="none" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
-            <rect x="500" y="20" width="200" height="200" stroke="#33B27C" strokeWidth="1" />
+            <rect x="500" y="20" width="200" height="200" stroke="#E5FE04" strokeWidth="1" />
             <rect x="560" y="80" width="200" height="200" stroke="#E5FE04" strokeWidth="1" />
-            <rect x="620" y="140" width="200" height="200" stroke="#33B27C" strokeWidth="1" />
+            <rect x="620" y="140" width="200" height="200" stroke="#E5FE04" strokeWidth="1" />
           </svg>
         </div>
 
@@ -62,7 +62,7 @@ export default function ContactPage() {
           </div>
           <motion.p
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}
-            className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-5"
+            className="text-[10px] font-bold uppercase tracking-[.3em] text-[#E5FE04] mb-5"
           >
             {C.badge}
           </motion.p>
@@ -83,7 +83,7 @@ export default function ContactPage() {
           <motion.div
             initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
           >
-            <motion.p variants={fadeUp} className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-6">
+            <motion.p variants={fadeUp} className="text-[10px] font-bold uppercase tracking-[.3em] text-[#E5FE04] mb-6">
               {C.infoTitle}
             </motion.p>
             <motion.p variants={fadeUp} className="text-white/50 text-base leading-8 mb-10 max-w-md">
@@ -92,7 +92,7 @@ export default function ContactPage() {
 
             <div className="space-y-6">
               {[
-                { label: C.phone, value: "+966 500 851 177", href: "tel:+966500851177", icon: (
+                { label: C.phone, value: "+966 500 851 177", href: "https://wa.me/966500851177", icon: (
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2z" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
@@ -122,7 +122,7 @@ export default function ContactPage() {
                   variants={fadeUp}
                   className="flex items-start gap-4 group"
                 >
-                  <span className="w-10 h-10 rounded-full border border-white/12 flex items-center justify-center text-white/40 group-hover:border-[#33B27C] group-hover:text-[#33B27C] transition-all flex-shrink-0">
+                  <span className="w-10 h-10 rounded-full border border-white/12 flex items-center justify-center text-white/40 group-hover:border-[#E5FE04] group-hover:text-[#E5FE04] transition-all flex-shrink-0">
                     {icon}
                   </span>
                   <div>
@@ -138,7 +138,7 @@ export default function ContactPage() {
               variants={fadeUp}
               className="mt-10 bg-white/[0.04] border border-white/8 rounded-2xl p-7"
             >
-              <p className="text-[10px] font-bold uppercase tracking-[.25em] text-[#33B27C] mb-3">{C.consultTitle}</p>
+              <p className="text-[10px] font-bold uppercase tracking-[.25em] text-[#E5FE04] mb-3">{C.consultTitle}</p>
               <p className="text-white/50 text-sm leading-7 mb-4">{C.consultDesc}</p>
               <p className="text-xs font-bold text-[#E5FE04]">{C.available}</p>
             </motion.div>
@@ -151,8 +151,8 @@ export default function ContactPage() {
               animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center justify-center text-center bg-white/[0.03] border border-white/8 rounded-2xl p-14"
             >
-              <div className="w-16 h-16 rounded-full bg-[#33B27C]/20 border border-[#33B27C]/40 flex items-center justify-center mb-6">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#33B27C" strokeWidth="2" className="w-8 h-8">
+              <div className="w-16 h-16 rounded-full bg-[#E5FE04]/20 border border-[#E5FE04]/40 flex items-center justify-center mb-6">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#E5FE04" strokeWidth="2" className="w-8 h-8">
                   <path d="m20 6-11 11-5-5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
@@ -165,7 +165,7 @@ export default function ContactPage() {
               onSubmit={handleSubmit}
               className="space-y-4"
             >
-              <motion.p variants={fadeUp} className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-6">
+              <motion.p variants={fadeUp} className="text-[10px] font-bold uppercase tracking-[.3em] text-[#E5FE04] mb-6">
                 {C.formTitle}
               </motion.p>
 
@@ -182,7 +182,7 @@ export default function ContactPage() {
                       value={form[id as keyof typeof form]}
                       onChange={(e) => setForm({ ...form, [id]: e.target.value })}
                       required
-                      className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
+                      className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#E5FE04] transition-colors"
                     />
                   </motion.div>
                 ))}
@@ -197,7 +197,7 @@ export default function ContactPage() {
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     required
-                    className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
+                      className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#E5FE04] transition-colors"
                   />
                 </motion.div>
                 <motion.div variants={fadeUp}>
@@ -206,7 +206,7 @@ export default function ContactPage() {
                     value={form.phone}
                     onChange={(phone) => setForm({ ...form, phone })}
                     required
-                    className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
+                      className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#E5FE04] transition-colors"
                   />
                 </motion.div>
               </div>
@@ -216,7 +216,7 @@ export default function ContactPage() {
                 <select
                   value={form.service}
                   onChange={(e) => setForm({ ...form, service: e.target.value })}
-                  className="w-full bg-white/[0.04] border border-white/10 text-white text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors"
+                  className="w-full bg-white/[0.04] border border-white/10 text-white text-sm px-4 py-3 rounded-xl outline-none focus:border-[#E5FE04] transition-colors"
                 >
                   <option value="" className="bg-[#2B273F]">{C.serviceDefault}</option>
                   {C.services.map((s) => (
@@ -232,7 +232,7 @@ export default function ContactPage() {
                   placeholder={C.messagePlaceholder}
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#33B27C] transition-colors resize-none"
+                  className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/25 text-sm px-4 py-3 rounded-xl outline-none focus:border-[#E5FE04] transition-colors resize-none"
                 />
               </motion.div>
 
@@ -240,7 +240,7 @@ export default function ContactPage() {
                 <button
                   type="submit"
                   disabled={status === "sending"}
-                  className="w-full flex items-center justify-center gap-3 bg-[#33B27C] text-white font-black text-sm py-4 rounded-full hover:bg-[#2a9668] transition-colors disabled:opacity-60"
+                  className="w-full flex items-center justify-center gap-3 bg-[#E5FE04] text-[#071936] font-black text-sm py-4 rounded-full hover:bg-white transition-colors disabled:opacity-60"
                 >
                   {status === "sending" ? ui.common.sending : ui.common.send}
                   {status !== "sending" && (
