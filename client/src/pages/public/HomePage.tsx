@@ -174,7 +174,7 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          <div dir="rtl" className="absolute bottom-[-14px] left-1/2 z-20 grid w-[85%] max-w-[1120px] -translate-x-1/2 grid-cols-4 overflow-hidden rounded-[16px] bg-[#071936] text-white shadow-[0_-8px_30px_rgba(7,25,54,.16)] sm:bottom-[-18px] sm:rounded-[20px]">
+          <div dir="rtl" className="absolute bottom-[-14px] right-[4%] z-20 grid w-[92%] max-w-[1120px] grid-cols-4 overflow-hidden rounded-[16px] bg-[#071936] text-white shadow-[0_-8px_30px_rgba(7,25,54,.16)] sm:bottom-[-18px] sm:right-[6%] sm:w-[85%] sm:rounded-[20px]">
             {[
               { value: "98%", label: pageCopy.stats[0], icon: "★" },
               { value: "25,000+", label: pageCopy.stats[1], icon: "✓" },
@@ -190,7 +190,7 @@ export default function HomePage() {
         </section>
 
         <section className="relative isolate overflow-hidden pb-10 pt-14 text-white sm:pb-16 sm:pt-14">
-          <picture className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[150px] sm:h-[190px]">
+          <picture className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[210px] sm:h-[250px]">
             <source media="(max-width: 639px)" srcSet="/images/ofoq-hero-reference-mobile.webp" />
             <img
               src="/images/ofoq-hero-reference.webp"
@@ -198,10 +198,10 @@ export default function HomePage() {
               aria-hidden="true"
               loading="lazy"
               decoding="async"
-              className="h-full w-full object-cover object-bottom"
+              className="h-full w-full object-cover object-center"
             />
           </picture>
-          <div className="pointer-events-none absolute inset-0 z-0 rounded-tl-[58px] bg-[#071936] sm:rounded-tl-[128px]" />
+          <div className="pointer-events-none absolute inset-0 z-0 rounded-tl-[58px] bg-gradient-to-b from-[#071936]/35 via-[#071936]/90 to-[#071936] sm:rounded-tl-[128px]" />
           <div className="relative z-10 mx-auto grid max-w-[1480px] gap-8 px-5 [direction:ltr] sm:gap-10 sm:px-10 lg:grid-cols-[.62fr_1.85fr] lg:items-start lg:px-16">
             <div dir={dir} className={dir === "rtl" ? "text-right" : "text-left"}>
               <p className="mb-3 text-[10px] font-bold uppercase tracking-[.16em] text-[#C5B278] sm:mb-4 sm:text-xs">{pageCopy.servicesEyebrow}</p>
