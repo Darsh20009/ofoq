@@ -145,7 +145,7 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-[#F4F1EC]" />
           <div className="pointer-events-none absolute left-[-14%] top-[7%] h-[430px] w-[430px] rounded-full border border-[#071936]/[.035] sm:h-[620px] sm:w-[620px]" />
           <div className="pointer-events-none absolute left-[4%] top-[26%] h-[260px] w-[260px] rounded-full border border-[#C13229]/[.07]" />
-          <picture className="pointer-events-none absolute inset-x-[-8%] bottom-[-72px] top-0 z-0 -translate-x-[6%] sm:inset-x-[-2%] sm:bottom-[-100px] sm:top-0 sm:translate-x-[2%]">
+          <picture className="pointer-events-none absolute inset-x-0 bottom-[-72px] top-0 z-0 sm:inset-x-[-2%] sm:bottom-[-100px] sm:top-0 sm:translate-x-[2%]">
             <source media="(max-width: 639px)" srcSet="/images/ofoq-hero-reference-mobile.webp" />
             <img
               src="/images/ofoq-hero-reference.webp"
@@ -153,7 +153,7 @@ export default function HomePage() {
               aria-hidden="true"
               loading="eager"
               decoding="async"
-              className="h-full w-full object-cover object-[50%_0%] sm:object-center"
+              className="h-full w-full object-cover object-center"
             />
           </picture>
 
@@ -163,7 +163,7 @@ export default function HomePage() {
                 <span className="block whitespace-nowrap">{copy.titleOne}</span>
                 <span className="block whitespace-nowrap">{copy.titleTwo}</span>
               </h1>
-              <p className="mt-4 ml-auto w-full max-w-[250px] text-xs font-semibold leading-7 text-[#061a36] sm:mt-5 sm:max-w-[430px] sm:text-base sm:leading-8">{copy.description}</p>
+              <p className="mt-4 ml-auto w-full max-w-[190px] text-xs font-semibold leading-7 text-[#061a36] sm:mt-5 sm:max-w-[430px] sm:text-base sm:leading-8">{copy.description}</p>
               <div className="mt-6 ml-auto flex w-full max-w-[320px] flex-col items-start gap-3 sm:mt-7 sm:max-w-[440px] sm:flex-row sm:items-center sm:justify-end sm:gap-5 sm:[direction:ltr]">
                 <Link to="/services" className="inline-flex shrink-0 items-center gap-3 whitespace-nowrap rounded-md bg-[#071936] px-5 py-3 text-xs font-bold text-white shadow-[0_12px_24px_rgba(7,25,54,.16)] transition-colors hover:bg-[#102b57] sm:text-sm">
                   {copy.explore}<span className="text-lg text-[#C5B278]">←</span>
