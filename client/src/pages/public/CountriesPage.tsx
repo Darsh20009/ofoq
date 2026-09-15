@@ -99,38 +99,12 @@ export default function CountriesPage() {
               <span className="text-[#33B27C]">{ui.countries.sectionHighlight}</span>
             </h2>
           </div>
-           <div className="grid items-start gap-8 lg:grid-cols-[1.35fr_.65fr]">
-             <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#071936] p-3 shadow-[0_18px_50px_rgba(7,25,54,.18)] sm:p-6">
-               <WorldRouteGraphic countries={countries} countryName={countryName} />
-             </div>
-             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-               {countries.map((country, i) => (
-                 <motion.div
-                   key={country._id}
-                   variants={fadeUp}
-                   custom={i}
-                   initial="hidden"
-                   whileInView="visible"
-                   viewport={{ once: true }}
-                   className="group rounded-2xl border border-[#2B273F]/10 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-[#33B27C]/50"
-                 >
-                   <div className="flex items-start gap-3">
-                     <span className="text-2xl transition-transform group-hover:scale-110">{country.flag}</span>
-                     <div className="min-w-0">
-                       <h3 className="font-black text-[#2B273F]">{countryName(country)}</h3>
-                       <p className="mt-1 text-xs leading-5 text-[#2B273F]/55">{countryDescription(country)}</p>
-                     </div>
-                   </div>
-                   <Link to="/client/register" className="mt-3 flex items-center gap-2 text-xs font-bold text-[#33B27C] transition-colors hover:text-[#2B273F]">
-                     {ui.countries.request}
-                     <svg viewBox="0 0 16 16" fill="none" className="h-3.5 w-3.5">
-                       <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                     </svg>
-                   </Link>
-                 </motion.div>
-               ))}
-             </div>
-          </div>
+           <CountryConstellation
+             countries={countries}
+             countryName={countryName}
+             countryDescription={countryDescription}
+             requestLabel={ui.countries.request}
+           />
         </div>
       </section>
 
@@ -183,99 +157,109 @@ export default function CountriesPage() {
   );
 }
 
-function WorldRouteGraphic({ countries, countryName }: { countries: Country[]; countryName: (country: Country) => string }) {
-  const routes = countries.slice(0, -1).map((country, index) => {
-    const next = countries[index + 1];
-    const middleX = (country.mapX + next.mapX) / 2;
-    const curve = index % 2 === 0 ? -72 : 72;
-    return {
-      d: `M ${country.mapX} ${country.mapY} C ${middleX} ${country.mapY + curve}, ${middleX} ${next.mapY + curve}, ${next.mapX} ${next.mapY}`,
-      from: country,
-      to: next,
-    };
-  });
+function getConstellationPosition(index: number, total: number): { x: number; y: number } {
+  const presets = [
+    { x: 10, y: 25 }, { x: 28, y: 13 }, { x: 48, y: 25 }, { x: 68, y: 13 }, { x: 89, y: 27 },
+    { x: 78, y: 55 }, { x: 58, y: 44 }, { x: 38, y: 57 }, { x: 17, y: 50 }, { x: 49, y: 84 },
+  ];
+  if (presets[index]) return presets[index];
+  const columns = Math.min(5, Math.max(2, Math.ceil(Math.sqrt(total))));
+  const row = Math.floor(index / columns);
+  const column = index % columns;
+  return {
+    x: 10 + (column * 80) / Math.max(columns - 1, 1),
+    y: 20 + row * 23,
+  };
+}
+
+function CountryConstellation({
+  countries,
+  countryName,
+  countryDescription,
+  requestLabel,
+}: {
+  countries: Country[];
+  countryName: (country: Country) => string;
+  countryDescription: (country: Country) => string;
+  requestLabel: string;
+}) {
+  const points = countries.map((country, index) => ({
+    country,
+    ...getConstellationPosition(index, countries.length),
+  }));
+  const routePath = points.length > 1
+    ? points.map((point, index) => {
+      if (index === 0) return `M ${point.x * 10} ${point.y * 5.5}`;
+      const previous = points[index - 1];
+      const midX = (previous.x + point.x) * 5;
+      const curve = index % 2 === 0 ? -34 : 34;
+      return `C ${midX} ${(previous.y * 5.5) + curve}, ${midX} ${(point.y * 5.5) + curve}, ${point.x * 10} ${point.y * 5.5}`;
+    }).join(" ")
+    : "";
 
   return (
-    <div className="relative">
-      <div className="mb-5 flex items-center justify-between gap-4 px-2 text-white">
+    <div className="relative min-h-[560px] overflow-hidden rounded-[30px] border border-[#2B273F]/10 bg-[#F1ECE5] px-3 py-6 sm:min-h-[650px] sm:px-8 sm:py-8">
+      <div className="pointer-events-none absolute inset-0 opacity-60" style={{ backgroundImage: "radial-gradient(#2B273F 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+      <div className="relative z-10 flex items-start justify-between gap-4 px-2">
         <div>
-          <p className="text-xs font-black tracking-[.16em] text-[#C5B278]">OFOQ GLOBAL ROUTE</p>
-          <p className="mt-1 text-[11px] text-white/45">Every country is a connected step</p>
+          <p className="text-[10px] font-black tracking-[.22em] text-[#C13229]">OFOQ / RECRUITMENT ROUTE</p>
+          <p className="mt-2 max-w-xs text-xs leading-5 text-[#2B273F]/50">اضغط على العلم للوصول إلى طلب الاستقطاب الخاص بالدولة</p>
         </div>
-        <span className="rounded-full border border-[#C13229]/60 px-3 py-1 text-[10px] font-bold text-[#C13229]">{countries.length} stops</span>
+        <span className="rounded-full border border-[#C13229]/35 bg-white/70 px-3 py-1.5 text-[10px] font-black text-[#C13229]">{countries.length} {countries.length === 1 ? "stop" : "stops"}</span>
       </div>
-      <svg viewBox="0 0 1000 500" role="img" aria-label="OFOQ recruitment countries route" className="h-auto w-full overflow-visible">
-        <defs>
-          <linearGradient id="ofoq-route-bg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#0d2852" />
-            <stop offset="100%" stopColor="#071936" />
-          </linearGradient>
-          <radialGradient id="ofoq-route-glow">
-            <stop offset="0%" stopColor="#C13229" stopOpacity=".42" />
-            <stop offset="100%" stopColor="#C13229" stopOpacity="0" />
-          </radialGradient>
-          <pattern id="ofoq-route-grid" width="32" height="32" patternUnits="userSpaceOnUse">
-            <circle cx="2" cy="2" r="1" fill="#ffffff" fillOpacity=".11" />
-          </pattern>
-        </defs>
-        <rect width="1000" height="500" rx="24" fill="url(#ofoq-route-bg)" />
-        <rect width="1000" height="500" rx="24" fill="url(#ofoq-route-grid)" />
-        <circle cx="260" cy="130" r="180" fill="url(#ofoq-route-glow)" opacity=".45" />
-        <circle cx="780" cy="365" r="210" fill="url(#ofoq-route-glow)" opacity=".25" />
-        <path d="M50 425C215 350 178 132 390 162S635 431 952 86" fill="none" stroke="#ffffff" strokeOpacity=".06" strokeWidth="1" strokeDasharray="4 14" />
-        <path d="M35 96C280 210 430 50 615 164S805 440 968 395" fill="none" stroke="#ffffff" strokeOpacity=".05" strokeWidth="1" strokeDasharray="2 18" />
-        <g fill="none" strokeLinecap="round">
-          {routes.map((route, index) => (
-            <g key={`${route.from._id}-${route.to._id}`}>
-              <path d={route.d} stroke="#C13229" strokeOpacity=".16" strokeWidth="12" />
-              <motion.path
-                d={route.d}
-                stroke="#C13229"
-                strokeOpacity=".72"
-                strokeWidth="2"
-                strokeDasharray="2 16"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 1, strokeDashoffset: [0, -72] }}
-                transition={{
-                  pathLength: { delay: index * 0.12, duration: 0.7 },
-                  opacity: { delay: index * 0.12, duration: 0.4 },
-                  strokeDashoffset: { duration: 2.8, repeat: Infinity, ease: "linear", delay: index * 0.12 },
-                }}
-              />
-            </g>
-          ))}
-        </g>
-        {countries.map((country, index) => (
-          <motion.g
-            key={country._id}
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: Math.min(index * 0.08, 1.2), type: "spring", stiffness: 180, damping: 16 }}
-            style={{ transformOrigin: `${country.mapX}px ${country.mapY}px` }}
-          >
-            <motion.circle
-              cx={country.mapX}
-              cy={country.mapY}
-              r="28"
-              fill="url(#ofoq-route-glow)"
-              animate={{ opacity: [0.25, 0.65, 0.25], scale: [0.82, 1.12, 0.82] }}
-              transition={{ duration: 2.8, repeat: Infinity, delay: index * 0.13 }}
-            />
-            <circle cx={country.mapX} cy={country.mapY} r="8" fill="#071936" stroke="#C13229" strokeWidth="3" />
-            <circle cx={country.mapX} cy={country.mapY} r="3" fill="#E5FE04" />
-            <text x={country.mapX} y={country.mapY + 25} textAnchor="middle" fill="#ffffff" fillOpacity=".86" fontSize="13" fontWeight="700">
-              {country.flag} {countryName(country)}
-            </text>
-            <text x={country.mapX} y={country.mapY - 16} textAnchor="middle" fill="#C5B278" fillOpacity=".8" fontSize="9" fontWeight="700">
-              {String(index + 1).padStart(2, "0")}
-            </text>
-            <title>{countryName(country)}</title>
-          </motion.g>
-        ))}
+
+      <svg viewBox="0 0 1000 500" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full">
+        <path d={routePath} fill="none" stroke="#C13229" strokeOpacity=".14" strokeWidth="15" strokeLinecap="round" strokeLinejoin="round" />
+        <motion.path
+          d={routePath}
+          fill="none"
+          stroke="#C13229"
+          strokeOpacity=".85"
+          strokeWidth="2.5"
+          strokeDasharray="3 16"
+          strokeLinecap="round"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1, strokeDashoffset: [0, -90] }}
+          transition={{
+            pathLength: { duration: 1.2, ease: "easeOut" },
+            opacity: { duration: .4 },
+            strokeDashoffset: { duration: 3.5, repeat: Infinity, ease: "linear" },
+          }}
+        />
       </svg>
-      <div className="mt-1 flex flex-wrap items-center justify-between gap-3 px-2 text-[10px] text-white/45">
-        <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#E5FE04]" /> Connected recruitment route</span>
-        <span className="text-[#C13229]">OFOQ / WORLD / NETWORK</span>
+
+      {points.map(({ country, x, y }, index) => (
+        <motion.div
+          key={country._id}
+          initial={{ opacity: 0, scale: .7, y: 12 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ delay: Math.min(index * .07, .7), type: "spring", stiffness: 180, damping: 16 }}
+          className="absolute z-20 -translate-x-1/2 -translate-y-1/2"
+          style={{ left: `${x}%`, top: `${y}%` }}
+        >
+          <Link
+            to={`/client/register?country=${encodeURIComponent(country.code)}`}
+            aria-label={`${requestLabel}: ${countryName(country)}`}
+            className="group flex w-[104px] flex-col items-center text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C13229] focus-visible:ring-offset-4 focus-visible:ring-offset-[#F1ECE5] sm:w-[132px]"
+          >
+            <span className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#C13229] bg-white text-3xl shadow-[0_8px_22px_rgba(43,39,63,.13)] transition-all duration-300 group-hover:scale-110 group-hover:border-[#33B27C] group-hover:shadow-[0_12px_26px_rgba(51,178,124,.25)] sm:h-16 sm:w-16">
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#071936] text-[9px] font-black text-[#E5FE04]">{String(index + 1).padStart(2, "0")}</span>
+              {country.flag}
+            </span>
+            <span className="mt-2 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-black text-[#2B273F] shadow-sm transition-colors group-hover:bg-[#C13229] group-hover:text-white sm:text-xs">
+              {countryName(country)}
+            </span>
+            <span className="mt-1 max-w-[124px] text-[9px] leading-4 text-[#2B273F]/45 opacity-0 transition-opacity group-hover:opacity-100">
+              {countryDescription(country)}
+            </span>
+          </Link>
+        </motion.div>
+      ))}
+
+      <div className="absolute bottom-5 left-0 right-0 z-10 flex flex-wrap items-center justify-center gap-4 px-4 text-[10px] font-bold text-[#2B273F]/45 sm:justify-between">
+        <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#E5FE04] ring-2 ring-[#C13229]/30" /> {requestLabel}</span>
+        <span className="text-[#C13229]">CLICK A FLAG TO START</span>
       </div>
     </div>
   );
