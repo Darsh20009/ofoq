@@ -516,14 +516,14 @@ export default function PublicLayout() {
               <p className="text-white/40 text-sm leading-relaxed max-w-sm mb-6">
                 {ui.footer.description}
               </p>
-              <div className="flex items-center gap-2.5 mb-6">
+               <div className="flex items-center gap-2.5 mb-6">
                 {SOCIAL.map((s) => (
                   <a
                     key={s.label}
                     href={s.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-full border border-white/12 flex items-center justify-center text-white/35 hover:border-[#33B27C] hover:text-[#33B27C] transition-all"
+                     className="flex h-10 w-10 items-center justify-center rounded-full border border-[#C13229]/70 text-[#C13229] transition-all duration-300 hover:-translate-y-1 hover:bg-[#C13229] hover:text-white hover:shadow-[0_8px_20px_rgba(193,50,41,.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C13229] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071936]"
                   >
                     {s.icon}
                   </a>

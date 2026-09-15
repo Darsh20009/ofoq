@@ -101,7 +101,7 @@ export default function CountriesPage() {
           </div>
            <div className="grid items-start gap-8 lg:grid-cols-[1.35fr_.65fr]">
              <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#071936] p-3 shadow-[0_18px_50px_rgba(7,25,54,.18)] sm:p-6">
-               <WorldMapGraphic countries={countries} countryName={countryName} />
+               <WorldRouteGraphic countries={countries} countryName={countryName} />
              </div>
              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                {countries.map((country, i) => (
@@ -183,60 +183,100 @@ export default function CountriesPage() {
   );
 }
 
-function WorldMapGraphic({ countries, countryName }: { countries: Country[]; countryName: (country: Country) => string }) {
+function WorldRouteGraphic({ countries, countryName }: { countries: Country[]; countryName: (country: Country) => string }) {
+  const routes = countries.slice(0, -1).map((country, index) => {
+    const next = countries[index + 1];
+    const middleX = (country.mapX + next.mapX) / 2;
+    const curve = index % 2 === 0 ? -72 : 72;
+    return {
+      d: `M ${country.mapX} ${country.mapY} C ${middleX} ${country.mapY + curve}, ${middleX} ${next.mapY + curve}, ${next.mapX} ${next.mapY}`,
+      from: country,
+      to: next,
+    };
+  });
+
   return (
     <div className="relative">
-      <div className="mb-4 flex items-center justify-between gap-4 px-2 text-white">
+      <div className="mb-5 flex items-center justify-between gap-4 px-2 text-white">
         <div>
-          <p className="text-xs font-black text-[#C5B278]">OFOQ GLOBAL NETWORK</p>
-          <p className="mt-1 text-[11px] text-white/45">Recruitment partners across the world</p>
+          <p className="text-xs font-black tracking-[.16em] text-[#C5B278]">OFOQ GLOBAL ROUTE</p>
+          <p className="mt-1 text-[11px] text-white/45">Every country is a connected step</p>
         </div>
-        <span className="rounded-full border border-[#C13229]/60 px-3 py-1 text-[10px] font-bold text-[#C13229]">{countries.length} countries</span>
+        <span className="rounded-full border border-[#C13229]/60 px-3 py-1 text-[10px] font-bold text-[#C13229]">{countries.length} stops</span>
       </div>
-      <svg viewBox="0 0 1000 500" role="img" aria-label="OFOQ recruitment countries map" className="h-auto w-full">
+      <svg viewBox="0 0 1000 500" role="img" aria-label="OFOQ recruitment countries route" className="h-auto w-full overflow-visible">
         <defs>
-          <linearGradient id="ofoq-map-land" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#1C2B6E" />
-            <stop offset="100%" stopColor="#102d56" />
+          <linearGradient id="ofoq-route-bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#0d2852" />
+            <stop offset="100%" stopColor="#071936" />
           </linearGradient>
-          <radialGradient id="ofoq-map-glow">
-            <stop offset="0%" stopColor="#C13229" stopOpacity=".6" />
+          <radialGradient id="ofoq-route-glow">
+            <stop offset="0%" stopColor="#C13229" stopOpacity=".42" />
             <stop offset="100%" stopColor="#C13229" stopOpacity="0" />
           </radialGradient>
+          <pattern id="ofoq-route-grid" width="32" height="32" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1" fill="#ffffff" fillOpacity=".11" />
+          </pattern>
         </defs>
-        <rect width="1000" height="500" rx="24" fill="#0b2144" />
-        <g fill="url(#ofoq-map-land)" stroke="#5671a0" strokeOpacity=".28" strokeWidth="2">
-          <path d="M80 135 124 96l66-12 50 28 43 2 35 38-19 40-46 5-30 38-48-5-31-43-40-14z" />
-          <path d="m280 260 53-18 48 21 26 57-18 46-26 61-35 51-26-15 4-57-27-43 17-42-19-33z" />
-          <path d="m437 102 37-30 58-9 29 18 37-1 30 32-22 31-27 16-17 32-38-9-33 19-23-31-31-7z" />
-          <path d="m519 203 39-4 26 20 32-2 25 30 54 16 27 39-7 54-34 21-29-17-20 31-41-5-18-43-30-20-3-43-30-20z" />
-          <path d="m699 123 78-23 85 14 59 38 12 41-45 19-19 44-52-4-37-29-58 1-39-35z" />
-          <path d="m807 313 52 5 35 32-20 28-54 3-30-24z" />
-          <path d="m900 412 37 8 23 25-18 19-46-7-20-21z" />
-          <path d="m698 399 32-8 31 24-17 23-37-5z" />
+        <rect width="1000" height="500" rx="24" fill="url(#ofoq-route-bg)" />
+        <rect width="1000" height="500" rx="24" fill="url(#ofoq-route-grid)" />
+        <circle cx="260" cy="130" r="180" fill="url(#ofoq-route-glow)" opacity=".45" />
+        <circle cx="780" cy="365" r="210" fill="url(#ofoq-route-glow)" opacity=".25" />
+        <path d="M50 425C215 350 178 132 390 162S635 431 952 86" fill="none" stroke="#ffffff" strokeOpacity=".06" strokeWidth="1" strokeDasharray="4 14" />
+        <path d="M35 96C280 210 430 50 615 164S805 440 968 395" fill="none" stroke="#ffffff" strokeOpacity=".05" strokeWidth="1" strokeDasharray="2 18" />
+        <g fill="none" strokeLinecap="round">
+          {routes.map((route, index) => (
+            <g key={`${route.from._id}-${route.to._id}`}>
+              <path d={route.d} stroke="#C13229" strokeOpacity=".16" strokeWidth="12" />
+              <motion.path
+                d={route.d}
+                stroke="#C13229"
+                strokeOpacity=".72"
+                strokeWidth="2"
+                strokeDasharray="2 16"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1, strokeDashoffset: [0, -72] }}
+                transition={{
+                  pathLength: { delay: index * 0.12, duration: 0.7 },
+                  opacity: { delay: index * 0.12, duration: 0.4 },
+                  strokeDashoffset: { duration: 2.8, repeat: Infinity, ease: "linear", delay: index * 0.12 },
+                }}
+              />
+            </g>
+          ))}
         </g>
-        <path d="M40 250h920M500 35v430" stroke="#ffffff" strokeOpacity=".08" strokeDasharray="3 12" />
         {countries.map((country, index) => (
           <motion.g
             key={country._id}
-            initial={{ opacity: 0, scale: 0, x: country.mapX, y: country.mapY }}
-            animate={{ opacity: 1, scale: 1, x: country.mapX, y: country.mapY }}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: Math.min(index * 0.08, 1.2), type: "spring", stiffness: 180, damping: 16 }}
             style={{ transformOrigin: `${country.mapX}px ${country.mapY}px` }}
           >
             <motion.circle
               cx={country.mapX}
               cy={country.mapY}
-              r="22"
-              fill="url(#ofoq-map-glow)"
-              animate={{ opacity: [0.35, 0.7, 0.35], scale: [0.85, 1.18, 0.85] }}
+              r="28"
+              fill="url(#ofoq-route-glow)"
+              animate={{ opacity: [0.25, 0.65, 0.25], scale: [0.82, 1.12, 0.82] }}
               transition={{ duration: 2.8, repeat: Infinity, delay: index * 0.13 }}
             />
-            <circle cx={country.mapX} cy={country.mapY} r="6" fill="#C13229" stroke="#F4F1EC" strokeWidth="3" />
+            <circle cx={country.mapX} cy={country.mapY} r="8" fill="#071936" stroke="#C13229" strokeWidth="3" />
+            <circle cx={country.mapX} cy={country.mapY} r="3" fill="#E5FE04" />
+            <text x={country.mapX} y={country.mapY + 25} textAnchor="middle" fill="#ffffff" fillOpacity=".86" fontSize="13" fontWeight="700">
+              {country.flag} {countryName(country)}
+            </text>
+            <text x={country.mapX} y={country.mapY - 16} textAnchor="middle" fill="#C5B278" fillOpacity=".8" fontSize="9" fontWeight="700">
+              {String(index + 1).padStart(2, "0")}
+            </text>
             <title>{countryName(country)}</title>
           </motion.g>
         ))}
       </svg>
+      <div className="mt-1 flex flex-wrap items-center justify-between gap-3 px-2 text-[10px] text-white/45">
+        <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#E5FE04]" /> Connected recruitment route</span>
+        <span className="text-[#C13229]">OFOQ / WORLD / NETWORK</span>
+      </div>
     </div>
   );
 }
