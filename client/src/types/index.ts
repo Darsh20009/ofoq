@@ -122,7 +122,7 @@ export interface Invoice {
   customerId?: Customer | string;
   project?: Project;
   projectId?: Project | string;
-  status: "draft" | "sent" | "viewed" | "partial" | "paid" | "overdue" | "cancelled";
+  status: "draft" | "sent" | "viewed" | "accepted" | "partial" | "paid" | "overdue" | "cancelled";
   issueDate?: string;
   dueDate?: string;
   items: InvoiceItem[];
@@ -169,6 +169,22 @@ export interface Partner {
   partnershipEn: string;
   servicesAr: string;
   servicesEn: string;
+  order: number;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Country {
+  _id: string;
+  code: string;
+  nameAr: string;
+  nameEn: string;
+  descriptionAr: string;
+  descriptionEn: string;
+  flag: string;
+  mapX: number;
+  mapY: number;
   order: number;
   isPublished: boolean;
   createdAt: string;

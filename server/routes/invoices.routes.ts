@@ -283,7 +283,14 @@ invoicesRouter.post("/:id/send", requireAuth, requireRole("super_admin", "admin"
       return;
     }
 
-    // Email customer with attached PDF
+    if (!invoice.customerId) {
+      await InvoiceModel.updateOne({ _id: invoice._id, status: "sent" }, { status: "draft" });
+      res.status(400).json({ error: "لا يوجد عميل مرتبط بهذا المستند" });
+      return;
+    }
+
+    // Email customer with attached PDF. PDF generation is best effort so
+    // an email can still be delivered when Chromium is temporarily unavailable.
     if (invoice.customerId?.email) {
       let pdfBuffer: Buffer | undefined;
       try {
@@ -291,15 +298,26 @@ invoicesRouter.post("/:id/send", requireAuth, requireRole("super_admin", "admin"
       } catch (e: any) {
         console.error("[Invoices] PDF attach generation failed:", e.message);
       }
-      await sendInvoiceEmail(
-        invoice.customerId.email,
-        invoice.customerId.name,
-        invoice.invoiceNumber,
-        invoice.total,
-        invoice.currency,
-        invoice.dueDate?.toLocaleDateString("ar-SA"),
-        pdfBuffer
-      );
+      try {
+        await sendInvoiceEmail(
+          invoice.customerId.email,
+          invoice.customerId.name,
+          invoice.invoiceNumber,
+          invoice.total,
+          invoice.currency,
+          invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString("ar-SA") : undefined,
+          pdfBuffer
+        );
+      } catch (emailError: any) {
+        await InvoiceModel.updateOne({ _id: invoice._id, status: "sent" }, { status: "draft" });
+        console.error("[Invoices] email delivery failed:", emailError?.message || emailError);
+        res.status(502).json({ error: "تعذر إرسال البريد إلى العميل، ولم يتم تغيير حالة المستند" });
+        return;
+      }
+    } else {
+      await InvoiceModel.updateOne({ _id: invoice._id, status: "sent" }, { status: "draft" });
+      res.status(400).json({ error: "أضف بريد العميل قبل إرسال المستند" });
+      return;
     }
 
     // Notify customer if linked user

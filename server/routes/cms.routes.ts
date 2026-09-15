@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { requireAuth, requireRole, optionalAuth } from "../auth.js";
-import { PageModel, BlogPostModel, TestimonialModel, SystemSettingsModel, PartnerModel } from "../models/index.js";
+import { PageModel, BlogPostModel, TestimonialModel, SystemSettingsModel, PartnerModel, CountryModel } from "../models/index.js";
 import { uploadMultiple, uploadSingle, uploadPartnerLogo } from "../middleware/upload.js";
 import { removePartnerLogoFile, processPartnerLogo } from "../services/logo-processing.js";
+import { countryCatalog, findCountryCatalogEntry } from "../data/countryCatalog.js";
 import slugify from "slugify";
 import path from "path";
 
@@ -10,6 +11,8 @@ export const cmsRouter = Router();
 
 const PARTNER_EDIT_ROLES = ["super_admin", "admin", "manager", "employee"];
 const PARTNER_DELETE_ROLES = ["super_admin", "admin"];
+const COUNTRY_EDIT_ROLES = ["super_admin", "admin", "manager", "employee"];
+const COUNTRY_DELETE_ROLES = ["super_admin", "admin"];
 const partnerFields = [
   "nameAr", "nameEn", "logo", "descriptionAr", "descriptionEn",
   "partnershipAr", "partnershipEn", "servicesAr", "servicesEn",
@@ -19,14 +22,51 @@ function partnerPayload(body: Record<string, any>, partial = false): { payload?:
   const payload: Record<string, unknown> = {};
   for (const field of partnerFields) {
     if (!partial || Object.prototype.hasOwnProperty.call(body, field)) {
-      if (typeof body[field] !== "string" || !body[field].trim()) {
+      const value = typeof body[field] === "string" ? body[field].trim() : "";
+      const required = field === "nameAr" || field === "nameEn" || field === "logo";
+      if (required && !value) {
         return { error: `الحقل ${field} مطلوب` };
       }
-      payload[field] = body[field].trim();
+      if (value) {
+        payload[field] = value;
+      } else if (!partial) {
+        const nameAr = String(body.nameAr || "").trim();
+        const nameEn = String(body.nameEn || "").trim();
+        const defaults: Record<string, string> = {
+          descriptionAr: nameAr,
+          descriptionEn: nameEn,
+          partnershipAr: "شراكة أعمال مع أفق.",
+          partnershipEn: "A business partnership with OFOQ.",
+          servicesAr: "خدمات وحلول أعمال حسب احتياج الشريك.",
+          servicesEn: "Business services and solutions tailored to the partner.",
+        };
+        payload[field] = defaults[field] || "";
+      }
     }
   }
   if (!partial || Object.prototype.hasOwnProperty.call(body, "order")) {
     const order = Number(body.order);
+    if (!Number.isInteger(order) || order < 0 || order > 9999) return { error: "الترتيب يجب أن يكون رقمًا صحيحًا من 0 إلى 9999" };
+    payload.order = order;
+  }
+  if (!partial || Object.prototype.hasOwnProperty.call(body, "isPublished")) {
+    payload.isPublished = body.isPublished === true || body.isPublished === "true";
+  }
+  return { payload };
+}
+
+function countryPayload(body: Record<string, any>, partial = false): { payload?: Record<string, unknown>; error?: string } {
+  const payload: Record<string, unknown> = {};
+  if (!partial || Object.prototype.hasOwnProperty.call(body, "descriptionAr")) {
+    const value = String(body.descriptionAr || "").trim();
+    if (value) payload.descriptionAr = value;
+  }
+  if (!partial || Object.prototype.hasOwnProperty.call(body, "descriptionEn")) {
+    const value = String(body.descriptionEn || "").trim();
+    if (value) payload.descriptionEn = value;
+  }
+  if (!partial || Object.prototype.hasOwnProperty.call(body, "order")) {
+    const order = Number(body.order ?? 0);
     if (!Number.isInteger(order) || order < 0 || order > 9999) return { error: "الترتيب يجب أن يكون رقمًا صحيحًا من 0 إلى 9999" };
     payload.order = order;
   }
@@ -221,6 +261,95 @@ cmsRouter.delete("/admin/partners/:id", requireAuth, requireRole(...PARTNER_DELE
     res.json({ success: true });
   } catch {
     res.status(500).json({ error: "تعذر حذف الشريك" });
+  }
+});
+
+// ═══════════════════════════════════════════════════
+// RECRUITMENT COUNTRIES
+// ═══════════════════════════════════════════════════
+
+cmsRouter.get("/countries", async (_req, res) => {
+  try {
+    const countries = await CountryModel.find({ isPublished: true })
+      .sort({ order: 1, createdAt: -1 })
+      .lean();
+    res.json({ countries });
+  } catch {
+    res.status(500).json({ error: "تعذر جلب الدول" });
+  }
+});
+
+cmsRouter.get("/admin/countries", requireAuth, requireRole(...COUNTRY_EDIT_ROLES), async (_req, res) => {
+  try {
+    const countries = await CountryModel.find().sort({ order: 1, createdAt: -1 }).lean();
+    res.json({ countries, catalog: countryCatalog });
+  } catch {
+    res.status(500).json({ error: "تعذر جلب الدول" });
+  }
+});
+
+cmsRouter.post("/admin/countries", requireAuth, requireRole(...COUNTRY_EDIT_ROLES), async (req, res) => {
+  try {
+    const code = String(req.body?.code || "").trim().toUpperCase();
+    const catalogCountry = findCountryCatalogEntry(code);
+    if (!catalogCountry) {
+      res.status(400).json({ error: "اختر دولة صحيحة من القائمة" });
+      return;
+    }
+    if (await CountryModel.exists({ code })) {
+      res.status(409).json({ error: "هذه الدولة مضافة بالفعل" });
+      return;
+    }
+    const { payload, error } = countryPayload(req.body || {});
+    if (error) {
+      res.status(400).json({ error });
+      return;
+    }
+    const count = await CountryModel.countDocuments();
+    const country = await CountryModel.create({
+      ...catalogCountry,
+      ...payload,
+      descriptionAr: payload?.descriptionAr || `كوادر وخبرات من ${catalogCountry.nameAr}.`,
+      descriptionEn: payload?.descriptionEn || `Talent and expertise from ${catalogCountry.nameEn}.`,
+      order: payload?.order ?? count + 1,
+      isPublished: payload?.isPublished ?? true,
+    });
+    res.status(201).json({ country });
+  } catch (error: any) {
+    res.status(error?.code === 11000 ? 409 : 500).json({ error: error?.code === 11000 ? "هذه الدولة مضافة بالفعل" : "تعذر إضافة الدولة" });
+  }
+});
+
+cmsRouter.patch("/admin/countries/:id", requireAuth, requireRole(...COUNTRY_EDIT_ROLES), async (req, res) => {
+  try {
+    const existing = await CountryModel.findById(req.params.id);
+    if (!existing) {
+      res.status(404).json({ error: "الدولة غير موجودة" });
+      return;
+    }
+    const { payload, error } = countryPayload(req.body || {}, true);
+    if (error) {
+      res.status(400).json({ error });
+      return;
+    }
+    Object.assign(existing, payload);
+    await existing.save();
+    res.json({ country: existing });
+  } catch {
+    res.status(500).json({ error: "تعذر تعديل الدولة" });
+  }
+});
+
+cmsRouter.delete("/admin/countries/:id", requireAuth, requireRole(...COUNTRY_DELETE_ROLES), async (req, res) => {
+  try {
+    const country = await CountryModel.findByIdAndDelete(req.params.id);
+    if (!country) {
+      res.status(404).json({ error: "الدولة غير موجودة" });
+      return;
+    }
+    res.json({ success: true });
+  } catch {
+    res.status(500).json({ error: "تعذر حذف الدولة" });
   }
 });
 

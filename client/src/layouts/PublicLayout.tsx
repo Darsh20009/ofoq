@@ -538,7 +538,7 @@ export default function PublicLayout() {
                 <h4 className="font-bold text-xs uppercase tracking-[.2em] text-white/50 mb-5">
                   {ui.footer.services}
                 </h4>
-                <ul className="space-y-3">
+                   <ul className="space-y-3">
                   {[
                     { label: ui.footer.formation, href: "/services" },
                     { label: ui.footer.legal, href: "/services" },
@@ -547,7 +547,7 @@ export default function PublicLayout() {
                     { label: ui.footer.investors, href: "/services" },
                   ].map((l) => (
                     <li key={l.label}>
-                      <Link to={l.href} className="text-white/35 hover:text-white text-xs transition-colors">
+                       <Link to={l.href} className="text-white/65 hover:text-[#C13229] text-[13px] transition-colors">
                         {l.label}
                       </Link>
                     </li>
@@ -558,7 +558,7 @@ export default function PublicLayout() {
                 <h4 className="font-bold text-xs uppercase tracking-[.2em] text-white/50 mb-5">
                   {ui.footer.packages}
                 </h4>
-                <ul className="space-y-3">
+                   <ul className="space-y-3">
                   {[
                     { label: ui.footer.silver, href: "/packages" },
                     { label: ui.footer.gold, href: "/packages" },
@@ -566,7 +566,7 @@ export default function PublicLayout() {
                     { label: ui.footer.compare, href: "/packages" },
                   ].map((l) => (
                     <li key={l.label}>
-                      <Link to={l.href} className="text-white/35 hover:text-white text-xs transition-colors">
+                       <Link to={l.href} className="text-white/65 hover:text-[#C13229] text-[13px] transition-colors">
                         {l.label}
                       </Link>
                     </li>
@@ -574,17 +574,17 @@ export default function PublicLayout() {
                 </ul>
               </div>
               <div>
-                <h4 className="font-bold text-xs uppercase tracking-[.2em] text-white/50 mb-5">
+                 <h4 className="font-bold text-xs uppercase tracking-[.2em] text-[#C13229] mb-5">
                   {ui.footer.contact}
                 </h4>
-                <ul className="space-y-3 text-xs text-white/35">
-                  <li><a href="mailto:info@ofoqhc.com" className="hover:text-white transition-colors">info@ofoqhc.com</a></li>
-                  <li><a href="https://wa.me/966500851177" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" dir="ltr">+966 500 851 177</a></li>
-                  <li className="leading-relaxed">
+                 <ul className="space-y-3 text-[13px] text-white/55">
+                   <li><a href="mailto:info@ofoqhc.com" className="text-[#C13229] hover:text-white transition-colors">info@ofoqhc.com</a></li>
+                   <li><a href="https://wa.me/966500851177" target="_blank" rel="noopener noreferrer" className="text-[#C13229] hover:text-white transition-colors" dir="ltr">+966 500 851 177</a></li>
+                   <li className="leading-relaxed text-white/55">
                     {ui.footer.location}
                   </li>
                   <li>
-                    <Link to="/contact" className="text-[#E5FE04] hover:text-white transition-colors font-bold">
+                     <Link to="/contact" className="text-[#C13229] hover:text-white transition-colors font-bold">
                       {ui.footer.form}
                     </Link>
                   </li>

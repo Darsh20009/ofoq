@@ -69,20 +69,23 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
 
   const downloadPdf = async (id: string, number: string) => {
     try {
-      const token = localStorage.getItem("ofoq_token");
-      const res = await fetch(`/api/invoices/${id}/pdf`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-       if (!res.ok) {
-         throw new Error("PDF download failed");
-       }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url; a.download = `${number}.pdf`; a.click();
-      URL.revokeObjectURL(url);
-     } catch {
-       toast.error(lang === "ar" ? "تعذر تحميل ملف الفاتورة" : "Couldn't download the invoice PDF");
+      const response = await invoicesApi.pdf(id);
+      const contentType = String(response.headers["content-type"] || "");
+      if (!contentType.includes("pdf")) throw new Error("PDF download failed");
+      const url = URL.createObjectURL(response.data);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${number}.pdf`;
+      anchor.style.display = "none";
+      document.body.appendChild(anchor);
+      anchor.click();
+      window.setTimeout(() => {
+        URL.revokeObjectURL(url);
+        anchor.remove();
+      }, 1000);
+    } catch (error: any) {
+      const message = error?.response?.data?.error;
+      toast.error(message || (lang === "ar" ? "تعذر تحميل ملف الفاتورة" : "Couldn't download the invoice PDF"));
     }
   };
 

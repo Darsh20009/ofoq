@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Edit2, Trash2, Globe, FileText, Star, Image, Eye, EyeOff, Handshake } from "lucide-react";
+import { Plus, Edit2, Trash2, Globe, FileText, Star, Image, Handshake, MapPinned } from "lucide-react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { cmsApi } from "../../../api/client";
-import type { BlogPost, Partner } from "../../../types";
+import type { BlogPost, Partner, Country } from "../../../types";
 import BlogModal from "./BlogModal";
 import PartnerModal from "./PartnerModal";
+import CountryModal from "./CountryModal";
 import { useLang } from "../../../i18n/LangContext";
 import { useAuthStore } from "../../../store/authStore";
 
@@ -18,6 +19,7 @@ export default function CmsPage() {
     { id: "blog", label: copy.blog, icon: FileText },
     { id: "testimonials", label: copy.testimonials, icon: Star },
     { id: "partners", label: isArabic ? "الشركاء" : "Partners", icon: Handshake },
+    { id: "countries", label: isArabic ? "الدول" : "Countries", icon: MapPinned },
     { id: "pages", label: copy.pages, icon: Globe },
   ];
   const locale = lang === "ar" ? "ar-SA" : lang === "ur" ? "ur-PK" : lang;
@@ -27,6 +29,8 @@ export default function CmsPage() {
   const [editPost, setEditPost] = useState<BlogPost | null>(null);
   const [partnerModalOpen, setPartnerModalOpen] = useState(false);
   const [editPartner, setEditPartner] = useState<Partner | null>(null);
+  const [countryModalOpen, setCountryModalOpen] = useState(false);
+  const [editCountry, setEditCountry] = useState<Country | null>(null);
   const { user } = useAuthStore();
   const canDeletePartner = ["super_admin", "admin"].includes(user?.role || "");
 
@@ -55,6 +59,13 @@ export default function CmsPage() {
     retry: 1,
   });
 
+  const { data: countryData, isLoading: countriesLoading, isError: countriesError } = useQuery({
+    queryKey: ["admin-countries"],
+    queryFn: () => cmsApi.countries.adminList().then((r) => r.data),
+    enabled: tab === "countries",
+    retry: 1,
+  });
+
   const deletePostMut = useMutation({
     mutationFn: (id: string) => cmsApi.blog.delete(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["blog-posts"] }); toast.success(copy.deleted); },
@@ -79,6 +90,8 @@ export default function CmsPage() {
   const testimonialList = testimonials?.data?.testimonials || [];
   const pageList = pages?.data?.pages || [];
   const partnerList: Partner[] = partnerData?.partners || [];
+  const countryList: Country[] = countryData?.countries || [];
+  const countryCatalog = countryData?.catalog || [];
 
   return (
     <div className="space-y-6" dir={dir}>
@@ -95,6 +108,11 @@ export default function CmsPage() {
         {tab === "partners" && (
           <button onClick={() => { setEditPartner(null); setPartnerModalOpen(true); }} className="btn-primary">
             <Plus size={16} /> {isArabic ? "إضافة شريك" : "Add partner"}
+          </button>
+        )}
+        {tab === "countries" && (
+          <button onClick={() => { setEditCountry(null); setCountryModalOpen(true); }} className="btn-primary">
+            <Plus size={16} /> {isArabic ? "إضافة دولة" : "Add country"}
           </button>
         )}
       </div>
@@ -320,6 +338,38 @@ export default function CmsPage() {
         </div>
       )}
 
+      {tab === "countries" && (
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-lg font-bold text-navy-700">{isArabic ? "إدارة دول الاستقطاب" : "Manage recruitment countries"}</h2>
+            <p className="mt-1 text-sm text-gray-500">{isArabic ? "اختر دولة من القائمة، واكتب وصفها، وستظهر على الخريطة العامة بحركة دخول ناعمة." : "Choose a country, add its description, and it will appear on the public map with a soft entrance animation."}</p>
+          </div>
+          {countriesError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{isArabic ? "تعذر تحميل الدول." : "Could not load countries."}</p>}
+          {countriesLoading ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[...Array(6)].map((_, i) => <div key={i} className="skeleton h-40 rounded-2xl" />)}</div>
+          ) : countryList.length === 0 ? (
+            <div className="card py-16 text-center"><MapPinned size={42} className="mx-auto mb-3 text-gray-200" /><p className="text-gray-400">{isArabic ? "لا توجد دول مضافة بعد." : "No countries have been added yet."}</p></div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {countryList.map((country, index) => (
+                <motion.article key={country._id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.035 }} className="card group">
+                  <div className="flex items-start gap-3">
+                    <span className="text-3xl">{country.flag}</span>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-bold text-navy-700">{isArabic ? country.nameAr : country.nameEn}</h3>
+                      <p className="mt-1 text-xs text-gray-400">{country.code} · {isArabic ? country.nameEn : country.nameAr}</p>
+                      <div className="mt-3 flex gap-2"><span className={country.isPublished ? "badge-green" : "badge-gray"}>{country.isPublished ? (isArabic ? "ظاهرة" : "Visible") : (isArabic ? "مخفية" : "Hidden")}</span><span className="badge-navy">{isArabic ? `الترتيب ${country.order}` : `Order ${country.order}`}</span></div>
+                    </div>
+                    <button onClick={() => { setEditCountry(country); setCountryModalOpen(true); }} className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-navy-700" aria-label={isArabic ? "تعديل الدولة" : "Edit country"}><Edit2 size={15} /></button>
+                  </div>
+                  <p className="mt-4 line-clamp-2 text-sm leading-6 text-gray-500">{isArabic ? country.descriptionAr : country.descriptionEn}</p>
+                </motion.article>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       <BlogModal open={modalOpen} onClose={() => setModalOpen(false)} post={editPost}
         onSaved={() => { qc.invalidateQueries({ queryKey: ["blog-posts"] }); setModalOpen(false); }} />
       <PartnerModal
@@ -330,6 +380,17 @@ export default function CmsPage() {
           qc.invalidateQueries({ queryKey: ["admin-partners"] });
           qc.invalidateQueries({ queryKey: ["public-partners"] });
           setPartnerModalOpen(false);
+        }}
+      />
+      <CountryModal
+        open={countryModalOpen}
+        onClose={() => setCountryModalOpen(false)}
+        country={editCountry}
+        catalog={countryCatalog}
+        onSaved={() => {
+          qc.invalidateQueries({ queryKey: ["admin-countries"] });
+          qc.invalidateQueries({ queryKey: ["public-countries"] });
+          setCountryModalOpen(false);
         }}
       />
     </div>

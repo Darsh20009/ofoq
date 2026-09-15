@@ -6,6 +6,7 @@ import { initWebSocket } from "./ws.js";
 import { generateVapidKeys } from "./push.js";
 import { startScheduler } from "./scheduler.js";
 import { ensureDefaultPartners } from "./services/partner-seed.service.js";
+import { ensureDefaultCountries } from "./services/country-seed.service.js";
 import { verifyEmailTransport } from "./email.js";
 
 const PORT = parseInt(process.env.PORT || "5000");
@@ -15,6 +16,9 @@ async function bootstrap() {
   await connectDB();
   await ensureDefaultPartners().catch((error) => {
     console.error("❌ Partner initialization failed:", error?.message || error);
+  });
+  await ensureDefaultCountries().catch((error) => {
+    console.error("❌ Country initialization failed:", error?.message || error);
   });
 
   // Generate VAPID keys if not set

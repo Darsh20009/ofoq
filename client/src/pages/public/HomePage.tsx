@@ -391,7 +391,7 @@ function PartnersSection({ dir, useArabicContent, copy }: { dir: "rtl" | "ltr"; 
                             src={partner.logo}
                             alt=""
                             loading="lazy"
-                            className="h-10 w-full max-w-[104px] object-contain grayscale brightness-0 invert opacity-60 transition-opacity duration-300 group-hover:opacity-95 group-focus-visible:opacity-95 sm:h-12 sm:max-w-[138px]"
+                             className="h-10 w-full max-w-[104px] object-contain opacity-90 transition-all duration-300 group-hover:scale-[1.04] group-hover:opacity-100 group-focus-visible:scale-[1.04] group-focus-visible:opacity-100 sm:h-12 sm:max-w-[138px]"
                           />
                         </button>
                       ))}

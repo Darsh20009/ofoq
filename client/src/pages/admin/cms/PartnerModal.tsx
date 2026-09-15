@@ -110,12 +110,9 @@ export default function PartnerModal({
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError("");
-    const required = [
-      form.nameAr, form.nameEn, form.descriptionAr, form.descriptionEn,
-      form.partnershipAr, form.partnershipEn, form.servicesAr, form.servicesEn,
-    ];
+    const required = [form.nameAr, form.nameEn];
     if (required.some((value) => !value.trim()) || (!form.logo && !logoFile)) {
-      setError(isArabic ? "أكمل جميع الحقول وارفع شعار الشريك." : "Complete all fields and upload the partner logo.");
+      setError(isArabic ? "أدخل اسم الشريك باللغتين وارفع شعاره." : "Add both partner names and upload the logo.");
       return;
     }
     setSaving(true);
@@ -198,7 +195,6 @@ export default function PartnerModal({
                 className="input-field resize-y"
                 rows={3}
                 dir={fieldDir}
-                required
               />
             </div>
           ))}

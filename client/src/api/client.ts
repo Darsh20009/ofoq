@@ -121,6 +121,7 @@ export const invoicesApi = {
   update: (id: string, data: object) => api.patch(`/invoices/${id}`, data),
   delete: (id: string) => api.delete(`/invoices/${id}`),
   send: (id: string) => api.post(`/invoices/${id}/send`),
+  pdf: (id: string) => api.get(`/invoices/${id}/pdf`, { responseType: "blob" }),
   markPaid: (id: string, data?: object) => api.post(`/invoices/${id}/mark-paid`, data),
   acceptQuotation: (id: string) => api.post(`/invoices/${id}/accept-quotation`),
   convertToInvoice: (id: string) => api.post(`/invoices/${id}/convert-to-invoice`),
@@ -167,6 +168,13 @@ export const cmsApi = {
         headers: { "Content-Type": "multipart/form-data" },
       });
     },
+  },
+  countries: {
+    list: () => api.get("/cms/countries"),
+    adminList: () => api.get("/cms/admin/countries"),
+    create: (data: object) => api.post("/cms/admin/countries", data),
+    update: (id: string, data: object) => api.patch(`/cms/admin/countries/${id}`, data),
+    delete: (id: string) => api.delete(`/cms/admin/countries/${id}`),
   },
   settings: {
     list: (group?: string) => api.get("/cms/settings", { params: { group } }),
