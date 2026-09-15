@@ -198,8 +198,8 @@ function CountryConstellation({
     : "";
 
   return (
-    <div className="relative min-h-[560px] overflow-hidden rounded-[30px] border border-[#2B273F]/10 bg-[#F1ECE5] px-3 py-6 sm:min-h-[650px] sm:px-8 sm:py-8">
-      <div className="pointer-events-none absolute inset-0 opacity-60" style={{ backgroundImage: "radial-gradient(#2B273F 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+    <div className="relative min-h-[560px] overflow-hidden px-3 py-6 sm:min-h-[650px] sm:px-8 sm:py-8">
+      <div className="pointer-events-none absolute inset-0 opacity-35" style={{ backgroundImage: "radial-gradient(#2B273F 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
       <div className="relative z-10 flex items-start justify-between gap-4 px-2">
         <div>
           <p className="text-[10px] font-black tracking-[.22em] text-[#C13229]">OFOQ / RECRUITMENT ROUTE</p>
@@ -241,7 +241,7 @@ function CountryConstellation({
           <Link
             to={`/client/register?country=${encodeURIComponent(country.code)}`}
             aria-label={`${requestLabel}: ${countryName(country)}`}
-            className="group flex w-[104px] flex-col items-center text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C13229] focus-visible:ring-offset-4 focus-visible:ring-offset-[#F1ECE5] sm:w-[132px]"
+            className="group flex w-[104px] flex-col items-center text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C13229] focus-visible:ring-offset-4 focus-visible:ring-offset-[#F7F3EE] sm:w-[132px]"
           >
             <span className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#C13229] bg-white text-3xl shadow-[0_8px_22px_rgba(43,39,63,.13)] transition-all duration-300 group-hover:scale-110 group-hover:border-[#33B27C] group-hover:shadow-[0_12px_26px_rgba(51,178,124,.25)] sm:h-16 sm:w-16">
               <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#071936] text-[9px] font-black text-[#E5FE04]">{String(index + 1).padStart(2, "0")}</span>
