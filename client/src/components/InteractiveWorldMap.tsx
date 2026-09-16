@@ -203,7 +203,11 @@ export default function InteractiveWorldMap({
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [hoveredCountry, setHoveredCountry] = useState<Country | null>(null);
 
-  const countryKey = countries.map((country) => country._id).join("|");
+  const recruitmentCountries = useMemo(
+    () => countries.filter((country) => country.isPublished),
+    [countries],
+  );
+  const countryKey = recruitmentCountries.map((country) => country._id).join("|");
   const countryByMapId = useMemo(
     () => new Map(
       countries
@@ -220,11 +224,11 @@ export default function InteractiveWorldMap({
     countryByMapId.get(String(geography.id)) || countryByName.get(normalizeCountryName(geography.properties?.name));
 
   useEffect(() => {
-    if (!countries.length || activeCountry) return;
+    if (!recruitmentCountries.length || activeCountry) return;
 
     const start = () => {
       setActiveIndex(0);
-      setActiveCountry(countries[0]);
+      setActiveCountry(recruitmentCountries[0]);
     };
     if (reducedMotion) {
       start();
@@ -233,24 +237,24 @@ export default function InteractiveWorldMap({
 
     const timer = window.setTimeout(start, 900);
     return () => window.clearTimeout(timer);
-  }, [activeCountry, countryKey, countries, reducedMotion]);
+  }, [activeCountry, countryKey, recruitmentCountries, reducedMotion]);
 
   useEffect(() => {
-    if (!isAutoPlaying || reducedMotion || countries.length < 2 || activeIndex < 0) return;
+    if (!isAutoPlaying || reducedMotion || recruitmentCountries.length < 2 || activeIndex < 0) return;
 
     const timer = window.setInterval(() => {
       setActiveIndex((currentIndex) => {
-        const nextIndex = (currentIndex + 1) % countries.length;
-        setActiveCountry(countries[nextIndex]);
+        const nextIndex = (currentIndex + 1) % recruitmentCountries.length;
+        setActiveCountry(recruitmentCountries[nextIndex]);
         return nextIndex;
       });
     }, ROTATION_INTERVAL);
 
     return () => window.clearInterval(timer);
-  }, [activeIndex, countries, isAutoPlaying, reducedMotion]);
+  }, [activeIndex, isAutoPlaying, recruitmentCountries, reducedMotion]);
 
   const selectCountry = (country: Country) => {
-    const nextIndex = countries.findIndex((item) => item._id === country._id);
+    const nextIndex = recruitmentCountries.findIndex((item) => item._id === country._id);
     setActiveCountry(country);
     setActiveIndex(nextIndex);
     setIsAutoPlaying(false);
@@ -259,6 +263,44 @@ export default function InteractiveWorldMap({
   return (
     <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_290px]">
       <div className="min-w-0">
+        <div
+          className="mb-5 overflow-x-auto overscroll-x-contain pb-2"
+          aria-label={isArabic ? "دول الاستقطاب المتاحة" : "Available recruitment countries"}
+        >
+          <div className="flex min-w-max items-stretch gap-2 px-1">
+            {recruitmentCountries.map((country) => {
+              const isSpotlight = activeCountry?._id === country._id;
+              const label = `${country.nameAr} · ${country.nameEn}`;
+              return (
+                <button
+                  key={`top-flag-${country._id}`}
+                  type="button"
+                  title={label}
+                  aria-label={label}
+                  onClick={() => selectCountry(country)}
+                  className={`flex min-w-[68px] flex-col items-center justify-center gap-1 rounded-xl border px-3 py-2 text-center transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1F6B55] focus-visible:ring-offset-2 ${
+                    isSpotlight
+                      ? "border-[#1F6B55] bg-[#EDE7DC] text-[#173E31]"
+                      : "border-transparent bg-transparent text-[#68716B] hover:border-[#D9D2C5] hover:bg-[#EDE7DC]"
+                  }`}
+                >
+                  <span
+                    className={`text-3xl leading-none transition-transform duration-500 ${
+                      isSpotlight ? "scale-110" : ""
+                    }`}
+                    aria-hidden="true"
+                  >
+                    {country.flag}
+                  </span>
+                  <span className="max-w-[84px] truncate text-[10px] font-bold leading-tight">
+                    {countryName(country)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="flex flex-wrap items-center justify-between gap-4 px-1 pb-4">
           <div className="relative min-h-6 text-xs text-[#68716B]" role="status" aria-live="polite">
             {hoveredCountry ? (
@@ -270,7 +312,7 @@ export default function InteractiveWorldMap({
             )}
           </div>
           <div className="text-right">
-            <span className="block text-2xl font-black text-[#17251F]">{countries.length}</span>
+            <span className="block text-2xl font-black text-[#17251F]">{recruitmentCountries.length}</span>
             <span className="text-xs text-[#68716B]">دول الاستقطاب</span>
           </div>
         </div>
