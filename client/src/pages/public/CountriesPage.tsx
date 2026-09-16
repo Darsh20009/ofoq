@@ -43,7 +43,6 @@ export default function CountriesPage() {
   const countries: Country[] = Array.isArray(data?.countries) && data.countries.length > 0 ? data.countries : fallbackCountries;
   const isArabic = lang === "ar" || lang === "ur";
   const countryName = (country: Country) => isArabic ? country.nameAr || country.nameEn : country.nameEn || country.nameAr;
-  const countryDescription = (country: Country) => isArabic ? country.descriptionAr || country.descriptionEn : country.descriptionEn || country.descriptionAr;
   return (
     <div dir={dir} className="min-h-screen bg-[#F7F3EE] text-[#2B273F]">
       <Helmet>
@@ -90,19 +89,18 @@ export default function CountriesPage() {
       </section>
 
        {/* ══ خريطة الدول ═══════════════════════════════════════ */}
-        <section className="border-t border-[#2B273F]/10 py-16 sm:py-20">
+        <section id="countries-network" className="border-t border-[#D8CDBD]/10 bg-[#071936] py-16 text-white sm:py-20">
         <div className="max-w-7xl mx-auto px-6 sm:px-10">
           <div className="mb-12">
-            <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#33B27C] mb-4">{ui.countries.sectionEyebrow}</p>
-            <h2 className="text-4xl font-black text-[#2B273F]">
-              {ui.countries.sectionTitle}{" "}
-              <span className="text-[#33B27C]">{ui.countries.sectionHighlight}</span>
+             <p className="mb-4 text-[10px] font-bold uppercase tracking-[.3em] text-[#7EEBFF]">{ui.countries.sectionEyebrow}</p>
+             <h2 className="text-4xl font-black text-white">
+               {ui.countries.sectionTitle}{" "}
+               <span className="text-[#7EEBFF]">{ui.countries.sectionHighlight}</span>
             </h2>
           </div>
            <CountryConstellation
              countries={countries}
              countryName={countryName}
-             countryDescription={countryDescription}
              requestLabel={ui.countries.request}
            />
         </div>
@@ -160,69 +158,117 @@ export default function CountriesPage() {
 function CountryConstellation({
   countries,
   countryName,
-  countryDescription,
   requestLabel,
 }: {
   countries: Country[];
   countryName: (country: Country) => string;
-  countryDescription: (country: Country) => string;
   requestLabel: string;
 }) {
+  const hub = { x: 615, y: 290 };
+  const points = countries.map((country, index) => ({
+    country,
+    index,
+    x: Math.min(960, Math.max(40, Number(country.mapX) || 120 + ((index * 137) % 760))),
+    y: Math.min(465, Math.max(45, Number(country.mapY) || 120 + ((index * 83) % 300))),
+  }));
+
+  const routePath = (x: number, y: number) => {
+    const horizontalDistance = x - hub.x;
+    const verticalDistance = y - hub.y;
+    const curve = Math.max(22, Math.min(100, Math.abs(horizontalDistance) * 0.2)) * (verticalDistance < 0 ? -1 : 1);
+    const controlX = hub.x + horizontalDistance * 0.48;
+    const controlY = hub.y + verticalDistance * 0.42 + curve;
+    return `M ${hub.x} ${hub.y} Q ${controlX} ${controlY} ${x} ${y}`;
+  };
+
   return (
-    <div className="relative px-3 py-6 sm:px-8 sm:py-8">
-      <div className="pointer-events-none absolute inset-0 opacity-35" style={{ backgroundImage: "radial-gradient(#2B273F 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+    <div className="relative px-0 py-6 sm:px-2 sm:py-8">
       <div className="relative z-10 flex items-start justify-between gap-4 px-2">
         <div>
-          <p className="text-[10px] font-black tracking-[.22em] text-[#C13229]">OFOQ / RECRUITMENT ROUTE</p>
-          <p className="mt-2 max-w-xs text-xs leading-5 text-[#2B273F]/50">اضغط على العلم للوصول إلى طلب الاستقطاب الخاص بالدولة</p>
+          <p className="text-[10px] font-black tracking-[.22em] text-[#7EEBFF]">OFOQ / RECRUITMENT ROUTE</p>
+          <p className="mt-2 max-w-xs text-xs leading-5 text-white/55">اضغط على علم الدولة للوصول إلى طلب الاستقطاب الخاص بها</p>
         </div>
-        <span className="rounded-full border border-[#C13229]/35 bg-white/70 px-3 py-1.5 text-[10px] font-black text-[#C13229]">{countries.length} {countries.length === 1 ? "stop" : "stops"}</span>
+        <span className="rounded-full border border-[#7EEBFF]/35 bg-[#0B2548]/80 px-3 py-1.5 text-[10px] font-black text-[#7EEBFF]">{countries.length} {countries.length === 1 ? "stop" : "stops"}</span>
       </div>
 
-      <div className="relative mt-10">
-        <div className="pointer-events-none absolute bottom-0 left-1/2 top-0 hidden w-px -translate-x-1/2 bg-[#C13229]/20 sm:block" />
-        <div className="grid gap-4 sm:grid-cols-2 sm:gap-x-20 sm:gap-y-8">
-          {countries.map((country, index) => (
-        <motion.div
-          key={country._id}
-          initial={{ opacity: 0, scale: .7, y: 12 }}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ delay: Math.min(index * .07, .7), type: "spring", stiffness: 180, damping: 16 }}
-          className={`relative z-10 flex ${index % 2 === 0 ? "sm:justify-end" : "sm:justify-start"}`}
-        >
-          <span
+      <div className="relative mt-10 overflow-hidden rounded-[2rem] border border-[#7EEBFF]/20 bg-[#071936] shadow-[0_24px_80px_rgba(0,0,0,.28)]">
+        <div className="relative min-h-[430px] aspect-[750/356] sm:min-h-0">
+          <div
             aria-hidden="true"
-            className={`pointer-events-none absolute top-1/2 hidden h-px w-20 -translate-y-1/2 bg-[#C13229]/35 sm:block ${
-              index % 2 === 0 ? "right-0" : "left-0"
-            }`}
+            className="absolute inset-0 bg-cover bg-center opacity-80"
+            style={{ backgroundImage: "url('/images/world-network-map.png')" }}
           />
-          <Link
-            to={`/client/register?country=${encodeURIComponent(country.code)}`}
-            aria-label={`${requestLabel}: ${countryName(country)}`}
-            className="group flex w-full max-w-[300px] items-center gap-4 rounded-2xl border border-[#2B273F]/10 bg-white/80 p-3 text-start transition-colors hover:border-[#C13229]/45 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C13229] focus-visible:ring-offset-4 focus-visible:ring-offset-[#F7F3EE] sm:w-[calc(100%-1.25rem)] sm:p-4"
-          >
-            <span className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-[#C13229] bg-white text-3xl transition-transform duration-300 group-hover:scale-105 sm:h-16 sm:w-16">
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#071936] text-[9px] font-black text-[#E5FE04]">{String(index + 1).padStart(2, "0")}</span>
-              {country.flag}
-            </span>
-            <span className="min-w-0">
-              <span className="block truncate text-xs font-black text-[#2B273F] transition-colors group-hover:text-[#C13229] sm:text-sm">
-                {countryName(country)}
-              </span>
-              <span className="mt-1 block line-clamp-2 text-[10px] leading-4 text-[#2B273F]/50">
-                {countryDescription(country)}
-              </span>
-            </span>
-          </Link>
-        </motion.div>
+          <div className="pointer-events-none absolute inset-0 bg-[#071936]/35" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#071936]/10 via-transparent to-[#071936]/75" />
+
+          <svg viewBox="0 0 1000 500" preserveAspectRatio="none" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full">
+            <defs>
+              <filter id="country-route-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            {points.map(({ country, x, y, index }) => country.code !== "SA" && (
+              <g key={`route-${country._id}`}>
+                <path d={routePath(x, y)} fill="none" stroke="#7EEBFF" strokeOpacity=".2" strokeWidth="7" strokeLinecap="round" />
+                <motion.path
+                  d={routePath(x, y)}
+                  fill="none"
+                  stroke="#C7F7FF"
+                  strokeOpacity=".9"
+                  strokeWidth="1.6"
+                  strokeDasharray="2 13"
+                  strokeLinecap="round"
+                  filter="url(#country-route-glow)"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1, strokeDashoffset: [0, -80] }}
+                  transition={{
+                    pathLength: { duration: .8, delay: Math.min(index * .04, .7), ease: "easeOut" },
+                    opacity: { duration: .25, delay: Math.min(index * .04, .7) },
+                    strokeDashoffset: { duration: 3.2, repeat: Infinity, ease: "linear" },
+                  }}
+                />
+              </g>
+            ))}
+            <circle cx={hub.x} cy={hub.y} r="18" fill="none" stroke="#7EEBFF" strokeOpacity=".45" strokeWidth="1.5" />
+            <circle cx={hub.x} cy={hub.y} r="5" fill="#FFFFFF" filter="url(#country-route-glow)" />
+          </svg>
+
+          {points.map(({ country, x, y, index }) => (
+            <motion.div
+              key={country._id}
+              initial={{ opacity: 0, scale: .5 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ delay: Math.min(index * .05, .7), type: "spring", stiffness: 220, damping: 18 }}
+              className="absolute z-20 -translate-x-1/2 -translate-y-1/2"
+              style={{ left: `${x / 10}%`, top: `${y / 5}%` }}
+            >
+              <Link
+                to={`/client/register?country=${encodeURIComponent(country.code)}`}
+                aria-label={`${requestLabel}: ${countryName(country)}`}
+                title={countryName(country)}
+                className="group flex flex-col items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7EEBFF] focus-visible:ring-offset-4 focus-visible:ring-offset-[#071936]"
+              >
+                <span className="relative flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#C7F7FF] bg-[#071936]/90 text-xl shadow-[0_0_18px_rgba(126,235,255,.8)] transition-transform duration-200 group-hover:scale-125 sm:h-12 sm:w-12 sm:text-2xl">
+                  <span className="absolute -inset-2 rounded-full border border-[#7EEBFF]/45 opacity-70 group-hover:animate-ping" />
+                  <span className="relative">{country.flag}</span>
+                </span>
+                <span className="mt-1 max-w-24 truncate rounded-full bg-[#071936]/85 px-2 py-0.5 text-[9px] font-bold text-white/80 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                  {countryName(country)}
+                </span>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </div>
 
-      <div className="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-4 px-4 text-[10px] font-bold text-[#2B273F]/45 sm:justify-between">
-        <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#E5FE04] ring-2 ring-[#C13229]/30" /> {requestLabel}</span>
-        <span className="text-[#C13229]">CLICK A FLAG TO START</span>
+      <div className="relative z-10 mt-6 flex flex-wrap items-center justify-center gap-4 px-4 text-[10px] font-bold text-white/55 sm:justify-between">
+        <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#C7F7FF] shadow-[0_0_10px_#7EEBFF]" /> {requestLabel}</span>
+        <span className="text-[#7EEBFF]">CLICK A FLAG TO START</span>
       </div>
     </div>
   );
