@@ -51,13 +51,12 @@ export default function CountriesPage() {
             <span>{ui.countries.badge}</span>
           </div>
           <div className="mt-10 max-w-3xl">
-            <p className="text-xs font-bold tracking-[.16em] text-[#1F6B55]">{ui.countries.sectionEyebrow}</p>
-            <h1 className="mt-4 text-4xl font-black tracking-tight text-[#17251F] sm:text-5xl">
-              {ui.countries.heroTitle}{" "}
-              <span className="text-[#1F6B55]">{ui.countries.heroHighlight}</span>
+            <p className="text-xs font-bold text-[#1F6B55]">{ui.countries.sectionEyebrow}</p>
+            <h1 className="mt-4 text-4xl font-black text-[#17251F] sm:text-5xl">
+              {ui.countries.badge}
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-8 text-[#68716B]">
-              اختر الدولة للوصول إلى طلب الاستقطاب الخاص بها
+              {ui.countries.heroSub}
             </p>
           </div>
         </div>
@@ -69,6 +68,7 @@ export default function CountriesPage() {
             countries={countries}
             countryName={countryName}
             requestLabel={ui.countries.request}
+            isArabic={isArabic}
           />
         </div>
       </section>
@@ -77,7 +77,7 @@ export default function CountriesPage() {
       <section className="border-t border-[#D9D2C5] bg-[#EDE7DC] py-20 text-[#17251F]">
         <div className="max-w-7xl mx-auto px-6 sm:px-10">
           <div className="text-center mb-14">
-            <p className="mb-4 text-[10px] font-bold uppercase tracking-[.16em] text-[#1F6B55]">{ui.countries.processEyebrow}</p>
+            <p className="mb-4 text-[10px] font-bold uppercase text-[#1F6B55]">{ui.countries.processEyebrow}</p>
             <h2 className="text-4xl font-black">
               {ui.countries.processTitle}{" "}
               <span className="text-[#1F6B55]">{ui.countries.processHighlight}</span>
@@ -101,7 +101,7 @@ export default function CountriesPage() {
       <section className="border-t border-[#D9D2C5] bg-[#F4F0E8]">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 py-20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
           <div>
-            <p className="mb-3 text-[10px] font-bold tracking-[.16em] text-[#1F6B55]">{ui.countries.ctaEyebrow}</p>
+            <p className="mb-3 text-[10px] font-bold text-[#1F6B55]">{ui.countries.ctaEyebrow}</p>
             <h2 className="text-3xl font-black text-[#17251F] sm:text-4xl">
               {ui.countries.ctaTitle}{" "}
               <span className="text-[#1F6B55]">{ui.countries.ctaHighlight}</span>
