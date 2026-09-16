@@ -157,21 +157,6 @@ export default function CountriesPage() {
   );
 }
 
-function getConstellationPosition(index: number, total: number): { x: number; y: number } {
-  const presets = [
-    { x: 10, y: 25 }, { x: 28, y: 13 }, { x: 48, y: 25 }, { x: 68, y: 13 }, { x: 89, y: 27 },
-    { x: 78, y: 55 }, { x: 58, y: 44 }, { x: 38, y: 57 }, { x: 17, y: 50 }, { x: 49, y: 84 },
-  ];
-  if (presets[index]) return presets[index];
-  const columns = Math.min(5, Math.max(2, Math.ceil(Math.sqrt(total))));
-  const row = Math.floor(index / columns);
-  const column = index % columns;
-  return {
-    x: 10 + (column * 80) / Math.max(columns - 1, 1),
-    y: 20 + row * 23,
-  };
-}
-
 function CountryConstellation({
   countries,
   countryName,
@@ -183,22 +168,8 @@ function CountryConstellation({
   countryDescription: (country: Country) => string;
   requestLabel: string;
 }) {
-  const points = countries.map((country, index) => ({
-    country,
-    ...getConstellationPosition(index, countries.length),
-  }));
-  const routePath = points.length > 1
-    ? points.map((point, index) => {
-      if (index === 0) return `M ${point.x * 10} ${point.y * 5.5}`;
-      const previous = points[index - 1];
-      const midX = (previous.x + point.x) * 5;
-      const curve = index % 2 === 0 ? -34 : 34;
-      return `C ${midX} ${(previous.y * 5.5) + curve}, ${midX} ${(point.y * 5.5) + curve}, ${point.x * 10} ${point.y * 5.5}`;
-    }).join(" ")
-    : "";
-
   return (
-    <div className="relative min-h-[560px] overflow-hidden px-3 py-6 sm:min-h-[650px] sm:px-8 sm:py-8">
+    <div className="relative px-3 py-6 sm:px-8 sm:py-8">
       <div className="pointer-events-none absolute inset-0 opacity-35" style={{ backgroundImage: "radial-gradient(#2B273F 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
       <div className="relative z-10 flex items-start justify-between gap-4 px-2">
         <div>
@@ -208,56 +179,48 @@ function CountryConstellation({
         <span className="rounded-full border border-[#C13229]/35 bg-white/70 px-3 py-1.5 text-[10px] font-black text-[#C13229]">{countries.length} {countries.length === 1 ? "stop" : "stops"}</span>
       </div>
 
-      <svg viewBox="0 0 1000 500" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full">
-        <path d={routePath} fill="none" stroke="#C13229" strokeOpacity=".14" strokeWidth="15" strokeLinecap="round" strokeLinejoin="round" />
-        <motion.path
-          d={routePath}
-          fill="none"
-          stroke="#C13229"
-          strokeOpacity=".85"
-          strokeWidth="2.5"
-          strokeDasharray="3 16"
-          strokeLinecap="round"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1, strokeDashoffset: [0, -90] }}
-          transition={{
-            pathLength: { duration: 1.2, ease: "easeOut" },
-            opacity: { duration: .4 },
-            strokeDashoffset: { duration: 3.5, repeat: Infinity, ease: "linear" },
-          }}
-        />
-      </svg>
-
-      {points.map(({ country, x, y }, index) => (
+      <div className="relative mt-10">
+        <div className="pointer-events-none absolute bottom-0 left-1/2 top-0 hidden w-px -translate-x-1/2 bg-[#C13229]/20 sm:block" />
+        <div className="grid gap-4 sm:grid-cols-2 sm:gap-x-20 sm:gap-y-8">
+          {countries.map((country, index) => (
         <motion.div
           key={country._id}
           initial={{ opacity: 0, scale: .7, y: 12 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ delay: Math.min(index * .07, .7), type: "spring", stiffness: 180, damping: 16 }}
-          className="absolute z-20 -translate-x-1/2 -translate-y-1/2"
-          style={{ left: `${x}%`, top: `${y}%` }}
+          className={`relative z-10 flex ${index % 2 === 0 ? "sm:justify-end" : "sm:justify-start"}`}
         >
+          <span
+            aria-hidden="true"
+            className={`pointer-events-none absolute top-1/2 hidden h-px w-20 -translate-y-1/2 bg-[#C13229]/35 sm:block ${
+              index % 2 === 0 ? "right-0" : "left-0"
+            }`}
+          />
           <Link
             to={`/client/register?country=${encodeURIComponent(country.code)}`}
             aria-label={`${requestLabel}: ${countryName(country)}`}
-            className="group flex w-[104px] flex-col items-center text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C13229] focus-visible:ring-offset-4 focus-visible:ring-offset-[#F7F3EE] sm:w-[132px]"
+            className="group flex w-full max-w-[300px] items-center gap-4 rounded-2xl border border-[#2B273F]/10 bg-white/80 p-3 text-start transition-colors hover:border-[#C13229]/45 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C13229] focus-visible:ring-offset-4 focus-visible:ring-offset-[#F7F3EE] sm:w-[calc(100%-1.25rem)] sm:p-4"
           >
-            <span className="relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#C13229] bg-white text-3xl shadow-[0_8px_22px_rgba(43,39,63,.13)] transition-all duration-300 group-hover:scale-110 group-hover:border-[#33B27C] group-hover:shadow-[0_12px_26px_rgba(51,178,124,.25)] sm:h-16 sm:w-16">
+            <span className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-[#C13229] bg-white text-3xl transition-transform duration-300 group-hover:scale-105 sm:h-16 sm:w-16">
               <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#071936] text-[9px] font-black text-[#E5FE04]">{String(index + 1).padStart(2, "0")}</span>
               {country.flag}
             </span>
-            <span className="mt-2 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-black text-[#2B273F] shadow-sm transition-colors group-hover:bg-[#C13229] group-hover:text-white sm:text-xs">
-              {countryName(country)}
-            </span>
-            <span className="mt-1 max-w-[124px] text-[9px] leading-4 text-[#2B273F]/45 opacity-0 transition-opacity group-hover:opacity-100">
-              {countryDescription(country)}
+            <span className="min-w-0">
+              <span className="block truncate text-xs font-black text-[#2B273F] transition-colors group-hover:text-[#C13229] sm:text-sm">
+                {countryName(country)}
+              </span>
+              <span className="mt-1 block line-clamp-2 text-[10px] leading-4 text-[#2B273F]/50">
+                {countryDescription(country)}
+              </span>
             </span>
           </Link>
         </motion.div>
-      ))}
+          ))}
+        </div>
+      </div>
 
-      <div className="absolute bottom-5 left-0 right-0 z-10 flex flex-wrap items-center justify-center gap-4 px-4 text-[10px] font-bold text-[#2B273F]/45 sm:justify-between">
+      <div className="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-4 px-4 text-[10px] font-bold text-[#2B273F]/45 sm:justify-between">
         <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#E5FE04] ring-2 ring-[#C13229]/30" /> {requestLabel}</span>
         <span className="text-[#C13229]">CLICK A FLAG TO START</span>
       </div>
