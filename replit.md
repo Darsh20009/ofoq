@@ -119,6 +119,8 @@ The **preview pane should be set to port 5000** (the Vite frontend). The fronten
 |---|---|
 | `MONGODB_URI` | MongoDB connection string — app runs in degraded mode without it |
 | `SESSION_SECRET` | Already configured |
+| `JWT_SECRET` | Required for secure authentication; development uses an insecure fallback if missing |
+| `ADMIN_INITIAL_PASSWORD` | Set as a secret only if running `npm run seed` to create the first administrator; never keep it in `.replit` |
 | `CPANEL_SMTP_PASS` | SMTP password for email delivery (nodemailer) |
 | `OPENAI_API_KEY` | Optional — AI features degrade gracefully without it |
 | `GOOGLE_CLIENT_ID` | Optional — enables Google OAuth login |
@@ -131,6 +133,8 @@ The **preview pane should be set to port 5000** (the Vite frontend). The fronten
 2. Add `MONGODB_URI` to Replit Secrets
 3. Start both workflows above
 4. (Optional) Run `npm run seed` to populate sample data
+
+Without `MONGODB_URI`, the public pages can load in development, but `/api/health` reports degraded status and database-backed routes are unavailable. The imported configuration contained a plain-text initial administrator password; it was removed. If that password was ever used, rotate it before using the account.
 
 ## User Preferences
 - اللغة العربية أساسية في جميع الردود والكود (تعليقات عربية)
