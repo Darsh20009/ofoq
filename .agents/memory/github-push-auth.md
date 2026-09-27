@@ -3,8 +3,8 @@ name: GitHub push authentication
 description: Environment-specific behavior encountered when pushing the OFOQ repository through the managed GitHub operation.
 ---
 
-The managed GitHub push operation returned `UNAUTHENTICATED` even though the workspace exposed a `GITHUB_PERSONAL_ACCESS_TOKEN` secret name. The repository's local commits were created successfully and the worktree was clean except for intentionally untracked uploaded attachments.
+GitHub pushes from this workspace have failed with `UNAUTHENTICATED` through the managed operation and with an invalid username/token error through `git push`. Local commits were ready in both cases. GitHub's Agent connector and Replit's Git provider connection are separate authorizations; connecting the former does not repair Git pushes.
 
-**Why:** The push failure was an external authentication/session issue, not a repository or code validation failure.
+**Why:** The push failures were external Git-provider authentication issues, not repository or code validation failures. Replit's Git pane documentation directs users to refresh the Git provider connection for this error.
 
-**How to apply:** Before retrying a future push, verify that the Replit workspace GitHub account is connected or refresh the managed GitHub authorization; do not expose or print the token.
+**How to apply:** Ask the user to disconnect and reconnect GitHub under Replit Workspace Settings > Git Providers, then retry a non-force push. Do not ask for, expose, or print a token, and do not propose the separate GitHub connector as a fix for Git push authentication.
