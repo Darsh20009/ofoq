@@ -18,3 +18,4 @@
 - [Partner legacy records](partner-legacy-records.md) — preserve incomplete old records in CMS, but require complete bilingual data before public display.
 - [Admin workspace styling](admin-workspace-styling.md) — admin and employee surfaces share a navy/gold workspace system scoped away from public and client portals.
 - [Replit configuration validation](replit-config-validation.md) — edit .replit through schema-validated replacement, not direct patches.
+- [Invoice reference fidelity](invoice-reference-fidelity.md) — invoice and quotation screenshots are exact print-layout references, not loose inspiration.

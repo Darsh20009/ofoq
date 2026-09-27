@@ -17,7 +17,10 @@ export default function SettingsPage() {
     email: ["email_from_name", "email_signature"],
     notifications: ["notify_new_lead", "notify_project_update", "notify_invoice_paid", "notify_overdue_invoice", "notify_contact_request"],
     security: ["session_timeout", "max_login_attempts", "require_2fa_admin"],
-    billing: ["company_bank_name", "company_bank_iban"],
+    billing: [
+      "company_bank_name", "company_bank_iban", "company_bank_account",
+      "company_bank_beneficiary", "company_bank_swift",
+    ],
   };
   const tabs = [
     { id: "general", label: copy.generalTab, icon: Globe },
@@ -117,6 +120,18 @@ export default function SettingsPage() {
             <div>
               <label className="label">IBAN</label>
               <input {...register("company_bank_iban")} className="input-field font-mono" dir="ltr" maxLength={34} placeholder="SA..." />
+            </div>
+            <div>
+              <label className="label">{lang === "ar" ? "رقم الحساب" : "Account number"}</label>
+              <input {...register("company_bank_account")} className="input-field font-mono" dir="ltr" />
+            </div>
+            <div>
+              <label className="label">{lang === "ar" ? "اسم المستفيد" : "Beneficiary"}</label>
+              <input {...register("company_bank_beneficiary")} className="input-field" dir="ltr" />
+            </div>
+            <div>
+              <label className="label">{lang === "ar" ? "رمز سويفت" : "SWIFT code"}</label>
+              <input {...register("company_bank_swift")} className="input-field font-mono" dir="ltr" />
             </div>
           </div>
         )}
