@@ -17,10 +17,18 @@ export interface IProject extends Document {
   // طلب → مراجعة → عرض سعر → عقد → دفع → تنفيذ → إغلاق
   stage: "request" | "review" | "quotation" | "contract" | "payment" | "execution" | "closed";
   stageHistory: {
+    _id?: mongoose.Types.ObjectId;
     stage: string;
     changedAt: Date;
     changedBy: mongoose.Types.ObjectId;
     note?: string;
+    customerFeedback?: {
+      _id?: mongoose.Types.ObjectId;
+      decision: "comment" | "approved";
+      message?: string;
+      createdBy: mongoose.Types.ObjectId;
+      createdAt: Date;
+    }[];
   }[];
   progress: number; // 0-100
   status: "active" | "paused" | "completed" | "cancelled";
@@ -71,6 +79,12 @@ const ProjectSchema = new Schema<IProject>({
     changedAt: { type: Date, default: Date.now },
     changedBy: { type: Schema.Types.ObjectId, ref: "User" },
     note: String,
+    customerFeedback: [{
+      decision: { type: String, enum: ["comment", "approved"], required: true },
+      message: { type: String, trim: true, maxlength: 1500 },
+      createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
+      createdAt: { type: Date, default: Date.now },
+    }],
   }],
   progress: { type: Number, default: 0, min: 0, max: 100 },
   status: {

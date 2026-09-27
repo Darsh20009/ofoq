@@ -10,6 +10,7 @@ export const invoicesRouter = Router();
 
 const financeRoles = ["super_admin", "admin", "manager"];
 const hasFinanceAccess = (role: string | undefined) => financeRoles.includes(role || "");
+const CLIENT_VISIBLE_STATUSES = ["sent", "viewed", "accepted", "partial", "paid", "overdue"];
 
 function validationError(message: string) {
   const error: any = new Error(message);
@@ -100,7 +101,13 @@ invoicesRouter.get("/", requireAuth, async (req, res) => {
       filter.customerId = customerId;
     }
 
-    if (status) filter.status = status;
+    if (me.role === "client") {
+      filter.status = status && CLIENT_VISIBLE_STATUSES.includes(String(status))
+        ? status
+        : { $in: CLIENT_VISIBLE_STATUSES };
+    } else if (status) {
+      filter.status = status;
+    }
     if (type && ["invoice", "proforma", "receipt", "credit_note"].includes(String(type))) filter.type = type;
     if (search) filter.invoiceNumber = { $regex: search, $options: "i" };
 
@@ -141,6 +148,10 @@ invoicesRouter.get("/:id", requireAuth, async (req, res) => {
       const customer = await CustomerModel.findOne({ userId: me._id }).select("_id").lean();
       if (!customer || String(customer._id) !== String((invoice as any).customerId?._id ?? (invoice as any).customerId)) {
         res.status(403).json({ error: "ليس لديك صلاحية للوصول لهذا المستند" });
+        return;
+      }
+      if (!CLIENT_VISIBLE_STATUSES.includes((invoice as any).status)) {
+        res.status(404).json({ error: "المستند غير متاح للعميل" });
         return;
       }
     }
@@ -348,6 +359,7 @@ invoicesRouter.get("/:id/pdf", requireAuth, async (req, res) => {
     }
     const invoice = await InvoiceModel.findById(req.params.id)
       .populate("customerId")
+      .populate("projectId", "name projectNumber")
       .lean() as any;
     if (!invoice) {
       res.status(404).json({ error: "الفاتورة غير موجودة" });
@@ -359,10 +371,16 @@ invoicesRouter.get("/:id/pdf", requireAuth, async (req, res) => {
         res.status(403).json({ error: "ليس لديك صلاحية للوصول لهذه الفاتورة" });
         return;
       }
+      if (!CLIENT_VISIBLE_STATUSES.includes(invoice.status)) {
+        res.status(404).json({ error: "المستند غير متاح للعميل" });
+        return;
+      }
     }
-    const pdf = await generateInvoicePdfBuffer(invoice, invoice.customerId);
+    const includeBankDetails = !["0", "false", "no"].includes(String(req.query.bankDetails || "").toLowerCase());
+    const pdf = await generateInvoicePdfBuffer(invoice, invoice.customerId, includeBankDetails);
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `inline; filename="${invoice.invoiceNumber}.pdf"`);
+    const safeNumber = String(invoice.invoiceNumber || "document").replace(/[^a-zA-Z0-9_-]/g, "_");
+    res.setHeader("Content-Disposition", `attachment; filename="${safeNumber}${includeBankDetails ? "-bank" : ""}.pdf"`);
     res.send(pdf);
   } catch (err: any) {
     console.error("[Invoices] PDF generation error:", err.message);

@@ -2,6 +2,7 @@
 export interface User {
   _id: string;
   name: string;
+  fullName?: string;
   email: string;
   role: "super_admin" | "admin" | "manager" | "employee" | "client";
   status: "active" | "inactive" | "suspended";
@@ -100,6 +101,20 @@ export interface Project {
   completedAt?: string;
   progress: number;
   createdAt: string;
+  stageHistory?: {
+    _id: string;
+    stage: ProjectStage;
+    changedAt: string;
+    changedBy?: User | string;
+    note?: string;
+    customerFeedback?: {
+      _id: string;
+      decision: "comment" | "approved";
+      message?: string;
+      createdBy?: User | string;
+      createdAt: string;
+    }[];
+  }[];
 }
 
 export interface Task {

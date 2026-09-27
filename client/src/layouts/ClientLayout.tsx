@@ -2,7 +2,7 @@ import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  LayoutDashboard, FolderOpen, MessageCircle, LogOut, Menu, X,
+  LayoutDashboard, FolderOpen, FolderKanban, FileText, MessageCircle, LogOut, Menu, X,
   Bell, ChevronDown, ArrowUpRight, Building2, Landmark, Scale, UsersRound, Plus,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,6 +14,8 @@ import LanguageSwitcher from "../components/LanguageSwitcher";
 
 const NAV = [
   { href: "/client/dashboard", icon: LayoutDashboard },
+  { href: "/client/projects", icon: FolderKanban },
+  { href: "/client/documents", icon: FileText },
   { href: "/client/requests",  icon: FolderOpen },
   { href: "/client/support",   icon: MessageCircle },
 ];
@@ -32,7 +34,13 @@ export default function ClientLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const { dir, ui } = useLang();
-  const navLabels = [ui.client.dashboard, ui.client.requests, ui.client.support];
+  const navLabels = [
+    ui.client.dashboard,
+    dir === "rtl" ? "مشاريعي" : "Projects",
+    dir === "rtl" ? "الفواتير والعروض" : "Invoices & quotes",
+    ui.client.requests,
+    ui.client.support,
+  ];
 
   const { data: unreadData } = useQuery({
     queryKey: ["client-support-unread"],

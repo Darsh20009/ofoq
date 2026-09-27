@@ -22,6 +22,7 @@ type ProjectForm = {
   progress: number;
   status: string;
   description?: string;
+  stageNote?: string;
 };
 
 function relatedId(value: unknown): string {
@@ -203,7 +204,49 @@ export default function ProjectModal({ open, onClose, project, onSaved }: {
                   <label className="label">{copy.description}</label>
                   <textarea {...register("description")} rows={3} className="input-field resize-none" placeholder={copy.descriptionPlaceholder} />
                 </div>
+                <div className="col-span-2">
+                  <label className="label">{lang === "ar" ? "ملاحظة تظهر للعميل عند تحديث المرحلة" : "Update note visible to the client"}</label>
+                  <textarea {...register("stageNote")} rows={2} maxLength={1000} className="input-field resize-none"
+                    placeholder={lang === "ar" ? "اكتب تقدم العمل أو ما يحتاجه العميل..." : "Share a progress update or anything needed from the client..."} />
+                </div>
               </div>
+              {projectRecord?.stageHistory?.length ? (
+                <section className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-navy-700">{lang === "ar" ? "سجل مراحل المشروع وتفاعل العميل" : "Project stage history & client feedback"}</h3>
+                    <span className="text-xs text-gray-400">{projectRecord.stageHistory.length}</span>
+                  </div>
+                  <div className="max-h-64 space-y-3 overflow-y-auto pe-1">
+                    {[...projectRecord.stageHistory].reverse().map((entry) => {
+                      const actor = entry.changedBy && typeof entry.changedBy === "object" ? entry.changedBy.fullName : "";
+                      return (
+                        <div key={entry._id} className="rounded-lg border border-gray-200 bg-white p-3">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <strong className="text-xs text-navy-700">{copy.stages[entry.stage] || entry.stage}</strong>
+                            <span className="text-[11px] text-gray-400">
+                              {new Date(entry.changedAt).toLocaleDateString(lang === "ar" ? "ar-SA" : lang)}
+                              {actor ? ` · ${actor}` : ""}
+                            </span>
+                          </div>
+                          {entry.note && <p className="mt-2 text-xs leading-5 text-gray-600">{entry.note}</p>}
+                          {entry.customerFeedback?.map((feedback) => {
+                            const clientName = feedback.createdBy && typeof feedback.createdBy === "object" ? feedback.createdBy.fullName : "";
+                            return (
+                              <div key={feedback._id} className="mt-2 rounded-lg bg-[#f8f5f0] px-3 py-2 text-xs">
+                                <strong className="text-[#1c2b6e]">
+                                  {feedback.decision === "approved" ? (lang === "ar" ? "اعتماد العميل" : "Client approval") : (lang === "ar" ? "تعليق العميل" : "Client comment")}
+                                  {clientName ? ` · ${clientName}` : ""}
+                                </strong>
+                                {feedback.message && <p className="mt-1 whitespace-pre-wrap text-gray-600">{feedback.message}</p>}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              ) : null}
               {formError && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{formError}</p>}
               <div className="flex gap-3 pt-2">
                 <button type="submit" disabled={mut.isPending || customersLoading || managersLoading || customers.length === 0 || managers.length === 0} className="btn-primary flex-1 justify-center">

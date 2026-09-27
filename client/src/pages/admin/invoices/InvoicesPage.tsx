@@ -26,6 +26,7 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
+  const [downloadOpenId, setDownloadOpenId] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["invoices", documentType, search, status],
@@ -67,18 +68,19 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
     onError: (error: any) => toast.error(error?.response?.data?.error || (lang === "ar" ? "تعذر اعتماد عرض السعر" : "Couldn't accept the quotation")),
   });
 
-  const downloadPdf = async (id: string, number: string) => {
+  const downloadPdf = async (id: string, number: string, includeBankDetails: boolean) => {
     try {
-      const response = await invoicesApi.pdf(id);
+      const response = await invoicesApi.pdf(id, includeBankDetails);
       const contentType = String(response.headers["content-type"] || "");
       if (!contentType.includes("pdf")) throw new Error("PDF download failed");
       const url = URL.createObjectURL(response.data);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `${number}.pdf`;
+      anchor.download = `${number}${includeBankDetails ? "-bank" : "-without-bank"}.pdf`;
       anchor.style.display = "none";
       document.body.appendChild(anchor);
       anchor.click();
+      setDownloadOpenId(null);
       window.setTimeout(() => {
         URL.revokeObjectURL(url);
         anchor.remove();
@@ -217,10 +219,27 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
                                <span className="hidden lg:inline">{lang === "ar" ? "تحويل إلى فاتورة" : "Convert"}</span>
                              </button>
                            )}
-                          <button onClick={() => downloadPdf(inv._id, inv.invoiceNumber)}
-                             className="p-1.5 rounded-lg hover:bg-purple-50 text-gray-400 hover:text-purple-600" title={copy.download}>
-                            <Download size={14} />
-                          </button>
+                           <div className="relative">
+                             <button onClick={() => setDownloadOpenId(downloadOpenId === inv._id ? null : inv._id)}
+                               aria-expanded={downloadOpenId === inv._id}
+                               className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-[#1C2B6E] hover:bg-blue-50"
+                               title={copy.download}>
+                               <Download size={14} />
+                               <span className="hidden xl:inline">{copy.download}</span>
+                             </button>
+                             {downloadOpenId === inv._id && (
+                               <div className="absolute end-0 top-full z-20 mt-1 w-52 rounded-xl border border-gray-200 bg-white p-1.5 shadow-xl">
+                                 <button onClick={() => downloadPdf(inv._id, inv.invoiceNumber, true)}
+                                   className="block w-full rounded-lg px-3 py-2 text-start text-xs font-semibold text-gray-700 hover:bg-gray-50">
+                                   {lang === "ar" ? "تحميل مع البيانات البنكية" : "Download with bank details"}
+                                 </button>
+                                 <button onClick={() => downloadPdf(inv._id, inv.invoiceNumber, false)}
+                                   className="block w-full rounded-lg px-3 py-2 text-start text-xs font-semibold text-gray-700 hover:bg-gray-50">
+                                   {lang === "ar" ? "تحميل بدون البيانات البنكية" : "Download without bank details"}
+                                 </button>
+                               </div>
+                             )}
+                           </div>
                            <button onClick={() => { if (confirm(copy.deleteConfirm)) deleteMut.mutate(inv._id); }}
                             className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500">
                             <Trash2 size={14} />

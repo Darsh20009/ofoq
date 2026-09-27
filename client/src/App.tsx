@@ -12,6 +12,7 @@ import ClientLayout from "./layouts/ClientLayout";
 
   // Employee Portal
 import EmployeePortalLoginPage from "./pages/employee/EmployeePortalLoginPage";
+import EmployeeProjectsPage from "./pages/employee/EmployeeProjectsPage";
 
 // Client Portal
 import ClientLoginPage from "./pages/client/ClientLoginPage";
@@ -20,6 +21,8 @@ import ClientRegisterPage from "./pages/client/ClientRegisterPage";
 import ClientForgotPasswordPage from "./pages/client/ClientForgotPasswordPage";
 import ClientResetPasswordPage from "./pages/client/ClientResetPasswordPage";
 import ClientDashboardPage from "./pages/client/ClientDashboardPage";
+import ClientProjectsPage from "./pages/client/ClientProjectsPage";
+import ClientDocumentsPage from "./pages/client/ClientDocumentsPage";
 import RequestsListPage from "./pages/client/RequestsListPage";
 import RequestDetailsPage from "./pages/client/RequestDetailsPage";
 import ServiceRequestPage from "./pages/client/ServiceRequestPage";
@@ -187,6 +190,7 @@ export default function App() {
           >
             <Route index element={<EmployeeDashboardPage />} />
             <Route path="dashboard" element={<EmployeeDashboardPage />} />
+            <Route path="projects" element={<EmployeeProjectsPage />} />
             <Route path="card" element={<EmployeeCardPage />} />
             <Route path="employee/card" element={<EmployeeCardPage />} />
             <Route path="employee/dashboard" element={<EmployeeDashboardPage />} />
@@ -308,6 +312,8 @@ export default function App() {
         >
           <Route index element={<Navigate to="/client/dashboard" replace />} />
           <Route path="dashboard" element={<ClientDashboardPage />} />
+          <Route path="projects" element={<ClientProjectsPage />} />
+          <Route path="documents" element={<ClientDocumentsPage />} />
           <Route path="requests" element={<RequestsListPage />} />
           <Route path="requests/new" element={<ServiceRequestPage />} />
           <Route path="requests/:id" element={<RequestDetailsPage />} />

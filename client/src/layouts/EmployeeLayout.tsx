@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { LayoutDashboard, CreditCard, User, LogOut, Menu, X, ClipboardList, HeadphonesIcon, MessageSquare } from "lucide-react";
+import { LayoutDashboard, CreditCard, User, LogOut, Menu, X, ClipboardList, HeadphonesIcon, MessageSquare, FolderKanban } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "../store/authStore";
 import { authApi } from "../api/client";
@@ -17,6 +17,7 @@ export default function EmployeeLayout() {
   const { dir, ui } = useLang();
   const nav = [
     { href: "/", label: ui.employee.dashboard, icon: LayoutDashboard },
+    { href: "/projects", label: ui.adminPages.projects.title || (dir === "rtl" ? "مشاريعي" : "Projects"), icon: FolderKanban },
     { href: "/service-requests", label: ui.client.requests, icon: ClipboardList },
     { href: "/support", label: ui.client.support, icon: HeadphonesIcon },
     { href: "/contact", label: ui.contact.badge, icon: MessageSquare },

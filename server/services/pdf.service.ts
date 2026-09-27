@@ -269,7 +269,7 @@ function escapeHtml(value: unknown): string {
 
 const INVOICE_STATUS_LABELS: Record<string, string> = {
   draft: "مسودة", sent: "مرسلة", viewed: "تمت المشاهدة", partial: "مدفوعة جزئياً",
-  paid: "مدفوعة بالكامل", overdue: "متأخرة", cancelled: "ملغاة",
+  paid: "مدفوعة بالكامل", accepted: "معتمد", overdue: "متأخرة", cancelled: "ملغاة",
 };
 const INVOICE_STATUS_COLORS: Record<string, [string, string]> = {
   draft: ["#eef0f4", "#6d6a7e"], sent: ["#e8f0ff", "#2563eb"], viewed: ["#eef2ff", "#4f46e5"],
@@ -278,102 +278,184 @@ const INVOICE_STATUS_COLORS: Record<string, [string, string]> = {
 };
 
 // ── Invoice PDF ──────────────────────────────────────────────────────
-export function buildInvoiceHtml(invoice: any, customer: any, company: CompanyProfile): string {
-  const typeLabels: Record<string, string> = { invoice: "فاتورة ضريبية", proforma: "فاتورة مبدئية", receipt: "إيصال استلام", credit_note: "إشعار دائن" };
-  const rows = (invoice.items || []).map((item: any) => `
-    <tr>
-      <td>${item.description}${item.descriptionAr ? `<br/><span style="color:#9691a8;font-size:11px">${item.descriptionAr}</span>` : ""}</td>
-      <td class="num-cell">${item.quantity}</td>
-      <td class="num-cell">${formatMoney(item.unitPrice)}</td>
-      <td class="num-cell">${item.discount || 0}%</td>
-      <td class="num-cell">${item.tax || 0}%</td>
-      <td class="num-cell"><strong>${formatMoney(item.total)}</strong></td>
-    </tr>`).join("");
-
+export function buildInvoiceHtml(
+  invoice: any,
+  customer: any,
+  company: CompanyProfile,
+  includeBankDetails = true,
+): string {
+  const isQuotation = invoice.type === "proforma";
+  const arTitle = isQuotation ? "عرض سعر" : "فاتورة ضريبية";
+  const enTitle = isQuotation ? "QUOTATION" : "TAX INVOICE";
+  const rawItems = Array.isArray(invoice.items) ? invoice.items : [];
+  const itemDiscounts = rawItems.reduce((sum: number, item: any) => sum + Number(item.discount || 0), 0);
+  const rows = rawItems.map((item: any, index: number) => {
+    const quantity = Number(item.quantity || 0);
+    const unitPrice = Number(item.unitPrice || 0);
+    const itemDiscount = Number(item.discount || 0);
+    const taxRate = Number(item.tax || 0);
+    const preTax = Math.max(0, quantity * unitPrice - itemDiscount);
+    const taxValue = preTax * taxRate / 100;
+    return `
+      <tr>
+        <td class="center">${index + 1}</td>
+        <td class="item-name">${escapeHtml(item.description)}${item.descriptionAr ? `<br/><span>${escapeHtml(item.descriptionAr)}</span>` : ""}</td>
+        <td class="number">${formatMoney(quantity)}</td>
+        <td class="number">${formatMoney(unitPrice)}</td>
+        <td class="number">${formatMoney(preTax)}</td>
+        <td class="number">${formatMoney(taxRate)}%</td>
+        <td class="number">${formatMoney(taxValue)}</td>
+        <td class="number strong">${formatMoney(preTax + taxValue)}</td>
+      </tr>`;
+  }).join("");
   const balanceDue = Math.max(0, (invoice.total || 0) - (invoice.paidAmount || 0));
-
+  const preTaxTotal = Math.max(0, Number(invoice.subtotal || 0) - itemDiscounts - Number(invoice.discount || 0));
+  const bankConfigured = company.bankName !== "-" && company.bankIban !== "-";
+  const bankBlock = includeBankDetails
+    ? `<section class="bank-details">
+        <h3>بيانات التحويل البنكي <span>PAYMENT INFORMATION</span></h3>
+        ${bankConfigured ? `
+          <p><strong>البنك / Bank:</strong> ${escapeHtml(company.bankName)}</p>
+          <p><strong>رقم الآيبان / IBAN:</strong> ${ltr(escapeHtml(company.bankIban))}</p>
+          <p><strong>المستفيد / Beneficiary:</strong> ${escapeHtml(company.nameEn)}</p>
+        ` : `<p class="bank-missing">لم تُضف بيانات البنك بعد؛ أكمل الإعدادات قبل إرسال المستند. Bank details are not configured yet; add them before sending this document.</p>`}
+      </section>`
+    : "";
+  const invoiceDate = formatDate(invoice.createdAt);
+  const customerName = customer?.companyName || customer?.name || "-";
+  const projectName = invoice.projectId?.name || invoice.projectId?.projectNumber;
   const body = `
-  <div class="page">
-    <div class="brand-bar"></div>
-    <div class="header">
-      <div class="brand">
-        ${company.logoDataUri ? `<img src="${company.logoDataUri}" />` : ""}
-        <div class="names">
-          <h1>${company.nameAr}</h1>
-          <p>${company.nameEn}</p>
-        </div>
+  <div class="page invoice-page">
+    <header class="document-head">
+      <div class="company-side company-en">
+        <strong>${escapeHtml(company.nameEn)}</strong>
+        <span>${escapeHtml(company.address)}</span>
+        <span>${ltr(escapeHtml(company.phone))}</span>
+        <span>${escapeHtml(company.email)}</span>
+        <span>${escapeHtml(company.website)}</span>
       </div>
-      <div class="doc-title">
-        <h2>${typeLabels[invoice.type] || "فاتورة"}</h2>
-        <div class="num">${invoice.invoiceNumber}</div>
-        <div>${statusBadge(invoice.status, INVOICE_STATUS_LABELS, INVOICE_STATUS_COLORS)}</div>
+      <div class="logo-center">${company.logoDataUri ? `<img src="${company.logoDataUri}" alt="OFOQ" />` : `<strong class="logo-fallback">OFOQ</strong>`}</div>
+      <div class="company-side company-ar">
+        <strong>${escapeHtml(company.nameAr)}</strong>
+        <span>${escapeHtml(company.address)}</span>
+        <span>${ltr(escapeHtml(company.phone))}</span>
+        <span>${escapeHtml(company.email)}</span>
+        <span>${escapeHtml(company.website)}</span>
       </div>
+    </header>
+    <div class="document-title">
+      <h1>${arTitle}</h1>
+      <p>${enTitle}</p>
     </div>
-
-    <div class="meta-grid">
-      <div class="meta-box">
-        <h3>فاتورة إلى</h3>
-        <p><strong>${customer?.companyName || customer?.name || "-"}</strong></p>
-        <p>${customer?.name || ""}</p>
-        <p>${customer?.email || ""} ${customer?.phone ? " · " + ltr(customer.phone) : ""}</p>
-        <p>${customer?.address || ""} ${customer?.city ? " - " + customer.city : ""}</p>
-        ${customer?.taxNumber ? `<p>الرقم الضريبي: ${ltr(customer.taxNumber)}</p>` : ""}
-      </div>
-      <div class="meta-box">
-        <h3>تفاصيل الفاتورة</h3>
-        <p>تاريخ الإصدار: <strong>${formatDate(invoice.createdAt)}</strong></p>
-        <p>تاريخ الاستحقاق: <strong>${formatDate(invoice.dueDate)}</strong></p>
-        <p>العملة: <strong>${invoice.currency}</strong></p>
-        ${company.taxNumber !== "-" ? `<p>الرقم الضريبي للمنشأة: ${ltr(company.taxNumber)}</p>` : ""}
-      </div>
-    </div>
-
-    <table class="items">
-      <thead>
-        <tr>
-          <th style="width:36%">الوصف</th>
-          <th>الكمية</th>
-          <th>سعر الوحدة</th>
-          <th>الخصم</th>
-          <th>الضريبة</th>
-          <th>الإجمالي</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
+    <section class="document-meta">
+      <div><span>الرقم · Number</span><strong>${ltr(escapeHtml(invoice.invoiceNumber || "-"))}</strong></div>
+      <div><span>التاريخ · Date</span><strong>${escapeHtml(invoiceDate)}</strong></div>
+      <div><span>${isQuotation ? "حالة العرض · Status" : "حالة الدفع · Payment status"}</span><strong>${escapeHtml(INVOICE_STATUS_LABELS[invoice.status] || invoice.status || "-")}</strong></div>
+      <div><span>العميل · Client</span><strong>${escapeHtml(customerName)}</strong></div>
+    </section>
+    <section class="customer-details">
+      <span>${escapeHtml(customer?.name || customerName)}</span>
+      ${customer?.email ? `<span>${escapeHtml(customer.email)}</span>` : ""}
+      ${customer?.phone ? `<span>${ltr(escapeHtml(customer.phone))}</span>` : ""}
+      ${customer?.taxNumber ? `<span>الرقم الضريبي · VAT: ${ltr(escapeHtml(customer.taxNumber))}</span>` : ""}
+      ${projectName ? `<span>المشروع · Project: ${escapeHtml(projectName)}</span>` : ""}
+    </section>
+    <table class="items document-items">
+      <thead><tr>
+        <th class="center">م<br/>No.</th>
+        <th>البند<br/>Item</th>
+        <th>الكمية<br/>Qty</th>
+        <th>السعر<br/>Price</th>
+        <th>المجموع قبل الضريبة<br/>Pre-Tax Total</th>
+        <th>نسبة الضريبة<br/>Tax %</th>
+        <th>قيمة الضريبة<br/>Tax Value</th>
+        <th>المجموع<br/>Total</th>
+      </tr></thead>
+      <tbody>${rows || `<tr><td colspan="8" class="center">لا توجد بنود</td></tr>`}</tbody>
     </table>
-
-    <div class="totals">
-      <div class="row"><span>المجموع الفرعي</span><span class="num-cell">${formatMoney(invoice.subtotal)} ${invoice.currency}</span></div>
-      ${invoice.discount ? `<div class="row"><span>الخصم</span><span class="num-cell">- ${formatMoney(invoice.discount)} ${invoice.currency}</span></div>` : ""}
-      ${invoice.tax ? `<div class="row"><span>ضريبة القيمة المضافة</span><span class="num-cell">${formatMoney(invoice.tax)} ${invoice.currency}</span></div>` : ""}
-      <div class="row grand"><span>الإجمالي المستحق</span><span class="num-cell amt">${formatMoney(invoice.total)} ${invoice.currency}</span></div>
-      ${invoice.paidAmount ? `<div class="row"><span>المبلغ المدفوع</span><span class="num-cell">${formatMoney(invoice.paidAmount)} ${invoice.currency}</span></div>
-      <div class="row"><span>المتبقي</span><span class="num-cell">${formatMoney(balanceDue)} ${invoice.currency}</span></div>` : ""}
-    </div>
-
+    <section class="totals">
+      <div><span>الإجمالي قبل الضريبة <small>Pre-Tax Total</small></span><strong>${formatMoney(preTaxTotal)} ${escapeHtml(invoice.currency || "SAR")}</strong></div>
+      ${invoice.discount ? `<div><span>الخصم <small>Discount</small></span><strong>− ${formatMoney(invoice.discount)} ${escapeHtml(invoice.currency || "SAR")}</strong></div>` : ""}
+      <div><span>ضريبة القيمة المضافة <small>VAT</small></span><strong>${formatMoney(invoice.tax)} ${escapeHtml(invoice.currency || "SAR")}</strong></div>
+      <div class="total-due"><span>${isQuotation ? "إجمالي العرض" : "الإجمالي المستحق"} <small>${isQuotation ? "Quotation Total" : "Total (SAR)"}</small></span><strong>${formatMoney(invoice.total)} ${escapeHtml(invoice.currency || "SAR")}</strong></div>
+      ${!isQuotation && invoice.paidAmount ? `<div><span>المدفوع · Paid</span><strong>${formatMoney(invoice.paidAmount)} ${escapeHtml(invoice.currency || "SAR")}</strong></div>
+      <div><span>المتبقي · Due</span><strong>${formatMoney(balanceDue)} ${escapeHtml(invoice.currency || "SAR")}</strong></div>` : ""}
+    </section>
     ${(invoice.notesAr || invoice.notes || invoice.termsAr || invoice.terms) ? `
-    <div class="notes">
-      ${invoice.notesAr || invoice.notes ? `<p><strong>ملاحظات:</strong> ${invoice.notesAr || invoice.notes}</p>` : ""}
-      ${invoice.termsAr || invoice.terms ? `<p style="margin-top:6px"><strong>الشروط:</strong> ${invoice.termsAr || invoice.terms}</p>` : ""}
-    </div>` : ""}
-
-    ${company.bankIban !== "-" ? `
-    <div class="notes" style="background:#f4f9ff;border-inline-start-color:#2563eb;margin-top:12px">
-      <p><strong>بيانات التحويل البنكي:</strong> ${company.bankName} — ${ltr(company.bankIban)}</p>
-    </div>` : ""}
-
-    <div class="footer">
-      <p><span class="brand-name">${company.nameAr}</span> · ${ltr(company.phone)} · ${ltr(company.email)} · ${ltr(company.website)}</p>
-      <p>هذه الفاتورة تم إصدارها إلكترونياً عبر نظام أفق ولا تتطلب توقيعاً أو ختماً لتكون سارية المفعول.</p>
-    </div>
+      <section class="document-notes">
+        ${invoice.notesAr || invoice.notes ? `<p><strong>ملاحظات · Notes:</strong> ${escapeHtml(invoice.notesAr || invoice.notes)}</p>` : ""}
+        ${invoice.termsAr || invoice.terms ? `<p><strong>الشروط · Terms:</strong> ${escapeHtml(invoice.termsAr || invoice.terms)}</p>` : ""}
+      </section>` : ""}
+    ${bankBlock}
+    <footer class="document-footer">
+      <span>${escapeHtml(company.nameAr)} · ${escapeHtml(company.nameEn)}</span>
+      <span>${ltr(escapeHtml(company.phone))} · ${escapeHtml(company.email)} · ${escapeHtml(company.website)}</span>
+      <span>${isQuotation ? "هذا العرض صادر عن نظام أفق." : "صدرت هذه الفاتورة إلكترونياً عبر نظام أفق."}</span>
+    </footer>
   </div>`;
 
-  return docShell(`فاتورة ${invoice.invoiceNumber}`, body);
+  const shell = docShell(`${arTitle} ${invoice.invoiceNumber || ""}`, body);
+  return shell.replace(
+    "</style>",
+    `
+      .invoice-page { padding: 9mm 10mm 13mm; color:#111827; font-size:10px; }
+      .document-head { display:grid; grid-template-columns:1fr 78px 1fr; gap:12px; align-items:center; min-height:40mm; border-bottom:1px solid #707070; padding-bottom:5mm; }
+      .company-side { display:flex; flex-direction:column; gap:2px; font-size:9px; line-height:1.35; color:#333; }
+      .company-side strong { font-size:12px; color:#111; }
+      .company-en { text-align:left; direction:ltr; }
+      .company-ar { text-align:right; direction:rtl; }
+      .logo-center { display:flex; justify-content:center; align-items:center; }
+      .logo-center img { width:70px; height:70px; object-fit:contain; }
+      .logo-fallback { color:#1C2B6E; font-size:19px; }
+      .document-title { text-align:center; padding:4mm 0 2mm; color:#111; }
+      .document-title h1 { font-size:17px; line-height:1.2; font-weight:800; }
+      .document-title p { font-size:13px; font-weight:700; letter-spacing:.4px; }
+      .document-meta { display:grid; grid-template-columns:1.1fr 1fr 1.1fr 1.4fr; gap:7px; margin:1mm 0 2mm; align-items:center; }
+      .document-meta div { display:flex; flex-direction:column; gap:2px; }
+      .document-meta span { font-size:9px; color:#555; }
+      .document-meta strong { font-size:10px; font-weight:600; }
+      .customer-details { display:flex; flex-wrap:wrap; align-items:center; gap:4px 14px; min-height:8mm; margin:1mm 0 3mm; font-size:9px; }
+      table.document-items { margin:0; table-layout:fixed; border-collapse:collapse; }
+      table.document-items th, table.document-items td { border:1px solid #777; padding:5px 4px; text-align:right; vertical-align:middle; font-size:8.5px; line-height:1.35; }
+      table.document-items th { color:#222; background:#f1f1f1; font-size:8px; font-weight:700; text-align:center; }
+      table.document-items th:nth-child(1) { width:5%; }
+      table.document-items th:nth-child(2) { width:31%; }
+      table.document-items th:nth-child(3) { width:8%; }
+      table.document-items th:nth-child(4) { width:10%; }
+      table.document-items th:nth-child(5) { width:14%; }
+      table.document-items th:nth-child(6) { width:9%; }
+      table.document-items th:nth-child(7) { width:11%; }
+      table.document-items th:nth-child(8) { width:12%; }
+      table.document-items td.center { text-align:center; }
+      table.document-items td.number { direction:ltr; text-align:center; font-variant-numeric:tabular-nums; }
+      table.document-items td.item-name { text-align:center; overflow-wrap:anywhere; }
+      table.document-items td.item-name span { color:#555; font-size:8px; }
+      table.document-items td.strong { font-weight:700; }
+      .totals { margin:2mm auto 0 0; width:78mm; }
+      .totals > div { display:flex; justify-content:space-between; align-items:center; gap:8px; border-bottom:1px solid #999; padding:3px 4px; font-size:9px; }
+      .totals > div > span { display:flex; flex-direction:column; }
+      .totals small { font-size:8px; color:#555; }
+      .totals strong { direction:ltr; white-space:nowrap; text-align:left; font-variant-numeric:tabular-nums; }
+      .totals .total-due { border-top:1px solid #777; border-bottom:2px solid #555; font-weight:800; }
+      .document-notes { margin-top:5mm; padding:3mm; border:1px solid #ddd; font-size:9px; line-height:1.6; }
+      .bank-details { margin-top:8mm; width:64%; border-top:1px solid #333; padding-top:3mm; direction:ltr; text-align:left; font-size:9px; line-height:1.5; }
+      .bank-details h3 { margin-bottom:1mm; font-size:10px; }
+      .bank-details h3 span { margin-left:4px; font-weight:600; }
+      .bank-details p { overflow-wrap:anywhere; }
+      .bank-details .bank-missing { color:#9a3412; font-weight:700; }
+      .document-footer { margin-top:6mm; padding-top:3mm; border-top:1px solid #bbb; display:flex; flex-direction:column; text-align:center; gap:2px; font-size:8px; color:#555; }
+      @media print { .invoice-page { min-height:277mm; } }
+    </style>`,
+  );
 }
 
-export async function generateInvoicePdfBuffer(invoice: any, customer: any): Promise<Buffer> {
+export async function generateInvoicePdfBuffer(
+  invoice: any,
+  customer: any,
+  includeBankDetails = true,
+): Promise<Buffer> {
   const company = await getCompanyProfile();
-  const html = buildInvoiceHtml(invoice, customer, company);
+  const html = buildInvoiceHtml(invoice, customer, company, includeBankDetails);
   return renderHtmlToPdf(html);
 }
 

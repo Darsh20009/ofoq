@@ -104,6 +104,8 @@ export const projectsApi = {
   get: (id: string) => api.get(`/projects/${id}`),
   create: (data: object) => api.post("/projects", data),
   update: (id: string, data: object) => api.patch(`/projects/${id}`, data),
+  stageFeedback: (id: string, data: { stageHistoryId: string; decision: "comment" | "approved"; message?: string }) =>
+    api.post(`/projects/${id}/stage-feedback`, data),
   delete: (id: string) => api.delete(`/projects/${id}`),
   tasks: (projectId: string, params?: object) =>
     api.get(`/projects/${projectId}/tasks`, { params }),
@@ -121,7 +123,11 @@ export const invoicesApi = {
   update: (id: string, data: object) => api.patch(`/invoices/${id}`, data),
   delete: (id: string) => api.delete(`/invoices/${id}`),
   send: (id: string) => api.post(`/invoices/${id}/send`),
-  pdf: (id: string) => api.get(`/invoices/${id}/pdf`, { responseType: "blob" }),
+  pdf: (id: string, includeBankDetails = true) =>
+    api.get(`/invoices/${id}/pdf`, {
+      params: { bankDetails: includeBankDetails ? "1" : "0" },
+      responseType: "blob",
+    }),
   markPaid: (id: string, data?: object) => api.post(`/invoices/${id}/mark-paid`, data),
   acceptQuotation: (id: string) => api.post(`/invoices/${id}/accept-quotation`),
   convertToInvoice: (id: string) => api.post(`/invoices/${id}/convert-to-invoice`),
@@ -177,8 +183,8 @@ export const cmsApi = {
     delete: (id: string) => api.delete(`/cms/admin/countries/${id}`),
   },
   settings: {
-    list: (group?: string) => api.get("/cms/settings", { params: { group } }),
-    update: (data: object) => api.put("/cms/settings", data),
+    list: (group?: string) => api.get("/cms/admin/settings", { params: { group } }),
+    update: (data: object) => api.post("/cms/admin/settings", data),
   },
   upload: (file: File) => {
     const fd = new FormData();

@@ -35,7 +35,7 @@ projectsRouter.get("/", requireAuth, async (req, res) => {
 
     if (status) filter.status = status;
     if (stage) filter.stage = stage;
-    if (customerId) filter.customerId = customerId;
+    if (customerId && me.role !== "client") filter.customerId = customerId;
     if (manager) filter.manager = manager;
     if (search) {
       filter.$or = [
@@ -50,6 +50,8 @@ projectsRouter.get("/", requireAuth, async (req, res) => {
         .populate("customerId", "name companyName")
         .populate("manager", "fullName avatar")
         .populate("team", "fullName avatar")
+        .populate("stageHistory.changedBy", "fullName")
+        .populate("stageHistory.customerFeedback.createdBy", "fullName")
         .populate("serviceId", "titleAr title")
         .sort({ createdAt: -1 })
         .skip((+page - 1) * +limit)
@@ -65,10 +67,13 @@ projectsRouter.get("/", requireAuth, async (req, res) => {
 
 projectsRouter.get("/:id", requireAuth, async (req, res) => {
   try {
+    const me = (req as any).user;
     const project = await ProjectModel.findById(req.params.id)
       .populate("customerId", "name companyName email phone")
       .populate("manager", "fullName avatar email")
       .populate("team", "fullName avatar email")
+      .populate("stageHistory.changedBy", "fullName")
+      .populate("stageHistory.customerFeedback.createdBy", "fullName")
       .populate("serviceId", "titleAr title workflow")
       .populate("contractId", "contractNumber status value")
       .lean();
@@ -76,8 +81,20 @@ projectsRouter.get("/:id", requireAuth, async (req, res) => {
       res.status(404).json({ error: "المشروع غير موجود" });
       return;
     }
+    if (me.role === "client") {
+      const customer = await CustomerModel.findOne({ userId: me._id }).select("_id").lean();
+      if (!customer || String(customer._id) !== String((project as any).customerId?._id ?? (project as any).customerId)) {
+        res.status(403).json({ error: "ليس لديك صلاحية للوصول لهذا المشروع" });
+        return;
+      }
+    } else if (me.role === "employee" &&
+      String((project as any).manager?._id ?? (project as any).manager) !== String(me._id) &&
+      !(project as any).team?.some((member: any) => String(member?._id ?? member) === String(me._id))) {
+      res.status(403).json({ error: "هذا المشروع غير مسند إليك" });
+      return;
+    }
     // Get tasks for this project
-    const tasks = await TaskModel.find({ projectId: project._id })
+    const tasks = me.role === "client" ? [] : await TaskModel.find({ projectId: project._id })
       .populate("assignedTo", "fullName avatar").lean();
     res.json({ project, tasks });
   } catch {
@@ -106,12 +123,25 @@ projectsRouter.post("/", requireAuth, requireRole("super_admin", "admin", "manag
       return;
     }
 
+    const initialStage = req.body.stage || "request";
+    const validStages = ["request", "review", "quotation", "contract", "payment", "execution", "closed"];
+    if (!validStages.includes(initialStage)) {
+      res.status(400).json({ error: "مرحلة المشروع غير صالحة" });
+      return;
+    }
+
     const projectNumber = await generateProjectNumber();
     const project = await ProjectModel.create({
       ...req.body,
       name: name.trim(),
       projectNumber,
-      stageHistory: [{ stage: "request", changedAt: new Date(), changedBy: (req as any).user._id }],
+      stageHistory: [{
+        stage: initialStage,
+        changedAt: new Date(),
+        changedBy: (req as any).user._id,
+        ...(typeof req.body.stageNote === "string" && req.body.stageNote.trim()
+          ? { note: req.body.stageNote.trim().slice(0, 1000) } : {}),
+      }],
     });
 
     // Notify manager
@@ -145,7 +175,7 @@ projectsRouter.post("/", requireAuth, requireRole("super_admin", "admin", "manag
   }
 });
 
-projectsRouter.patch("/:id", requireAuth, async (req, res) => {
+projectsRouter.patch("/:id", requireAuth, requireRole("super_admin", "admin", "manager", "employee"), async (req, res) => {
   try {
     const me = (req as any).user;
     const old = await ProjectModel.findById(req.params.id);
@@ -154,19 +184,39 @@ projectsRouter.patch("/:id", requireAuth, async (req, res) => {
       return;
     }
 
-    const updates: any = { ...req.body };
+    if (me.role === "employee" &&
+      String(old.manager) !== String(me._id) &&
+      !old.team.some((member: any) => String(member) === String(me._id))) {
+      res.status(403).json({ error: "هذا المشروع غير مسند إليك" });
+      return;
+    }
+
+    const editableFields = [
+      "name", "nameAr", "description", "manager", "team", "stage", "progress", "status",
+      "priority", "budget", "actualCost", "currency", "startDate", "dueDate", "completedAt",
+      "attachments", "notes", "tags", "serviceId", "contractId",
+    ];
+    const updates: any = Object.fromEntries(
+      editableFields.filter((field) => Object.prototype.hasOwnProperty.call(req.body, field))
+        .map((field) => [field, req.body[field]]),
+    );
 
     // Stage change — add to history
     if (req.body.stage && req.body.stage !== old.stage) {
+      const validStages = ["request", "review", "quotation", "contract", "payment", "execution", "closed"];
+      if (!validStages.includes(req.body.stage)) {
+        res.status(400).json({ error: "مرحلة المشروع غير صالحة" });
+        return;
+      }
+      const stageNote = typeof req.body.stageNote === "string" ? req.body.stageNote.trim().slice(0, 1000) : "";
       updates.$push = {
         stageHistory: {
           stage: req.body.stage,
           changedAt: new Date(),
           changedBy: me._id,
-          note: req.body.stageNote,
+          ...(stageNote ? { note: stageNote } : {}),
         },
       };
-      delete updates.stageHistory;
 
       // Notify customer via email
       try {
@@ -187,12 +237,74 @@ projectsRouter.patch("/:id", requireAuth, async (req, res) => {
 
     const project = await ProjectModel.findByIdAndUpdate(req.params.id, updates, { new: true })
       .populate("manager", "fullName avatar")
-      .populate("team", "fullName avatar").lean();
+      .populate("team", "fullName avatar")
+      .populate("stageHistory.changedBy", "fullName")
+      .populate("stageHistory.customerFeedback.createdBy", "fullName").lean();
 
     await logAction(String(me._id), "update_project", "Project", req.params.id, req);
     res.json({ project });
   } catch {
     res.status(500).json({ error: "خطأ في تحديث المشروع" });
+  }
+});
+
+// Clients can comment on or approve a recorded project stage. They cannot change project stages.
+projectsRouter.post("/:id/stage-feedback", requireAuth, requireRole("client"), async (req, res) => {
+  try {
+    const me = (req as any).user;
+    const decision = req.body?.decision;
+    const message = typeof req.body?.message === "string" ? req.body.message.trim() : "";
+    if (!["comment", "approved"].includes(decision) || (decision === "comment" && !message)) {
+      res.status(400).json({ error: "اختر تعليقًا أو اعتمادًا، وأضف نص التعليق" });
+      return;
+    }
+    if (message.length > 1500) {
+      res.status(400).json({ error: "التعليق يتجاوز الحد المسموح" });
+      return;
+    }
+    const project = await ProjectModel.findById(req.params.id);
+    if (!project) {
+      res.status(404).json({ error: "المشروع غير موجود" });
+      return;
+    }
+    const customer = await CustomerModel.findOne({ userId: me._id }).select("_id").lean();
+    if (!customer || String(customer._id) !== String(project.customerId)) {
+      res.status(403).json({ error: "ليس لديك صلاحية للتفاعل مع هذا المشروع" });
+      return;
+    }
+    const historyEntry = project.stageHistory.find((entry: any) => String(entry._id) === String(req.body?.stageHistoryId));
+    if (!historyEntry) {
+      res.status(404).json({ error: "مرحلة المشروع غير موجودة في السجل" });
+      return;
+    }
+    if (decision === "approved" && historyEntry.customerFeedback?.some(
+      (feedback: any) => feedback.decision === "approved" && String(feedback.createdBy) === String(me._id),
+    )) {
+      res.status(409).json({ error: "سبق اعتماد هذه المرحلة" });
+      return;
+    }
+    historyEntry.customerFeedback = historyEntry.customerFeedback || [];
+    historyEntry.customerFeedback.push({
+      decision,
+      ...(message ? { message } : {}),
+      createdBy: me._id,
+      createdAt: new Date(),
+    });
+    await project.save();
+
+    const notice = decision === "approved" ? "اعتمد العميل مرحلة من المشروع" : "أرسل العميل تعليقًا على المشروع";
+    const recipients = [String(project.manager), ...project.team.map(String)]
+      .filter((id) => id !== String(me._id));
+    if (recipients.length) {
+      await fireNotifyMany(recipients, notice, `المشروع: ${project.name}`, {
+        type: "project",
+        link: `/admin/projects`,
+      }).catch(() => {});
+    }
+    res.status(201).json({ message: decision === "approved" ? "تم اعتماد المرحلة" : "تم إرسال التعليق" });
+  } catch (error: any) {
+    console.error("[Projects] stage feedback error:", error?.message || error);
+    res.status(500).json({ error: "تعذر إرسال التفاعل على المرحلة" });
   }
 });
 
@@ -217,6 +329,22 @@ projectsRouter.delete("/:id", requireAuth, requireRole("super_admin", "admin"), 
 // ── TASKS ─────────────────────────────────────────────────────────
 projectsRouter.get("/:id/tasks", requireAuth, async (req, res) => {
   try {
+    const me = (req as any).user;
+    if (me.role === "client") {
+      res.status(403).json({ error: "مهام المشروع غير متاحة في بوابة العميل" });
+      return;
+    }
+    const project = await ProjectModel.findById(req.params.id).select("manager team").lean() as any;
+    if (!project) {
+      res.status(404).json({ error: "المشروع غير موجود" });
+      return;
+    }
+    if (me.role === "employee" &&
+      String(project.manager) !== String(me._id) &&
+      !project.team.some((member: any) => String(member) === String(me._id))) {
+      res.status(403).json({ error: "هذا المشروع غير مسند إليك" });
+      return;
+    }
     const tasks = await TaskModel.find({ projectId: req.params.id })
       .populate("assignedTo", "fullName avatar")
       .populate("createdBy", "fullName avatar")
@@ -227,8 +355,20 @@ projectsRouter.get("/:id/tasks", requireAuth, async (req, res) => {
   }
 });
 
-projectsRouter.post("/:id/tasks", requireAuth, async (req, res) => {
+projectsRouter.post("/:id/tasks", requireAuth, requireRole("super_admin", "admin", "manager", "employee"), async (req, res) => {
   try {
+    const me = (req as any).user;
+    const project = await ProjectModel.findById(req.params.id).select("manager team").lean() as any;
+    if (!project) {
+      res.status(404).json({ error: "المشروع غير موجود" });
+      return;
+    }
+    if (me.role === "employee" &&
+      String(project.manager) !== String(me._id) &&
+      !project.team.some((member: any) => String(member) === String(me._id))) {
+      res.status(403).json({ error: "هذا المشروع غير مسند إليك" });
+      return;
+    }
     const task = await TaskModel.create({
       ...req.body,
       projectId: req.params.id,
@@ -251,9 +391,30 @@ projectsRouter.post("/:id/tasks", requireAuth, async (req, res) => {
   }
 });
 
-projectsRouter.patch("/tasks/:taskId", requireAuth, async (req, res) => {
+projectsRouter.patch("/tasks/:taskId", requireAuth, requireRole("super_admin", "admin", "manager", "employee"), async (req, res) => {
   try {
-    const updates: any = { ...req.body };
+    const me = (req as any).user;
+    const oldTask = await TaskModel.findById(req.params.taskId).select("projectId");
+    if (!oldTask) {
+      res.status(404).json({ error: "المهمة غير موجودة" });
+      return;
+    }
+    const project = await ProjectModel.findById(oldTask.projectId).select("manager team").lean() as any;
+    if (!project) {
+      res.status(404).json({ error: "المشروع غير موجود" });
+      return;
+    }
+    if (me.role === "employee" &&
+      String(project.manager) !== String(me._id) &&
+      !project.team.some((member: any) => String(member) === String(me._id))) {
+      res.status(403).json({ error: "هذا المشروع غير مسند إليك" });
+      return;
+    }
+    const allowedFields = ["title", "description", "assignedTo", "status", "priority", "dueDate", "tags"];
+    const updates: any = Object.fromEntries(
+      allowedFields.filter((field) => Object.prototype.hasOwnProperty.call(req.body, field))
+        .map((field) => [field, req.body[field]]),
+    );
     if (req.body.status === "done") updates.completedAt = new Date();
     const task = await TaskModel.findByIdAndUpdate(req.params.taskId, updates, { new: true })
       .populate("assignedTo", "fullName avatar").lean();

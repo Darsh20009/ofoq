@@ -626,9 +626,13 @@ cmsRouter.get("/settings", optionalAuth, async (req, res) => {
   }
 });
 
-cmsRouter.get("/admin/settings", requireAuth, requireRole("super_admin", "admin"), async (_req, res) => {
+cmsRouter.get("/admin/settings", requireAuth, requireRole("super_admin", "admin"), async (req, res) => {
   try {
-    const settings = await SystemSettingsModel.find().lean();
+    const group = typeof req.query.group === "string" ? req.query.group : "";
+    const groupFilter = group === "general"
+      ? { group: { $in: ["general", "contact"] } }
+      : group ? { group } : {};
+    const settings = await SystemSettingsModel.find(groupFilter).lean();
     const result: Record<string, any> = {};
     settings.forEach((s) => { result[s.key] = s.value; });
     res.json({ settings: result });

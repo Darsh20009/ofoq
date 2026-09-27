@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { Save, Globe, Mail, Bell, Shield, Palette } from "lucide-react";
+import { Save, Globe, Mail, Bell, Shield, Landmark } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { cmsApi } from "../../../api/client";
@@ -9,14 +9,22 @@ import { useLang } from "../../../i18n/LangContext";
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("general");
   const qc = useQueryClient();
-  const { ui } = useLang();
+  const { ui, lang } = useLang();
   const copy = ui.adminPages.adminPortal;
   const { register, handleSubmit, reset } = useForm();
+  const settingKeys: Record<string, string[]> = {
+    general: ["app_name", "app_description", "contact_email", "contact_phone", "contact_address", "app_url"],
+    email: ["email_from_name", "email_signature"],
+    notifications: ["notify_new_lead", "notify_project_update", "notify_invoice_paid", "notify_overdue_invoice", "notify_contact_request"],
+    security: ["session_timeout", "max_login_attempts", "require_2fa_admin"],
+    billing: ["company_bank_name", "company_bank_iban"],
+  };
   const tabs = [
     { id: "general", label: copy.generalTab, icon: Globe },
     { id: "email", label: copy.emailTab, icon: Mail },
     { id: "notifications", label: copy.notificationsTab, icon: Bell },
     { id: "security", label: copy.securityTab, icon: Shield },
+    { id: "billing", label: lang === "ar" ? "بيانات الفوترة" : "Billing", icon: Landmark },
   ];
 
   const { data } = useQuery({
@@ -25,15 +33,18 @@ export default function SettingsPage() {
   });
 
   useEffect(() => {
-    if (data?.data?.settings) {
+    if (data?.settings) {
       const vals: Record<string, string> = {};
-      data.data.settings.forEach((s: { key: string; value: string }) => { vals[s.key] = s.value; });
+      Object.entries(data.settings).forEach(([key, value]) => { vals[key] = value as string; });
       reset(vals);
     }
   }, [data, reset]);
 
   const saveMut = useMutation({
-    mutationFn: (d: object) => cmsApi.settings.update(d),
+    mutationFn: (d: Record<string, any>) => {
+      const settings = Object.fromEntries(settingKeys[activeTab].map((key) => [key, d[key] ?? ""]));
+      return cmsApi.settings.update({ settings, group: activeTab });
+    },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["settings"] }); toast.success(copy.saveChanges); },
   });
 
@@ -87,6 +98,25 @@ export default function SettingsPage() {
             <div>
               <label className="label">{copy.website}</label>
               <input {...register("app_url")} className="input-field" dir="ltr" placeholder="https://ofoq.sa" />
+            </div>
+          </div>
+        )}
+
+        {activeTab === "billing" && (
+          <div className="card space-y-4">
+            <h3 className="font-bold text-navy-700">{lang === "ar" ? "بيانات التحويل البنكي للمستندات" : "Bank details for documents"}</h3>
+            <p className="text-sm leading-6 text-gray-500">
+              {lang === "ar"
+                ? "تظهر هذه البيانات في نسخة الفاتورة أو عرض السعر عند اختيار التنزيل مع البيانات البنكية. لا تُدرج في النسخة الأخرى."
+                : "These details appear only in the with-bank PDF version of invoices and quotations."}
+            </p>
+            <div>
+              <label className="label">{lang === "ar" ? "اسم البنك" : "Bank name"}</label>
+              <input {...register("company_bank_name")} className="input-field" placeholder={lang === "ar" ? "أدخل اسم البنك" : "Enter bank name"} />
+            </div>
+            <div>
+              <label className="label">IBAN</label>
+              <input {...register("company_bank_iban")} className="input-field font-mono" dir="ltr" maxLength={34} placeholder="SA..." />
             </div>
           </div>
         )}
