@@ -2,7 +2,7 @@
 - [OFOQ Frontend Setup](ofoq-frontend.md) — React 18 + Vite + Tailwind; dev on port 3000, proxies /api to port 5000
 - [OFOQ Client Portal](ofoq-client-portal.md) — client portal built: /client/*, clientApi, ServiceRequest model, SupportMessage, email functions
 - [Rate limiter & dev proxy](rate-limiter-dev-proxy.md) — sitewide 429s in dev were the shared-IP rate limiter; skipped outside production
-- [GitHub push authentication](github-push-auth.md) — Git provider auth is separate from the GitHub connector; local commits remain ready when pushes fail
+- [GitHub push authentication](github-push-auth.md) — Git provider auth is separate; a secret-backed one-off helper can push when shell OAuth remains stale
 - [Development asset proxy](development-asset-proxy.md) — Vite must proxy root-level images, icons, favicon, manifest, and service worker to Express
 - [Localization architecture](localization-architecture.md) — shared UI copy drives language, direction, and portal authentication surfaces
 - [OAuth deployment routing](oauth-deployment-routing.md) — OAuth callbacks must use the deployed API origin, separate from the marketing APP_URL
