@@ -23,13 +23,13 @@
 #   GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET   only if Google login is enabled
 #   APPLE_CLIENT_ID / APPLE_TEAM_ID / APPLE_KEY_ID / APPLE_PRIVATE_KEY  only if Apple login is enabled
 #
-# PDF generation note: this app renders PDFs (invoices/contracts) with
-# Puppeteer. On Render's standard Linux runtime there is no system Chromium,
-# so the app automatically falls back to Puppeteer's own bundled Chromium
-# download (see server/services/pdf.service.ts). No extra Render
-# configuration is required, but the first deploy's `npm install` will take
-# a little longer while it downloads that browser (~170MB) and the instance
-# needs at least the Starter plan's memory to run Chromium reliably.
+# PDF generation note: Puppeteer's Chrome is explicitly installed during
+# postinstall into the project-local cache (see .puppeteerrc.cjs), which is
+# preserved between Render's build and runtime. The first build downloads
+# Chrome; a paid instance is recommended for sufficient browser memory.
+# Free Render web services block outbound SMTP traffic on 25/465/587.
+# If mail times out, confirm the actual service plan in Render's dashboard;
+# changing "plan" below does not upgrade an already-created manual service.
 
 services:
   - type: web
@@ -38,7 +38,7 @@ services:
     plan: starter
     region: oregon
     branch: main
-    buildCommand: npm ci && npm run build
+    buildCommand: npm ci && npm run install:browser && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
     autoDeploy: true

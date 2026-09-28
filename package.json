@@ -15,7 +15,8 @@
     "lint": "tsc --noEmit",
     "check:translations": "tsx scripts/check-translations.ts",
     "seed": "tsx server/seed.ts",
-    "postinstall": "if [ -n \"$RENDER\" ]; then npm run build; fi"
+    "install:browser": "puppeteer browsers install chrome && node -e \"const fs=require('node:fs');const browser=require('puppeteer').executablePath();if(!fs.existsSync(browser)){console.error('Chromium installation missing at '+browser);process.exit(1)}\"",
+    "postinstall": "if [ -n \"$RENDER\" ]; then npm run install:browser && npm run build; fi"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.10",
