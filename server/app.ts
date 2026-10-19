@@ -12,6 +12,7 @@ import passport from "./passport.js";
 import { loginLimiter, globalLimiter } from "./middleware/rateLimiter.js";
 import { registerRoutes } from "./routes/index.js";
 import { isDBConnected } from "./db.js";
+import { enforcePlatformMaintenance } from "./middleware/platformMaintenance.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -92,6 +93,23 @@ const SESSION_SECRET = (() => {
   }
   return s;
 })();
+// Keep the platform-owner login in its own cookie/store namespace so it cannot
+// regenerate or replace a regular OAuth/application session.
+app.use("/api/qirox-owner", session({
+  name: "qirox_owner.sid",
+  secret: `${SESSION_SECRET}:qirox-owner-v1`,
+  resave: false,
+  saveUninitialized: false,
+  store: MONGO_URI
+    ? MongoStore.create({ mongoUrl: MONGO_URI, collectionName: "qirox_owner_sessions", ttl: 4 * 60 * 60 })
+    : undefined,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 4 * 60 * 60 * 1000,
+  },
+}) as any);
 app.use(session({
   secret: SESSION_SECRET,
   resave: false,
@@ -106,6 +124,9 @@ app.use(session({
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   },
 }) as any);
+
+// Platform suspension is enforced before static files and all application routes.
+app.use(enforcePlatformMaintenance);
 
 // ── Passport (OAuth handshake only — JWTs are used for actual sessions) ──
 app.use(passport.initialize() as any);
@@ -147,6 +168,7 @@ app.use(
 // authenticated/data request from reaching Mongoose's buffering queue.
 app.use("/api", (req, res, next) => {
   if (req.path === "/health" || req.path === "/auth/status") return next();
+  if (req.path.startsWith("/qirox-owner")) return next();
   if (!isDBConnected()) {
     res.status(503).json({ error: "قاعدة البيانات غير متاحة حالياً. حاول مرة أخرى بعد قليل." });
     return;

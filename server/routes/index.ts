@@ -15,11 +15,15 @@ import { webauthnRouter } from "./webauthn.routes.js";
 import { employeeRouter } from "./employee.routes.js";
 import { clientRouter } from "./client.routes.js";
 import { newsletterRouter } from "./newsletter.routes.js";
+import { qiroxOwnerRouter } from "./qirox-owner.routes.js";
 import { isDBConnected } from "../db.js";
 import { requireAuth, requireRole } from "../auth.js";
 
 export function registerRoutes(app: Express): void {
   const API = "/api";
+
+  // Independent platform-owner console; it does not use the regular admin JWT.
+  app.use(`${API}/qirox-owner`, qiroxOwnerRouter);
 
   // ── Auth ──────────────────────────────────────────────────────
   app.use(`${API}/auth`, authRouter);

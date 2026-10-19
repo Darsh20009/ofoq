@@ -2,12 +2,23 @@ import { WebSocket, WebSocketServer } from "ws";
 import type { IncomingMessage } from "http";
 import type { Server } from "http";
 import jwt from "jsonwebtoken";
+import { getPlatformMaintenanceState } from "./middleware/platformMaintenance.js";
 
 const userSockets = new Map<string, Set<WebSocket>>();
+let activeWebSocketServer: WebSocketServer | null = null;
 
 // ── Setup ─────────────────────────────────────────────────────────
 export function initWebSocket(server: Server): WebSocketServer {
-  const wss = new WebSocketServer({ server, path: "/ws" });
+  const wss = new WebSocketServer({
+    server,
+    path: "/ws",
+    verifyClient: (info, done) => {
+      void getPlatformMaintenanceState()
+        .then((state) => done(!state.enabled, 503, "Website under maintenance"))
+        .catch(() => done(true));
+    },
+  });
+  activeWebSocketServer = wss;
 
   wss.on("connection", async (ws: WebSocket, req: IncomingMessage) => {
     let userId: string | null = null;
@@ -49,6 +60,16 @@ export function initWebSocket(server: Server): WebSocketServer {
 
   console.log("✅ WebSocket server ready on /ws");
   return wss;
+}
+
+export function closeAllSocketsForMaintenance(): void {
+  if (activeWebSocketServer) {
+    for (const socket of activeWebSocketServer.clients) {
+      if (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING) {
+        socket.close(1012, "Website under maintenance");
+      }
+    }
+  }
 }
 
 function handleWSMessage(userId: string | null, ws: WebSocket, msg: any) {

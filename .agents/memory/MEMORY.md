@@ -19,3 +19,4 @@
 - [Admin workspace styling](admin-workspace-styling.md) — admin and employee surfaces share a navy/gold workspace system scoped away from public and client portals.
 - [Replit configuration validation](replit-config-validation.md) — edit .replit through schema-validated replacement, not direct patches.
 - [Invoice reference fidelity](invoice-reference-fidelity.md) — invoice and quotation screenshots are exact print-layout references, not loose inspiration.
+- [Platform owner control](platform-owner-control.md) — owner controls need isolated auth; keep external sync health-only until a documented API contract exists.

@@ -63,6 +63,9 @@ import ServiceRequestDetailPage from "./pages/admin/service-requests/ServiceRequ
 import AdminSupportPage from "./pages/admin/support/AdminSupportPage";
 import EmployeeContactPage from "./pages/admin/EmployeeContactPage";
 import ServicesManagementPage from "./pages/admin/ServicesManagementPage";
+import QiroxStudioPage from "./pages/qiroxstudio/QiroxStudioPage";
+import PlatformMaintenancePage from "./pages/qiroxstudio/PlatformMaintenancePage";
+import { qiroxOwnerApi } from "./api/qiroxOwnerApi";
 
 // Page Transition Loader
 import PageLoader from "./components/PageLoader";
@@ -128,9 +131,34 @@ export default function App() {
   const location = useLocation();
   const { isEmployee } = useSubdomain();
   const [showLoader, setShowLoader] = useState(false);
+  const [platformStatus, setPlatformStatus] = useState<"checking" | "available" | "maintenance">("checking");
   const [loaderPath, setLoaderPath] = useState("");
   const prevPathRef = useRef(location.pathname);
   const navIdRef = useRef(0);
+
+  useEffect(() => {
+    if (location.pathname === "/qiroxstudio") {
+      setPlatformStatus("available");
+      return;
+    }
+    setPlatformStatus("checking");
+    let active = true;
+    const check = () => {
+      qiroxOwnerApi.publicStatus()
+        .then((status) => {
+          if (active) setPlatformStatus(status.enabled ? "maintenance" : "available");
+        })
+        .catch(() => {
+          if (active) setPlatformStatus("available");
+        });
+    };
+    check();
+    const timer = window.setInterval(check, 2500);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, [location.pathname]);
 
   useEffect(() => {
     if (location.pathname !== prevPathRef.current) {
@@ -150,6 +178,8 @@ export default function App() {
      مسارات مستقلة تماماً، بدون سايدبار الأدمن
   ════════════════════════════════════════════════════════════════ */
   if (isEmployee) {
+    if (platformStatus === "maintenance") return <PlatformMaintenancePage />;
+    if (platformStatus === "checking") return <main className="min-h-screen bg-[#f7f7f8]" aria-label="جاري التحقق من حالة الموقع" />;
     return (
       <>
         <AnimatePresence mode="wait">
@@ -208,6 +238,13 @@ export default function App() {
     );
   }
 
+  if (location.pathname !== "/qiroxstudio" && platformStatus === "maintenance") {
+    return <PlatformMaintenancePage />;
+  }
+  if (location.pathname !== "/qiroxstudio" && platformStatus === "checking") {
+    return <main className="min-h-screen bg-[#f7f7f8]" aria-label="جاري التحقق من حالة الموقع" />;
+  }
+
   /* ════════════════════════════════════════════════════════════════
      الموقع الرئيسي + لوحة الأدمن — ofoqhc.com
   ════════════════════════════════════════════════════════════════ */
@@ -223,6 +260,7 @@ export default function App() {
       </AnimatePresence>
 
       <Routes>
+        <Route path="/qiroxstudio" element={<QiroxStudioPage />} />
         {/* ── الموقع العام ─────────────────────────── */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
