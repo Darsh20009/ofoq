@@ -35,6 +35,7 @@ const STATUS_LABELS: Record<StaffStatus, string> = {
   pending: "بانتظار التفعيل",
 };
 const ROLE_LABELS: Record<OwnerUser["role"], string> = {
+  super_admin: "مدير المنصة",
   admin: "مدير",
   manager: "مشرف",
   employee: "موظف",
@@ -264,6 +265,7 @@ export default function QiroxStudioPage() {
     if (!overview) return [];
     return [
       { label: "المديرون", value: Object.values(overview.roles.admin || {}).reduce((sum, count) => sum + count, 0) },
+      { label: "مديرو المنصة", value: Object.values(overview.roles.super_admin || {}).reduce((sum, count) => sum + count, 0) },
       { label: "المشرفون", value: Object.values(overview.roles.manager || {}).reduce((sum, count) => sum + count, 0) },
       { label: "الموظفون", value: Object.values(overview.roles.employee || {}).reduce((sum, count) => sum + count, 0) },
     ];
@@ -364,7 +366,7 @@ export default function QiroxStudioPage() {
               </div>
               <div className="qo-filters">
                 <label className="qo-search"><Search size={16} /><input value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="ابحث بالاسم أو البريد" aria-label="بحث عن حساب" /><kbd>بحث</kbd></label>
-                <label className="qo-select-wrap"><SlidersHorizontal size={15} /><select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)} aria-label="تصفية حسب الدور"><option value="">كل الأدوار</option><option value="admin">مدير</option><option value="manager">مشرف</option><option value="employee">موظف</option></select></label>
+                <label className="qo-select-wrap"><SlidersHorizontal size={15} /><select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)} aria-label="تصفية حسب الدور"><option value="">كل الأدوار</option><option value="super_admin">مدير المنصة</option><option value="admin">مدير</option><option value="manager">مشرف</option><option value="employee">موظف</option></select></label>
                 <label className="qo-select-wrap"><select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} aria-label="تصفية حسب الحالة"><option value="">كل الحالات</option><option value="active">نشط</option><option value="inactive">غير نشط</option><option value="suspended">موقوف</option><option value="pending">بانتظار التفعيل</option></select></label>
               </div>
               {userError && <div className="qo-inline-error"><AlertCircle size={15} />{userError}<button type="button" onClick={() => void loadUsers(page, search, roleFilter, statusFilter)}>إعادة المحاولة</button></div>}

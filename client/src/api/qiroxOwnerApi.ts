@@ -1,4 +1,4 @@
-export type OwnerRole = "admin" | "manager" | "employee";
+export type OwnerRole = "super_admin" | "admin" | "manager" | "employee";
 export type StaffStatus = "active" | "inactive" | "suspended" | "pending";
 
 export interface OwnerUser {

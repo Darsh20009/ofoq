@@ -8,7 +8,7 @@ import { closeAllSocketsForMaintenance } from "../ws.js";
 
 export const qiroxOwnerRouter = Router();
 
-const staffRoles = ["admin", "manager", "employee"] as const;
+const staffRoles = ["super_admin", "admin", "manager", "employee"] as const;
 const defaultMaintenance = {
   enabled: false,
   messageAr: "الموقع موقوف مؤقتاً لانتهاء الاشتراك أو لعدم سداد الرسوم. يرجى التواصل مع الإدارة.",
