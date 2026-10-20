@@ -89,7 +89,13 @@ qiroxOwnerRouter.get("/session", (req: any, res) => {
 
 qiroxOwnerRouter.post("/login", loginLimiter, requireCsrf, async (req: any, res) => {
   const configuredPassword = process.env.QIROXSTUDIO_OWNER_PASSWORD;
-  if (!configuredPassword || configuredPassword.length < 20) {
+  if (!configuredPassword) {
+    console.error("[qirox-owner] owner password secret is unavailable to the server process");
+    res.status(503).json({ error: "تعذر إعداد تسجيل دخول المالك. تحقق من إعدادات أسرار المشروع." });
+    return;
+  }
+  if (configuredPassword.length < 20) {
+    console.error("[qirox-owner] owner password secret is shorter than the 20-character minimum");
     res.status(503).json({ error: "لم يتم إعداد كلمة مرور مالك المنصة الآمنة في أسرار المشروع." });
     return;
   }
