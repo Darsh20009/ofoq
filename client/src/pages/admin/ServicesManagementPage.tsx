@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit2, Eye, EyeOff, Layers3, Plus, Star, Trash2, X } from "lucide-react";
+import { Edit2, Eye, EyeOff, FileText, Layers3, Plus, Star, Trash2, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { servicesApi } from "../../api/client";
 import { useAuthStore } from "../../store/authStore";
@@ -156,6 +157,14 @@ export default function ServicesManagementPage() {
                 <p className="mt-1 text-xs text-gray-400">{isArabic ? service.categoryAr : service.category} · /{service.slug}</p>
               </div>
               <div className="flex gap-1 self-end sm:self-auto">
+                <Link
+                  to={`/admin/contracts?serviceId=${encodeURIComponent(service._id)}`}
+                  className="btn-ghost px-3 text-ofoq-green"
+                  aria-label={isArabic ? `إنشاء اتفاقية ${service.titleAr || service.title}` : `Create agreement for ${service.title}`}
+                  title={isArabic ? "إنشاء اتفاقية لهذه الخدمة" : "Create an agreement for this service"}
+                >
+                  <FileText size={16} /> <span className="hidden xl:inline">{isArabic ? "إنشاء اتفاقية" : "Create agreement"}</span>
+                </Link>
                 <button onClick={() => startEdit(service)} className="btn-ghost px-3"><Edit2 size={16} /> <span className="hidden sm:inline">{text.edit}</span></button>
                 {canDelete && service.isActive && (
                   <button onClick={() => { if (confirm(isArabic ? "إخفاء هذه الخدمة من الموقع؟" : "Hide this service from the website?")) deleteMutation.mutate(service._id); }} className="btn-ghost px-3 text-red-600" aria-label={text.hidden}><Trash2 size={16} /></button>

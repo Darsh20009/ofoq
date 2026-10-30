@@ -12,19 +12,20 @@ interface Props {
  * - Small diagonal cursor element on the Q
  */
 export default function OfoqLogo({ className = "w-28 h-20", dark = false }: Props) {
-  const mark = dark ? "#2B273F" : "#FFFFFF";
+  const mark = dark ? "#071936" : "#FFFFFF";
   const red = "#C13229";
 
   return (
     <svg
       className={className}
-      viewBox="0 0 210 148"
+      viewBox="0 0 150 148"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-label="OFOQ لحلول الأعمال"
       focusable="false"
     >
+      <g transform="scale(1.1 1)">
       {/* ── Big O: tall portrait rounded rectangle ─────── */}
       <rect x="6" y="5" width="58" height="90" rx="11" stroke={mark} strokeWidth="9" fill="none" />
 
@@ -52,6 +53,7 @@ export default function OfoqLogo({ className = "w-28 h-20", dark = false }: Prop
         fill={red}
         transform="rotate(-45 119.25 140)"
       />
+      </g>
     </svg>
   );
 }

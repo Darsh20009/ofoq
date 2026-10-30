@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useLang } from "../../i18n/LangContext";
 import { useQuery } from "@tanstack/react-query";
+import { motion, useReducedMotion } from "framer-motion";
 import { cmsApi } from "../../api/client";
 import type { Country } from "../../types";
 import InteractiveWorldMap from "../../components/InteractiveWorldMap";
@@ -11,6 +12,7 @@ const FLAGS = ["🇵🇰", "🇮🇳", "🇯🇴", "🇱🇰", "🇪🇬", "🇵
 
 export default function CountriesPage() {
   const { ui, dir, lang } = useLang();
+  const reduceMotion = useReducedMotion();
   const { data } = useQuery({
     queryKey: ["public-countries"],
     queryFn: () => cmsApi.countries.list().then((response) => response.data),
@@ -50,7 +52,12 @@ export default function CountriesPage() {
             <span>/</span>
             <span>{ui.countries.badge}</span>
           </div>
-          <div className="mt-10 max-w-3xl">
+          <motion.div
+            className="mt-10 max-w-3xl"
+            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+            animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, ease: "easeOut" }}
+          >
             <p className="text-xs font-bold text-[#1F6B55]">{ui.countries.sectionEyebrow}</p>
             <h1 className="mt-4 text-4xl font-black text-[#17251F] sm:text-5xl">
               {ui.countries.badge}
@@ -58,7 +65,7 @@ export default function CountriesPage() {
             <p className="mt-4 max-w-2xl text-base leading-8 text-[#68716B]">
               {ui.countries.heroSub}
             </p>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -85,13 +92,26 @@ export default function CountriesPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {ui.countries.steps.map((step, i) => (
-              <div key={i} className="rounded-2xl border border-[#D9D2C5] bg-[#F4F0E8] p-7 text-center">
-                <span className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-[#1F6B55]/35 text-lg font-black text-[#1F6B55]">
+              <motion.div
+                key={i}
+                initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+                whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.25 }}
+                transition={{ duration: 0.42, delay: reduceMotion ? 0 : i * 0.07, ease: "easeOut" }}
+                className="rounded-2xl border border-[#D9D2C5] bg-[#F4F0E8] p-7 text-center"
+              >
+                <motion.span
+                  initial={reduceMotion ? false : { scale: 0.85 }}
+                  whileInView={reduceMotion ? undefined : { scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.35, delay: reduceMotion ? 0 : i * 0.07 + 0.08 }}
+                  className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-[#1F6B55]/35 text-lg font-black text-[#1F6B55]"
+                >
                   {i + 1}
-                </span>
+                </motion.span>
                 <h4 className="mb-3 text-sm font-black text-[#17251F]">{step.title}</h4>
                 <p className="text-xs leading-relaxed text-[#68716B]">{step.desc}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

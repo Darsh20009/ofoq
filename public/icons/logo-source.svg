@@ -1,5 +1,5 @@
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='none'>
-  <rect width='512' height='512' rx='112' fill='#2B273F'/>
+  <rect width='512' height='512' rx='112' fill='#071936'/>
   <rect x='40' y='56' width='148' height='228' rx='28' stroke='white' stroke-width='22' fill='none'/>
   <line x1='220' y1='62'  x2='220' y2='278' stroke='#C13229' stroke-width='28' stroke-linecap='square'/>
   <line x1='220' y1='62'  x2='400' y2='62'  stroke='#C13229' stroke-width='28' stroke-linecap='square'/>

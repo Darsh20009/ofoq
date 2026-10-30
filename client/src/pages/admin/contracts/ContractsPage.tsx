@@ -6,9 +6,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { arSA } from "date-fns/locale";
-import { contractsApi, crmApi } from "../../../api/client";
+import { useSearchParams } from "react-router-dom";
+import { contractsApi, crmApi, servicesApi } from "../../../api/client";
 import { useLang } from "../../../i18n/LangContext";
 import CustomerQuickCreate from "../../../components/admin/CustomerQuickCreate";
+import CurrencySuffix from "../../../components/CurrencySuffix";
 
 async function downloadContractPdf(id: string, number: string) {
   const token = localStorage.getItem("ofoq_token");
@@ -26,6 +28,7 @@ async function downloadContractPdf(id: string, number: string) {
 interface ContractForm {
   title: string;
   customerId: string;
+  serviceId: string;
   value: number;
   currency: string;
   startDate: string;
@@ -45,7 +48,6 @@ interface ApprovalField {
 }
 
 const CONTRACT_DRAFT_KEY = "ofoq_contract_editor_draft";
-
 export default function ContractsPage() {
   const { ui, lang, dir } = useLang();
   const copy = ui.adminPages.contracts;
@@ -56,6 +58,8 @@ export default function ContractsPage() {
     cancelled: { label: copy.cancelled, color: "badge-gray" },
   };
   const qc = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const preselectedServiceId = searchParams.get("serviceId") || "";
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -79,6 +83,10 @@ export default function ContractsPage() {
   const { data: customersData } = useQuery({
     queryKey: ["customers-mini"],
     queryFn: () => crmApi.customers.list({ limit: 200 }).then((r) => r.data),
+  });
+  const { data: servicesData } = useQuery({
+    queryKey: ["contract-service-options"],
+    queryFn: () => servicesApi.list({ all: true }).then((r) => r.data),
   });
 
   const createMut = useMutation({
@@ -131,6 +139,7 @@ export default function ContractsPage() {
 
   const contracts: any[] = data?.data?.contracts || data?.contracts || [];
   const customers: any[] = customersData?.data?.customers || customersData?.customers || [];
+  const services: any[] = servicesData?.services || [];
 
   const stats = {
     total: contracts.length,
@@ -144,13 +153,13 @@ export default function ContractsPage() {
     setEditing(null);
     const saved = readDraftLocally();
     if (saved && !saved.editingId) {
-      reset(saved.form);
+      reset({ ...saved.form, serviceId: saved.form?.serviceId || preselectedServiceId });
       setSections(saved.sections);
       setApprovalFields(saved.approvalFields);
       setDraftSaved(true);
       toast.success(isArabic ? "تم استرجاع المسودة المحفوظة" : "Saved draft restored");
     } else {
-      reset({ currency: "SAR" });
+      reset({ currency: "SAR", serviceId: preselectedServiceId });
       setSections([{ title: isArabic ? "نطاق الخدمات" : "Scope of services", content: "" }]);
       setApprovalFields([
         { type: "signature", label: isArabic ? "توقيع الطرف الأول (أفق)" : "First party signature (OFOQ)", party: "company", required: true },
@@ -174,6 +183,7 @@ export default function ContractsPage() {
       reset({
         title: c.title,
         customerId: c.customerId?._id || c.customerId,
+        serviceId: c.serviceId?._id || c.serviceId || "",
         value: c.value,
         currency: c.currency || "SAR",
         startDate: c.startDate ? c.startDate.slice(0, 10) : "",
@@ -250,6 +260,7 @@ export default function ContractsPage() {
     editing?._id,
     watchedForm.title,
     watchedForm.customerId,
+    watchedForm.serviceId,
     watchedForm.value,
     watchedForm.currency,
     watchedForm.startDate,
@@ -304,8 +315,8 @@ export default function ContractsPage() {
            <h1 className="page-title">{copy.title}</h1>
            <p className="page-subtitle">{contracts.length} {copy.count}</p>
         </div>
-        <button onClick={openCreate} className="btn-primary">
-           <Plus size={16} /> {copy.new}
+           <button onClick={openCreate} className="btn-primary">
+            <Plus size={16} /> {preselectedServiceId && !editing ? (isArabic ? "إنشاء اتفاقية للخدمة" : "Create service agreement") : copy.new}
         </button>
       </div>
 
@@ -315,7 +326,7 @@ export default function ContractsPage() {
            { label: copy.total, value: stats.total, icon: FileText, color: "bg-blue-500" },
            { label: copy.drafts, value: stats.draft, icon: FileSignature, color: "bg-amber-500" },
            { label: copy.signed, value: stats.signed, icon: CheckSquare, color: "bg-ofoq-green" },
-           { label: copy.totalValue, value: `${stats.totalValue.toLocaleString(lang)} ${lang === "id" ? "SAR" : "ر.س"}`, icon: FileText, color: "bg-navy-600" },
+            { label: copy.totalValue, value: <>{stats.totalValue.toLocaleString(lang)} <CurrencySuffix /></>, icon: FileText, color: "bg-navy-600" },
         ].map((s) => (
           <div key={s.label} className="card flex items-center gap-3">
             <div className={`stat-icon ${s.color}`}><s.icon size={18} className="text-white" /></div>
@@ -371,10 +382,15 @@ export default function ContractsPage() {
                     <motion.tr key={c._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.03 }} className="group">
                       <td className="font-mono text-sm font-semibold text-navy-700">{c.contractNumber}</td>
-                      <td className="max-w-40 truncate">{c.title}</td>
+                       <td className="max-w-48">
+                         <div className="truncate">{c.title}</div>
+                         {(c.serviceId?.titleAr || c.serviceId?.title) && (
+                           <div className="mt-1 truncate text-xs text-gray-400">{isArabic ? c.serviceId.titleAr || c.serviceId.title : c.serviceId.title || c.serviceId.titleAr}</div>
+                         )}
+                       </td>
                       <td>{c.customerId?.name || c.customerId?.companyName || "—"}</td>
                       <td className="font-semibold">
-                         {c.value ? `${c.value.toLocaleString(lang)} ${c.currency || "SAR"}` : "—"}
+                          {c.value ? <>{c.value.toLocaleString(lang)} <CurrencySuffix currency={c.currency || "SAR"} /></> : "—"}
                       </td>
                       <td>
                         {c.endDate
@@ -486,6 +502,33 @@ export default function ContractsPage() {
                    )}
                 </div>
 
+                 {/* Linked service */}
+                 <div>
+                   <label className="label">{isArabic ? "الخدمة المرتبطة بالاتفاقية" : "Service linked to agreement"}</label>
+                   <select
+                     {...register("serviceId", {
+                       onChange: (event) => {
+                         const service = services.find((entry) => entry._id === event.target.value);
+                         if (!service) return;
+                         if (!watchedForm.title?.trim()) {
+                           setValue("title", isArabic ? `اتفاقية ${service.titleAr || service.title}` : `${service.title || service.titleAr} agreement`, { shouldDirty: true });
+                         }
+                         if (!Number(watchedForm.value || 0) && Number(service.basePrice) > 0) {
+                           setValue("value", Number(service.basePrice), { shouldDirty: true });
+                         }
+                       },
+                     })}
+                     className="input-field"
+                   >
+                     <option value="">{isArabic ? "بدون خدمة مرتبطة" : "No linked service"}</option>
+                     {services.map((service) => (
+                       <option key={service._id} value={service._id}>
+                         {isArabic ? service.titleAr || service.title : service.title || service.titleAr}
+                       </option>
+                     ))}
+                   </select>
+                 </div>
+
                 {/* Value + Currency */}
                 <div className="grid grid-cols-3 gap-3">
                   <div className="col-span-2">
@@ -496,7 +539,7 @@ export default function ContractsPage() {
                   <div>
                      <label className="label">{copy.currency}</label>
                     <select {...register("currency")} className="input-field">
-                      <option value="SAR">ر.س</option>
+                       <option value="SAR">⃁ SAR</option>
                       <option value="USD">USD</option>
                       <option value="AED">AED</option>
                     </select>

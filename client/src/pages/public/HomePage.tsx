@@ -1,12 +1,10 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { X } from "lucide-react";
 import { useLang } from "../../i18n/LangContext";
 import type { Lang } from "../../i18n/LangContext";
 import { cmsApi } from "../../api/client";
-import OfoqLogo from "../../components/OfoqLogo";
 import type { Partner } from "../../types";
 
 type Service = {
@@ -50,12 +48,6 @@ type HomePageCopy = {
   partnersLoading: string;
   partnersFallback: string;
   partnersEmpty: string;
-  viewPartnerDetails: (name: string) => string;
-  close: string;
-  closePartnerDetails: string;
-  partnershipsEyebrow: string;
-  partnership: string;
-  delivered: string;
 };
 
 const homePageCopy: Record<Lang, HomePageCopy> = {
@@ -63,43 +55,43 @@ const homePageCopy: Record<Lang, HomePageCopy> = {
     stats: ["نسبة رضا العملاء", "معاملة مكتملة", "عميل وثق بنا", "سنوات من الخبرة"], servicesEyebrow: "خدمات أفق", learnMore: "اعرف أكثر ←", nextServices: "الخدمات التالية",
     portalEyebrow: "بوابة أفق الذكية", portalTitle: "لإدارة أعمالك بسهولة", portalDescription: "منصة رقمية متكاملة تمنحك رؤية واضحة وتحكمًا كاملًا في خدماتك ومعاملاتك.", portalFeatures: ["متابعة الطلبات والمعاملات أولًا بأول", "مستنداتك وفواتيرك في مكان واحد", "تقارير ذكية تساعدك على اتخاذ القرار"], openPortal: "الدخول إلى البوابة", portalImageAlt: "لوحة بوابة أفق الذكية",
     joinEyebrow: "كن جزءًا من أفق", joinTitle: "شريكك في رحلة النمو", joinDescription: "انضم إلى أكثر من 1,250 عميلًا يثقون بأفق لإدارة أعمالهم بثقة ووضوح.", joinCta: "ابدأ معنا الآن",
-    partnersTitle: "شركاؤنا", partnersHint: "اضغط على الشعار للتعرّف على تفاصيل الشراكة", partnersLoading: "جارٍ تحديث الشركاء...", partnersFallback: "نعرض البيانات المحفوظة", partnersEmpty: "سيتم عرض الشركاء هنا قريبًا.", viewPartnerDetails: (name) => `عرض تفاصيل ${name}`, close: "إغلاق", closePartnerDetails: "إغلاق نافذة الشريك", partnershipsEyebrow: "شراكات أفق", partnership: "طبيعة الشراكة", delivered: "ما قدمته أفق",
+    partnersTitle: "شركاؤنا", partnersHint: "شركاء نعتز بالتعاون معهم", partnersLoading: "جارٍ تحديث الشركاء...", partnersFallback: "نعرض البيانات المحفوظة", partnersEmpty: "سيتم عرض الشركاء هنا قريبًا.",
   },
   en: {
     stats: ["Client satisfaction", "Completed transactions", "Trusted clients", "Years of experience"], servicesEyebrow: "OFOQ SERVICES", learnMore: "Learn more →", nextServices: "Next services",
     portalEyebrow: "OFOQ SMART PORTAL", portalTitle: "Manage your business with ease", portalDescription: "An integrated digital platform giving you complete visibility and control over your services and transactions.", portalFeatures: ["Track requests and transactions in real time", "Keep documents and invoices in one place", "Smart reports to help you decide"], openPortal: "Open the portal", portalImageAlt: "OFOQ smart portal dashboard",
     joinEyebrow: "BE PART OF OFOQ", joinTitle: "Your partner for the growth journey", joinDescription: "Join more than 1,250 clients who trust OFOQ to manage their business with confidence and clarity.", joinCta: "Start with us",
-    partnersTitle: "Our partners", partnersHint: "Select a logo to explore our partnership", partnersLoading: "Updating partners...", partnersFallback: "Showing saved partners", partnersEmpty: "Partners will appear here soon.", viewPartnerDetails: (name) => `View ${name} details`, close: "Close", closePartnerDetails: "Close partner details", partnershipsEyebrow: "OFOQ PARTNERSHIPS", partnership: "The partnership", delivered: "What OFOQ delivered",
+    partnersTitle: "Our partners", partnersHint: "Organizations we are proud to work with", partnersLoading: "Updating partners...", partnersFallback: "Showing saved partners", partnersEmpty: "Partners will appear here soon.",
   },
   ur: {
     stats: ["صارفین کا اطمینان", "مکمل شدہ معاملات", "قابلِ اعتماد کلائنٹس", "سالوں کا تجربہ"], servicesEyebrow: "اُفق خدمات", learnMore: "مزید جانیں ←", nextServices: "اگلی خدمات",
     portalEyebrow: "اُفق اسمارٹ پورٹل", portalTitle: "اپنے کاروبار کو آسانی سے منظم کریں", portalDescription: "ایک مربوط ڈیجیٹل پلیٹ فارم جو آپ کو اپنی خدمات اور معاملات پر مکمل بصیرت اور کنٹرول دیتا ہے۔", portalFeatures: ["درخواستوں اور معاملات کو بروقت ٹریک کریں", "دستاویزات اور انوائس ایک جگہ رکھیں", "بہتر فیصلوں کے لیے اسمارٹ رپورٹس"], openPortal: "پورٹل کھولیں", portalImageAlt: "اُفق اسمارٹ پورٹل ڈیش بورڈ",
     joinEyebrow: "اُفق کا حصہ بنیں", joinTitle: "ترقی کے سفر میں آپ کے ساتھی", joinDescription: "1,250 سے زیادہ کلائنٹس میں شامل ہوں جو اعتماد اور وضاحت کے ساتھ کاروبار چلانے کے لیے اُفق پر بھروسا کرتے ہیں۔", joinCta: "آج ہی شروع کریں",
-    partnersTitle: "ہمارے شراکت دار", partnersHint: "شراکت کی تفصیلات دیکھنے کے لیے لوگو منتخب کریں", partnersLoading: "شراکت دار اپ ڈیٹ ہو رہے ہیں...", partnersFallback: "محفوظ شدہ شراکت دار دکھائے جا رہے ہیں", partnersEmpty: "شراکت دار جلد یہاں دکھائی دیں گے۔", viewPartnerDetails: (name) => `${name} کی تفصیلات دیکھیں`, close: "بند کریں", closePartnerDetails: "شراکت دار کی تفصیلات بند کریں", partnershipsEyebrow: "اُفق شراکت داریاں", partnership: "شراکت داری", delivered: "اُفق نے کیا فراہم کیا",
+    partnersTitle: "ہمارے شراکت دار", partnersHint: "وہ ادارے جن کے ساتھ ہمیں کام کرنے پر فخر ہے", partnersLoading: "شراکت دار اپ ڈیٹ ہو رہے ہیں...", partnersFallback: "محفوظ شدہ شراکت دار دکھائے جا رہے ہیں", partnersEmpty: "شراکت دار جلد یہاں دکھائی دیں گے۔",
   },
   hi: {
     stats: ["ग्राहक संतुष्टि", "पूर्ण लेनदेन", "विश्वसनीय ग्राहक", "वर्षों का अनुभव"], servicesEyebrow: "OFOQ सेवाएँ", learnMore: "और जानें →", nextServices: "अगली सेवाएँ",
     portalEyebrow: "OFOQ स्मार्ट पोर्टल", portalTitle: "अपने व्यवसाय को आसानी से प्रबंधित करें", portalDescription: "एक एकीकृत डिजिटल प्लेटफ़ॉर्म जो आपकी सेवाओं और लेनदेन पर पूरी दृश्यता और नियंत्रण देता है।", portalFeatures: ["अनुरोधों और लेनदेन को रियल टाइम में ट्रैक करें", "दस्तावेज़ और इनवॉइस एक जगह रखें", "निर्णय में मदद करने वाली स्मार्ट रिपोर्ट"], openPortal: "पोर्टल खोलें", portalImageAlt: "OFOQ स्मार्ट पोर्टल डैशबोर्ड",
     joinEyebrow: "OFOQ का हिस्सा बनें", joinTitle: "विकास की यात्रा में आपका साथी", joinDescription: "1,250 से अधिक ग्राहकों से जुड़ें जो अपने व्यवसाय को भरोसे और स्पष्टता के साथ प्रबंधित करने के लिए OFOQ पर विश्वास करते हैं।", joinCta: "हमारे साथ शुरू करें",
-    partnersTitle: "हमारे साझेदार", partnersHint: "हमारी साझेदारी देखने के लिए लोगो चुनें", partnersLoading: "साझेदार अपडेट हो रहे हैं...", partnersFallback: "सहेजे गए साझेदार दिखाए जा रहे हैं", partnersEmpty: "साझेदार जल्द ही यहाँ दिखाई देंगे।", viewPartnerDetails: (name) => `${name} का विवरण देखें`, close: "बंद करें", closePartnerDetails: "साझेदार का विवरण बंद करें", partnershipsEyebrow: "OFOQ साझेदारियाँ", partnership: "साझेदारी", delivered: "OFOQ ने क्या प्रदान किया",
+    partnersTitle: "हमारे साझेदार", partnersHint: "वे संस्थाएँ जिनके साथ काम करके हमें गर्व है", partnersLoading: "साझेदार अपडेट हो रहे हैं...", partnersFallback: "सहेजे गए साझेदार दिखाए जा रहे हैं", partnersEmpty: "साझेदार जल्द ही यहाँ दिखाई देंगे।",
   },
   id: {
     stats: ["Kepuasan klien", "Transaksi selesai", "Klien tepercaya", "Tahun pengalaman"], servicesEyebrow: "LAYANAN OFOQ", learnMore: "Pelajari lebih lanjut →", nextServices: "Layanan berikutnya",
     portalEyebrow: "PORTAL CERDAS OFOQ", portalTitle: "Kelola bisnis Anda dengan mudah", portalDescription: "Platform digital terpadu yang memberi Anda visibilitas dan kendali penuh atas layanan serta transaksi Anda.", portalFeatures: ["Lacak permintaan dan transaksi secara real time", "Simpan dokumen dan faktur di satu tempat", "Laporan cerdas untuk membantu pengambilan keputusan"], openPortal: "Buka portal", portalImageAlt: "Dasbor portal cerdas OFOQ",
     joinEyebrow: "JADI BAGIAN DARI OFOQ", joinTitle: "Mitra Anda dalam perjalanan pertumbuhan", joinDescription: "Bergabunglah dengan lebih dari 1.250 klien yang mempercayai OFOQ untuk mengelola bisnis mereka dengan yakin dan jelas.", joinCta: "Mulai bersama kami",
-    partnersTitle: "Mitra kami", partnersHint: "Pilih logo untuk menjelajahi kemitraan kami", partnersLoading: "Memperbarui mitra...", partnersFallback: "Menampilkan mitra tersimpan", partnersEmpty: "Mitra akan segera tampil di sini.", viewPartnerDetails: (name) => `Lihat detail ${name}`, close: "Tutup", closePartnerDetails: "Tutup detail mitra", partnershipsEyebrow: "KEMITRAAN OFOQ", partnership: "Kemitraan", delivered: "Yang OFOQ berikan",
+    partnersTitle: "Mitra kami", partnersHint: "Organisasi yang bangga kami ajak bekerja sama", partnersLoading: "Memperbarui mitra...", partnersFallback: "Menampilkan mitra tersimpan", partnersEmpty: "Mitra akan segera tampil di sini.",
   },
   de: {
     stats: ["Kundenzufriedenheit", "Abgeschlossene Vorgänge", "Vertrauensvolle Kunden", "Jahre Erfahrung"], servicesEyebrow: "OFOQ-LEISTUNGEN", learnMore: "Mehr erfahren →", nextServices: "Nächste Leistungen",
     portalEyebrow: "OFOQ SMART-PORTAL", portalTitle: "Verwalten Sie Ihr Unternehmen mühelos", portalDescription: "Eine integrierte digitale Plattform, die Ihnen vollständige Transparenz und Kontrolle über Ihre Leistungen und Vorgänge gibt.", portalFeatures: ["Anfragen und Vorgänge in Echtzeit verfolgen", "Dokumente und Rechnungen an einem Ort verwalten", "Intelligente Berichte für Ihre Entscheidungen"], openPortal: "Portal öffnen", portalImageAlt: "OFOQ Smart-Portal-Dashboard",
     joinEyebrow: "WERDEN SIE TEIL VON OFOQ", joinTitle: "Ihr Partner auf dem Wachstumskurs", joinDescription: "Schließen Sie sich mehr als 1.250 Kunden an, die OFOQ bei der klaren und sicheren Verwaltung ihres Unternehmens vertrauen.", joinCta: "Mit uns starten",
-    partnersTitle: "Unsere Partner", partnersHint: "Wählen Sie ein Logo, um unsere Partnerschaft zu entdecken", partnersLoading: "Partner werden aktualisiert...", partnersFallback: "Gespeicherte Partner werden angezeigt", partnersEmpty: "Partner werden bald hier angezeigt.", viewPartnerDetails: (name) => `Details zu ${name} anzeigen`, close: "Schließen", closePartnerDetails: "Partnerdetails schließen", partnershipsEyebrow: "OFOQ-PARTNERSCHAFTEN", partnership: "Die Partnerschaft", delivered: "Was OFOQ geleistet hat",
+    partnersTitle: "Unsere Partner", partnersHint: "Organisationen, mit denen wir gerne zusammenarbeiten", partnersLoading: "Partner werden aktualisiert...", partnersFallback: "Gespeicherte Partner werden angezeigt", partnersEmpty: "Partner werden bald hier angezeigt.",
   },
   es: {
     stats: ["Satisfacción del cliente", "Transacciones completadas", "Clientes de confianza", "Años de experiencia"], servicesEyebrow: "SERVICIOS OFOQ", learnMore: "Saber más →", nextServices: "Siguientes servicios",
     portalEyebrow: "PORTAL INTELIGENTE OFOQ", portalTitle: "Gestione su negocio con facilidad", portalDescription: "Una plataforma digital integrada que le brinda visibilidad y control total sobre sus servicios y transacciones.", portalFeatures: ["Siga solicitudes y transacciones en tiempo real", "Guarde documentos y facturas en un solo lugar", "Informes inteligentes para ayudarle a decidir"], openPortal: "Abrir el portal", portalImageAlt: "Panel del portal inteligente OFOQ",
     joinEyebrow: "SEA PARTE DE OFOQ", joinTitle: "Su aliado en el camino del crecimiento", joinDescription: "Únase a más de 1.250 clientes que confían en OFOQ para gestionar su negocio con confianza y claridad.", joinCta: "Empiece con nosotros",
-    partnersTitle: "Nuestros socios", partnersHint: "Seleccione un logotipo para conocer nuestra alianza", partnersLoading: "Actualizando socios...", partnersFallback: "Mostrando socios guardados", partnersEmpty: "Los socios aparecerán aquí pronto.", viewPartnerDetails: (name) => `Ver detalles de ${name}`, close: "Cerrar", closePartnerDetails: "Cerrar detalles del socio", partnershipsEyebrow: "ALIANZAS OFOQ", partnership: "La alianza", delivered: "Lo que OFOQ entregó",
+    partnersTitle: "Nuestros socios", partnersHint: "Organizaciones con las que nos enorgullece colaborar", partnersLoading: "Actualizando socios...", partnersFallback: "Mostrando socios guardados", partnersEmpty: "Los socios aparecerán aquí pronto.",
   },
 };
 
@@ -307,9 +299,7 @@ const fallbackPartners: Partner[] = [
 }));
 
 function PartnersSection({ dir, useArabicContent, copy }: { dir: "rtl" | "ltr"; useArabicContent: boolean; copy: HomePageCopy }) {
-  const [selected, setSelected] = useState<Partner | null>(null);
   const [motionPaused, setMotionPaused] = useState(false);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const { data, isError, isLoading } = useQuery({
     queryKey: ["public-partners"],
     queryFn: () => cmsApi.partners.list().then((response) => response.data),
@@ -323,27 +313,6 @@ function PartnersSection({ dir, useArabicContent, copy }: { dir: "rtl" | "ltr"; 
       : fallbackPartners;
   const partnerName = (partner: Partner) =>
     useArabicContent ? (partner.nameAr || partner.nameEn) : (partner.nameEn || partner.nameAr);
-  const partnerDescription = (partner: Partner) =>
-    useArabicContent ? (partner.descriptionAr || partner.descriptionEn) : (partner.descriptionEn || partner.descriptionAr);
-  const partnerPartnership = (partner: Partner) =>
-    useArabicContent ? (partner.partnershipAr || partner.partnershipEn) : (partner.partnershipEn || partner.partnershipAr);
-  const partnerServices = (partner: Partner) =>
-    useArabicContent ? (partner.servicesAr || partner.servicesEn) : (partner.servicesEn || partner.servicesAr);
-  useEffect(() => {
-    if (!selected) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus();
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setSelected(null);
-    };
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [selected]);
-
   return (
     <section className="bg-[#071936] px-5 pb-12 pt-3 sm:px-10 sm:pb-16 sm:pt-5 lg:px-16" dir={dir}>
       <div className="mx-auto max-w-[1380px] text-white">
@@ -379,21 +348,18 @@ function PartnersSection({ dir, useArabicContent, copy }: { dir: "rtl" | "ltr"; 
                   {[0, 1].map((copyIndex) => (
                     <div key={copyIndex} className="partners-tide-copy flex shrink-0 items-center gap-3 px-5 sm:gap-8 sm:px-10" aria-hidden={copyIndex === 1}>
                       {lane.items.map((partner) => (
-                        <button
+                        <div
                           key={`${lane.direction}-${copyIndex}-${partner._id}`}
-                          type="button"
-                          tabIndex={copyIndex === 1 ? -1 : 0}
-                          onClick={() => setSelected(partner)}
-                          className="group relative flex h-16 w-28 shrink-0 items-center justify-center rounded-md focus:outline-none focus-visible:z-10 focus-visible:ring-1 focus-visible:ring-[#C5B278] sm:h-20 sm:w-40"
-                          aria-label={copy.viewPartnerDetails(partnerName(partner))}
+                          className="relative flex h-16 w-28 shrink-0 items-center justify-center rounded-md sm:h-20 sm:w-40"
+                          aria-hidden={copyIndex === 1}
                         >
                           <img
                             src={partner.logo}
-                            alt=""
+                            alt={copyIndex === 1 ? "" : partnerName(partner)}
                             loading="lazy"
-                             className="h-10 w-full max-w-[104px] object-contain opacity-90 transition-all duration-300 group-hover:scale-[1.04] group-hover:opacity-100 group-focus-visible:scale-[1.04] group-focus-visible:opacity-100 sm:h-12 sm:max-w-[138px]"
+                            className="h-10 w-full max-w-[104px] object-contain opacity-90 sm:h-12 sm:max-w-[138px]"
                           />
-                        </button>
+                        </div>
                       ))}
                     </div>
                   ))}
@@ -406,57 +372,19 @@ function PartnersSection({ dir, useArabicContent, copy }: { dir: "rtl" | "ltr"; 
         )}
       </div>
 
-      {selected && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-6" dir={dir}>
-          <button type="button" className="absolute inset-0 bg-[#071936]/80 backdrop-blur-sm" aria-label={copy.close} onClick={() => setSelected(null)} />
-          <article role="dialog" aria-modal="true" aria-labelledby="partner-dialog-title" className="relative max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[24px] bg-[#F4F1EC] shadow-2xl">
-            <button
-              ref={closeButtonRef}
-              type="button"
-              onClick={() => setSelected(null)}
-              className="absolute end-4 top-4 z-10 rounded-full border border-[#071936]/10 bg-white/80 p-2 text-[#071936] hover:bg-white"
-              aria-label={copy.closePartnerDetails}
-            >
-              <X size={19} />
-            </button>
-            <div className="grid gap-0 md:grid-cols-[.8fr_1.2fr]">
-              <div className="flex min-h-56 flex-col items-center justify-center gap-8 bg-white p-8 md:min-h-full">
-                <img src={selected.logo} alt={partnerName(selected)} className="max-h-28 max-w-[220px] object-contain" />
-                <div className="h-px w-28 bg-[#071936]/10" />
-                <OfoqLogo className="h-16 w-28 text-[#071936]" />
-              </div>
-              <div className="p-6 pt-16 sm:p-9 sm:pt-16">
-                <p className="text-[10px] font-black uppercase tracking-[.16em] text-[#C13229]">{copy.partnershipsEyebrow}</p>
-                <h2 id="partner-dialog-title" className="mt-2 text-2xl font-black text-[#071936] sm:text-3xl">
-                  {partnerName(selected)}
-                </h2>
-                <p className="mt-4 text-sm leading-7 text-[#071936]/65">{partnerDescription(selected)}</p>
-                <div className="mt-6 space-y-5 border-t border-[#071936]/10 pt-6">
-                  <div>
-                    <h3 className="text-xs font-black text-[#071936]">{copy.partnership}</h3>
-                    <p className="mt-2 text-sm leading-7 text-[#071936]/60">{partnerPartnership(selected)}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-black text-[#071936]">{copy.delivered}</h3>
-                    <p className="mt-2 text-sm leading-7 text-[#071936]/60">{partnerServices(selected)}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </article>
-        </div>
-      )}
     </section>
   );
 }
 
 function OfoqOutlineMark() {
   return (
-    <svg viewBox="0 0 210 148" className="h-40 w-56 opacity-25" fill="none" aria-hidden="true">
+    <svg viewBox="0 0 150 148" className="h-40 w-56 opacity-25" fill="none" aria-hidden="true">
+      <g transform="scale(1.1 1)">
       <rect x="6" y="5" width="58" height="90" rx="11" stroke="#FFFFFF" strokeWidth="7" />
       <path d="M73 10v80M73 10h52M73 47h39" stroke="#C13229" strokeWidth="9" strokeLinecap="square" />
       <rect x="72" y="103" width="26" height="38" rx="6" stroke="#FFFFFF" strokeWidth="5" />
       <rect x="102" y="103" width="26" height="38" rx="6" stroke="#FFFFFF" strokeWidth="5" />
+      </g>
     </svg>
   );
 }

@@ -10,6 +10,7 @@ export interface IInvoice extends Document {
   items: {
     description: string;
     descriptionAr?: string;
+    serviceId?: mongoose.Types.ObjectId;
     quantity: number;
     unitPrice: number;
     discount: number;
@@ -50,6 +51,7 @@ const InvoiceSchema = new Schema<IInvoice>({
   items: [{
     description: { type: String, required: true },
     descriptionAr: String,
+    serviceId: { type: Schema.Types.ObjectId, ref: "Service" },
     quantity: { type: Number, required: true, default: 1 },
     unitPrice: { type: Number, required: true },
     discount: { type: Number, default: 0 },

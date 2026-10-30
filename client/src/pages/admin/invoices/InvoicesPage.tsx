@@ -5,10 +5,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { arSA } from "date-fns/locale";
-import { crmApi, invoicesApi } from "../../../api/client";
+import { crmApi, invoicesApi, servicesApi } from "../../../api/client";
 import type { Customer, Invoice } from "../../../types";
 import { useLang } from "../../../i18n/LangContext";
 import CustomerQuickCreate from "../../../components/admin/CustomerQuickCreate";
+import CurrencySuffix from "../../../components/CurrencySuffix";
 
 export default function InvoicesPage({ documentType = "invoice" }: { documentType?: "invoice" | "proforma" }) {
   const { ui, lang } = useLang();
@@ -116,14 +117,14 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
           <div className="stat-icon bg-ofoq-green"><CheckCircle size={20} className="text-white" /></div>
           <div>
              <p className="text-xs text-gray-400">{isQuotation ? (lang === "ar" ? "إجمالي عروض الأسعار" : "Quotation value") : copy.collected}</p>
-             <p className="text-xl font-bold text-navy-700">{totalRevenue.toLocaleString(lang)} {lang === "id" ? "SAR" : "ر.س"}</p>
+             <p className="text-xl font-bold text-navy-700">{totalRevenue.toLocaleString(lang)} <CurrencySuffix /></p>
           </div>
         </div>
         <div className="card flex items-center gap-4">
           <div className="stat-icon bg-amber-500"><FileText size={20} className="text-white" /></div>
           <div>
              <p className="text-xs text-gray-400">{isQuotation ? (lang === "ar" ? "بانتظار الاعتماد" : "Awaiting approval") : copy.pending}</p>
-             <p className="text-xl font-bold text-navy-700">{pending.toLocaleString(lang)} {lang === "id" ? "SAR" : "ر.س"}</p>
+             <p className="text-xl font-bold text-navy-700">{pending.toLocaleString(lang)} <CurrencySuffix /></p>
           </div>
         </div>
         <div className="card flex items-center gap-4">
@@ -181,7 +182,7 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
                       <td className="font-mono text-sm font-semibold text-navy-700">{inv.invoiceNumber}</td>
                       <td>{getCustomerName(inv)}</td>
                       <td className="font-bold text-navy-700">
-                         {inv.total.toLocaleString(lang)} {inv.currency}
+                         {inv.total.toLocaleString(lang)} <CurrencySuffix currency={inv.currency} />
                       </td>
                       <td>
                         <span className={isOverdue ? "text-red-500 font-semibold" : "text-gray-600"}>
@@ -279,7 +280,7 @@ function defaultDueDate() {
   return date.toISOString().slice(0, 10);
 }
 
-type DraftItem = { description: string; quantity: number; unitPrice: number };
+type DraftItem = { description: string; descriptionAr?: string; serviceId?: string; quantity: number; unitPrice: number };
 
 function InvoiceModal({ open, onClose, onSaved, documentType }: {
   open: boolean;
@@ -304,7 +305,13 @@ function InvoiceModal({ open, onClose, onSaved, documentType }: {
     queryFn: () => crmApi.customers.list({ limit: 200 }).then((response) => response.data),
     enabled: open,
   });
+  const { data: serviceData, isLoading: servicesLoading } = useQuery({
+    queryKey: ["invoice-service-options"],
+    queryFn: () => servicesApi.list().then((response) => response.data),
+    enabled: open,
+  });
   const customers: Customer[] = customerData?.customers || [];
+  const services: any[] = serviceData?.services || [];
 
   const subtotal = items.reduce((sum, item) => sum + Math.max(0, item.quantity) * Math.max(0, item.unitPrice), 0);
   const taxAmount = subtotal * Math.max(0, taxRate) / 100;
@@ -320,6 +327,8 @@ function InvoiceModal({ open, onClose, onSaved, documentType }: {
       type: documentType,
       items: items.map((item) => ({
         description: item.description.trim(),
+        descriptionAr: item.descriptionAr?.trim() || undefined,
+        serviceId: item.serviceId || undefined,
         quantity: Math.max(1, item.quantity),
         unitPrice: Math.max(0, item.unitPrice),
         discount: 0,
@@ -420,9 +429,37 @@ function InvoiceModal({ open, onClose, onSaved, documentType }: {
                 </div>
                 {items.map((item, index) => (
                   <div key={index} className="grid grid-cols-12 gap-2 rounded-xl border border-gray-100 bg-gray-50 p-3">
+                    <div className="col-span-12">
+                      <label className="mb-1 block text-xs font-semibold text-gray-500">{isArabic ? "اختيار خدمة من القائمة" : "Select a listed service"}</label>
+                      <select
+                        value={item.serviceId || ""}
+                        onChange={(event) => {
+                          const service = services.find((entry) => entry._id === event.target.value);
+                          if (!service) {
+                            updateItem(index, { serviceId: undefined, descriptionAr: undefined });
+                            return;
+                          }
+                          updateItem(index, {
+                            serviceId: service._id,
+                            description: service.title || service.titleAr || "",
+                            descriptionAr: service.titleAr || "",
+                            unitPrice: Number(service.basePrice) || 0,
+                          });
+                        }}
+                        className="input-field bg-white"
+                        disabled={servicesLoading}
+                      >
+                        <option value="">{servicesLoading ? (isArabic ? "جارٍ تحميل الخدمات..." : "Loading services...") : (isArabic ? "اختر خدمة أو اتركها فارغة لبند يدوي" : "Choose a service or leave blank for a custom item")}</option>
+                        {services.map((service) => (
+                          <option key={service._id} value={service._id}>
+                            {isArabic ? service.titleAr || service.title : service.title || service.titleAr}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                     <div className="col-span-12 sm:col-span-6">
                       <label className="mb-1 block text-xs font-semibold text-gray-500">{isArabic ? "الوصف" : "Description"}</label>
-                      <input value={item.description} onChange={(event) => updateItem(index, { description: event.target.value })}
+                      <input value={item.description} onChange={(event) => updateItem(index, { description: event.target.value, serviceId: undefined, descriptionAr: undefined })}
                         className="input-field bg-white" placeholder={isArabic ? "مثال: رسوم تأسيس شركة" : "Example: Company formation fee"} required />
                     </div>
                     <div className="col-span-4 sm:col-span-2">
@@ -469,9 +506,9 @@ function InvoiceModal({ open, onClose, onSaved, documentType }: {
                   <input type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} className="input-field" dir="ltr" />
                 </div>
                 <div className="rounded-xl bg-gray-50 p-3 text-sm">
-                  <div className="flex justify-between text-gray-500"><span>{isArabic ? "المجموع الفرعي" : "Subtotal"}</span><span>{subtotal.toLocaleString(lang)} {currency}</span></div>
-                  <div className="mt-1 flex justify-between text-gray-500"><span>{isArabic ? "الضريبة" : "Tax"}</span><span>{taxAmount.toLocaleString(lang)} {currency}</span></div>
-                  <div className="mt-2 flex justify-between border-t pt-2 font-bold text-navy-700"><span>{copy.total}</span><span>{total.toLocaleString(lang)} {currency}</span></div>
+                  <div className="flex justify-between text-gray-500"><span>{isArabic ? "المجموع الفرعي" : "Subtotal"}</span><span>{subtotal.toLocaleString(lang)} <CurrencySuffix currency={currency} /></span></div>
+                  <div className="mt-1 flex justify-between text-gray-500"><span>{isArabic ? "الضريبة" : "Tax"}</span><span>{taxAmount.toLocaleString(lang)} <CurrencySuffix currency={currency} /></span></div>
+                  <div className="mt-2 flex justify-between border-t pt-2 font-bold text-navy-700"><span>{copy.total}</span><span>{total.toLocaleString(lang)} <CurrencySuffix currency={currency} /></span></div>
                 </div>
               </div>
 

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { requireAuth, requireRole, logAction } from "../auth.js";
-import { ContractModel, CustomerModel } from "../models/index.js";
+import { ContractModel, CustomerModel, ServiceModel } from "../models/index.js";
 import { fireNotify } from "../notify.js";
 import { generateContractPdfBuffer } from "../services/pdf.service.js";
 import { sendContractEmail } from "../email.js";
@@ -9,6 +9,7 @@ export const contractsRouter = Router();
 
 function normalizeContractBody(body: any) {
   const normalized = { ...body };
+  if (normalized.serviceId === "") normalized.serviceId = null;
 
   if (Array.isArray(body.sections)) {
     normalized.sections = body.sections
@@ -36,6 +37,12 @@ function normalizeContractBody(body: any) {
   }
 
   return normalized;
+}
+
+async function validateServiceReference(serviceId: unknown) {
+  if (serviceId === undefined || serviceId === null || serviceId === "") return;
+  const service = await ServiceModel.exists({ _id: serviceId });
+  if (!service) throw new Error("الخدمة المرتبطة غير موجودة");
 }
 
 async function generateContractNumber(): Promise<string> {
@@ -66,6 +73,7 @@ contractsRouter.get("/", requireAuth, async (req, res) => {
       ContractModel.find(filter)
         .populate("customerId", "name companyName email")
         .populate("projectId", "name projectNumber")
+        .populate("serviceId", "title titleAr")
         .populate("createdBy", "fullName")
         .sort({ createdAt: -1 })
         .skip((+page - 1) * +limit)
@@ -109,6 +117,7 @@ contractsRouter.get("/:id", requireAuth, async (req, res) => {
 // ── Create Contract ────────────────────────────────────────────────
 contractsRouter.post("/", requireAuth, requireRole("super_admin", "admin", "manager", "employee"), async (req, res) => {
   try {
+    await validateServiceReference(req.body.serviceId);
     const contractNumber = await generateContractNumber();
     const contract = await ContractModel.create({
       ...normalizeContractBody(req.body),
@@ -126,8 +135,10 @@ contractsRouter.post("/", requireAuth, requireRole("super_admin", "admin", "mana
 // ── Update Contract ────────────────────────────────────────────────
 contractsRouter.patch("/:id", requireAuth, requireRole("super_admin", "admin", "manager", "employee"), async (req, res) => {
   try {
+    await validateServiceReference(req.body.serviceId);
     const contract = await ContractModel.findByIdAndUpdate(req.params.id, normalizeContractBody(req.body), { new: true })
-      .populate("customerId", "name companyName email").lean();
+      .populate("customerId", "name companyName email")
+      .populate("serviceId", "title titleAr").lean();
     if (!contract) {
       res.status(404).json({ error: "العقد غير موجود" });
       return;
@@ -163,7 +174,8 @@ contractsRouter.delete("/:id", requireAuth, requireRole("super_admin", "admin"),
 contractsRouter.post("/:id/send", requireAuth, requireRole("super_admin", "admin", "manager"), async (req, res) => {
   try {
     const contract = await ContractModel.findById(req.params.id)
-      .populate("customerId", "name companyName email userId").lean() as any;
+      .populate("customerId", "name companyName email userId")
+      .populate("serviceId", "title titleAr").lean() as any;
     if (!contract) {
       res.status(404).json({ error: "العقد غير موجود" });
       return;
@@ -226,6 +238,7 @@ contractsRouter.get("/:id/pdf", requireAuth, async (req, res) => {
   try {
     const contract = await ContractModel.findById(req.params.id)
       .populate("customerId")
+      .populate("serviceId", "title titleAr")
       .lean() as any;
     if (!contract) {
       res.status(404).json({ error: "العقد غير موجود" });

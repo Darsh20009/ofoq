@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Edit2, Trash2, Globe, FileText, Star, Image, Handshake, MapPinned } from "lucide-react";
+import { Plus, Edit2, Trash2, Globe, FileText, Star, Image, Handshake, MapPinned, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { cmsApi } from "../../../api/client";
@@ -31,8 +31,10 @@ export default function CmsPage() {
   const [editPartner, setEditPartner] = useState<Partner | null>(null);
   const [countryModalOpen, setCountryModalOpen] = useState(false);
   const [editCountry, setEditCountry] = useState<Country | null>(null);
+  const [countrySearch, setCountrySearch] = useState("");
   const { user } = useAuthStore();
   const canDeletePartner = ["super_admin", "admin"].includes(user?.role || "");
+  const canDeleteCountry = ["super_admin", "admin"].includes(user?.role || "");
 
   const { data: blogData, isLoading: blogLoading } = useQuery({
     queryKey: ["blog-posts"],
@@ -86,11 +88,26 @@ export default function CmsPage() {
     onError: (error: any) => toast.error(error?.response?.data?.error || (isArabic ? "تعذر حذف الشريك." : "Could not delete partner.")),
   });
 
+  const deleteCountryMut = useMutation({
+    mutationFn: (id: string) => cmsApi.countries.delete(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-countries"] });
+      qc.invalidateQueries({ queryKey: ["public-countries"] });
+      toast.success(isArabic ? "تم حذف الدولة." : "Country deleted.");
+    },
+    onError: (error: any) => toast.error(error?.response?.data?.error || (isArabic ? "تعذر حذف الدولة." : "Could not delete country.")),
+  });
+
   const posts: BlogPost[] = blogData?.data?.posts || [];
   const testimonialList = testimonials?.data?.testimonials || [];
   const pageList = pages?.data?.pages || [];
   const partnerList: Partner[] = partnerData?.partners || [];
   const countryList: Country[] = countryData?.countries || [];
+  const filteredCountryList = countryList.filter((country) =>
+    [country.nameAr, country.nameEn, country.code].some((value) =>
+      value.toLocaleLowerCase().includes(countrySearch.trim().toLocaleLowerCase()),
+    ),
+  );
   const countryCatalog = countryData?.catalog || [];
 
   return (
@@ -345,22 +362,58 @@ export default function CmsPage() {
             <p className="mt-1 text-sm text-gray-500">{isArabic ? "اختر دولة من القائمة، واكتب وصفها، وستظهر على الخريطة العامة بحركة دخول ناعمة." : "Choose a country, add its description, and it will appear on the public map with a soft entrance animation."}</p>
           </div>
           {countriesError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{isArabic ? "تعذر تحميل الدول." : "Could not load countries."}</p>}
+          <div className="relative max-w-xl">
+            <Search size={16} className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              value={countrySearch}
+              onChange={(event) => setCountrySearch(event.target.value)}
+              className="input-field ps-10"
+              placeholder={isArabic ? "ابحث في الدول المضافة بالاسم أو الرمز" : "Search added countries by name or code"}
+              aria-label={isArabic ? "البحث في الدول" : "Search countries"}
+            />
+          </div>
           {countriesLoading ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[...Array(6)].map((_, i) => <div key={i} className="skeleton h-40 rounded-2xl" />)}</div>
           ) : countryList.length === 0 ? (
             <div className="card py-16 text-center"><MapPinned size={42} className="mx-auto mb-3 text-gray-200" /><p className="text-gray-400">{isArabic ? "لا توجد دول مضافة بعد." : "No countries have been added yet."}</p></div>
+          ) : filteredCountryList.length === 0 ? (
+            <div className="card py-12 text-center text-sm text-gray-400">{isArabic ? "لا توجد دولة مطابقة لبحثك." : "No countries match your search."}</div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {countryList.map((country, index) => (
+              {filteredCountryList.map((country, index) => (
                 <motion.article key={country._id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.035 }} className="card group">
-                  <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-3">
                     <span className="text-3xl">{country.flag}</span>
                     <div className="min-w-0 flex-1">
                       <h3 className="font-bold text-navy-700">{isArabic ? country.nameAr : country.nameEn}</h3>
                       <p className="mt-1 text-xs text-gray-400">{country.code} · {isArabic ? country.nameEn : country.nameAr}</p>
                       <div className="mt-3 flex gap-2"><span className={country.isPublished ? "badge-green" : "badge-gray"}>{country.isPublished ? (isArabic ? "ظاهرة" : "Visible") : (isArabic ? "مخفية" : "Hidden")}</span><span className="badge-navy">{isArabic ? `الترتيب ${country.order}` : `Order ${country.order}`}</span></div>
                     </div>
-                    <button onClick={() => { setEditCountry(country); setCountryModalOpen(true); }} className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-navy-700" aria-label={isArabic ? "تعديل الدولة" : "Edit country"}><Edit2 size={15} /></button>
+                      <div className="flex shrink-0 items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => { setEditCountry(country); setCountryModalOpen(true); }}
+                          className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-navy-700"
+                          aria-label={isArabic ? "تعديل الدولة" : "Edit country"}
+                          title={isArabic ? "تعديل الدولة" : "Edit country"}
+                        ><Edit2 size={15} /></button>
+                        {canDeleteCountry && (
+                          <button
+                            type="button"
+                            disabled={deleteCountryMut.isPending}
+                            onClick={() => {
+                              const name = isArabic ? country.nameAr : country.nameEn;
+                              const message = isArabic
+                                ? `هل تريد حذف دولة ${name} نهائيًا؟ ستختفي من الموقع والخريطة.`
+                                : `Permanently delete ${name}? It will be removed from the website and map.`;
+                              if (window.confirm(message)) deleteCountryMut.mutate(country._id);
+                            }}
+                            className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-40"
+                            aria-label={isArabic ? `حذف ${country.nameAr}` : `Delete ${country.nameEn}`}
+                            title={isArabic ? "حذف الدولة" : "Delete country"}
+                          ><Trash2 size={15} /></button>
+                        )}
+                      </div>
                   </div>
                   <p className="mt-4 line-clamp-2 text-sm leading-6 text-gray-500">{isArabic ? country.descriptionAr : country.descriptionEn}</p>
                 </motion.article>

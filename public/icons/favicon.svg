@@ -1,4 +1,5 @@
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none'>
+  <rect x='1' y='1' width='62' height='62' rx='14' fill='#071936'/>
   <rect x='3' y='3' width='22' height='34' rx='5' stroke='white' stroke-width='4.5' fill='none'/>
   <line x1='30' y1='4'  x2='30' y2='36' stroke='#C13229' stroke-width='5' stroke-linecap='square'/>
   <line x1='30' y1='4'  x2='55' y2='4'  stroke='#C13229' stroke-width='5' stroke-linecap='square'/>

@@ -5,6 +5,7 @@ interface DocumentAssets {
   logoDataUri: string;
   stampDataUri: string;
   cairoFontBase64: string;
+  saudiRiyalFontBase64: string;
 }
 
 // Contact details and print artwork are taken from the supplied invoice and
@@ -104,7 +105,10 @@ export function buildReferenceInvoiceHtml(
   assets: DocumentAssets,
 ): string {
   const isQuotation = invoice.type === "proforma";
-  const currency = escapeHtml(invoice.currency || "SAR");
+  const currencyCode = String(invoice.currency || "SAR");
+  const currency = currencyCode === "SAR"
+    ? `<bdi class="riyal-currency"><span class="saudi-riyal-symbol">&#xEA;</span><small>SAR</small></bdi>`
+    : escapeHtml(currencyCode);
   const entries = Array.isArray(invoice.items) ? invoice.items : [];
   const itemDiscounts = entries.reduce((sum: number, item: any) => sum + Number(item.discount || 0), 0);
   const preTaxTotal = Math.max(0, Number(invoice.subtotal || 0) - itemDiscounts - Number(invoice.discount || 0));
@@ -151,20 +155,21 @@ export function buildReferenceInvoiceHtml(
   <title>${isQuotation ? "عرض سعر" : "فاتورة ضريبية"} ${escapeHtml(invoice.invoiceNumber || "")}</title>
   <style>
     ${assets.cairoFontBase64 ? `@font-face { font-family: Cairo; src: url(data:font/ttf;base64,${assets.cairoFontBase64}) format("truetype"); }` : ""}
+    ${assets.saudiRiyalFontBase64 ? `@font-face { font-family: SaudiRiyalSymbol; src: url(data:font/ttf;base64,${assets.saudiRiyalFontBase64}) format("truetype"); font-weight: 400; }` : ""}
     @page { size: A4; margin: 0; }
     * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; color: #161616; background: #fff; font-family: Arial, Cairo, Tahoma, sans-serif; font-size: 10px; }
+    html, body { margin: 0; padding: 0; color: #161616; background: #fff; font-family: Cairo, "Noto Sans Arabic", Arial, Tahoma, sans-serif; font-size: 10px; text-rendering: optimizeLegibility; }
     .invoice-page { width: 210mm; min-height: 297mm; padding: 4mm 3.5mm 6mm; }
     .document-head { direction: ltr; display: grid; grid-template-columns: 1fr 32mm 1fr; gap: 3mm; align-items: start; min-height: 41mm; border-bottom: 1px solid #5b5b5b; padding-bottom: 3mm; }
-    .company-side { display: flex; flex-direction: column; font-size: 12px; line-height: 1.4; }
-    .company-side strong { margin-bottom: 1mm; font-size: 14px; line-height: 1.55; font-weight: 800; }
+    .company-side { display: flex; flex-direction: column; font-size: 11.5px; line-height: 1.48; }
+    .company-side strong { margin-bottom: 1mm; font-size: 14px; line-height: 1.5; font-weight: 800; }
     .company-en { text-align: left; direction: ltr; }
     .company-ar { text-align: right; direction: rtl; }
     .logo-center { text-align: center; }
     .logo-center img { display: block; width: 31mm; height: auto; margin: 3mm auto 0; }
     .document-title { text-align: center; min-height: 11mm; padding-top: 1mm; line-height: 1.05; }
-    .document-title h1 { margin: 0; font-family: Cairo, Arial, sans-serif; font-size: 17px; font-weight: 800; }
-    .document-title p { margin: 0; font-size: 14px; font-weight: 800; }
+    .document-title h1 { margin: 0; font-family: Cairo, "Noto Sans Arabic", Arial, sans-serif; font-size: 18px; font-weight: 800; line-height: 1.3; }
+    .document-title p { margin: 0; font-size: 12px; font-weight: 700; line-height: 1.4; color: #071936; }
     .document-meta { direction: ltr; display: grid; grid-template-columns: 1fr 1fr; min-height: 15mm; align-items: center; font-size: 11px; }
     .meta-left { text-align: left; line-height: 1.55; }
     .meta-line { display: flex; gap: 3mm; }
@@ -176,9 +181,9 @@ export function buildReferenceInvoiceHtml(
     .items thead { display: table-header-group; }
     .items tr { break-inside: avoid; }
     .items th, .items td { border: 1px solid #4b4b4b; text-align: center; vertical-align: middle; }
-    .items th { background: #f0f0f0; height: 18mm; padding: 1mm; font-size: 11px; font-weight: 700; line-height: 1.08; }
+    .items th { background: #F4F1EC; color: #071936; height: 18mm; padding: 1mm; font-size: 10.5px; font-weight: 700; line-height: 1.24; }
     .items th span { font-weight: 400; }
-    .items td { min-height: 11mm; padding: 3mm 1mm; font-size: 11px; line-height: 1.25; }
+    .items td { min-height: 11mm; padding: 3mm 1mm; font-size: 11px; line-height: 1.45; }
     .items th:nth-child(1) { width: 5%; }
     .items th:nth-child(2) { width: 40%; }
     .items th:nth-child(3) { width: 8%; }
@@ -189,8 +194,11 @@ export function buildReferenceInvoiceHtml(
     .cell-item { overflow-wrap: anywhere; }
     .cell-item span { display: inline-block; }
     .numeric { direction: ltr; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .riyal-currency { display: inline-flex; align-items: baseline; gap: 1mm; direction: ltr; white-space: nowrap; }
+    .riyal-currency .saudi-riyal-symbol { font-family: SaudiRiyalSymbol, sans-serif; font-size: 1.2em; line-height: 1; }
+    .riyal-currency small { font-family: Arial, sans-serif; font-size: 6.5px; font-weight: 400; }
     .totals { direction: ltr; width: 40%; margin-right: auto; margin-left: 0; }
-    .total-row { display: flex; align-items: center; justify-content: space-between; min-height: 13mm; border-bottom: 1px solid #555; padding: 1mm 0; font-size: 11.5px; }
+    .total-row { display: flex; align-items: center; justify-content: space-between; min-height: 13mm; border-bottom: 1px solid #D8CDBD; padding: 1mm 0; font-size: 11.5px; line-height: 1.4; }
     .total-row .amount { font-weight: 700; direction: ltr; white-space: nowrap; }
     .total-row .label { text-align: left; width: 64%; line-height: 1.2; }
     .total-row .label span { display: block; }

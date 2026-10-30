@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { requireAuth, requireRole, logAction } from "../auth.js";
-import { InvoiceModel, CustomerModel, ProjectModel } from "../models/index.js";
+import { InvoiceModel, CustomerModel, ProjectModel, ServiceModel } from "../models/index.js";
 import { fireNotify } from "../notify.js";
 import { sendInvoiceEmail } from "../email.js";
 import { generateInvoicePdfBuffer } from "../services/pdf.service.js";
@@ -18,9 +18,22 @@ function validationError(message: string) {
   return error;
 }
 
-function calculateDocumentTotals(rawItems: unknown, rawDiscount: unknown) {
+async function calculateDocumentTotals(rawItems: unknown, rawDiscount: unknown) {
   if (!Array.isArray(rawItems) || rawItems.length === 0) {
     throw validationError("أدخل بند فاتورة صحيحًا واحدًا على الأقل");
+  }
+  const serviceIds = rawItems
+    .map((raw: any) => raw?.serviceId?._id ?? raw?.serviceId)
+    .filter(Boolean)
+    .map((id: unknown) => String(id));
+  if (serviceIds.some((id: string) => !mongoose.Types.ObjectId.isValid(id))) {
+    throw validationError("الخدمة المرتبطة بأحد البنود غير صالحة");
+  }
+  if (serviceIds.length) {
+    const foundServices = await ServiceModel.countDocuments({ _id: { $in: [...new Set(serviceIds)] } });
+    if (foundServices !== new Set(serviceIds).size) {
+      throw validationError("إحدى الخدمات المرتبطة بالفاتورة لم تعد موجودة");
+    }
   }
   const items = rawItems.map((raw: any) => {
     const quantity = Number(raw?.quantity);
@@ -38,6 +51,7 @@ function calculateDocumentTotals(rawItems: unknown, rawDiscount: unknown) {
     return {
       description: String(raw.description).trim(),
       ...(raw.descriptionAr ? { descriptionAr: String(raw.descriptionAr).trim() } : {}),
+      ...(raw.serviceId ? { serviceId: String(raw.serviceId?._id ?? raw.serviceId) } : {}),
       quantity,
       unitPrice,
       discount,
@@ -179,7 +193,7 @@ invoicesRouter.post("/", requireAuth, requireRole("super_admin", "admin", "manag
       return;
     }
     await validateProjectForCustomer(req.body.projectId, customerId);
-    const totals = calculateDocumentTotals(items, req.body.discount);
+    const totals = await calculateDocumentTotals(items, req.body.discount);
     const type = req.body.type === "proforma" ? "proforma" : "invoice";
     const createFields = [
       "customerId", "projectId", "items", "subtotal", "discount", "tax", "total",
@@ -260,7 +274,7 @@ invoicesRouter.patch("/:id", requireAuth, requireRole("super_admin", "admin", "m
     if (!customerExists) throw validationError("العميل المختار غير موجود");
     await validateProjectForCustomer(updates.projectId ?? currentInvoice.projectId, effectiveCustomerId);
     if (Object.prototype.hasOwnProperty.call(updates, "items") || Object.prototype.hasOwnProperty.call(updates, "discount")) {
-      Object.assign(updates, calculateDocumentTotals(updates.items ?? currentInvoice.items, updates.discount ?? currentInvoice.discount));
+      Object.assign(updates, await calculateDocumentTotals(updates.items ?? currentInvoice.items, updates.discount ?? currentInvoice.discount));
     }
     const snapshotFilter: any = {
       _id: req.params.id,

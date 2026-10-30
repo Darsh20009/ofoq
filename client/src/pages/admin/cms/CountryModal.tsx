@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, X } from "lucide-react";
+import { Loader2, Search, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { cmsApi } from "../../../api/client";
 import { useLang } from "../../../i18n/LangContext";
@@ -23,6 +23,7 @@ export default function CountryModal({
   const { lang, dir } = useLang();
   const isArabic = lang === "ar" || lang === "ur";
   const [code, setCode] = useState("");
+  const [countrySearch, setCountrySearch] = useState("");
   const [descriptionAr, setDescriptionAr] = useState("");
   const [descriptionEn, setDescriptionEn] = useState("");
   const [order, setOrder] = useState("0");
@@ -33,6 +34,7 @@ export default function CountryModal({
   useEffect(() => {
     if (!open) return;
     setCode(country?.code || "");
+    setCountrySearch("");
     setDescriptionAr(country?.descriptionAr || "");
     setDescriptionEn(country?.descriptionEn || "");
     setOrder(String(country?.order || 0));
@@ -43,9 +45,17 @@ export default function CountryModal({
   if (!open) return null;
 
   const selected = catalog.find((item) => item.code === code);
+  const normalizedSearch = countrySearch.trim().toLocaleLowerCase();
+  const filteredCatalog = catalog.filter((item) =>
+    !normalizedSearch ||
+    [item.nameAr, item.nameEn, item.code].some((value) =>
+      value.toLocaleLowerCase().includes(normalizedSearch),
+    ),
+  );
   const text = {
     title: country ? (isArabic ? "تعديل الدولة" : "Edit country") : (isArabic ? "إضافة دولة" : "Add country"),
     country: isArabic ? "اختر الدولة من القائمة" : "Choose a country from the list",
+    search: isArabic ? "ابحث باسم الدولة أو رمزها" : "Search by country name or code",
     descriptionAr: isArabic ? "الوصف بالعربية" : "Description in Arabic",
     descriptionEn: isArabic ? "الوصف بالإنجليزية" : "Description in English",
     order: isArabic ? "الترتيب على الخريطة" : "Map order",
@@ -97,10 +107,39 @@ export default function CountryModal({
                 <span className="ms-auto text-xs text-gray-400">{country.code}</span>
               </div>
             ) : (
-              <select value={code} onChange={(event) => setCode(event.target.value)} className="input-field" required>
-                <option value="">{isArabic ? "اختر الدولة..." : "Select country..."}</option>
-                {catalog.map((item) => <option key={item.code} value={item.code}>{item.flag} {isArabic ? item.nameAr : item.nameEn}</option>)}
-              </select>
+              <div className="space-y-2">
+                <div className="relative">
+                  <Search size={16} className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    value={countrySearch}
+                    onChange={(event) => setCountrySearch(event.target.value)}
+                    className="input-field ps-10"
+                    placeholder={text.search}
+                    aria-label={text.search}
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="max-h-56 overflow-y-auto rounded-xl border border-gray-200" role="listbox" aria-label={text.country}>
+                  {filteredCatalog.length ? filteredCatalog.map((item) => (
+                    <button
+                      key={item.code}
+                      type="button"
+                      role="option"
+                      aria-selected={code === item.code}
+                      onClick={() => setCode(item.code)}
+                      className={`flex w-full items-center gap-3 px-4 py-2.5 text-start text-sm transition-colors hover:bg-gray-50 ${
+                        code === item.code ? "bg-navy-50 text-navy-700" : "text-gray-700"
+                      }`}
+                    >
+                      <span className="text-xl">{item.flag}</span>
+                      <span className="flex-1">{isArabic ? item.nameAr : item.nameEn}</span>
+                      <span className="text-xs text-gray-400" dir="ltr">{item.code}</span>
+                    </button>
+                  )) : (
+                    <p className="px-4 py-3 text-sm text-gray-400">{isArabic ? "لا توجد دولة مطابقة." : "No matching countries."}</p>
+                  )}
+                </div>
+              </div>
             )}
           </div>
           {selected && !country && <p className="text-xs text-gray-400">{selected.flag} {isArabic ? selected.nameAr : selected.nameEn}</p>}

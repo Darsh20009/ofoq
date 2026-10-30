@@ -152,6 +152,8 @@ export interface Invoice {
 
 export interface InvoiceItem {
   description: string;
+  descriptionAr?: string;
+  serviceId?: string;
   quantity: number;
   unitPrice: number;
   total: number;

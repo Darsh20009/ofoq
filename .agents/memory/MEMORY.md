@@ -4,13 +4,14 @@
 - [Rate limiter & dev proxy](rate-limiter-dev-proxy.md) — sitewide 429s in dev were the shared-IP rate limiter; skipped outside production
 - [GitHub push authentication](github-push-auth.md) — Git provider auth is separate; a secret-backed one-off helper can push when shell OAuth remains stale
 - [Development asset proxy](development-asset-proxy.md) — Vite must proxy root-level images, icons, favicon, manifest, and service worker to Express
+- [Saudi Riyal symbol font](saudi-riyal-symbol.md) — the custom currency glyph uses U+00EA; load its local font in UI and PDFs for reliable rendering.
 - [Localization architecture](localization-architecture.md) — shared UI copy drives language, direction, and portal authentication surfaces
 - [OAuth deployment routing](oauth-deployment-routing.md) — OAuth callbacks must use the deployed API origin, separate from the marketing APP_URL
 - [Employee Apple Wallet passes](apple-wallet-employee.md) — validate server-side signing before debugging iOS Wallet download behavior
 - [Admin transition overlay](admin-transition-overlay.md) — page loader callbacks must not restart timers during auth/data re-renders
 - [i18n nav fix](i18n-nav-fix.md) — all 5 language overrides (ur/hi/id/de/es) must have header.nav[]; ur and id need full about/services/home keys (no ...en spread)
 - [Admin CMS site content](admin-cms-site-content.md) — SiteContentPage + /api/cms/site-content GET+PUT; LangContext deepMerges DB patch over getUiCopy()
-- [OFOQ visual palette](ofoq-visual-palette.md) — primary UI palette is deep violet, green, and lime across future public-facing work.
+- [OFOQ visual palette](ofoq-visual-palette.md) — use navy, red, and beige for public-facing work; avoid fluorescent colors.
 - [Mockup sandbox dependencies](mockup-sandbox-dependencies.md) — nested previews resolve Vite plugins from the workspace root when their local install is absent.
 - [International phone input](international-phone-input.md) — keep country selection and E.164 formatting centralized with wrapper-specific styling.
 - [GitHub sync validation](github-sync-validation.md) — pulling newer remote UI commits can reintroduce stale brand links; validate public contact endpoints after merges.

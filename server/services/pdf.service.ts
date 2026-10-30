@@ -121,9 +121,9 @@ let cachedLogoDataUri: string | null = null;
 function getLogoDataUri(): string {
   if (cachedLogoDataUri) return cachedLogoDataUri;
   try {
-    const logoPath = path.join(process.cwd(), "public", "icons", "logo.png");
+    const logoPath = path.join(process.cwd(), "public", "images", "document-logo.svg");
     const buf = fs.readFileSync(logoPath);
-    cachedLogoDataUri = `data:image/png;base64,${buf.toString("base64")}`;
+    cachedLogoDataUri = `data:image/svg+xml;base64,${buf.toString("base64")}`;
   } catch {
     cachedLogoDataUri = "";
   }
@@ -131,11 +131,12 @@ function getLogoDataUri(): string {
 }
 
 const documentImageCache = new Map<string, string>();
-function getDocumentImageDataUri(filename: "document-logo.png" | "document-stamp.png"): string {
+function getDocumentImageDataUri(filename: "document-logo.svg" | "document-stamp.png"): string {
   const cached = documentImageCache.get(filename);
   if (cached) return cached;
   const assetPath = path.join(process.cwd(), "public", "images", filename);
-  const image = `data:image/png;base64,${fs.readFileSync(assetPath).toString("base64")}`;
+  const mimeType = filename.endsWith(".svg") ? "image/svg+xml" : "image/png";
+  const image = `data:${mimeType};base64,${fs.readFileSync(assetPath).toString("base64")}`;
   documentImageCache.set(filename, image);
   return image;
 }
@@ -150,6 +151,18 @@ function getCairoFontBase64(): string {
     cachedFontBase64 = "";
   }
   return cachedFontBase64;
+}
+
+let cachedSaudiRiyalFontBase64: string | null = null;
+function getSaudiRiyalFontBase64(): string {
+  if (cachedSaudiRiyalFontBase64 !== null) return cachedSaudiRiyalFontBase64;
+  try {
+    const fontPath = path.join(process.cwd(), "public", "fonts", "saudiriyalsymbol.ttf");
+    cachedSaudiRiyalFontBase64 = fs.readFileSync(fontPath).toString("base64");
+  } catch {
+    cachedSaudiRiyalFontBase64 = "";
+  }
+  return cachedSaudiRiyalFontBase64;
 }
 
 export async function getCompanyProfile(): Promise<CompanyProfile> {
@@ -293,9 +306,10 @@ export function buildInvoiceHtml(
   includeBankDetails = true,
 ): string {
   return buildReferenceInvoiceHtml(invoice, customer, company, includeBankDetails, {
-    logoDataUri: getDocumentImageDataUri("document-logo.png"),
+    logoDataUri: getDocumentImageDataUri("document-logo.svg"),
     stampDataUri: getDocumentImageDataUri("document-stamp.png"),
     cairoFontBase64: getCairoFontBase64(),
+    saudiRiyalFontBase64: getSaudiRiyalFontBase64(),
   });
 }
 
@@ -324,6 +338,9 @@ const CONTRACT_TYPE_LABELS: Record<string, string> = {
 
 export function buildContractHtml(contract: any, customer: any, company: CompanyProfile): string {
   const defaultContent = `يقر الطرفان بالموافقة على تنفيذ الأعمال والخدمات الموضحة في هذا العقد وفق النطاق والجدول الزمني والمقابل المالي المتفق عليه أدناه، ويلتزم كل طرف بتنفيذ التزاماته بحسن نية ووفقاً للأنظمة المعمول بها في المملكة العربية السعودية.`;
+  const serviceValue = contract.serviceId && typeof contract.serviceId === "object"
+    ? contract.serviceId.titleAr || contract.serviceId.title
+    : "";
   const sections = Array.isArray(contract.sections) && contract.sections.length
     ? [...contract.sections].sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
     : [{ title: "بنود العقد", content: contract.content || contract.termsAr || contract.terms || defaultContent }];
@@ -365,6 +382,7 @@ export function buildContractHtml(contract: any, customer: any, company: Company
     <div style="margin-top:20px">
       <h2 style="font-size:17px;color:#2B273F;text-align:center">${contract.titleAr || contract.title}</h2>
       <p style="text-align:center;color:#9691a8;font-size:12px;margin-top:4px">${CONTRACT_TYPE_LABELS[contract.type] || contract.type}</p>
+      ${serviceValue ? `<p style="text-align:center;color:#4d5663;font-size:11px;margin-top:5px">الخدمة المرتبطة: ${escapeHtml(serviceValue)}</p>` : ""}
     </div>
 
     <div class="parties">

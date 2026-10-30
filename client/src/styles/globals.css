@@ -3,6 +3,21 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "SaudiRiyalSymbol";
+  src: url("/fonts/saudiriyalsymbol.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+.saudi-riyal-symbol {
+  font-family: "SaudiRiyalSymbol", sans-serif !important;
+  font-size: 1.2em;
+  line-height: 1;
+  font-weight: 400;
+}
+
 /* ── Custom Font ─────────────────────────────── */
 @layer base {
   * {
