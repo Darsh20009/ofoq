@@ -90,7 +90,8 @@ const NAME_ALIASES: Record<string, string> = {
 const START_VIEW: GlobeView = { rotation: [12, -6, 0], zoom: 1 };
 const GLOBE_CENTER: [number, number] = [400, 282];
 const GLOBE_RADIUS = 232;
-const ROTATION_SPEED = 7.2;
+const TOUR_DWELL_MS = 5_000;
+const FOCUS_TRANSITION_MS = 850;
 const SMALL_COUNTRY_CENTROIDS: Record<string, [number, number]> = {
   AD: [1.6, 42.5], AG: [-61.8, 17.1], AI: [-63.05, 18.22], AX: [20, 60.2], AW: [-69.97, 12.52],
   BB: [-59.55, 13.2], BH: [50.55, 26.05], BM: [-64.75, 32.3], BN: [114.7, 4.5], BQ: [-68.3, 12.2],
@@ -152,15 +153,27 @@ export default function InteractiveWorldMap({
   const [isPlaying, setIsPlaying] = useState(!reducedMotion);
   const [hoveredCountry, setHoveredCountry] = useState<Country | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  const networkRef = useRef<HTMLDivElement>(null);
+  const countryStripRef = useRef<HTMLDivElement>(null);
+  const countryChipRefs = useRef(new Map<string, HTMLButtonElement>());
   const dragRef = useRef<{ pointerId: number; x: number; y: number; moved: boolean } | null>(null);
   const skipNextClickRef = useRef(false);
   const animationRef = useRef<number | null>(null);
+  const tourTimerRef = useRef<number | null>(null);
   const viewRef = useRef(view);
+  const [isOnscreen, setIsOnscreen] = useState(true);
+  const [pageVisible, setPageVisible] = useState(
+    () => typeof document === "undefined" || document.visibilityState === "visible",
+  );
   viewRef.current = view;
 
   const recruitmentCountries = useMemo(
     () => countries.filter((country) => country.isPublished).slice().sort((a, b) => a.order - b.order),
     [countries],
+  );
+  const recruitmentCountryIds = useMemo(
+    () => recruitmentCountries.map((country) => country._id).join("|"),
+    [recruitmentCountries],
   );
 
   const countryFeatures = useMemo(() => {
@@ -233,10 +246,38 @@ export default function InteractiveWorldMap({
     if (reducedMotion) setIsPlaying(false);
   }, [reducedMotion]);
 
-  const selectCountry = useCallback((country: Country) => {
+  useEffect(() => {
+    const root = networkRef.current;
+    if (!root || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(([entry]) => setIsOnscreen(entry.isIntersecting), {
+      threshold: 0.01,
+    });
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const updateVisibility = () => setPageVisible(document.visibilityState === "visible");
+    document.addEventListener("visibilitychange", updateVisibility);
+    updateVisibility();
+    return () => document.removeEventListener("visibilitychange", updateVisibility);
+  }, []);
+
+  const selectCountry = useCallback((country: Country, manual = true) => {
     const coordinates = featureCountries.coordinatesByCountryId.get(country._id);
     setActiveCountry(country);
-    setIsPlaying(false);
+    if (manual) setIsPlaying(false);
+    const strip = countryStripRef.current;
+    const chip = countryChipRefs.current.get(country._id);
+    if (strip && chip) {
+      const stripBounds = strip.getBoundingClientRect();
+      const chipBounds = chip.getBoundingClientRect();
+      if (chipBounds.left < stripBounds.left) {
+        strip.scrollBy({ left: chipBounds.left - stripBounds.left, behavior: reducedMotion ? "auto" : "smooth" });
+      } else if (chipBounds.right > stripBounds.right) {
+        strip.scrollBy({ left: chipBounds.right - stripBounds.right, behavior: reducedMotion ? "auto" : "smooth" });
+      }
+    }
     if (!coordinates) return;
     const [longitude, latitude] = coordinates;
     const targetRotation: [number, number, number] = [normalizeLongitude(-longitude), Math.max(-80, Math.min(80, -latitude)), 0];
@@ -248,7 +289,7 @@ export default function InteractiveWorldMap({
     }
     if (animationRef.current !== null) window.cancelAnimationFrame(animationRef.current);
     const startedAt = performance.now();
-    const duration = 850;
+    const duration = FOCUS_TRANSITION_MS;
     const startLongitude = from.rotation[0];
     const longitudeDelta = normalizeLongitude(targetRotation[0] - startLongitude);
     const animate = (now: number) => {
@@ -269,25 +310,38 @@ export default function InteractiveWorldMap({
   }, [featureCountries.coordinatesByCountryId, reducedMotion]);
 
   useEffect(() => {
-    if (!isPlaying || reducedMotion || activeCountry) return;
-    let frame = 0;
-    let previous = 0;
-    const rotate = (now: number) => {
-      if (!previous) previous = now;
-      const elapsed = Math.min(now - previous, 50);
-      previous = now;
-      setView((current) => ({
-        ...current,
-        rotation: [normalizeLongitude(current.rotation[0] + (elapsed / 1000) * ROTATION_SPEED), current.rotation[1], 0],
-      }));
-      frame = window.requestAnimationFrame(rotate);
+    if (!isPlaying || reducedMotion || !recruitmentCountries.length) return;
+    if (!activeCountry) {
+      selectCountry(recruitmentCountries[0], false);
+      return;
+    }
+    if (!isOnscreen || !pageVisible) return;
+
+    tourTimerRef.current = window.setTimeout(() => {
+      const currentIndex = recruitmentCountries.findIndex((country) => country._id === activeCountry._id);
+      const nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % recruitmentCountries.length;
+      selectCountry(recruitmentCountries[nextIndex], false);
+    }, TOUR_DWELL_MS + FOCUS_TRANSITION_MS);
+
+    return () => {
+      if (tourTimerRef.current !== null) window.clearTimeout(tourTimerRef.current);
+      tourTimerRef.current = null;
     };
-    frame = window.requestAnimationFrame(rotate);
-    return () => window.cancelAnimationFrame(frame);
-  }, [activeCountry, isPlaying, reducedMotion]);
+  }, [activeCountry, isOnscreen, isPlaying, pageVisible, recruitmentCountryIds, recruitmentCountries, reducedMotion, selectCountry]);
+
+  useEffect(() => {
+    if (!recruitmentCountries.length) {
+      setActiveCountry(null);
+      return;
+    }
+    if (activeCountry && !recruitmentCountries.some((country) => country._id === activeCountry._id)) {
+      setActiveCountry(null);
+    }
+  }, [activeCountry, isPlaying, recruitmentCountries]);
 
   useEffect(() => () => {
     if (animationRef.current !== null) window.cancelAnimationFrame(animationRef.current);
+    if (tourTimerRef.current !== null) window.clearTimeout(tourTimerRef.current);
   }, []);
 
   const resetGlobe = () => {
@@ -353,11 +407,11 @@ export default function InteractiveWorldMap({
 
   const highlightedCountry = hoveredCountry || activeCountry;
   const mapInstructions = isArabic
-    ? "اسحب الكرة لاستكشافها، أو اختر دولة للتركيز عليها"
-    : "Drag to explore, or choose a country to focus the globe";
+    ? "جولة تلقائية بين الدول بالترتيب، اختر دولة أو اسحب الكرة لإيقاف الجولة واستكشافها"
+    : "An automatic tour in country order. Select a country or drag the globe to pause and explore.";
 
   return (
-    <div className="ofoq-network" dir={isArabic ? "rtl" : "ltr"}>
+    <div ref={networkRef} className="ofoq-network" dir={isArabic ? "rtl" : "ltr"}>
       <div className="ofoq-network-main">
         <div className="ofoq-network-head">
           <div>
@@ -370,7 +424,7 @@ export default function InteractiveWorldMap({
           </div>
         </div>
 
-        <div className="ofoq-country-strip" role="group" aria-label={isArabic ? "دول الاستقطاب المتاحة" : "Available recruitment countries"}>
+        <div ref={countryStripRef} className="ofoq-country-strip" role="group" aria-label={isArabic ? "دول الاستقطاب المتاحة" : "Available recruitment countries"}>
           {recruitmentCountries.length ? recruitmentCountries.map((country) => {
             const selected = activeCountry?._id === country._id;
             const label = `${country.nameAr} · ${country.nameEn}`;
@@ -383,6 +437,10 @@ export default function InteractiveWorldMap({
                 aria-pressed={selected}
                 title={label}
                 onClick={() => selectCountry(country)}
+                ref={(element) => {
+                  if (element) countryChipRefs.current.set(country._id, element);
+                  else countryChipRefs.current.delete(country._id);
+                }}
               >
                 <span className="ofoq-country-flag" aria-hidden="true">{country.flag}</span>
                 <span className="ofoq-country-label">{countryName(country)}</span>
@@ -397,21 +455,28 @@ export default function InteractiveWorldMap({
           <span className="ofoq-globe-status" role="status" aria-live="polite">
             <i className={isPlaying ? "is-live" : ""} aria-hidden="true" />
             {activeCountry
-              ? `${isArabic ? activeCountry.nameAr : activeCountry.nameEn} · ${isArabic ? "تركيز الدولة" : "country focus"}`
+              ? `${isArabic ? activeCountry.nameAr : activeCountry.nameEn} · ${isArabic ? "تركيز الدولة" : "country focus"}${isPlaying ? ` · ${String(recruitmentCountries.findIndex((country) => country._id === activeCountry._id) + 1).padStart(2, "0")} / ${String(recruitmentCountries.length).padStart(2, "0")}` : ""}`
               : isPlaying
-                ? (isArabic ? "عرض كروي دوّار" : "Rotating overview")
-                : (isArabic ? "العرض متوقف" : "Overview paused")}
+                ? (isArabic ? "عرض الدول بالتتابع" : "Touring countries")
+                : (isArabic ? "العرض متوقف" : "Tour paused")}
           </span>
           <div className="ofoq-globe-actions">
             <button
               className="ofoq-globe-control"
               type="button"
-              onClick={() => activeCountry ? resetGlobe() : setIsPlaying((playing) => !playing)}
+              onClick={() => {
+                if (isPlaying) {
+                  setIsPlaying(false);
+                } else {
+                  if (!activeCountry && recruitmentCountries.length) selectCountry(recruitmentCountries[0], false);
+                  setIsPlaying(true);
+                }
+              }}
               disabled={reducedMotion}
-              aria-label={isPlaying ? (isArabic ? "إيقاف دوران الكرة" : "Pause globe rotation") : (isArabic ? "استئناف دوران الكرة" : "Resume globe rotation")}
+              aria-label={isPlaying ? (isArabic ? "إيقاف جولة الدول" : "Pause country tour") : (isArabic ? "استئناف جولة الدول" : "Resume country tour")}
               title={reducedMotion
-                ? (isArabic ? "الدوران التلقائي متوقف حسب إعداد تقليل الحركة في جهازك" : "Auto-rotation is disabled by your reduced-motion preference")
-                : isPlaying ? (isArabic ? "إيقاف الدوران" : "Pause rotation") : (isArabic ? "استئناف الدوران" : "Resume rotation")}
+                ? (isArabic ? "الجولة التلقائية متوقفة حسب إعداد تقليل الحركة في جهازك" : "The automatic tour is disabled by your reduced-motion preference")
+                : isPlaying ? (isArabic ? "إيقاف الجولة" : "Pause tour") : (isArabic ? "استئناف الجولة" : "Resume tour")}
             >
               <GlobeControlIcon kind={isPlaying ? "pause" : "play"} />
               <span>{isPlaying ? (isArabic ? "إيقاف" : "Pause") : (isArabic ? "تشغيل" : "Play")}</span>
