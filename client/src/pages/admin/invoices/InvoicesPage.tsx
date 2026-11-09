@@ -169,13 +169,17 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
               <thead>
                 <tr>
                    <th>{isQuotation ? (lang === "ar" ? "رقم العرض" : "Quotation #") : copy.number}</th><th>{copy.customer}</th><th>{copy.total}</th>
-                   <th>{copy.dueDate}</th><th>{copy.status}</th><th>{copy.actions}</th>
+                    <th>{lang === "ar" ? "التاريخ" : "Date"}</th><th>{copy.status}</th><th>{copy.actions}</th>
                 </tr>
               </thead>
               <tbody>
                 {invoices.map((inv, i) => {
-                   const s = statusConfig[inv.status] || { label: inv.status, color: "badge-gray" };
-                  const isOverdue = new Date(inv.dueDate) < now && !["paid", "cancelled"].includes(inv.status);
+                    const isHistorical = !!inv.historicalImport;
+                    const s = isHistorical
+                      ? { label: lang === "ar" ? "سجل تاريخي للمراجعة" : "Historical record for review", color: "badge-navy" }
+                      : statusConfig[inv.status] || { label: inv.status, color: "badge-gray" };
+                   const displayDate = isHistorical ? inv.createdAt : inv.dueDate;
+                   const isOverdue = !isHistorical && !!inv.dueDate && new Date(inv.dueDate) < now && !["paid", "cancelled"].includes(inv.status);
                   return (
                     <motion.tr key={inv._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.03 }} className="group">
@@ -184,14 +188,24 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
                       <td className="font-bold text-navy-700">
                          {inv.total.toLocaleString(lang)} <CurrencySuffix currency={inv.currency} />
                       </td>
-                      <td>
+                    <td>
                         <span className={isOverdue ? "text-red-500 font-semibold" : "text-gray-600"}>
-                          {format(new Date(inv.dueDate), "d MMM yyyy", { locale: arSA })}
+                          {displayDate ? format(new Date(displayDate), "d MMM yyyy", { locale: arSA }) : "—"}
                         </span>
                       </td>
-                      <td><span className={s.color}>{s.label}</span></td>
+                      <td>
+                        <span className={s.color}>{s.label}</span>
+                        {isHistorical && (
+                          <p className="mt-1 max-w-xs text-xs leading-5 text-gray-500">
+                            {lang === "ar"
+                              ? "تفاصيل البنود والضريبة غير متوفرة في الكشف. راجع كشف الحساب للتسويات والسداد."
+                              : "Line items and tax details are unavailable in the statement. Review the account statement for adjustments and settlement."}
+                          </p>
+                        )}
+                      </td>
                       <td>
                          <div className="flex flex-wrap items-center gap-1 opacity-100">
+                          {!isHistorical && <>
                           {inv.status === "draft" && (
                             <button onClick={() => sendMut.mutate(inv._id)}
                                className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50" title={copy.send}>
@@ -245,6 +259,10 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
                             className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500">
                             <Trash2 size={14} />
                           </button>
+                          </>}
+                          {isHistorical && <span className="px-2 py-1 text-xs text-gray-400">
+                            {lang === "ar" ? "للمراجعة فقط" : "Read only"}
+                          </span>}
                         </div>
                       </td>
                     </motion.tr>

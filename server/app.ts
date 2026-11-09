@@ -212,18 +212,23 @@ if (process.env.NODE_ENV !== "production") {
     title: string; description: string; url: string;
     image?: string; siteName?: string;
   }): string {
-    const img = opts.image || "https://www.ofoqhc.com/icons/og-image.png";
+    const img = opts.image || "https://www.ofoqhc.com/icons/ofoq-business-solutions-share.png";
     return [
       `<meta property="og:title" content="${opts.title}" />`,
       `<meta property="og:description" content="${opts.description}" />`,
       `<meta property="og:url" content="${opts.url}" />`,
       `<meta property="og:image" content="${img}" />`,
-      `<meta property="og:image:width" content="1024" />`,
-      `<meta property="og:image:height" content="1024" />`,
+      `<meta property="og:image:secure_url" content="${img}" />`,
+      `<meta property="og:image:type" content="image/png" />`,
+      `<meta property="og:image:width" content="1200" />`,
+      `<meta property="og:image:height" content="630" />`,
+      `<meta property="og:image:alt" content="أفق لحلول الأعمال | OFOQ Business Solutions" />`,
+      `<meta property="og:type" content="website" />`,
       `<meta property="og:site_name" content="${opts.siteName || "أفق لحلول الأعمال"}" />`,
       `<meta name="twitter:title" content="${opts.title}" />`,
       `<meta name="twitter:description" content="${opts.description}" />`,
       `<meta name="twitter:image" content="${img}" />`,
+      `<meta name="twitter:card" content="summary_large_image" />`,
     ].join("\n    ");
   }
 
@@ -232,20 +237,17 @@ if (process.env.NODE_ENV !== "production") {
       title: "بوابة موظفي أفق | OFOQ Employee Portal",
       description: "بوابة الموظفين الرسمية لشركة أفق لحلول الأعمال — عرض بطاقة الموظف وبياناتك.",
       url: "https://employee.ofoqhc.com/",
-      image: "https://www.ofoqhc.com/icons/og-image.png",
+      image: "https://www.ofoqhc.com/icons/ofoq-business-solutions-share.png",
       siteName: "أفق — بوابة الموظفين",
     }),
     client: buildOgMeta({
       title: "بوابة عملاء أفق | OFOQ Client Portal",
       description: "تابع طلبات خدماتك، راسل الفريق، وتابع مستجدات مشاريعك مع أفق لحلول الأعمال.",
       url: "https://www.ofoqhc.com/client/",
-      image: "https://www.ofoqhc.com/icons/og-image.png",
+      image: "https://www.ofoqhc.com/icons/ofoq-business-solutions-share.png",
       siteName: "أفق — بوابة العملاء",
     }),
   };
-
-  // Pattern to replace OG block in index.html
-  const OG_PATTERN = /<meta property="og:title[\s\S]*?(?=<\/head>)/;
 
   app.get("*", (req: express.Request, res: express.Response) => {
     if (!fs.existsSync(indexHtmlPath)) {
@@ -268,8 +270,7 @@ if (process.env.NODE_ENV !== "production") {
       html = html
         .replace(/<meta property="og:[^"]*"[^>]*\/>/g, "")
         .replace(/<meta name="twitter:[^"]*"[^>]*\/>/g, "")
-        .replace("<!-- ══ Open Graph / Facebook ═", `<!-- ══ Open Graph / Facebook ═\n    ${ogBlock}\n    <!--`)
-        .replace("<!-- ══ Twitter / X Card", "<!--");
+        .replace("</head>", `${ogBlock}\n</head>`);
     }
 
     res.setHeader("Content-Type", "text/html; charset=utf-8");

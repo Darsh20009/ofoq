@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Search, Trash2, Edit2, Star } from "lucide-react";
+import { Plus, Search, Trash2, Edit2, Star, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { AnimatePresence } from "framer-motion";
@@ -10,6 +10,8 @@ import { crmApi } from "../../../api/client";
 import type { Customer } from "../../../types";
 import { useLang } from "../../../i18n/LangContext";
 import PhoneInput from "../../../components/forms/PhoneInput";
+import CurrencySuffix from "../../../components/CurrencySuffix";
+import HistoricalAccountModal from "../../../components/admin/HistoricalAccountModal";
 
 const TIER_COLORS: Record<string, string> = {
   bronze: "badge-gray",
@@ -24,6 +26,7 @@ export default function CustomersPage() {
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editCustomer, setEditCustomer] = useState<Customer | null>(null);
+  const [statementCustomer, setStatementCustomer] = useState<Customer | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["customers", search],
@@ -83,28 +86,39 @@ export default function CustomersPage() {
                   </div>
                   <div>
                     <p className="font-semibold text-navy-700">{c.name}</p>
-                    <p className="text-xs text-gray-400">{c.companyName || c.company || c.email}</p>
+                     <p className="text-xs text-gray-400">{c.companyName || c.company || c.email || "—"}</p>
                   </div>
                 </div>
                  <span className={TIER_COLORS[c.tier] || "badge-gray"}>{copy[c.tier as "bronze" | "silver" | "gold" | "platinum"] || c.tier}</span>
               </div>
               <div className="space-y-1 text-sm text-gray-500">
-                <p>📧 {c.email}</p>
-                {c.phone && <p>📱 {c.phone}</p>}
-                {c.industry && <p>🏢 {c.industry}</p>}
+                 {c.email && <p><span className="text-gray-400">{copy.email}:</span> <span dir="ltr" className="inline-block">{c.email}</span></p>}
+                 {c.phone && <p><span className="text-gray-400">{copy.phone}:</span> <span dir="ltr" className="inline-block">{c.phone}</span></p>}
+                 {c.industry && <p><span className="text-gray-400">{copy.industry}:</span> {c.industry}</p>}
+                 {c.historicalAccount && (
+                   <span className="inline-flex rounded-md bg-[#eef4f0] px-2 py-1 text-xs font-semibold text-[#355f4b]">
+                     {lang === "ar" ? "بيانات تاريخية موثقة" : "Verified historical data"}
+                   </span>
+                 )}
                 <p className="font-semibold text-navy-700 pt-1">
-                   💰 {c.totalRevenue.toLocaleString(lang)} {c.currency}
+                    {c.totalRevenue.toLocaleString(lang)} <CurrencySuffix currency={c.currency} />
                 </p>
               </div>
-              <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex flex-wrap gap-2 mt-4 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                {c.historicalAccount && (
+                  <button onClick={() => setStatementCustomer(c)}
+                    className="btn-ghost text-xs flex-1 justify-center text-[#355f4b]">
+                    <BookOpen size={13} /> {lang === "ar" ? "كشف الحساب" : "Account statement"}
+                  </button>
+                )}
                 <button onClick={() => { setEditCustomer(c); setModalOpen(true); }}
                   className="btn-ghost text-xs flex-1 justify-center">
                    <Edit2 size={13} /> {copy.edit}
                 </button>
-                 <button onClick={() => { if (confirm(copy.deleteConfirm)) deleteMut.mutate(c._id); }}
+                 {!c.historicalAccount && <button onClick={() => { if (confirm(copy.deleteConfirm)) deleteMut.mutate(c._id); }}
                   className="p-2 rounded-lg hover:bg-red-50 text-red-400 transition-colors">
                   <Trash2 size={14} />
-                </button>
+                </button>}
               </div>
             </motion.div>
           ))}
@@ -114,6 +128,11 @@ export default function CustomersPage() {
       <CustomerModal open={modalOpen} onClose={() => setModalOpen(false)}
         customer={editCustomer}
         onSaved={() => { qc.invalidateQueries({ queryKey: ["customers"] }); setModalOpen(false); }} />
+      <HistoricalAccountModal
+        account={statementCustomer?.historicalAccount || null}
+        customerName={statementCustomer?.name || ""}
+        onClose={() => setStatementCustomer(null)}
+      />
     </div>
   );
 }
@@ -157,15 +176,23 @@ function CustomerModal({ open, onClose, customer, onSaved }: {
                <h2 className="font-bold text-navy-700">{customer ? `${copy.edit} ${copy.title.slice(0, -1)}` : copy.add}</h2>
               <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400"><X size={18} /></button>
             </div>
-            <form onSubmit={handleSubmit((d) => mut.mutate(d))} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit((d) => {
+              const payload = { ...d } as Record<string, unknown>;
+              if (typeof payload.email === "string") {
+                const email = payload.email.trim();
+                if (email) payload.email = email;
+                else delete payload.email;
+              }
+              mut.mutate(payload);
+            })} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
                    <label className="label">{copy.name} *</label>
                   <input {...register("name", { required: true })} className="input-field" />
                 </div>
                 <div>
-                   <label className="label">{copy.email} *</label>
-                  <input {...register("email", { required: true })} type="email" className="input-field" dir="ltr" />
+                    <label className="label">{copy.email}{customer ? "" : " *"}</label>
+                   <input {...register("email", { required: !customer })} type="email" className="input-field" dir="ltr" />
                 </div>
                 <div>
                    <label className="label">{copy.phone}</label>

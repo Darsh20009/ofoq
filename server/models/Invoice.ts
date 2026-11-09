@@ -1,6 +1,13 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IInvoice extends Document {
+  historicalImport?: {
+    sourceHash: string;
+    sourceRow: number;
+    accountCode: string;
+    asOf: Date;
+    taxDetailsUnavailable: boolean;
+  };
   invoiceNumber: string;
   type: "invoice" | "proforma" | "receipt" | "credit_note";
   customerId: mongoose.Types.ObjectId;
@@ -38,6 +45,16 @@ export interface IInvoice extends Document {
 }
 
 const InvoiceSchema = new Schema<IInvoice>({
+  historicalImport: {
+    type: new Schema({
+      sourceHash: { type: String, required: true },
+      sourceRow: { type: Number, required: true },
+      accountCode: { type: String, required: true },
+      asOf: { type: Date, required: true },
+      taxDetailsUnavailable: { type: Boolean, required: true },
+    }, { _id: false }),
+    immutable: true,
+  },
   invoiceNumber: { type: String, required: true, unique: true },
   type: {
     type: String,

@@ -77,6 +77,31 @@ export interface Customer {
   industry?: string;
   accountManager?: User;
   createdAt: string;
+  historicalAccount?: HistoricalAccount;
+}
+
+export interface HistoricalAccountEntry {
+  row: number;
+  journalNumber: string;
+  date: string;
+  kind: "invoice" | "receipt" | "credit_note";
+  reference: string;
+  description: string;
+  debit: number;
+  credit: number;
+  balance: number;
+  relatedInvoiceNumber?: string;
+}
+
+export interface HistoricalAccount {
+  sourceHash: string;
+  sourceName: string;
+  accountCode: string;
+  asOf: string;
+  debit: number;
+  credit: number;
+  balance: number;
+  entries: HistoricalAccountEntry[];
 }
 
 /* ── Projects ──────────────────────────────── */
@@ -148,6 +173,13 @@ export interface Invoice {
   currency: string;
   paidAt?: string;
   createdAt: string;
+  historicalImport?: {
+    sourceHash: string;
+    sourceRow: number;
+    accountCode: string;
+    asOf: string;
+    taxDetailsUnavailable: boolean;
+  };
 }
 
 export interface InvoiceItem {

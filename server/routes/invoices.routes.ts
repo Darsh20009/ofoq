@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type Request, type Response, type NextFunction } from "express";
 import { requireAuth, requireRole, logAction } from "../auth.js";
 import { InvoiceModel, CustomerModel, ProjectModel, ServiceModel } from "../models/index.js";
 import { fireNotify } from "../notify.js";
@@ -11,6 +11,22 @@ export const invoicesRouter = Router();
 const financeRoles = ["super_admin", "admin", "manager"];
 const hasFinanceAccess = (role: string | undefined) => financeRoles.includes(role || "");
 const CLIENT_VISIBLE_STATUSES = ["sent", "viewed", "accepted", "partial", "paid", "overdue"];
+
+async function preserveHistoricalRecord(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (mongoose.isValidObjectId(req.params.id) && await InvoiceModel.exists({
+      _id: req.params.id, "historicalImport.sourceHash": { $exists: true },
+    })) {
+      res.status(409).json({
+        error: "هذا سجل تاريخي محفوظ من كشف الحساب، وليس فاتورة جديدة قابلة للتعديل أو الإصدار. يلزم الرجوع إلى المستند الأصلي لتفاصيل البنود والضريبة.",
+      });
+      return;
+    }
+    next();
+  } catch {
+    res.status(500).json({ error: "تعذر التحقق من السجل التاريخي" });
+  }
+}
 
 function validationError(message: string) {
   const error: any = new Error(message);
@@ -250,7 +266,7 @@ invoicesRouter.post("/", requireAuth, requireRole("super_admin", "admin", "manag
 });
 
 // ── Update Invoice ────────────────────────────────────────────────
-invoicesRouter.patch("/:id", requireAuth, requireRole("super_admin", "admin", "manager"), async (req, res) => {
+invoicesRouter.patch("/:id", requireAuth, requireRole("super_admin", "admin", "manager"), preserveHistoricalRecord, async (req, res) => {
   try {
     const editableFields = [
       "customerId", "projectId", "items", "discount",
@@ -296,7 +312,7 @@ invoicesRouter.patch("/:id", requireAuth, requireRole("super_admin", "admin", "m
 });
 
 // ── Send Invoice to Client ────────────────────────────────────────
-invoicesRouter.post("/:id/send", requireAuth, requireRole("super_admin", "admin", "manager"), async (req, res) => {
+invoicesRouter.post("/:id/send", requireAuth, requireRole("super_admin", "admin", "manager"), preserveHistoricalRecord, async (req, res) => {
   try {
     const invoice = await InvoiceModel.findOneAndUpdate(
       { _id: req.params.id, status: "draft", convertedToInvoiceId: { $exists: false } },
@@ -391,6 +407,10 @@ invoicesRouter.get("/:id/pdf", requireAuth, async (req, res) => {
       }
     }
     const includeBankDetails = !["0", "false", "no"].includes(String(req.query.bankDetails || "").toLowerCase());
+    if (invoice.historicalImport) {
+      res.status(409).json({ error: "هذا سجل تاريخي لا يتضمن تفاصيل البنود والضريبة. لا يمكن إصداره كفاتورة ضريبية من كشف الحساب وحده." });
+      return;
+    }
     const pdf = await generateInvoicePdfBuffer(invoice, invoice.customerId, includeBankDetails);
     res.setHeader("Content-Type", "application/pdf");
     const safeNumber = String(invoice.invoiceNumber || "document").replace(/[^a-zA-Z0-9_-]/g, "_");
@@ -403,7 +423,7 @@ invoicesRouter.get("/:id/pdf", requireAuth, async (req, res) => {
 });
 
 // ── Mark as Paid ──────────────────────────────────────────────────
-invoicesRouter.post("/:id/mark-paid", requireAuth, requireRole("super_admin", "admin"), async (req, res) => {
+invoicesRouter.post("/:id/mark-paid", requireAuth, requireRole("super_admin", "admin"), preserveHistoricalRecord, async (req, res) => {
   try {
     const { paidAmount, note } = req.body;
     const payableStatuses = ["sent", "viewed", "overdue", "partial"];
@@ -445,7 +465,7 @@ invoicesRouter.post("/:id/mark-paid", requireAuth, requireRole("super_admin", "a
 });
 
 // ── Record Quotation Acceptance ────────────────────────────────────
-invoicesRouter.post("/:id/accept-quotation", requireAuth, requireRole("super_admin", "admin", "manager"), async (req, res) => {
+invoicesRouter.post("/:id/accept-quotation", requireAuth, requireRole("super_admin", "admin", "manager"), preserveHistoricalRecord, async (req, res) => {
   try {
     const quotation = await InvoiceModel.findOneAndUpdate(
       { _id: req.params.id, type: "proforma", status: { $in: ["sent", "viewed"] }, convertedToInvoiceId: { $exists: false } },
@@ -464,7 +484,7 @@ invoicesRouter.post("/:id/accept-quotation", requireAuth, requireRole("super_adm
 });
 
 // ── Convert Approved Quotation to Invoice ───────────────────────────
-invoicesRouter.post("/:id/convert-to-invoice", requireAuth, requireRole("super_admin", "admin", "manager"), async (req, res) => {
+invoicesRouter.post("/:id/convert-to-invoice", requireAuth, requireRole("super_admin", "admin", "manager"), preserveHistoricalRecord, async (req, res) => {
   const session = await mongoose.startSession();
   try {
     const existingInvoice = await InvoiceModel.findOne({ sourceQuotationId: req.params.id })
@@ -538,7 +558,7 @@ invoicesRouter.post("/:id/convert-to-invoice", requireAuth, requireRole("super_a
 });
 
 // ── Delete Invoice ─────────────────────────────────────────────────
-invoicesRouter.delete("/:id", requireAuth, requireRole("super_admin", "admin"), async (req, res) => {
+invoicesRouter.delete("/:id", requireAuth, requireRole("super_admin", "admin"), preserveHistoricalRecord, async (req, res) => {
   try {
     const invoice = await InvoiceModel.findOneAndDelete({
       _id: req.params.id,

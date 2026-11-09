@@ -1,6 +1,8 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { HistoricalAccountSchema, type HistoricalAccount } from "./HistoricalAccount.js";
 
 export interface ICustomer extends Document {
+  historicalAccount?: HistoricalAccount;
   // Identity
   name: string;
   nameAr?: string;
@@ -46,6 +48,7 @@ export interface ICustomer extends Document {
 }
 
 const CustomerSchema = new Schema<ICustomer>({
+  historicalAccount: { type: HistoricalAccountSchema, immutable: true },
   name: { type: String, required: true, trim: true },
   nameAr: String,
   email: { type: String, lowercase: true, trim: true },

@@ -180,7 +180,7 @@ crmRouter.post("/leads/:id/convert", requireAuth, requireRole("super_admin", "ad
 // CUSTOMERS
 // ═══════════════════════════════════════════════════
 
-crmRouter.get("/customers", requireAuth, async (req, res) => {
+crmRouter.get("/customers", requireAuth, requireRole("super_admin", "admin", "manager", "employee"), async (req, res) => {
   try {
     const { status, tier, search, page = 1, limit = 20, accountManager } = req.query;
     const filter: any = {};
@@ -198,6 +198,7 @@ crmRouter.get("/customers", requireAuth, async (req, res) => {
 
     const [customers, total] = await Promise.all([
       CustomerModel.find(filter)
+        .select((req as any).user.role === "employee" ? "-historicalAccount" : "")
         .populate("accountManager", "fullName avatar")
         .sort({ createdAt: -1 })
         .skip((+page - 1) * +limit)
@@ -211,9 +212,10 @@ crmRouter.get("/customers", requireAuth, async (req, res) => {
   }
 });
 
-crmRouter.get("/customers/:id", requireAuth, async (req, res) => {
+crmRouter.get("/customers/:id", requireAuth, requireRole("super_admin", "admin", "manager", "employee"), async (req, res) => {
   try {
     const customer = await CustomerModel.findById(req.params.id)
+      .select((req as any).user.role === "employee" ? "-historicalAccount" : "")
       .populate("accountManager", "fullName avatar email phone").lean();
     if (!customer) {
       res.status(404).json({ error: "العميل غير موجود" });
@@ -227,7 +229,8 @@ crmRouter.get("/customers/:id", requireAuth, async (req, res) => {
 
 crmRouter.post("/customers", requireAuth, requireRole("super_admin", "admin", "manager"), async (req, res) => {
   try {
-    const customer = await CustomerModel.create(req.body);
+    const { historicalAccount: _sourceSnapshot, ...fields } = req.body;
+    const customer = await CustomerModel.create(fields);
     await logAction(String((req as any).user._id), "create_customer", "Customer", String(customer._id), req);
     res.status(201).json({ customer });
   } catch {
@@ -237,7 +240,11 @@ crmRouter.post("/customers", requireAuth, requireRole("super_admin", "admin", "m
 
 crmRouter.patch("/customers/:id", requireAuth, requireRole("super_admin", "admin", "manager"), async (req, res) => {
   try {
-    const customer = await CustomerModel.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    // Source snapshots are only written by the validated, audited importer.
+    const fields = Object.fromEntries(Object.entries(req.body).filter(([key]) =>
+      key !== "historicalAccount" && !key.startsWith("historicalAccount.") && !key.startsWith("$"),
+    ));
+    const customer = await CustomerModel.findByIdAndUpdate(req.params.id, { $set: fields }, { new: true })
       .populate("accountManager", "fullName avatar").lean();
     if (!customer) {
       res.status(404).json({ error: "العميل غير موجود" });
@@ -252,6 +259,10 @@ crmRouter.patch("/customers/:id", requireAuth, requireRole("super_admin", "admin
 
 crmRouter.delete("/customers/:id", requireAuth, requireRole("super_admin", "admin"), async (req, res) => {
   try {
+    if (await CustomerModel.exists({ _id: req.params.id, historicalAccount: { $exists: true } })) {
+      res.status(409).json({ error: "لا يمكن حذف عميل له كشف حساب تاريخي محفوظ" });
+      return;
+    }
     await CustomerModel.findByIdAndDelete(req.params.id);
     await logAction(String((req as any).user._id), "delete_customer", "Customer", req.params.id, req);
     res.json({ message: "تم حذف العميل" });

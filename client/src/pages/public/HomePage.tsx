@@ -127,7 +127,7 @@ export default function HomePage() {
   return (
     <>
       <Helmet>
-        <title>{ui.home.metaTitle}</title>
+        <title>أفق لحلول الأعمال | OFOQ Business Solutions</title>
         <meta name="description" content={copy.description} />
         <link rel="preload" as="image" href="/images/ofoq-hero-reference.webp" media="(min-width: 640px)" />
         <link rel="preload" as="image" href="/images/ofoq-hero-reference-mobile.webp" media="(max-width: 639px)" />
