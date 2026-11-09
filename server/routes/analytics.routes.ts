@@ -2,6 +2,7 @@ import { Router } from "express";
 import { requireAuth, requireRole } from "../auth.js";
 import { LeadModel, CustomerModel, ProjectModel, InvoiceModel, UserModel, TaskModel } from "../models/index.js";
 import { aiService } from "../services/ai.service.js";
+import { receivedRevenue, receivedRevenueByMonth } from "../services/operational-finance.js";
 
 export const analyticsRouter = Router();
 
@@ -30,11 +31,8 @@ analyticsRouter.get("/dashboard", requireAuth, requireRole("super_admin", "admin
       ProjectModel.countDocuments(),
       ProjectModel.countDocuments({ status: "active" }),
       ProjectModel.countDocuments({ status: "completed" }),
-      InvoiceModel.aggregate([{ $match: { status: "paid" } }, { $group: { _id: null, total: { $sum: "$total" } } }]),
-      InvoiceModel.aggregate([
-        { $match: { status: "paid", paidAt: { $gte: startOfMonth } } },
-        { $group: { _id: null, total: { $sum: "$total" } } }
-      ]),
+      receivedRevenue(),
+      receivedRevenue(startOfMonth),
       TaskModel.countDocuments({ status: { $ne: "done" }, dueDate: { $lt: now } }),
       UserModel.countDocuments({ role: { $in: ["super_admin", "admin", "manager", "employee"] } }),
       LeadModel.find().sort({ createdAt: -1 }).limit(5)
@@ -74,17 +72,7 @@ analyticsRouter.get("/revenue", requireAuth, requireRole("super_admin", "admin")
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - months);
 
-    const revenue = await InvoiceModel.aggregate([
-      { $match: { status: "paid", paidAt: { $gte: startDate } } },
-      {
-        $group: {
-          _id: { year: { $year: "$paidAt" }, month: { $month: "$paidAt" } },
-          total: { $sum: "$total" },
-          count: { $sum: 1 },
-        },
-      },
-      { $sort: { "_id.year": 1, "_id.month": 1 } },
-    ]);
+    const revenue = await receivedRevenueByMonth(startDate);
 
     res.json({ revenue });
   } catch {

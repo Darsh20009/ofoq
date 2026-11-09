@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Search, Trash2, Edit2, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
@@ -41,7 +42,8 @@ export default function ProjectsPage() {
   const formatDate = (value: string, withYear = false) =>
     new Date(value).toLocaleDateString(locale, { day: "numeric", month: "short", ...(withYear ? { year: "numeric" } : {}) });
   const qc = useQueryClient();
-  const [search, setSearch] = useState("");
+  const [searchParams] = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get("search") || "");
   const [stage, setStage] = useState("");
   const [view, setView] = useState<"table" | "kanban">("table");
   const [modalOpen, setModalOpen] = useState(false);

@@ -318,7 +318,7 @@ export async function generateInvoicePdfBuffer(
   customer: any,
   includeBankDetails = true,
 ): Promise<Buffer> {
-  if (invoice.historicalImport) {
+  if (invoice.historicalImport && !invoice.operationalImport) {
     throw new Error("Historical ledger references cannot be issued as tax invoices without their original line items and tax details.");
   }
   const company = await getCompanyProfile();

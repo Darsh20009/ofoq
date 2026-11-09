@@ -161,7 +161,7 @@ export interface Invoice {
   customer?: Customer;
   customerId?: Customer | string;
   project?: Project;
-  projectId?: Project | string;
+  projectId?: Project | string | { _id: string; name?: string; projectNumber?: string };
   status: "draft" | "sent" | "viewed" | "accepted" | "partial" | "paid" | "overdue" | "cancelled";
   issueDate?: string;
   dueDate?: string;
@@ -172,13 +172,47 @@ export interface Invoice {
   total: number;
   currency: string;
   paidAt?: string;
+  paidAmount: number;
+  creditedAmount: number;
+  __v: number;
+  notes?: string;
+  notesAr?: string;
   createdAt: string;
+  operationalImport?: {
+    activatedAt: string;
+    confirmedTaxRate: number;
+    sourceInvoiceTotal: number;
+    sourceItemsUnavailable: boolean;
+  };
   historicalImport?: {
     sourceHash: string;
     sourceRow: number;
     accountCode: string;
     asOf: string;
     taxDetailsUnavailable: boolean;
+  };
+}
+
+export interface InvoiceAccountCredit {
+  _id: string;
+  kind: "payment" | "credit_note";
+  reference: string;
+  date: string;
+  amount: number;
+  remaining: number;
+}
+
+export interface InvoiceFinanceSummary {
+  scope: "operational-import";
+  summary: {
+    invoiceTotal: number;
+    allocatedPayments: number;
+    allocatedCredits: number;
+    unallocatedPayments: number;
+    unallocatedCredits: number;
+    cashReceived: number;
+    invoiceOutstanding: number;
+    netOutstanding: number;
   };
 }
 

@@ -112,7 +112,7 @@ export function buildReferenceInvoiceHtml(
   const entries = Array.isArray(invoice.items) ? invoice.items : [];
   const itemDiscounts = entries.reduce((sum: number, item: any) => sum + Number(item.discount || 0), 0);
   const preTaxTotal = Math.max(0, Number(invoice.subtotal || 0) - itemDiscounts - Number(invoice.discount || 0));
-  const balanceDue = Math.max(0, Number(invoice.total || 0) - Number(invoice.paidAmount || 0));
+  const balanceDue = Math.max(0, Number(invoice.total || 0) - Number(invoice.paidAmount || 0) - Number(invoice.creditedAmount || 0));
   const customerName = customer?.companyName || customer?.name || "-";
   const projectName = invoice.projectId?.name || invoice.projectId?.projectNumber;
 
@@ -146,7 +146,9 @@ export function buildReferenceInvoiceHtml(
     : "";
   const dueNote = invoice.dueDate
     ? `<span>يرجى سداد الفاتورة بحلول ${escapeHtml(shortDate(invoice.dueDate))}.</span><span>Payment is due by ${escapeHtml(shortDate(invoice.dueDate))}.</span>`
-    : "<span>يجب دفع مبلغ الفاتورة خلال يومين من تاريخ إصدار الفاتورة.</span><span>Payment is due within 2 days from the invoice date.</span>";
+    : invoice.operationalImport
+      ? "<span>موعد الاستحقاق غير محدد في كشف الحساب الأصلي.</span><span>No due date was specified in the source account statement.</span>"
+      : "<span>يجب دفع مبلغ الفاتورة خلال يومين من تاريخ إصدار الفاتورة.</span><span>Payment is due within 2 days from the invoice date.</span>";
 
   return `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -269,6 +271,8 @@ export function buildReferenceInvoiceHtml(
     <section class="totals">
       <div class="total-row"><strong class="amount">${money(preTaxTotal)}</strong><span class="label"><span>الإجمالي قبل الضريبة</span><span>Pre-Tax Total</span></span></div>
       <div class="total-row"><strong class="amount">${money(invoice.total)}</strong><span class="label"><span>الإجمالي (${currency})</span><span>Total (${currency})</span></span></div>
+      ${!isQuotation ? `<div class="total-row"><strong class="amount">${money(invoice.paidAmount)}</strong><span class="label"><span>المسدد (${currency})</span><span>Paid (${currency})</span></span></div>` : ""}
+      ${!isQuotation && invoice.creditedAmount ? `<div class="total-row"><strong class="amount">${money(invoice.creditedAmount)}</strong><span class="label"><span>التسويات الدائنة (${currency})</span><span>Credits (${currency})</span></span></div>` : ""}
       <div class="total-row"><strong class="amount">${money(isQuotation ? invoice.total : balanceDue)}</strong><span class="label"><span>المستحق (${currency})</span><span>Due (${currency})</span></span></div>
     </section>
     <div class="seal-row">

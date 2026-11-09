@@ -5,6 +5,9 @@ import { fireNotify } from "../notify.js";
 import { sendInvoiceEmail } from "../email.js";
 import { generateInvoicePdfBuffer } from "../services/pdf.service.js";
 import mongoose from "mongoose";
+import { accountCredits, allocateCredit, cents, financeError, money, operationalSummary, recordOperationalPayment, settlementStatus } from "../services/operational-finance.js";
+import { AuditLogModel } from "../models/AuditLog.js";
+import { FinancialEntryModel } from "../models/FinancialEntry.js";
 
 export const invoicesRouter = Router();
 
@@ -15,7 +18,7 @@ const CLIENT_VISIBLE_STATUSES = ["sent", "viewed", "accepted", "partial", "paid"
 async function preserveHistoricalRecord(req: Request, res: Response, next: NextFunction) {
   try {
     if (mongoose.isValidObjectId(req.params.id) && await InvoiceModel.exists({
-      _id: req.params.id, "historicalImport.sourceHash": { $exists: true },
+      _id: req.params.id, "historicalImport.sourceHash": { $exists: true }, operationalImport: { $exists: false },
     })) {
       res.status(409).json({
         error: "هذا سجل تاريخي محفوظ من كشف الحساب، وليس فاتورة جديدة قابلة للتعديل أو الإصدار. يلزم الرجوع إلى المستند الأصلي لتفاصيل البنود والضريبة.",
@@ -59,11 +62,11 @@ async function calculateDocumentTotals(rawItems: unknown, rawDiscount: unknown) 
     if (!raw?.description?.trim() || !Number.isFinite(quantity) || quantity <= 0 || !Number.isFinite(unitPrice) || unitPrice < 0) {
       throw validationError("أدخل وصفًا وكمية وسعرًا صحيحًا لكل بند");
     }
-    const lineSubtotal = quantity * unitPrice;
+    const lineSubtotal = money(quantity * unitPrice);
     if (!Number.isFinite(discount) || discount < 0 || discount > lineSubtotal || !Number.isFinite(tax) || tax < 0 || tax > 100) {
       throw validationError("تحقق من قيم الخصم والضريبة في البنود");
     }
-    const lineTax = (lineSubtotal - discount) * tax / 100;
+    const lineTax = money((quantity * unitPrice - discount) * tax / 100);
     return {
       description: String(raw.description).trim(),
       ...(raw.descriptionAr ? { descriptionAr: String(raw.descriptionAr).trim() } : {}),
@@ -72,17 +75,17 @@ async function calculateDocumentTotals(rawItems: unknown, rawDiscount: unknown) 
       unitPrice,
       discount,
       tax,
-      total: lineSubtotal - discount + lineTax,
+      total: money(lineSubtotal - discount + lineTax),
     };
   });
-  const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+  const subtotal = money(items.reduce((sum, item) => sum + money(item.quantity * item.unitPrice), 0));
   const itemDiscount = items.reduce((sum, item) => sum + item.discount, 0);
   const discount = Number(rawDiscount || 0);
   if (!Number.isFinite(discount) || discount < 0 || discount > subtotal - itemDiscount) {
     throw validationError("قيمة الخصم الإجمالي غير صالحة");
   }
-  const tax = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice - item.discount) * item.tax / 100, 0);
-  return { items, subtotal, discount, tax, total: subtotal - itemDiscount - discount + tax };
+  const tax = money(items.reduce((sum, item) => sum + money((item.quantity * item.unitPrice - item.discount) * item.tax / 100), 0));
+  return { items, subtotal, discount, tax, total: money(subtotal - itemDiscount - discount + tax) };
 }
 
 async function validateProjectForCustomer(projectId: unknown, customerId: unknown) {
@@ -113,6 +116,45 @@ async function generateInvoiceNumber(prefix = "INV", session?: mongoose.ClientSe
 }
 
 // ── Get All Invoices ──────────────────────────────────────────────
+invoicesRouter.get("/finance-summary", requireAuth, requireRole("super_admin", "admin", "manager"), async (_req, res) => {
+  try {
+    res.json({ scope: "operational-import", summary: await operationalSummary() });
+  } catch {
+    res.status(500).json({ error: "تعذر تحميل الأرصدة التشغيلية" });
+  }
+});
+
+invoicesRouter.get("/:id/account-credits", requireAuth, requireRole("super_admin", "admin", "manager"), async (req, res) => {
+  try {
+    const invoice = await InvoiceModel.findById(req.params.id).lean();
+    if (!invoice?.operationalImport) { res.status(404).json({ error: "الفاتورة التشغيلية غير موجودة" }); return; }
+    const credits = await accountCredits(invoice.customerId);
+    const applied = await FinancialEntryModel.find({
+      customerId: invoice.customerId, "allocations.invoiceId": invoice._id,
+    }).select("kind reference date allocations note").sort({ date: -1 }).lean();
+    res.json({
+      entries: credits.map(({ _id, kind, reference, date, amount, remaining }) => ({ _id, kind, reference, date, amount, remaining })),
+      unallocatedTotal: money(credits.reduce((sum, entry) => sum + entry.remaining, 0)),
+      history: applied.map((entry) => ({
+        _id: entry._id, kind: entry.kind, reference: entry.reference, date: entry.date, note: entry.note,
+        amount: money(entry.allocations.filter((allocation) => String(allocation.invoiceId) === String(invoice._id))
+          .reduce((sum, allocation) => sum + allocation.amount, 0)),
+      })),
+    });
+  } catch {
+    res.status(500).json({ error: "تعذر تحميل أرصدة العميل" });
+  }
+});
+
+invoicesRouter.post("/:id/allocate-credit", requireAuth, requireRole("super_admin", "admin"), async (req, res) => {
+  try {
+    const invoice = await allocateCredit(req.params.id, req.body, String((req as any).user._id));
+    res.json({ invoice });
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.statusCode ? error.message : "تعذر توزيع الرصيد. حدّث البيانات وأعد المحاولة." });
+  }
+});
+
 invoicesRouter.get("/", requireAuth, async (req, res) => {
   try {
     const me = (req as any).user;
@@ -280,8 +322,58 @@ invoicesRouter.patch("/:id", requireAuth, requireRole("super_admin", "admin", "m
       res.status(400).json({ error: "لا توجد حقول مسموح بتعديلها" });
       return;
     }
-    const currentInvoice = await InvoiceModel.findOne({ _id: req.params.id, status: "draft" }).lean();
-    if (!currentInvoice) {
+    const currentInvoice = await InvoiceModel.findById(req.params.id).lean();
+    if (currentInvoice?.operationalImport) {
+      if (!Number.isInteger(req.body.expectedVersion) || req.body.expectedVersion !== currentInvoice.__v) {
+        financeError("تغيرت الفاتورة. حدّث البيانات وأعد المحاولة.", 409);
+      }
+      if (currentInvoice.status === "cancelled") financeError("لا يمكن تعديل فاتورة ملغاة");
+      if ((updates.customerId && String(updates.customerId) !== String(currentInvoice.customerId)) ||
+        (Object.hasOwn(updates, "projectId") && String(updates.projectId) !== String(currentInvoice.projectId)) ||
+        (updates.currency && updates.currency !== currentInvoice.currency)) {
+        financeError("لا يمكن تغيير العميل أو المشروع أو عملة الفاتورة المرتبطة بكشف الحساب");
+      }
+      delete updates.customerId;
+      delete updates.projectId;
+      if (Object.hasOwn(updates, "dueDate")) {
+        if (!updates.dueDate) updates.dueDate = null;
+        else if (!Number.isFinite(new Date(String(updates.dueDate)).getTime())) financeError("تاريخ الاستحقاق غير صالح");
+      }
+      if (Object.hasOwn(updates, "items") || Object.hasOwn(updates, "discount")) {
+        Object.assign(updates, await calculateDocumentTotals(updates.items ?? currentInvoice.items, updates.discount ?? currentInvoice.discount));
+      }
+      const total = Number(updates.total ?? currentInvoice.total);
+      if (cents(total) < cents((currentInvoice.paidAmount || 0) + (currentInvoice.creditedAmount || 0))) {
+        financeError("الإجمالي الجديد أقل من السداد والتسويات المسجلة. لا يمكن حذف أثرها بتعديل الفاتورة.");
+      }
+      const nextStatus = settlementStatus({ ...currentInvoice, ...updates, total } as any);
+      const session = await mongoose.startSession();
+      let invoice: any;
+      try {
+        await session.withTransaction(async () => {
+          invoice = await InvoiceModel.findOneAndUpdate(
+            { _id: currentInvoice._id, __v: req.body.expectedVersion },
+            {
+              $set: { ...updates, status: nextStatus },
+              $inc: { __v: 1 },
+              ...(nextStatus !== "paid" ? { $unset: { paidAt: "" } } : {}),
+            }, { new: true, session },
+          ).lean();
+          if (!invoice) financeError("تغيرت الفاتورة أثناء الحفظ. حدّث البيانات وأعد المحاولة.", 409);
+          if (currentInvoice.projectId) await ProjectModel.updateOne(
+            { _id: currentInvoice.projectId, customerId: currentInvoice.customerId },
+            { $set: { budget: total } }, { session },
+          );
+          await AuditLogModel.create([{
+            userId: (req as any).user._id, action: "update_operational_invoice", entity: "Invoice", entityId: req.params.id,
+            metadata: { before: currentInvoice, after: invoice },
+          }], { session });
+        });
+      } finally { await session.endSession(); }
+      res.json({ invoice });
+      return;
+    }
+    if (!currentInvoice || currentInvoice.status !== "draft") {
       res.status(400).json({ error: "لا يمكن تعديل إلا المستندات الموجودة بحالة مسودة" });
       return;
     }
@@ -407,7 +499,7 @@ invoicesRouter.get("/:id/pdf", requireAuth, async (req, res) => {
       }
     }
     const includeBankDetails = !["0", "false", "no"].includes(String(req.query.bankDetails || "").toLowerCase());
-    if (invoice.historicalImport) {
+    if (invoice.historicalImport && !invoice.operationalImport) {
       res.status(409).json({ error: "هذا سجل تاريخي لا يتضمن تفاصيل البنود والضريبة. لا يمكن إصداره كفاتورة ضريبية من كشف الحساب وحده." });
       return;
     }
@@ -425,6 +517,12 @@ invoicesRouter.get("/:id/pdf", requireAuth, async (req, res) => {
 // ── Mark as Paid ──────────────────────────────────────────────────
 invoicesRouter.post("/:id/mark-paid", requireAuth, requireRole("super_admin", "admin"), preserveHistoricalRecord, async (req, res) => {
   try {
+    const operational = await InvoiceModel.exists({ _id: req.params.id, operationalImport: { $exists: true } });
+    if (operational) {
+      const invoice = await recordOperationalPayment(req.params.id, req.body, String((req as any).user._id));
+      res.json({ invoice, message: "تم تسجيل الدفعة وحفظ أثرها المالي" });
+      return;
+    }
     const { paidAmount, note } = req.body;
     const payableStatuses = ["sent", "viewed", "overdue", "partial"];
     const invoice = await InvoiceModel.findOne({
@@ -459,8 +557,8 @@ invoicesRouter.post("/:id/mark-paid", requireAuth, requireRole("super_admin", "a
     }
     await logAction(String((req as any).user._id), "mark_invoice_paid", "Invoice", req.params.id, req, { paidAmount: payment, note });
     res.json({ message: status === "paid" ? "تم تحديد الفاتورة كمدفوعة" : "تم تسجيل دفعة جزئية" });
-  } catch {
-    res.status(500).json({ error: "خطأ في تحديث حالة الدفع" });
+  } catch (error: any) {
+    res.status(error.statusCode || 500).json({ error: error.statusCode ? error.message : "خطأ في تحديث حالة الدفع" });
   }
 });
 

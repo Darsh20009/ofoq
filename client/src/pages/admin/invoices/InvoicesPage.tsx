@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Search, Send, CheckCircle, Trash2, FileText, Download, X } from "lucide-react";
+import { Plus, Search, Send, CheckCircle, Trash2, FileText, Download, X, Pencil, Wallet, RefreshCw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { arSA } from "date-fns/locale";
+import { Link } from "react-router-dom";
 import { crmApi, invoicesApi, servicesApi } from "../../../api/client";
-import type { Customer, Invoice } from "../../../types";
+import type { Customer, Invoice, InvoiceFinanceSummary } from "../../../types";
 import { useLang } from "../../../i18n/LangContext";
 import CustomerQuickCreate from "../../../components/admin/CustomerQuickCreate";
 import CurrencySuffix from "../../../components/CurrencySuffix";
+import InvoiceFinanceModal from "./InvoiceFinanceModal";
+import { useAuthStore } from "../../../store/authStore";
 
 export default function InvoicesPage({ documentType = "invoice" }: { documentType?: "invoice" | "proforma" }) {
   const { ui, lang } = useLang();
@@ -19,20 +22,31 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
   const documentSingular = isQuotation ? (lang === "ar" ? "عرض سعر" : "quotation") : (lang === "ar" ? "فاتورة" : "invoice");
   const statusConfig: Record<string, { label: string; color: string }> = {
     draft: { label: copy.draft, color: "badge-gray" }, sent: { label: copy.sent, color: "badge-blue" },
-    viewed: { label: copy.viewed, color: "badge-navy" }, paid: { label: copy.paid, color: "badge-green" },
+    viewed: { label: copy.viewed, color: "badge-navy" }, partial: { label: lang === "ar" ? "مدفوعة جزئيًا" : "Partially paid", color: "badge-blue" }, paid: { label: copy.paid, color: "badge-green" },
     accepted: { label: lang === "ar" ? "معتمد" : "Accepted", color: "badge-green" },
     overdue: { label: copy.overdueStatus, color: "badge-red" }, cancelled: { label: copy.cancelled, color: "badge-gray" },
   };
   const qc = useQueryClient();
+  const { user } = useAuthStore();
+  const canEditImports = ["super_admin", "admin", "manager"].includes(user?.role || "");
+  const canReconcileImports = ["super_admin", "admin"].includes(user?.role || "");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
   const [downloadOpenId, setDownloadOpenId] = useState<string | null>(null);
+  const [financeInvoice, setFinanceInvoice] = useState<Invoice | null>(null);
+  const [financeMode, setFinanceMode] = useState<"edit" | "reconcile">("edit");
 
   const { data, isLoading } = useQuery({
     queryKey: ["invoices", documentType, search, status],
     queryFn: () =>
       invoicesApi.list({ type: documentType, search, status: status || undefined, limit: 50 }).then((r) => r.data),
+  });
+  const financeSummaryQuery = useQuery({
+    queryKey: ["invoice-finance-summary"],
+    queryFn: () => invoicesApi.financeSummary().then((response) => response.data as InvoiceFinanceSummary),
+    enabled: !isQuotation,
+    retry: 1,
   });
 
   const sendMut = useMutation({
@@ -95,8 +109,14 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
   const invoices: Invoice[] = data?.invoices || [];
   const now = new Date();
 
-  const totalRevenue = invoices.filter((i) => i.status === "paid").reduce((s, i) => s + i.total, 0);
-  const pending = invoices.filter((i) => ["sent", "viewed"].includes(i.status)).reduce((s, i) => s + i.total, 0);
+  const totalRevenue = isQuotation
+    ? invoices.filter((i) => i.status === "paid").reduce((sum, i) => sum + i.total, 0)
+    : invoices.reduce((sum, i) => sum + Number(i.paidAmount || 0), 0);
+  const pending = isQuotation
+    ? invoices.filter((i) => ["sent", "viewed"].includes(i.status)).reduce((sum, i) => sum + i.total, 0)
+    : invoices.filter((i) => ["sent", "viewed", "partial", "overdue"].includes(i.status))
+      .reduce((sum, i) => sum + Math.max(0, Number(i.total || 0) - Number(i.paidAmount || 0) - Number(i.creditedAmount || 0)), 0);
+  const financial = financeSummaryQuery.data?.summary;
   const overdue = invoices.filter((i) => i.status === "overdue").length;
 
   return (
@@ -116,14 +136,14 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
         <div className="card flex items-center gap-4">
           <div className="stat-icon bg-ofoq-green"><CheckCircle size={20} className="text-white" /></div>
           <div>
-             <p className="text-xs text-gray-400">{isQuotation ? (lang === "ar" ? "إجمالي عروض الأسعار" : "Quotation value") : copy.collected}</p>
+             <p className="text-xs text-gray-400">{isQuotation ? (lang === "ar" ? "إجمالي عروض الأسعار" : "Quotation value") : financial ? (lang === "ar" ? "المسدّد على الفواتير المعروضة" : "Payments on displayed invoices") : copy.collected}</p>
              <p className="text-xl font-bold text-navy-700">{totalRevenue.toLocaleString(lang)} <CurrencySuffix /></p>
           </div>
         </div>
         <div className="card flex items-center gap-4">
           <div className="stat-icon bg-amber-500"><FileText size={20} className="text-white" /></div>
           <div>
-             <p className="text-xs text-gray-400">{isQuotation ? (lang === "ar" ? "بانتظار الاعتماد" : "Awaiting approval") : copy.pending}</p>
+             <p className="text-xs text-gray-400">{isQuotation ? (lang === "ar" ? "بانتظار الاعتماد" : "Awaiting approval") : financial ? (lang === "ar" ? "المتبقي قبل تخصيص أرصدة العملاء" : "Outstanding before unapplied credits") : copy.pending}</p>
              <p className="text-xl font-bold text-navy-700">{pending.toLocaleString(lang)} <CurrencySuffix /></p>
           </div>
         </div>
@@ -135,6 +155,47 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
           </div>
         </div>
       </div>
+
+      {!isQuotation && (
+        <section className="overflow-hidden rounded-2xl border border-[#d9e1ec] bg-[#f8fafb]">
+          <div className="flex flex-col gap-1 border-b border-[#e4e9ef] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="font-bold text-[#1c2b52]">{lang === "ar" ? "ملخص الحسابات المستوردة المفعّلة" : "Activated imported-account summary"}</h2>
+              <p className="mt-1 text-xs text-[#748096]">{lang === "ar" ? "يشمل جميع الفواتير المستوردة المفعّلة، بصرف النظر عن البحث الحالي." : "Includes all activated imported invoices, independent of the current search."}</p>
+            </div>
+            {financeSummaryQuery.isError && (
+              <button type="button" onClick={() => financeSummaryQuery.refetch()} className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1c2b52] hover:underline">
+                <RefreshCw size={13} />{lang === "ar" ? "إعادة المحاولة" : "Retry"}
+              </button>
+            )}
+          </div>
+          {financeSummaryQuery.isLoading ? (
+            <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-3">{[0, 1, 2].map((item) => <div key={item} className="skeleton h-16 rounded-xl" />)}</div>
+          ) : financial ? (
+            <>
+              <div className="grid grid-cols-1 gap-px bg-[#e4e9ef] sm:grid-cols-3">
+                <FinanceMetric label={lang === "ar" ? "صافي المستحق بعد الأرصدة" : "Net outstanding after credits"} value={financial.netOutstanding} currency="SAR" lang={lang} emphasis />
+                <FinanceMetric label={lang === "ar" ? "النقد المحصّل" : "Cash received"} value={financial.cashReceived} currency="SAR" lang={lang} />
+                <div className="bg-[#f8fafb] p-4">
+                  <p className="text-xs text-[#748096]">{lang === "ar" ? "دفعات / مرتجعات غير مطبّقة" : "Unapplied payments / returns"}</p>
+                  <p className="mt-1 text-lg font-bold text-[#1c2b52]">
+                    {financial.unallocatedPayments.toLocaleString(lang)} <CurrencySuffix currency="SAR" />
+                    <span className="mx-1 text-[#a4adba]">/</span>
+                    {financial.unallocatedCredits.toLocaleString(lang)} <CurrencySuffix currency="SAR" />
+                  </p>
+                </div>
+              </div>
+              <p className="px-5 py-3 text-xs leading-5 text-[#758198]">
+                {lang === "ar"
+                  ? "قد يختلف المتبقي في صف الفاتورة حتى تُخصّص أرصدة العميل. تخصيص الرصيد لا يُعدّ تحصيلاً نقديًا جديدًا."
+                  : "The invoice-row balance can differ until customer credits are allocated. Allocating a credit is not new cash received."}
+              </p>
+            </>
+          ) : (
+            <div className="px-5 py-4 text-sm text-[#758198]">{lang === "ar" ? "تعذر تحميل ملخص الحسابات." : "Finance summary is unavailable."}</div>
+          )}
+        </section>
+      )}
 
       {/* Filters */}
       <div className="card p-4 flex flex-col sm:flex-row gap-3">
@@ -175,18 +236,35 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
               <tbody>
                 {invoices.map((inv, i) => {
                     const isHistorical = !!inv.historicalImport;
-                    const s = isHistorical
+                    const isOperational = !!inv.operationalImport;
+                    const historicalOnly = isHistorical && !isOperational;
+                    const s = historicalOnly
                       ? { label: lang === "ar" ? "سجل تاريخي للمراجعة" : "Historical record for review", color: "badge-navy" }
                       : statusConfig[inv.status] || { label: inv.status, color: "badge-gray" };
-                   const displayDate = isHistorical ? inv.createdAt : inv.dueDate;
-                   const isOverdue = !isHistorical && !!inv.dueDate && new Date(inv.dueDate) < now && !["paid", "cancelled"].includes(inv.status);
+                    const displayDate = historicalOnly ? inv.createdAt : (inv.dueDate || inv.issueDate || inv.createdAt);
+                    const isOverdue = !historicalOnly && !!inv.dueDate && new Date(inv.dueDate) < now && !["paid", "cancelled"].includes(inv.status);
+                    const project = inv.projectId && typeof inv.projectId === "object" ? inv.projectId : inv.project;
+                    const projectLabel = project && typeof project === "object"
+                      ? (project.projectNumber ? `#${project.projectNumber}` : ("name" in project ? project.name : ("title" in project ? project.title.ar : (lang === "ar" ? "مشروع مرتبط" : "Linked project"))))
+                      : "";
+                    const rowBalance = Math.max(0, Number(inv.total || 0) - Number(inv.paidAmount || 0) - Number(inv.creditedAmount || 0));
                   return (
                     <motion.tr key={inv._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.03 }} className="group">
                       <td className="font-mono text-sm font-semibold text-navy-700">{inv.invoiceNumber}</td>
-                      <td>{getCustomerName(inv)}</td>
+                    <td>
+                      <span>{getCustomerName(inv)}</span>
+                      {project && typeof project === "object" && (
+                        <Link to={`/admin/projects?search=${encodeURIComponent(project.projectNumber || "")}`} className="mt-1 block w-fit text-xs font-semibold text-[#1c6c58] hover:underline">
+                          {projectLabel}
+                        </Link>
+                      )}
+                    </td>
                       <td className="font-bold text-navy-700">
-                         {inv.total.toLocaleString(lang)} <CurrencySuffix currency={inv.currency} />
+                          {inv.total.toLocaleString(lang)} <CurrencySuffix currency={inv.currency} />
+                          {!isQuotation && !historicalOnly && <div className="mt-1 text-xs font-normal text-[#748096]">{lang === "ar" ? "متبقي" : "Remaining"}: {rowBalance.toLocaleString(lang)} <CurrencySuffix currency={inv.currency} /></div>}
+                          {!isQuotation && !historicalOnly && <div className="mt-0.5 text-xs font-normal text-[#748096]">{lang === "ar" ? "مدفوع" : "Paid"}: {Number(inv.paidAmount || 0).toLocaleString(lang)} <CurrencySuffix currency={inv.currency} /></div>}
+                          {!isQuotation && !historicalOnly && Number(inv.creditedAmount || 0) > 0 && <div className="mt-0.5 text-xs font-normal text-[#748096]">{lang === "ar" ? "رصيد مخصص" : "Credit applied"}: {Number(inv.creditedAmount).toLocaleString(lang)} <CurrencySuffix currency={inv.currency} /></div>}
                       </td>
                     <td>
                         <span className={isOverdue ? "text-red-500 font-semibold" : "text-gray-600"}>
@@ -195,7 +273,7 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
                       </td>
                       <td>
                         <span className={s.color}>{s.label}</span>
-                        {isHistorical && (
+                        {historicalOnly && (
                           <p className="mt-1 max-w-xs text-xs leading-5 text-gray-500">
                             {lang === "ar"
                               ? "تفاصيل البنود والضريبة غير متوفرة في الكشف. راجع كشف الحساب للتسويات والسداد."
@@ -205,7 +283,21 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
                       </td>
                       <td>
                          <div className="flex flex-wrap items-center gap-1 opacity-100">
-                          {!isHistorical && <>
+                          {!historicalOnly && <>
+                          {!isQuotation && isOperational && canEditImports && (
+                            <button onClick={() => { setFinanceInvoice(inv); setFinanceMode("edit"); }}
+                              className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-[#52617b] hover:bg-[#eef1f5]"
+                              title={lang === "ar" ? "تعديل الفاتورة المفعّلة" : "Edit activated invoice"}>
+                              <Pencil size={14} /><span className="hidden xl:inline">{lang === "ar" ? "تعديل" : "Edit"}</span>
+                            </button>
+                          )}
+                          {!isQuotation && isOperational && canReconcileImports && (
+                            <button onClick={() => { setFinanceInvoice(inv); setFinanceMode("reconcile"); }}
+                              className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-[#1c6c58] hover:bg-[#eaf4ef]"
+                              title={lang === "ar" ? "تسجيل دفعة أو تخصيص رصيد" : "Record payment or allocate credit"}>
+                              <Wallet size={14} /><span className="hidden xl:inline">{lang === "ar" ? "تسوية" : "Reconcile"}</span>
+                            </button>
+                          )}
                           {inv.status === "draft" && (
                             <button onClick={() => sendMut.mutate(inv._id)}
                                className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50" title={copy.send}>
@@ -213,7 +305,7 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
                               <span className="hidden lg:inline">{isQuotation ? (lang === "ar" ? "إرسال العرض" : "Send quotation") : copy.send}</span>
                             </button>
                           )}
-                           {!isQuotation && ["sent", "viewed", "overdue"].includes(inv.status) && (
+                           {!isQuotation && !isOperational && canReconcileImports && ["sent", "viewed", "overdue", "partial"].includes(inv.status) && (
                             <button onClick={() => paidMut.mutate(inv._id)}
                                className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-emerald-600 hover:bg-emerald-50" title={copy.markPaid}>
                               <CheckCircle size={14} />
@@ -255,12 +347,12 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
                                </div>
                              )}
                            </div>
-                           <button onClick={() => { if (confirm(copy.deleteConfirm)) deleteMut.mutate(inv._id); }}
+                           {!isHistorical && <button onClick={() => { if (confirm(copy.deleteConfirm)) deleteMut.mutate(inv._id); }}
                             className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500">
                             <Trash2 size={14} />
-                          </button>
+                           </button>}
                           </>}
-                          {isHistorical && <span className="px-2 py-1 text-xs text-gray-400">
+                           {historicalOnly && <span className="px-2 py-1 text-xs text-gray-400">
                             {lang === "ar" ? "للمراجعة فقط" : "Read only"}
                           </span>}
                         </div>
@@ -283,6 +375,22 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
           setCreateOpen(false);
         }}
       />
+      {financeInvoice && (
+        <InvoiceFinanceModal
+          invoice={financeInvoice}
+          mode={financeMode}
+          canEdit={canEditImports}
+          canReconcile={canReconcileImports}
+          onClose={() => setFinanceInvoice(null)}
+          onChanged={() => {
+            qc.invalidateQueries({ queryKey: ["invoices"] });
+            qc.invalidateQueries({ queryKey: ["invoice-finance-summary"] });
+            qc.invalidateQueries({ queryKey: ["customers"] });
+            qc.invalidateQueries({ queryKey: ["projects"] });
+            setFinanceInvoice(null);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -290,6 +398,17 @@ export default function InvoicesPage({ documentType = "invoice" }: { documentTyp
 function getCustomerName(invoice: Invoice) {
   const customer = invoice.customerId || invoice.customer;
   return typeof customer === "object" && customer ? customer.name : "—";
+}
+
+function FinanceMetric({ label, value, currency, lang, emphasis = false }: { label: string; value: number; currency: string; lang: string; emphasis?: boolean }) {
+  return (
+    <div className="bg-[#f8fafb] p-4">
+      <p className="text-xs text-[#748096]">{label}</p>
+      <p className={`mt-1 text-lg font-bold ${emphasis ? "text-[#1c6c58]" : "text-[#1c2b52]"}`}>
+        {Number(value || 0).toLocaleString(lang)} <CurrencySuffix currency={currency} />
+      </p>
+    </div>
+  );
 }
 
 function defaultDueDate() {

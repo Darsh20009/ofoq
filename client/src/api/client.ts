@@ -129,6 +129,14 @@ export const invoicesApi = {
       responseType: "blob",
     }),
   markPaid: (id: string, data?: object) => api.post(`/invoices/${id}/mark-paid`, data),
+  financeSummary: () => api.get("/invoices/finance-summary"),
+  accountCredits: (id: string) => api.get(`/invoices/${id}/account-credits`),
+  allocateCredit: (id: string, data: { entryId: string; amount: number; expectedVersion: number }) =>
+    api.post(`/invoices/${id}/allocate-credit`, data),
+  recordPayment: (id: string, data: {
+    paidAmount: number; paidAt: string; reference?: string; note?: string;
+    requestId: string; expectedVersion: number;
+  }) => api.post(`/invoices/${id}/mark-paid`, data),
   acceptQuotation: (id: string) => api.post(`/invoices/${id}/accept-quotation`),
   convertToInvoice: (id: string) => api.post(`/invoices/${id}/convert-to-invoice`),
 };
